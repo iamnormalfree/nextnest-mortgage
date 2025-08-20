@@ -67,7 +67,7 @@ const ContactSection = () => {
                 Thank you for your interest!
               </h3>
               <p className="text-gray-600 mb-6">
-                We've received your information and one of our mortgage experts will contact you within 24 hours.
+                We&apos;ve received your information and one of our mortgage experts will contact you within 24 hours.
               </p>
               <button
                 onClick={() => setSubmitted(false)}
@@ -90,7 +90,7 @@ const ContactSection = () => {
             Get Your Free Mortgage Consultation
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Tell us about your needs and we'll provide personalized recommendations within 24 hours.
+            Tell us about your needs and we&apos;ll provide personalized recommendations within 24 hours.
           </p>
         </div>
 

@@ -27,6 +27,31 @@
 
 ---
 
+## 🎯 Development Philosophy
+
+### **Core Principles**
+- **Stay Lean**: Keep Next.js but evaluate all dependencies before adding
+- **GEO-First**: Optimize for AI citation and Generative Engine Optimization
+- **Performance Priority**: Maintain fast site speed (~140KB gzipped target)
+- **Progressive Enhancement**: Build core functionality without JavaScript, enhance with JS
+- **SSR Strategy**: Server-render marketing/SEO pages, use client islands for interactivity
+
+### **Decision Framework**
+Before adding any dependency or feature, ask:
+1. **Does this improve GEO/SEO?**
+2. **Is this essential for user functionality?**
+3. **Can we build this with existing tools?**
+4. **What's the bundle size impact?**
+
+### **Architecture Strategy**
+- **Marketing Pages**: SSR for AI crawlers and search engines
+- **Dashboard**: Hybrid SSR shell + interactive islands
+- **Calculators**: Server-rendered initial state + client interactivity
+- **Programmatic Content**: Generate location/loan-type combinations for SEO
+- **External APIs**: Add only when user dashboards are ready
+
+---
+
 ## 📁 Project Structure & Navigation
 
 ```
