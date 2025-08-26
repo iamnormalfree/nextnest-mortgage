@@ -15,7 +15,7 @@ const ServicesSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center p-6">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{background: 'rgba(15, 76, 117, 0.1)'}}>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-nn-blue/10">
               <CheckCircle className="h-8 w-8 text-nn-blue" />
             </div>
             <h3 className="text-xl font-gilda font-normal text-nn-grey-dark mb-3">
@@ -27,7 +27,7 @@ const ServicesSection = () => {
           </div>
 
           <div className="text-center p-6">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{background: 'rgba(255, 184, 0, 0.1)'}}>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-nn-gold/10">
               <Shield className="h-8 w-8 text-nn-gold" />
             </div>
             <h3 className="text-xl font-gilda font-normal text-nn-grey-dark mb-3">
@@ -39,7 +39,7 @@ const ServicesSection = () => {
           </div>
 
           <div className="text-center p-6">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{background: 'rgba(107, 70, 193, 0.1)'}}>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-nn-purple/10">
               <TrendingUp className="h-8 w-8 text-nn-purple" />
             </div>
             <h3 className="text-xl font-gilda font-normal text-nn-grey-dark mb-3">
@@ -55,10 +55,10 @@ const ServicesSection = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-2xl font-gilda font-normal text-nn-grey-dark mb-4">
-                Mathematical Analysis Without Broker Bias
+                Bank‑Agnostic, Math‑First Advice
               </h3>
               <p className="text-nn-grey-medium font-inter mb-6">
-                We earn referral fees only when you switch banks, but we&apos;ll recommend repricing or staying put if that&apos;s your best option.
+                Our engine scans 286 packages and models repricing, refinancing, or staying put—then ranks what maximizes your long‑term savings.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
@@ -69,7 +69,7 @@ const ServicesSection = () => {
                 </a>
                 <a
                   href="/dashboard"
-                  className="border-2 border-nn-gold text-nn-gold hover:bg-nn-gold hover:text-nn-grey-dark px-6 py-3 rounded-md font-medium transition text-center font-inter"
+                  className="btn-secondary self-start sm:self-auto"
                 >
                   Try Calculator
                 </a>

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:brand": "node scripts/brand-lint.js",
+    "lint:all": "npm run lint && npm run lint:brand"
   },
   "dependencies": {
     "@types/node": "^20.17.0",

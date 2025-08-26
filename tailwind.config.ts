@@ -13,19 +13,6 @@ const config: Config = {
         'sans': ['Inter', 'sans-serif'],
       },
       colors: {
-        // Legacy colors (kept for compatibility)
-        primary: {
-          50: '#f0f4fa',
-          100: '#e6edf7',
-          500: '#4A90E2',
-          600: '#3A80D2',
-        },
-        dark: {
-          900: '#0D1B2A',
-        },
-        light: {
-          50: '#FAF9F8',
-        },
         // NextNest Brand Colors
         'nn-gold': '#FFB800',
         'nn-gold-soft': '#F4B942',

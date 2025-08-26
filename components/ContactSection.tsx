@@ -61,9 +61,9 @@ const ContactSection = () => {
       <section id="contact" className="py-16 bg-nn-grey-light">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-xl shadow-lg border border-nn-grey-medium/30 p-8">
+              <div className="w-16 h-16 bg-nn-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-nn-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
@@ -99,7 +99,7 @@ const ContactSection = () => {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border border-nn-grey-medium/30 p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-nn-grey-dark mb-2 font-inter">
