@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'NextNest - Modern Mortgage Solutions',
-  description: 'Get the best mortgage rates and expert advice for your Singapore property',
+  title: 'NextNest - Singapore\'s Most Transparent Mortgage Advisor',
+  description: 'Singapore\'s only mortgage advisor who shows you ALL your options - AI-powered analysis with complete transparency. See repricing, switching, or staying put options.',
 }
 
 export default function RootLayout({

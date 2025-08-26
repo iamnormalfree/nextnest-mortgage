@@ -254,7 +254,7 @@ const ContactSection = () => {
                 disabled={isSubmitting}
                 className="w-full bg-[#4A90E2] hover:bg-[#3A80D2] disabled:bg-gray-400 text-white font-medium py-4 px-6 rounded-md transition"
               >
-                {isSubmitting ? 'Submitting...' : 'Get Free Consultation'}
+{isSubmitting ? 'Submitting...' : 'Get Complete Mortgage Analysis - Free'}
               </button>
             </div>
 

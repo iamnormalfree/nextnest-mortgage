@@ -11,7 +11,7 @@ const HeroSection = () => {
           {/* Left side content */}
           <div className="lg:w-1/2 mb-12 lg:mb-0">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-gilda font-bold text-[#0D1B2A] leading-tight mb-6">
-              Singapore's Only Mortgage Advisor Who Shows You
+              Singapore&apos;s Only Mortgage Advisor Who Shows You
               <br />
               <span className="text-[#4A90E2]">ALL Your Options</span>
             </h1>
