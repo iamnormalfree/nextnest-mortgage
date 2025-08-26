@@ -2,7 +2,7 @@ import { Clock, Users, Star } from './icons'
 
 const HeroSection = () => {
   return (
-    <section className="header-offset bg-[#FAF9F8]" id="hero" style={{
+    <section className="header-offset bg-nn-grey-light" id="hero" style={{
       paddingTop: '120px',
       paddingBottom: '64px'
     }}>
@@ -10,25 +10,25 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center justify-between">
           {/* Left side content */}
           <div className="lg:w-1/2 mb-12 lg:mb-0">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-gilda font-bold text-[#0D1B2A] leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-gilda font-normal text-nn-grey-dark leading-tight mb-6">
               Singapore&apos;s Only Mortgage Advisor Who Shows You
               <br />
-              <span className="text-[#4A90E2]">ALL Your Options</span>
+              <span className="text-nn-gold">ALL Your Options</span>
             </h1>
-            <p className="text-lg text-gray-600 mb-8 font-sans">
+            <p className="text-lg text-nn-grey-medium mb-8 font-inter">
               AI-powered analysis with complete transparency. See all your options: repricing, switching, or staying put - even the ones that make us nothing.
             </p>
 
             <div className="flex flex-col sm:flex-row items-start space-y-8 sm:space-y-0 sm:space-x-10 mb-10">
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 rounded-full bg-[#F0F4FA] flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-[#4A90E2]" />
+                  <div className="w-10 h-10 rounded-full" style={{background: 'rgba(255, 184, 0, 0.1)'}}>
+                    <Clock className="h-5 w-5 text-nn-gold" style={{margin: '10px'}} />
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-gilda font-semibold text-[#0D1B2A]">24-Hour Response</h3>
-                  <p className="text-gray-600 text-sm mt-1 font-sans">
+                  <h3 className="text-xl font-gilda font-normal text-nn-grey-dark">24-Hour Response</h3>
+                  <p className="text-nn-grey-medium text-sm mt-1 font-inter">
                     Complete analysis guaranteed within 48 hours.
                   </p>
                 </div>
@@ -36,44 +36,44 @@ const HeroSection = () => {
 
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 mt-1">
-                  <div className="w-10 h-10 rounded-full bg-[#F0F4FA] flex items-center justify-center">
-                    <Users className="h-5 w-5 text-[#4A90E2]" />
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{background: 'rgba(15, 76, 117, 0.1)'}}>
+                    <Users className="h-5 w-5 text-nn-blue" />
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-gilda font-semibold text-[#0D1B2A]">Complete Transparency</h3>
-                  <p className="text-gray-600 text-sm mt-1 font-sans">See exactly how we earn and what we recommend.</p>
+                  <h3 className="text-xl font-gilda font-normal text-nn-grey-dark">Complete Transparency</h3>
+                  <p className="text-nn-grey-medium text-sm mt-1 font-inter">See exactly how we earn and what we recommend.</p>
                 </div>
               </div>
             </div>
 
             <a
               href="#contact"
-              className="inline-block bg-[#4A90E2] hover:bg-[#3A80D2] text-white font-medium py-3 px-8 rounded-md text-center transition font-sans"
+              className="btn-primary"
             >
               Get Your Complete Mortgage Analysis - Free
             </a>
 
-            <p className="text-xs text-gray-500 mt-4 font-sans">
+            <p className="text-xs text-nn-grey-medium mt-4 font-inter">
               Transparent analysis of all 286 Singapore mortgage packages. We earn referral fees from banks you choose to switch to.
             </p>
 
             <div className="flex flex-wrap items-center space-x-8 mt-12">
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-gilda font-normal text-[#0D1B2A]">286</span>
-                <span className="text-sm text-gray-500 font-sans">Bank packages analyzed</span>
+                <span className="text-2xl font-gilda font-normal text-nn-grey-dark">286</span>
+                <span className="text-sm text-nn-grey-medium font-inter">Bank packages analyzed</span>
               </div>
 
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-gilda font-normal text-[#0D1B2A]">24hr</span>
-                <span className="text-sm text-gray-500 font-sans">Response guarantee</span>
+                <span className="text-2xl font-gilda font-normal text-nn-grey-dark">24hr</span>
+                <span className="text-sm text-nn-grey-medium font-inter">Response guarantee</span>
               </div>
 
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-gilda font-normal text-[#0D1B2A] flex items-center">
-                  100% <Star className="h-4 w-4 ml-1" />
+                <span className="text-2xl font-gilda font-normal text-nn-grey-dark flex items-center">
+                  100% <Star className="h-4 w-4 ml-1 text-nn-gold" />
                 </span>
-                <span className="text-sm text-gray-500 font-sans">Transparency</span>
+                <span className="text-sm text-nn-grey-medium font-inter">Transparency</span>
               </div>
             </div>
           </div>

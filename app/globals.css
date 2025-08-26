@@ -1,30 +1,130 @@
-@import url('https://fonts.googleapis.com/css2?family=Gilda+Display:wght@400&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gilda+Display:wght@400&family=Inter:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* NextNest Visual Brand Identity System */
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Primary Brand Colors */
+  --nn-gold-primary: #FFB800;
+  --nn-gold-soft: #F4B942;
+  --nn-grey-dark: #1C1C1E;
+  --nn-grey-medium: #8E8E93;
+  --nn-grey-light: #F5F5F7;
+  
+  /* Accent Colors */
+  --nn-purple-authority: #6B46C1;
+  --nn-blue-trust: #0F4C75;
+  --nn-red-alert: #DC2626;
+  --nn-green-success: #059669;
+  --nn-white: #FFFFFF;
+  
+  /* Typography */
+  --nn-font-display: 'Gilda Display', serif;
+  --nn-font-body: 'Inter', sans-serif;
+  
+  /* Spacing */
+  --nn-space-xs: 0.5rem;
+  --nn-space-sm: 1rem;
+  --nn-space-md: 1.5rem;
+  --nn-space-lg: 2rem;
+  --nn-space-xl: 3rem;
+  
+  /* Shadows */
+  --nn-shadow-soft: 0 4px 12px rgba(28, 28, 30, 0.1);
+  --nn-shadow-medium: 0 8px 24px rgba(28, 28, 30, 0.15);
+  --nn-shadow-strong: 0 12px 40px rgba(28, 28, 30, 0.2);
+  
+  /* Gradients */
+  --nn-gradient-gold: linear-gradient(135deg, #FFB800 0%, #F4B942 100%);
+  --nn-gradient-calculation: linear-gradient(90deg, rgba(255, 184, 0, 0.1) 0%, rgba(107, 70, 193, 0.1) 100%);
+  --nn-gradient-trust: linear-gradient(90deg, rgba(15, 76, 117, 0.05) 0%, rgba(15, 76, 117, 0.1) 100%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+/* Global Typography Styles */
+html {
+  font-family: var(--nn-font-body);
+  color: var(--nn-grey-dark);
+  line-height: 1.6;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: var(--nn-grey-dark);
+  background: var(--nn-white);
+  font-family: var(--nn-font-body);
+}
+
+/* Custom Font Classes */
+.font-gilda {
+  font-family: var(--nn-font-display);
+}
+
+.font-inter {
+  font-family: var(--nn-font-body);
+}
+
+/* Brand Component Styles */
+.btn-primary {
+  background: var(--nn-gradient-gold);
+  color: var(--nn-grey-dark);
+  font-family: var(--nn-font-body);
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: var(--nn-shadow-soft);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #F4B942 0%, #E6A536 100%);
+  box-shadow: var(--nn-shadow-medium);
+  transform: translateY(-1px);
+  color: var(--nn-grey-dark);
+  text-decoration: none;
+}
+
+.trust-indicator {
+  background: var(--nn-gradient-trust);
+  border-left: 4px solid var(--nn-blue-trust);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.calculation-highlight {
+  background: var(--nn-gradient-calculation);
+  border: 1px solid rgba(255, 184, 0, 0.3);
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+/* Custom Brand Colors for Tailwind Override */
+.text-nn-gold { color: var(--nn-gold-primary) !important; }
+.text-nn-grey-dark { color: var(--nn-grey-dark) !important; }
+.text-nn-grey-medium { color: var(--nn-grey-medium) !important; }
+.bg-nn-grey-light { background-color: var(--nn-grey-light) !important; }
+
+/* Form Styling */
+.form-input {
+  font-family: var(--nn-font-body);
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 0.5rem;
+  background: var(--nn-white);
+  color: var(--nn-grey-dark);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: var(--nn-gold-primary);
+  box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.1);
+  outline: none;
 }
 
 .header-offset {
