@@ -13,6 +13,7 @@ const config: Config = {
         'sans': ['Inter', 'sans-serif'],
       },
       colors: {
+        // Legacy colors (kept for compatibility)
         primary: {
           50: '#f0f4fa',
           100: '#e6edf7',
@@ -24,7 +25,27 @@ const config: Config = {
         },
         light: {
           50: '#FAF9F8',
-        }
+        },
+        // NextNest Brand Colors
+        'nn-gold': '#FFB800',
+        'nn-gold-soft': '#F4B942',
+        'nn-grey-dark': '#1C1C1E',
+        'nn-grey-medium': '#8E8E93',
+        'nn-grey-light': '#F5F5F7',
+        'nn-purple': '#6B46C1',
+        'nn-blue': '#0F4C75',
+        'nn-red': '#DC2626',
+        'nn-green': '#059669',
+      },
+      backgroundImage: {
+        'nn-gradient-gold': 'linear-gradient(135deg, #FFB800 0%, #F4B942 100%)',
+        'nn-gradient-calculation': 'linear-gradient(90deg, rgba(255, 184, 0, 0.1) 0%, rgba(107, 70, 193, 0.1) 100%)',
+        'nn-gradient-trust': 'linear-gradient(90deg, rgba(15, 76, 117, 0.05) 0%, rgba(15, 76, 117, 0.1) 100%)',
+      },
+      boxShadow: {
+        'nn-soft': '0 4px 12px rgba(28, 28, 30, 0.1)',
+        'nn-medium': '0 8px 24px rgba(28, 28, 30, 0.15)',
+        'nn-strong': '0 12px 40px rgba(28, 28, 30, 0.2)',
       },
     },
   },

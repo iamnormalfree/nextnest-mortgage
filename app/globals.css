@@ -108,7 +108,12 @@ body {
 .text-nn-gold { color: var(--nn-gold-primary) !important; }
 .text-nn-grey-dark { color: var(--nn-grey-dark) !important; }
 .text-nn-grey-medium { color: var(--nn-grey-medium) !important; }
+.text-nn-blue { color: var(--nn-blue-trust) !important; }
+.text-nn-purple { color: var(--nn-purple-authority) !important; }
+.text-nn-green { color: var(--nn-green-success) !important; }
 .bg-nn-grey-light { background-color: var(--nn-grey-light) !important; }
+.bg-nn-gold { background-color: var(--nn-gold-primary) !important; }
+.border-nn-gold { border-color: var(--nn-gold-primary) !important; }
 
 /* Form Styling */
 .form-input {
@@ -129,4 +134,58 @@ body {
 
 .header-offset {
   scroll-margin-top: 80px;
+}
+
+/* Navigation Styling */
+nav {
+  background: var(--nn-white);
+  border-bottom: 1px solid rgba(142, 142, 147, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+nav a {
+  color: var(--nn-grey-dark);
+  font-family: var(--nn-font-body);
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: var(--nn-gold-primary);
+}
+
+/* Typography Hierarchy */
+.hero-h1 {
+  font-family: var(--nn-font-display);
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--nn-grey-dark);
+  letter-spacing: -0.02em;
+}
+
+.section-h2 {
+  font-family: var(--nn-font-display);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--nn-grey-dark);
+}
+
+.body-text {
+  font-family: var(--nn-font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--nn-grey-medium);
+}
+
+.calculation-text {
+  font-family: var(--nn-font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--nn-grey-dark);
+  background: rgba(255, 184, 0, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
 }
