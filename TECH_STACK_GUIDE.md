@@ -278,3 +278,127 @@ EMAIL_SERVICE_API_KEY=your-email-service-key
 - Use TypeScript for better error catching
 - Test responsive design on multiple screen sizes
 - Validate forms thoroughly before submission
+
+### Reusable Tools You DON'T Need:
+❌ Skip these popular additions:
+React Query (overkill for your simple data needs)
+Zustand/Redux (no complex state management needed)
+Framer Motion (animations aren't priority)
+Heavy component libraries (Tailwind is enough)
+
+### WHEN TO USE PROGRESSIVE ENHANCEMENT:
+
+#### ✅ USE FOR:
+1. Calculators (work without JS for SEO)
+2. Forms (accessibility requirement)  
+3. Search (basic GET params work everywhere)
+4. File uploads (fallback for all devices)
+
+#### ❌ DON'T USE FOR:
+1. Real-time chat (requires JS)
+2. Complex animations (JS-only features)
+3. Client-only features (like drawing tools)
+
+### WHEN TO USE MICRO-FRAMEWORKS:
+
+#### ✅ USE WHEN:
+1. You have repetitive code patterns
+2. Need focused functionality (validation, dates, HTTP)
+3. Want to avoid reinventing the wheel
+4. Bundle size is still small
+
+#### ❌ AVOID WHEN:
+1. You can write it in 5-10 lines yourself
+2. Only using 1-2 functions from large library
+3. Adds complexity without clear benefit
+
+#### FOR YOUR MORTGAGE PLATFORM - RECOMMENDED:
+✅ Zod (form validation)
+✅ clsx (conditional CSS)
+✅ date-fns (mortgage date calculations)
+❌ Skip: lodash, ramda, moment.js (too heavy)
+
+---
+
+## 🏗️ Architecture Decisions & Implementation Strategy
+
+### **Folder Structure Evolution**
+Based on GEO optimization requirements, the project will adopt a hybrid structure:
+
+```
+NextNest/
+├── app/
+│   ├── (marketing)/              # Route group for static/SEO pages
+│   │   ├── calculators/         # Static calculator pages for SEO
+│   │   │   └── [location]/[type]/page.tsx
+│   │   └── guides/              # Educational content
+│   ├── dashboard/               # Existing interactive calculator (preserved)
+│   ├── api/                     # API routes
+│   └── layout.tsx              # Root layout
+├── lib/                         # Business logic layer
+│   ├── calculations/           # Mortgage calculation utilities
+│   ├── seo/                   # SEO utilities
+│   └── utils.ts
+├── data/                       # Static data for programmatic content
+├── types/                      # TypeScript definitions
+└── components/
+    ├── marketing/              # Static/SEO components
+    ├── dashboard/              # Interactive components
+    └── ui/                     # Base components
+```
+
+### **Component Strategy**
+**Decision**: Preserve existing dashboard calculator, add new static components for SEO
+- **Existing Dashboard**: Keep `app/dashboard/page.tsx` as interactive calculator
+- **New Static Calculators**: Create progressive enhancement versions for SEO
+- **Shared Logic**: Extract calculations to `lib/calculations/` for reuse
+
+### **Progressive Enhancement Pattern**
+1. **Level 1**: Works without JavaScript (form submissions via GET params)
+2. **Level 2**: JavaScript enhancement for real-time calculations
+3. **Level 3**: Advanced features (charts, comparisons)
+
+### **Bundle Size Management**
+- **Target**: Maintain <140KB gzipped for marketing pages
+- **Strategy**: Code splitting between marketing and dashboard routes
+- **Monitoring**: Use `@next/bundle-analyzer` for tracking
+
+### **SEO/GEO Implementation**
+- **Static Generation**: Pre-render calculator pages for all location/type combinations
+- **Schema Markup**: Structured data for AI crawlers
+- **Progressive Enhancement**: Ensure functionality without JavaScript
+
+### **Development Phases**
+1. **Phase 1**: ✅ **COMPLETED** - Extract business logic, add new dependencies
+2. **Phase 2**: Create static calculator pages and components  
+3. **Phase 3**: Implement AI triage system and n8n integration
+
+### **Phase 1 Implementation Details**
+**Dependencies Added:**
+- `zod` (12KB) - Form validation and schema parsing
+- `clsx` (500B) - Conditional CSS class utility
+- `date-fns` (tree-shakeable) - Date manipulation for mortgage calculations
+- `sharp` - Image optimization for Next.js
+- `@next/bundle-analyzer` (dev) - Bundle size monitoring
+
+**New Folder Structure:**
+```
+├── lib/
+│   ├── calculations/
+│   │   └── mortgage.ts          # Extracted calculator logic with Zod validation
+│   ├── seo/                     # SEO utilities (future)
+│   └── utils.ts                 # Utility functions (clsx, formatters)
+├── data/                        # Static data for programmatic content
+├── types/
+│   └── mortgage.ts              # TypeScript interfaces
+```
+
+**Bundle Configuration:**
+- Bundle analyzer configured in `next.config.js`
+- Image optimization with AVIF/WebP support
+- Package import optimization for react-hook-form and date-fns
+
+### **Risk Mitigation**
+- **Preserve Working Features**: ✅ Existing dashboard remains untouched
+- **Incremental Migration**: ✅ Shared logic extracted without breaking changes
+- **Fallback Strategy**: Static pages work without JavaScript

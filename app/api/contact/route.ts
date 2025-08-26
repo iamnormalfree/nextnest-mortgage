@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, phone, loanAmount, propertyType, message } = body
+    const { name, email, phone, loanAmount, propertyType, currentBank, timeline, message } = body
 
     // Basic validation
     if (!name || !email || !phone || !loanAmount || !propertyType) {
@@ -25,6 +25,8 @@ export async function POST(request: NextRequest) {
       phone,
       loanAmount,
       propertyType,
+      currentBank,
+      timeline,
       message,
       timestamp: new Date().toISOString()
     })

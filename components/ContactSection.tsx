@@ -9,6 +9,8 @@ const ContactSection = () => {
     phone: '',
     loanAmount: '',
     propertyType: '',
+    currentBank: '',
+    timeline: '',
     message: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -42,6 +44,8 @@ const ContactSection = () => {
           phone: '',
           loanAmount: '',
           propertyType: '',
+          currentBank: '',
+          timeline: '',
           message: ''
         })
       }
@@ -67,7 +71,7 @@ const ContactSection = () => {
                 Thank you for your interest!
               </h3>
               <p className="text-gray-600 mb-6">
-                We&apos;ve received your information and one of our mortgage experts will contact you within 24 hours.
+                We&apos;ve received your information and will provide your complete mortgage analysis within 48 hours. We&apos;ll show you all options transparently.
               </p>
               <button
                 onClick={() => setSubmitted(false)}
@@ -87,10 +91,10 @@ const ContactSection = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-gilda font-bold text-[#0D1B2A] mb-4">
-            Get Your Free Mortgage Consultation
+            Get Your Complete Mortgage Analysis - Free
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Tell us about your needs and we&apos;ll provide personalized recommendations within 24 hours.
+            Tell us about your situation and we&apos;ll show you ALL your options - including repricing and staying put - within 48 hours.
           </p>
         </div>
 
@@ -165,7 +169,7 @@ const ContactSection = () => {
                 </select>
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <label htmlFor="propertyType" className="block text-sm font-medium text-gray-700 mb-2">
                   Property Type *
                 </label>
@@ -182,6 +186,49 @@ const ContactSection = () => {
                   <option value="private-condo">Private Condo</option>
                   <option value="landed">Landed Property</option>
                   <option value="commercial">Commercial</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="currentBank" className="block text-sm font-medium text-gray-700 mb-2">
+                  Current Bank
+                </label>
+                <select
+                  id="currentBank"
+                  name="currentBank"
+                  value={formData.currentBank}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4A90E2] focus:border-transparent"
+                >
+                  <option value="">Select current bank</option>
+                  <option value="dbs">DBS/POSB</option>
+                  <option value="ocbc">OCBC</option>
+                  <option value="uob">UOB</option>
+                  <option value="maybank">Maybank</option>
+                  <option value="cimb">CIMB</option>
+                  <option value="hsbc">HSBC</option>
+                  <option value="sc">Standard Chartered</option>
+                  <option value="other">Other</option>
+                  <option value="new-purchase">New Purchase</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label htmlFor="timeline" className="block text-sm font-medium text-gray-700 mb-2">
+                  Timeline
+                </label>
+                <select
+                  id="timeline"
+                  name="timeline"
+                  value={formData.timeline}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4A90E2] focus:border-transparent"
+                >
+                  <option value="">Select timeline</option>
+                  <option value="urgent">Urgent (within 2 weeks)</option>
+                  <option value="soon">Soon (within 1 month)</option>
+                  <option value="planning">Planning (1-3 months)</option>
+                  <option value="exploring">Just exploring options</option>
                 </select>
               </div>
 
@@ -212,7 +259,7 @@ const ContactSection = () => {
             </div>
 
             <p className="text-xs text-gray-500 mt-4 text-center">
-              By submitting this form, you agree to be contacted by our mortgage experts. We respect your privacy and will never share your information.
+              We earn referral fees from banks you choose to switch to, but nothing if you reprice or stay put. We&apos;ll be transparent about all options. By submitting, you agree to be contacted.
             </p>
           </form>
         </div>

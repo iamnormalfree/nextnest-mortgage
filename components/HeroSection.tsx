@@ -11,10 +11,13 @@ const HeroSection = () => {
           {/* Left side content */}
           <div className="lg:w-1/2 mb-12 lg:mb-0">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-gilda font-bold text-[#0D1B2A] leading-tight mb-6">
-              Mortgages work
+              Singapore's Only Mortgage Advisor Who Shows You
               <br />
-              better here.
+              <span className="text-[#4A90E2]">ALL Your Options</span>
             </h1>
+            <p className="text-lg text-gray-600 mb-8 font-sans">
+              AI-powered analysis with complete transparency. See all your options: repricing, switching, or staying put - even the ones that make us nothing.
+            </p>
 
             <div className="flex flex-col sm:flex-row items-start space-y-8 sm:space-y-0 sm:space-x-10 mb-10">
               <div className="flex items-start space-x-3">
@@ -24,9 +27,9 @@ const HeroSection = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-gilda font-semibold text-[#0D1B2A]">Save 1.5% APR*</h3>
+                  <h3 className="text-xl font-gilda font-semibold text-[#0D1B2A]">24-Hour Response</h3>
                   <p className="text-gray-600 text-sm mt-1 font-sans">
-                    on your HDB or private property loan.
+                    Complete analysis guaranteed within 48 hours.
                   </p>
                 </div>
               </div>
@@ -38,8 +41,8 @@ const HeroSection = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-gilda font-semibold text-[#0D1B2A]">Expert-backed advice</h3>
-                  <p className="text-gray-600 text-sm mt-1 font-sans">with personalized loan analysis.</p>
+                  <h3 className="text-xl font-gilda font-semibold text-[#0D1B2A]">Complete Transparency</h3>
+                  <p className="text-gray-600 text-sm mt-1 font-sans">See exactly how we earn and what we recommend.</p>
                 </div>
               </div>
             </div>
@@ -48,29 +51,29 @@ const HeroSection = () => {
               href="#contact"
               className="inline-block bg-[#4A90E2] hover:bg-[#3A80D2] text-white font-medium py-3 px-8 rounded-md text-center transition font-sans"
             >
-              Get started
+              Get Your Complete Mortgage Analysis - Free
             </a>
 
             <p className="text-xs text-gray-500 mt-4 font-sans">
-              *Rates subject to change. Average customer savings compared to standard bank rates.
+              Transparent analysis of all 286 Singapore mortgage packages. We earn referral fees from banks you choose to switch to.
             </p>
 
             <div className="flex flex-wrap items-center space-x-8 mt-12">
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-gilda font-normal text-[#0D1B2A]">500+</span>
-                <span className="text-sm text-gray-500 font-sans">Happy clients</span>
+                <span className="text-2xl font-gilda font-normal text-[#0D1B2A]">286</span>
+                <span className="text-sm text-gray-500 font-sans">Bank packages analyzed</span>
               </div>
 
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-gilda font-normal text-[#0D1B2A]">$500M+</span>
-                <span className="text-sm text-gray-500 font-sans">In total loans</span>
+                <span className="text-2xl font-gilda font-normal text-[#0D1B2A]">24hr</span>
+                <span className="text-sm text-gray-500 font-sans">Response guarantee</span>
               </div>
 
               <div className="flex flex-col items-center">
                 <span className="text-2xl font-gilda font-normal text-[#0D1B2A] flex items-center">
-                  4.9 <Star className="h-4 w-4 ml-1" />
+                  100% <Star className="h-4 w-4 ml-1" />
                 </span>
-                <span className="text-sm text-gray-500 font-sans">Google Reviews</span>
+                <span className="text-sm text-gray-500 font-sans">Transparency</span>
               </div>
             </div>
           </div>
