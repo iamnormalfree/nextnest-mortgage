@@ -1,0 +1,65 @@
+{
+  "G1_minimal": {
+    "description": "Gate 1 - Minimal data (no email/phone)",
+    "expected_gate": "G1",
+    "expected_router_output": 0,
+    "payload": {
+      "formData": {
+        "name": "John Smith G1",
+        "loanType": "refinance"
+      }
+    }
+  },
+  
+  "G2_partial": {
+    "description": "Gate 2 - Email + Phone + 3 required fields",
+    "expected_gate": "G2",
+    "expected_router_output": 1,
+    "payload": {
+      "formData": {
+        "name": "Sarah Lee G2",
+        "email": "sarah@example.com",
+        "phone": "91234567",
+        "loanType": "refinance",
+        "propertyType": "HDB",
+        "currentRate": 3.5
+      }
+    }
+  },
+  
+  "G3_complete": {
+    "description": "Gate 3 - All 8 required fields + email + phone",
+    "expected_gate": "G3",
+    "expected_router_output": 2,
+    "required_fields": ["name", "loanType", "propertyType", "currentRate", "outstandingLoan", "monthlyIncome", "lockInStatus", "urgency"],
+    "payload": {
+      "formData": {
+        "name": "Ahmad Rahman G3",
+        "email": "ahmad@example.com",
+        "phone": "98765432",
+        "loanType": "refinance",
+        "propertyType": "Private",
+        "currentRate": 4.2,
+        "outstandingLoan": 800000,
+        "monthlyIncome": 15000,
+        "lockInStatus": "ending_soon",
+        "urgency": "immediate"
+      }
+    }
+  },
+  
+  "G2_edge_case": {
+    "description": "Edge case - Email + Phone + exactly 3 fields (boundary test)",
+    "expected_gate": "G2",
+    "expected_router_output": 1,
+    "payload": {
+      "formData": {
+        "email": "edge@test.com",
+        "phone": "91111111",
+        "name": "Edge Case",
+        "loanType": "new_purchase",
+        "propertyType": "Condo"
+      }
+    }
+  }
+}
