@@ -153,12 +153,14 @@ export function ProgressiveForm({
       defaults.currentBank = ''
       defaults.propertyValue = 0
       defaults.outstandingLoan = 0
-    } else if (loanType === 'equity_loan') {
-      defaults.propertyValue = 0
-      defaults.outstandingLoan = 0
-      defaults.equityNeeded = 0
-      defaults.purpose = ''
     }
+    // REMOVED: equity_loan not in LoanType union ('new_purchase' | 'refinance' | 'commercial')
+    // else if (loanType === 'equity_loan') {
+    //   defaults.propertyValue = 0
+    //   defaults.outstandingLoan = 0
+    //   defaults.equityNeeded = 0
+    //   defaults.purpose = ''
+    // }
     
     return defaults
   }
@@ -373,7 +375,7 @@ export function ProgressiveForm({
               />
               {errors.purchaseTimeline && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.purchaseTimeline.message}
+                  {String(errors.purchaseTimeline.message)}
                 </p>
               )}
             </div>
@@ -408,7 +410,7 @@ export function ProgressiveForm({
               />
               {errors.propertyType && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.propertyType.message}
+                  {String(errors.propertyType.message)}
                 </p>
               )}
             </div>
@@ -446,7 +448,7 @@ export function ProgressiveForm({
               </p>
               {errors.priceRange && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.priceRange.message}
+                  {String(errors.priceRange.message)}
                 </p>
               )}
             </div>
@@ -484,7 +486,7 @@ export function ProgressiveForm({
               </p>
               {errors.ipaStatus && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.ipaStatus.message}
+                  {String(errors.ipaStatus.message)}
                 </p>
               )}
             </div>
@@ -524,7 +526,7 @@ export function ProgressiveForm({
               </p>
               {errors.currentRate && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.currentRate.message}
+                  {String(errors.currentRate.message)}
                 </p>
               )}
             </div>
@@ -559,7 +561,7 @@ export function ProgressiveForm({
               />
               {errors.lockInStatus && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.lockInStatus.message}
+                  {String(errors.lockInStatus.message)}
                 </p>
               )}
             </div>
@@ -605,7 +607,7 @@ export function ProgressiveForm({
               />
               {errors.currentBank && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.currentBank.message}
+                  {String(errors.currentBank.message)}
                 </p>
               )}
             </div>
@@ -640,7 +642,7 @@ export function ProgressiveForm({
               />
               {errors.propertyValue && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.propertyValue.message}
+                  {String(errors.propertyValue.message)}
                 </p>
               )}
             </div>
@@ -675,17 +677,19 @@ export function ProgressiveForm({
               />
               {errors.outstandingLoan && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.outstandingLoan.message}
+                  {String(errors.outstandingLoan.message)}
                 </p>
               )}
             </div>
           </>
         )
 
+      // REMOVED: equity_loan not in LoanType union ('new_purchase' | 'refinance' | 'commercial')
+      /*
       case 'equity_loan':
         return (
           <>
-            {/* Property Value */}
+            {/* Property Value *\/}
             <div className="field-group">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Current Property Value <span className="text-gray-400 text-sm font-normal">(Optional)</span>
@@ -718,12 +722,12 @@ export function ProgressiveForm({
               </p>
               {errors.propertyValue && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.propertyValue.message}
+                  {String(errors.propertyValue.message)}
                 </p>
               )}
             </div>
 
-            {/* Outstanding Loan */}
+            {/* Outstanding Loan *\/}
             <div className="field-group">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Outstanding Mortgage Balance
@@ -756,12 +760,12 @@ export function ProgressiveForm({
               </p>
               {errors.outstandingLoan && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.outstandingLoan.message}
+                  {String(errors.outstandingLoan.message)}
                 </p>
               )}
             </div>
 
-            {/* Equity Needed */}
+            {/* Equity Needed *\/}
             <div className="field-group">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Equity Amount Needed
@@ -791,12 +795,12 @@ export function ProgressiveForm({
               />
               {errors.equityNeeded && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.equityNeeded.message}
+                  {String(errors.equityNeeded.message)}
                 </p>
               )}
             </div>
 
-            {/* Purpose */}
+            {/* Purpose *\/}
             <div className="field-group">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Purpose of Equity Loan <span className="text-gray-400 text-sm font-normal">(Optional)</span>
@@ -829,12 +833,13 @@ export function ProgressiveForm({
               </p>
               {errors.purpose && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                  {errors.purpose.message}
+                  {String(errors.purpose.message)}
                 </p>
               )}
             </div>
           </>
         )
+      */
 
       default:
         return null
@@ -879,7 +884,7 @@ export function ProgressiveForm({
             </p>
             {errors.monthlyIncome && (
               <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                {errors.monthlyIncome.message}
+                {String(errors.monthlyIncome.message)}
               </p>
             )}
           </div>
@@ -917,7 +922,7 @@ export function ProgressiveForm({
             </p>
             {errors.existingCommitments && (
               <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                {errors.existingCommitments.message}
+                {String(errors.existingCommitments.message)}
               </p>
             )}
           </div>
@@ -952,7 +957,7 @@ export function ProgressiveForm({
             />
             {errors.packagePreference && (
               <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                {errors.packagePreference.message}
+                {String(errors.packagePreference.message)}
               </p>
             )}
           </div>
@@ -986,7 +991,7 @@ export function ProgressiveForm({
             />
             {errors.riskTolerance && (
               <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                {errors.riskTolerance.message}
+                {String(errors.riskTolerance.message)}
               </p>
             )}
           </div>
@@ -1020,7 +1025,7 @@ export function ProgressiveForm({
             />
             {errors.planningHorizon && (
               <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                {errors.planningHorizon.message}
+                {String(errors.planningHorizon.message)}
               </p>
             )}
           </div>
@@ -1073,7 +1078,7 @@ export function ProgressiveForm({
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                    {errors.name.message}
+                    {String(errors.name.message)}
                   </p>
                 )}
               </div>
@@ -1105,7 +1110,7 @@ export function ProgressiveForm({
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                    {errors.email.message}
+                    {String(errors.email.message)}
                   </p>
                 )}
               </div>
@@ -1153,7 +1158,7 @@ export function ProgressiveForm({
                 />
                 {errors.phone && (
                   <p className="mt-1 text-sm text-red-600 animate-fade-in">
-                    {errors.phone.message}
+                    {String(errors.phone.message)}
                   </p>
                 )}
               </div>
