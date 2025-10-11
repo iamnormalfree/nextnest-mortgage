@@ -1,0 +1,234 @@
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+
+export default function TestChatwootPage() {
+  const [status, setStatus] = useState<string>('Initializing...')
+  const [logs, setLogs] = useState<string[]>([])
+  const [widgetLoaded, setWidgetLoaded] = useState(false)
+
+  const addLog = React.useCallback((message: string) => {
+    const timestamp = new Date().toLocaleTimeString()
+    setLogs(prev => [...prev, `[${timestamp}] ${message}`])
+    console.log(`[Test] ${message}`)
+  }, [])
+
+  const testChatwootWidget = React.useCallback(async () => {
+    try {
+      // Configuration from environment
+      const config = {
+        baseUrl: process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL || 'https://chat.nextnest.sg',
+        websiteToken: process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'SBSfsRrvWSyzfVUXv7QKjoa2'
+      }
+
+      addLog(`Using Chatwoot URL: ${config.baseUrl}`)
+      addLog(`Website Token: ${config.websiteToken}`)
+      setStatus('Testing server connection...')
+
+      // Test 1: Check if server is reachable
+      try {
+        const testUrl = `${config.baseUrl}/api/v1/widget/config?website_token=${config.websiteToken}`
+        addLog(`Testing API endpoint: ${testUrl}`)
+        
+        const response = await fetch(testUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          }
+        })
+        
+        if (response.ok) {
+          addLog('✅ Server API is reachable')
+          const data = await response.json()
+          addLog(`Widget config received: ${JSON.stringify(data).substring(0, 100)}...`)
+        } else {
+          addLog(`⚠️ Server returned status: ${response.status}`)
+        }
+      } catch (error) {
+        addLog(`❌ API test failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        addLog('This might be a CORS issue - widget may still work')
+      }
+
+      // Test 2: Load the actual widget
+      setStatus('Loading Chatwoot widget...')
+      addLog('Attempting to load widget SDK...')
+
+      // Configure window.chatwootSettings
+      (window as any).chatwootSettings = {
+        hideMessageBubble: false,
+        position: 'right',
+        locale: 'en',
+        type: 'expanded_bubble',
+        launcherTitle: 'Chat with us'
+      }
+
+      // Create and load script
+      const script = document.createElement('script')
+      script.src = `${config.baseUrl}/packs/js/sdk.js`
+      script.defer = true
+      script.async = true
+
+      script.onload = () => {
+        addLog('✅ SDK script loaded successfully')
+        setStatus('Widget loaded - check bottom right corner')
+        setWidgetLoaded(true)
+        
+        // Check if Chatwoot object is available
+        setTimeout(() => {
+          if ((window as any).$chatwoot) {
+            addLog('✅ $chatwoot object is available')
+            addLog('Widget should be visible now')
+          } else {
+            addLog('⚠️ $chatwoot object not found')
+          }
+        }, 2000)
+      }
+
+      script.onerror = (error) => {
+        addLog(`❌ Failed to load SDK: ${error}`)
+        setStatus('Failed to load widget')
+      }
+
+      // Add website token as data attribute
+      script.setAttribute('data-website-token', config.websiteToken)
+      
+      document.head.appendChild(script)
+      addLog('Script element added to DOM')
+
+    } catch (error) {
+      addLog(`❌ Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      setStatus('Error occurred')
+    }
+  }, [addLog])
+
+  useEffect(() => {
+    testChatwootWidget()
+  }, [testChatwootWidget])
+
+  const toggleWidget = () => {
+    try {
+      if ((window as any).$chatwoot) {
+        (window as any).$chatwoot.toggle()
+        addLog('Toggled widget visibility')
+      } else {
+        addLog('Widget not available')
+      }
+    } catch (error) {
+      addLog(`Error toggling widget: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  const openWidget = () => {
+    try {
+      if ((window as any).$chatwoot) {
+        (window as any).$chatwoot.toggle('open')
+        addLog('Opened widget')
+      } else {
+        addLog('Widget not available')
+      }
+    } catch (error) {
+      addLog(`Error opening widget: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  const resetTest = () => {
+    // Remove existing widget elements
+    const widgetContainer = document.getElementById('chatwoot_live_chat_widget')
+    if (widgetContainer) widgetContainer.remove()
+    
+    const bubble = document.querySelector('.woot-widget-bubble')
+    if (bubble) bubble.remove()
+    
+    const scripts = document.querySelectorAll('script[src*="chat.nextnest.sg"]')
+    scripts.forEach(s => s.remove())
+    
+    delete (window as any).$chatwoot
+    delete (window as any).chatwootSettings
+    
+    setLogs([])
+    setStatus('Reset complete')
+    setWidgetLoaded(false)
+    addLog('Cleared all widget elements')
+    
+    // Restart test
+    setTimeout(() => testChatwootWidget(), 500)
+  }
+
+  return (
+    <div className="container mx-auto p-8 max-w-4xl">
+      <Card>
+        <CardHeader>
+          <CardTitle>Chatwoot Widget Test Page</CardTitle>
+          <p className="text-sm text-gray-600">
+            Testing Chatwoot integration for local development
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Status */}
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm font-semibold mb-1">Status:</div>
+            <div className={`text-lg ${widgetLoaded ? 'text-green-600' : 'text-amber-600'}`}>
+              {status}
+            </div>
+          </div>
+
+          {/* Control Buttons */}
+          <div className="flex gap-2">
+            <Button onClick={toggleWidget} disabled={!widgetLoaded}>
+              Toggle Widget
+            </Button>
+            <Button onClick={openWidget} disabled={!widgetLoaded} variant="outline">
+              Open Widget
+            </Button>
+            <Button onClick={resetTest} variant="destructive">
+              Reset & Retry
+            </Button>
+          </div>
+
+          {/* Logs */}
+          <div className="border rounded-lg p-4 bg-gray-900 text-gray-100">
+            <div className="text-sm font-semibold mb-2">Debug Logs:</div>
+            <div className="font-mono text-xs space-y-1 max-h-96 overflow-y-auto">
+              {logs.length === 0 ? (
+                <div className="text-gray-400">No logs yet...</div>
+              ) : (
+                logs.map((log, i) => (
+                  <div key={i} className={
+                    log.includes('✅') ? 'text-green-400' :
+                    log.includes('❌') ? 'text-red-400' :
+                    log.includes('⚠️') ? 'text-yellow-400' :
+                    'text-gray-300'
+                  }>
+                    {log}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <div className="text-sm font-semibold mb-2">Instructions:</div>
+            <ul className="text-sm space-y-1 list-disc list-inside">
+              <li>This page tests the Chatwoot widget integration</li>
+              <li>If successful, you should see a chat bubble in the bottom right</li>
+              <li>Check the console for additional debug information</li>
+              <li>If the widget doesn&apos;t appear, check the logs above</li>
+            </ul>
+          </div>
+
+          {/* Environment Info */}
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm font-semibold mb-2">Environment Configuration:</div>
+            <div className="text-xs font-mono space-y-1">
+              <div>CHATWOOT_BASE_URL: {process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL || 'https://chat.nextnest.sg (default)'}</div>
+              <div>CHATWOOT_WEBSITE_TOKEN: {process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'SBSfsRrvWSyzfVUXv7QKjoa2 (default)'}</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
