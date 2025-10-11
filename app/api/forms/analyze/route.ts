@@ -84,11 +84,12 @@ function checkRateLimit(clientIp: string): { allowed: boolean; retryAfter?: numb
 // Clean up old rate limit entries periodically
 setInterval(() => {
   const now = Date.now()
-  for (const [key, value] of rateLimitStore.entries()) {
+  // Convert Map entries to array for iteration compatibility
+  Array.from(rateLimitStore.entries()).forEach(([key, value]) => {
     if (value.resetTime < now) {
       rateLimitStore.delete(key)
     }
-  }
+  })
 }, RATE_LIMIT_WINDOW_MS * 2)
 
 // n8n webhook integration with urgency enrichment

@@ -372,10 +372,11 @@ export async function POST(request: NextRequest) {
 
       // For reopened conversations, retrieve existing broker assignment
       if (isConversationReopen) {
-        // Try to get existing broker from conversation attributes
-        const existingBrokerName = conversation.custom_attributes?.ai_broker_name
-        const existingBrokerId = conversation.custom_attributes?.ai_broker_id
-        const existingBrokerPersonality = conversation.custom_attributes?.broker_persona
+        // Try to get existing broker from conversation attributes (cast to any for dynamic attributes)
+        const attrs = conversation.custom_attributes as any
+        const existingBrokerName = attrs?.ai_broker_name
+        const existingBrokerId = attrs?.ai_broker_id
+        const existingBrokerPersonality = attrs?.broker_persona
 
         if (existingBrokerName && existingBrokerId) {
           assignedBroker = {
