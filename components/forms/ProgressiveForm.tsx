@@ -520,7 +520,7 @@ export function ProgressiveForm({
                 )}
               />
               <p className="mt-1 text-xs text-gray-500">
-                💡 Check your latest statement or estimate. We'll verify exact rate later.
+                💡 Check your latest statement or estimate. We&apos;ll verify exact rate later.
               </p>
               {errors.currentRate && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
@@ -714,7 +714,7 @@ export function ProgressiveForm({
                 )}
               />
               <p className="mt-1 text-xs text-gray-500">
-                💡 We can estimate via market data if you're unsure. Leave blank for now.
+                💡 We can estimate via market data if you&apos;re unsure. Leave blank for now.
               </p>
               {errors.propertyValue && (
                 <p className="mt-1 text-sm text-red-600 animate-fade-in">
