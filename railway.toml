@@ -1,11 +1,11 @@
 [build]
-builder = "nixpacks"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "npm start"
-healthcheckPath = "/"
+healthcheckPath = "/api/health/chat-integration"
 healthcheckTimeout = 300
-restartPolicyType = "always"
+restartPolicyType = "ALWAYS"
 
 [env]
 NODE_ENV = "production"
