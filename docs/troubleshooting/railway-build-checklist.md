@@ -319,6 +319,94 @@ git push --force
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2025-10-12  
+---
+
+## Error 8: Redis module-level initialization causing build failure
+
+**Symptom:**
+```
+Error: REDIS_URL environment variable is required
+  at n (/app/.next/server/app/api/admin/migration-status/route.js:1:9467)
+```
+
+**Root Cause:** Module-level Queue/Worker initialization in broker-queue.ts or broker-worker.ts
+
+**Solution:** Convert to lazy initialization pattern
+
+**Example Fix:**
+```typescript
+// BEFORE (BROKEN)
+export const brokerQueue = new Queue('broker-conversations', {
+  connection: getRedisConnection(),
+});
+
+// AFTER (FIXED)
+let _brokerQueue: Queue | null = null;
+
+export function getBrokerQueue(): Queue {
+  if (!_brokerQueue) {
+    _brokerQueue = new Queue('broker-conversations', {
+      connection: getRedisConnection(),
+    });
+  }
+  return _brokerQueue;
+}
+```
+
+---
+
+## Error 9: Healthcheck failing - replicas never become healthy
+
+**Symptom:**
+```
+1/1 replicas never became healthy!
+Healthcheck failed!
+```
+
+**Root Cause:** Healthcheck endpoint has circular dependencies or crashes
+
+**Solution:** Create simple healthcheck without external calls
+
+**Example Fix:**
+```typescript
+// app/api/health/route.ts
+export async function GET() {
+  return NextResponse.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: process.env.npm_package_version || '1.0.0'
+  });
+}
+```
+
+Update railway.toml:
+```toml
+[deploy]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+```
+
+---
+
+## Error 10: Custom domain returns 502 but Railway domain works
+
+**Symptom:**
+- https://your-app.up.railway.app works ✅
+- https://yourdomain.com returns 502 ❌
+
+**Root Cause:** Custom domain targetPort doesn't match application port
+
+**Solution:** Update custom domain configuration in Railway dashboard
+
+**Fix:**
+1. Go to Railway dashboard → Service → Settings → Domains
+2. Click on custom domain
+3. Set Target Port to **3000** (Next.js default)
+4. Save changes
+
+---
+
+**Document Version:** 1.1
+**Last Updated:** 2025-10-12 (Continuation Session)
 **Quick Access:** Bookmark this file for fast troubleshooting
