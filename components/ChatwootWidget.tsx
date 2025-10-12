@@ -2,7 +2,14 @@
 
 import { useEffect, useRef } from 'react'
 
-// Global Window interface declarations moved to types/global.d.ts
+// Extend Window interface for Chatwoot
+declare global {
+  interface Window {
+    $chatwoot?: any
+    chatwootSettings?: any
+    chatwootSDK?: any
+  }
+}
 
 interface ChatwootWidgetProps {
   websiteToken?: string
