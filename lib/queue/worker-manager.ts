@@ -50,9 +50,9 @@ export async function initializeWorker() {
 
     // Dynamically import worker (lazy load)
     // This prevents the worker from being bundled in client-side code
-    const { brokerWorker } = await import('./broker-worker');
+    const { getBrokerWorker } = await import('./broker-worker');
 
-    worker = brokerWorker;
+    worker = getBrokerWorker();
     workerInitialized = true;
 
     console.log('✅ BullMQ worker initialized successfully');
