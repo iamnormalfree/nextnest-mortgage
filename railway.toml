@@ -3,8 +3,8 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-healthcheckPath = "/api/health/chat-integration"
-healthcheckTimeout = 300
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
 restartPolicyType = "ALWAYS"
 
 [env]
