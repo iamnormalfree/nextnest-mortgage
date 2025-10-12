@@ -28,6 +28,11 @@ export interface Database {
           performance_metrics: Json | null
           created_at: string
           updated_at: string
+          // ADDED: Missing fields for broker availability management
+          max_concurrent_chats: number
+          active_conversations: number
+          is_available: boolean
+          last_active_at: string | null
         }
         Insert: {
           id?: string
@@ -47,6 +52,11 @@ export interface Database {
           performance_metrics?: Json | null
           created_at?: string
           updated_at?: string
+          // ADDED: Missing fields for broker availability management
+          max_concurrent_chats?: number
+          active_conversations?: number
+          is_available?: boolean
+          last_active_at?: string | null
         }
         Update: {
           id?: string
@@ -66,6 +76,11 @@ export interface Database {
           performance_metrics?: Json | null
           created_at?: string
           updated_at?: string
+          // ADDED: Missing fields for broker availability management
+          max_concurrent_chats?: number
+          active_conversations?: number
+          is_available?: boolean
+          last_active_at?: string | null
         }
       }
       broker_conversations: {

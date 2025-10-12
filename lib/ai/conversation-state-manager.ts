@@ -64,7 +64,9 @@ export class ConversationStateManager {
    */
   private getRedis(): Redis {
     if (!this.redis) {
-      this.redis = new Redis(getRedisConnection());
+      // Cast to any to work around BullMQ ConnectionOptions vs ioredis RedisOptions type incompatibility
+      // The options are compatible at runtime, just different TypeScript definitions
+      this.redis = new Redis(getRedisConnection() as any);
 
       this.redis.on('error', (error) => {
         console.error('Redis error in ConversationStateManager:', error);

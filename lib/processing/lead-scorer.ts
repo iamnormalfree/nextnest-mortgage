@@ -71,7 +71,9 @@ export class LeadScorer {
       else score += 4
     }
 
-    if (formData.loanType === 'commercial') {
+    // Commercial loans (handled via extended formData type)
+    const loanType = formData.loanType as string;
+    if (loanType === 'commercial') {
       const propertyValue = (formData as any).propertyValue || 0
       const income = (formData as any).monthlyIncome || 0
       if (propertyValue >= 2000000 && income >= 30000) score += 10
@@ -244,7 +246,8 @@ export class LeadScorer {
 
     // Qualified leads with complex needs go to specialists
     if (category === 'qualified') {
-      const isComplex = formData.loanType === 'commercial' || 
+      const loanType = formData.loanType as string;
+      const isComplex = loanType === 'commercial' ||
                        (formData as any).purpose === 'investment' ||
                        (formData as any).propertyType === 'Commercial'
       

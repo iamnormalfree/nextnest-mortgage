@@ -535,7 +535,6 @@ The market is moving fast right now, and with your strong profile, we should sec
 
 **Ready to lock in these rates today?** I can have your pre-approval letter ready within 2 hours. 🚀`
 
-      case 'modern':
       case 'balanced':
         return `Hello ${name}! 👋
 

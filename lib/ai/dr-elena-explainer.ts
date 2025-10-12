@@ -63,8 +63,7 @@ export async function explainCalculation(
       model: openai('gpt-4o-mini'),
       system: systemPrompt,
       prompt: userPrompt,
-      temperature: 0.7,  // Some creativity for natural language
-      maxCompletionTokens: 300     // Keep explanations concise
+      temperature: 0.7  // Some creativity for natural language
     });
 
     // Parse the AI response into structured format

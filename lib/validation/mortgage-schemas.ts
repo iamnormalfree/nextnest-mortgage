@@ -328,3 +328,9 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
       return fullSchema
   }
 }
+
+/**
+ * Alias for createGateSchema to support progressive form hooks
+ * @deprecated Use createGateSchema instead
+ */
+export const createStepSchema = createGateSchema

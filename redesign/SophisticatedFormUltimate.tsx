@@ -3,7 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 
 // Import calculation functions
-import { getMarketRate, getCreditCardCommitment } from '@/lib/calculations/mortgage'
+import { getPlaceholderRate } from '@/lib/calculations/mortgage'
+
+// Simple helper for credit card debt calculation (3.5% of card limit per MAS)
+const getCreditCardCommitment = (creditCards: string): number => {
+  const numCards = parseFloat(creditCards || '0')
+  // Assume average $10,000 credit limit per card, 3.5% minimum payment
+  return numCards * 10000 * 0.035
+}
 
 // Import shadcn components
 import { Button } from '@/components/ui/button'
@@ -830,10 +837,9 @@ export default function SophisticatedFormUltimate() {
                       {(() => {
                         const affordability = calculateAffordability(formData)
                         const loanAmount = parseFloat(formData.loanAmount || '900000')
-                        const rate = getMarketRate(
+                        const rate = getPlaceholderRate(
                           formData.propertyType || 'Private',
-                          (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase',
-                          formData.currentBank
+                          (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase'
                         )
                         const tenure = parseInt(formData.loanTenure || '25')
                         const monthlyPayment = calculateMonthlyPayment(loanAmount, rate, tenure)
@@ -908,10 +914,9 @@ export default function SophisticatedFormUltimate() {
 
                       {(() => {
                         const loanAmount = parseFloat(formData.loanAmount || '900000')
-                        const rate = getMarketRate(
+                        const rate = getPlaceholderRate(
                           formData.propertyType || 'Private',
-                          (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase',
-                          formData.currentBank
+                          (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase'
                         )
                         const tenure = parseInt(formData.loanTenure || '25')
                         const monthlyPayment = calculateMonthlyPayment(loanAmount, rate, tenure)
@@ -1015,10 +1020,9 @@ export default function SophisticatedFormUltimate() {
                   <div className="text-xs text-stone mb-xs uppercase tracking-wider">Best Rate Found</div>
                   <div className="heading-5xl gradient-text-accent mono mb-sm">
                     {(() => {
-                      const rate = getMarketRate(
+                      const rate = getPlaceholderRate(
                         formData.propertyType || 'Private',
-                        (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase',
-                        formData.currentBank
+                        (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase'
                       )
                       return <AnimatedCounter end={rate} suffix="%" decimals={2} duration={1500} />
                     })()}
@@ -1035,10 +1039,9 @@ export default function SophisticatedFormUltimate() {
                     $<AnimatedCounter
                       end={(() => {
                         const loanAmount = parseFloat(formData.loanAmount || '900000')
-                        const rate = getMarketRate(
+                        const rate = getPlaceholderRate(
                           formData.propertyType || 'Private',
-                          (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase',
-                          formData.currentBank
+                          (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase'
                         )
                         const tenure = parseInt(formData.loanTenure || '25')
                         return Math.round(calculateMonthlyPayment(loanAmount, rate, tenure))

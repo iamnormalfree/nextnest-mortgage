@@ -3,7 +3,14 @@
 import React, { useState, useEffect } from 'react'
 
 // Import calculation functions
-import { getMarketRate, getCreditCardCommitment } from '@/lib/calculations/mortgage'
+import { getPlaceholderRate } from '@/lib/calculations/mortgage'
+
+// Simple helper for credit card debt calculation (3.5% of card limit per MAS)
+const getCreditCardCommitment = (creditCards: string): number => {
+  const numCards = parseFloat(creditCards || '0')
+  // Assume average $10,000 credit limit per card, 3.5% minimum payment
+  return numCards * 10000 * 0.035
+}
 
 // Sophisticated icon components
 const ChevronRight = () => (
@@ -176,10 +183,9 @@ export default function SophisticatedFormEnhanced() {
 
     // Calculate affordability and get market rates
     const affordability = calculateAffordability(formData)
-    const marketRate = getMarketRate(
+    const marketRate = getPlaceholderRate(
       formData.propertyType || 'Private',
-      (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase',
-      formData.currentBank
+      (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase'
     )
 
     // Simulate analysis with calculations
@@ -699,10 +705,9 @@ export default function SophisticatedFormEnhanced() {
                       <div className="text-xs text-stone mb-xs">Best Rate Found</div>
                       <div className="heading-4xl gradient-text-accent mono">
                         {(() => {
-                          const rate = getMarketRate(
+                          const rate = getPlaceholderRate(
                             formData.propertyType || 'Private',
-                            (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase',
-                            formData.currentBank
+                            (formData.loanType === 'commercial' ? 'new_purchase' : formData.loanType) || 'new_purchase'
                           )
                           return <AnimatedCounter end={rate * 100} suffix="%" duration={1500} />
                         })()}

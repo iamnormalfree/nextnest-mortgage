@@ -283,8 +283,8 @@ export const MobileAIAssistantCompact: React.FC<MobileAIAssistantCompactProps> =
       {/* Compact Input Area - 44px */}
       {activeView === 'chat' && (
         <div className="h-11 bg-white border-t flex items-center px-3 gap-2 flex-shrink-0">
-          <button className="w-7 h-7 flex items-center justify-center text-gray-500">
-            <Image className="w-3.5 h-3.5" />
+          <button className="w-7 h-7 flex items-center justify-center text-gray-500" aria-label="Attach image">
+            <Image className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
 
           <input

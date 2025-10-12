@@ -50,13 +50,10 @@ export function useChatwootIntegration(
 
     try {
       // Calculate broker persona for assignment
-      const brokerPersona = calculateBrokerPersona({
-        age: formData.actualAges?.[0] || 35,
-        loanType: formData.loanType as 'new_purchase' | 'refinance' | 'commercial',
-        incomeLevel: formData.actualIncomes?.[0] || 8000,
-        riskTolerance: 'moderate',
-        hasExistingLoan: formData.loanType === 'refinance'
-      })
+      const brokerPersona = calculateBrokerPersona(
+        formData.leadScore || 50,
+        formData
+      )
 
       // Create conversation via API
       const response = await fetch('/api/chatwoot-conversation', {
@@ -85,11 +82,12 @@ export function useChatwootIntegration(
       setIsConnected(true)
 
       // Track conversion
-      conversionTracker.trackChatInitiation({
-        leadScore: formData.leadScore || 0,
+      conversionTracker.trackChatCreated(
         sessionId,
-        conversationId: data.conversationId
-      })
+        data.conversationId,
+        formData.leadScore || 0,
+        Date.now() - performance.now()
+      )
 
       // Store in session for persistence
       if (typeof window !== 'undefined') {

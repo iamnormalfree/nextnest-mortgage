@@ -1,6 +1,10 @@
 import { assignBestBroker } from '@/lib/ai/broker-assignment'
 import { releaseBrokerCapacity } from '@/lib/ai/broker-availability'
 import { ChatwootClient, ProcessedLeadData } from '@/lib/integrations/chatwoot-client'
+import { Database } from '@/lib/db/types/database.types'
+
+// Use the proper Database type from Supabase
+type BrokerRecord = Database['public']['Tables']['ai_brokers']['Row']
 
 type ScheduleResult = {
   status: 'assigned'
@@ -9,16 +13,6 @@ type ScheduleResult = {
 } | {
   status: 'queued'
   queuePosition: number
-}
-
-interface BrokerRecord {
-  id: string
-  name: string
-  personality_type?: string
-  slug?: string
-  current_workload?: number | null
-  active_conversations?: number | null
-  max_concurrent_chats?: number | null
 }
 
 interface EngagementContext {

@@ -45,8 +45,7 @@ export class IntentRouter {
         model: openai('gpt-4o-mini'),
         system: this.getClassificationSystemPrompt(),
         prompt: this.buildClassificationPrompt(userMessage, conversationContext),
-        temperature: 0.3,
-        maxCompletionTokens: 200,
+        temperature: 0.3
       });
 
       return this.parseClassificationResult(text);

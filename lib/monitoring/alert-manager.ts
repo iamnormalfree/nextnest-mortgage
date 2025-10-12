@@ -212,14 +212,14 @@ export class AlertManager {
     }
 
     // Resolve alerts that are no longer active
-    for (const [key, alert] of this.alerts.entries()) {
+    for (const [key, alert] of Array.from(this.alerts.entries())) {
       if (!currentAlertKeys.has(key) && !alert.resolved) {
         alert.resolved = true;
         alert.resolvedAt = new Date().toISOString();
-        
+
         // Send resolution notification
         await this.sendResolutionNotification(alert);
-        
+
         // Remove from active alerts after a delay
         setTimeout(() => this.alerts.delete(key), 300000); // 5 minutes
       }
@@ -427,7 +427,7 @@ export class AlertManager {
    * Clear resolved alerts
    */
   clearResolvedAlerts(): void {
-    for (const [key, alert] of this.alerts.entries()) {
+    for (const [key, alert] of Array.from(this.alerts.entries())) {
       if (alert.resolved) {
         this.alerts.delete(key);
       }

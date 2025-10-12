@@ -68,7 +68,7 @@ export default function ChatWidgetLoader({
         cleanup()
       }
     }
-  }, [])
+  }, [config.baseUrl, config.websiteToken, autoOpen, isDevelopment])
 
   const loadChatwootScript = async (cancelled: { value: boolean }) => {
     try {

@@ -64,11 +64,11 @@ function ApplyPageContent() {
   const [aiInsights, setAIInsights] = useState<any>(null)
   const [leadScore, setLeadScore] = useState<any>(null)
 
-  const handleStepCompletion = (step: number, stepData: any) => {
-    console.log(`Step ${step} completed with data:`, stepData)
+  const handleGateCompletion = (gate: number, gateData: any) => {
+    console.log(`Gate ${gate} completed with data:`, gateData)
 
-    // Update context with step data
-    updateStepData(step, stepData)
+    // Update context with gate data
+    updateStepData(gate, gateData)
 
     // The ProgressiveForm component will handle the ChatTransitionScreen
     // No need to redirect or create Chatwoot here
@@ -96,10 +96,9 @@ function ApplyPageContent() {
             <ProgressiveForm
               loanType={validLoanType}
               sessionId={sessionId}
-              onStepCompletion={handleStepCompletion}
+              onGateCompletion={handleGateCompletion}
               onAIInsight={handleAIInsight}
               onScoreUpdate={handleScoreUpdate}
-              showDiagnostics={showDiagnostics}
               className="w-full"
             />
           )}

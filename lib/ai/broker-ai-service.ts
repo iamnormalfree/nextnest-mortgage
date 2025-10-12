@@ -94,7 +94,6 @@ export async function generateBrokerResponse(
         { role: 'user', content: message }
       ],
       temperature: 0.7,
-      maxCompletionTokens: 500,
     });
 
     console.log(`✅ Generated response (${text.length} chars)`);
@@ -292,6 +291,5 @@ export async function streamBrokerResponse(
       { role: 'user', content: message }
     ],
     temperature: 0.7,
-    maxCompletionTokens: 500,
   });
 }

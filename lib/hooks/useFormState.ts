@@ -207,6 +207,31 @@ export function useFormState(
     })
   }
 
+  // Handle form abandonment
+  const handleAbandonment = useCallback(() => {
+    const timeSpent = Math.round((Date.now() - formStartTimeRef.current) / 1000)
+    const abandonData: AbandonmentData = {
+      timestamp: new Date().toISOString(),
+      completionPercentage: calculateCompletionPercentage(formData),
+      lastActiveField: lastActiveFieldRef.current,
+      timeSpent,
+      formData
+    }
+
+    // Save abandonment data
+    localStorage.setItem(`${storageKey}_abandonment`, JSON.stringify(abandonData))
+    setAbandonmentData(abandonData)
+
+    // Call abandonment callback if provided
+    if (onAbandonment) {
+      onAbandonment(formData, abandonData.completionPercentage)
+    }
+
+    // Save current state for recovery
+    saveToStorage()
+
+  }, [formData, storageKey, calculateCompletionPercentage, onAbandonment, saveToStorage])
+
   // Update single field
   const updateField = useCallback((field: keyof FormState, value: any) => {
     setFormData(prev => ({
@@ -216,17 +241,17 @@ export function useFormState(
     setHasUnsavedChanges(true)
     lastActivityRef.current = Date.now()
     lastActiveFieldRef.current = field
-    
+
     // Reset abandonment timer
     if (abandonmentTimerRef.current) {
       clearTimeout(abandonmentTimerRef.current)
     }
-    
+
     abandonmentTimerRef.current = setTimeout(() => {
       handleAbandonment()
     }, ABANDONMENT_THRESHOLD)
-    
-  }, [])
+
+  }, [handleAbandonment])
 
   // Update multiple fields
   const updateMultipleFields = useCallback((updates: Partial<FormState>) => {
@@ -261,31 +286,6 @@ export function useFormState(
       }
     }
   }, [storageKey])
-
-  // Handle form abandonment
-  const handleAbandonment = useCallback(() => {
-    const timeSpent = Math.round((Date.now() - formStartTimeRef.current) / 1000)
-    const abandonData: AbandonmentData = {
-      timestamp: new Date().toISOString(),
-      completionPercentage: calculateCompletionPercentage(formData),
-      lastActiveField: lastActiveFieldRef.current,
-      timeSpent,
-      formData
-    }
-    
-    // Save abandonment data
-    localStorage.setItem(`${storageKey}_abandonment`, JSON.stringify(abandonData))
-    setAbandonmentData(abandonData)
-    
-    // Call abandonment callback if provided
-    if (onAbandonment) {
-      onAbandonment(formData, abandonData.completionPercentage)
-    }
-    
-    // Save current state for recovery
-    saveToStorage()
-    
-  }, [formData, storageKey, calculateCompletionPercentage, onAbandonment, saveToStorage])
 
   // Auto-save effect
   useEffect(() => {

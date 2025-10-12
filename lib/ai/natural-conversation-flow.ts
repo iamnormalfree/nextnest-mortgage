@@ -3,7 +3,7 @@
  * Handles AI broker joining, personality-driven messages, and natural conversation transitions
  */
 
-import { BrokerPersona } from '@/types/mortgage'
+import { BrokerPersona } from '@/lib/calculations/broker-persona'
 
 interface ConversationContext {
   conversationId: number

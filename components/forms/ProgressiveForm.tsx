@@ -190,7 +190,7 @@ export function ProgressiveForm({
       watchedFields,
       schema: currentSchema._def
     })
-  }, [currentGate, isValid, errors, watchedFields])
+  }, [currentGate, isValid, errors, watchedFields, currentSchema])
   
   useEffect(() => {
     // Set loan type in lead form

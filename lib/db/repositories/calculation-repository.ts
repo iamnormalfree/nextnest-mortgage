@@ -85,9 +85,10 @@ export class CalculationRepository {
 
       const { data, error } = await getSupabaseClient()
         .from('calculation_audit')
+        // @ts-expect-error - Supabase type inference issue with insert
         .insert(record)
         .select('id')
-        .single();
+        .single() as { data: any; error: any };
 
       if (error) {
         console.error('L Failed to store calculation audit:', error);
@@ -159,12 +160,14 @@ export class CalculationRepository {
         .select('*')
         .eq('conversation_id', conversationId)
         .order('timestamp', { ascending: false })
-        .limit(limit);
+        .limit(limit) as { data: any[] | null; error: any };
 
       if (error) {
         console.error('L Failed to retrieve calculation history:', error);
         return [];
       }
+
+      if (!data) return [];
 
       return data.map(row => ({
         id: row.id,
@@ -210,7 +213,7 @@ export class CalculationRepository {
         query = query.lte('timestamp', dateTo.toISOString());
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query as { data: any[] | null; error: any };
 
       if (error) {
         console.error('L Failed to get calculation stats:', error);
@@ -279,12 +282,14 @@ export class CalculationRepository {
         .from('calculation_audit')
         .select('*')
         .gte('timestamp', dateFrom.toISOString())
-        .lte('timestamp', dateTo.toISOString());
+        .lte('timestamp', dateTo.toISOString()) as { data: any[] | null; error: any };
 
       if (error) {
         console.error('L Failed to generate compliance report:', error);
         return null;
       }
+
+      if (!data) return null;
 
       const totalCalculations = data.length;
       const compliantCalculations = data.filter(row => row.mas_compliant).length;
@@ -335,7 +340,7 @@ export class CalculationRepository {
         .eq('conversation_id', conversationId)
         .order('timestamp', { ascending: false })
         .limit(1)
-        .single();
+        .single() as { data: any | null; error: any };
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -345,6 +350,8 @@ export class CalculationRepository {
         console.error('L Failed to get latest calculation:', error);
         return null;
       }
+
+      if (!data) return null;
 
       return {
         id: data.id,
@@ -377,7 +384,7 @@ export class CalculationRepository {
         .from('calculation_audit')
         .delete()
         .lt('timestamp', cutoffDate.toISOString())
-        .select('id');
+        .select('id') as { data: any[] | null; error: any };
 
       if (error) {
         console.error('L Failed to delete old calculations:', error);

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -104,7 +104,7 @@ export default function ChatTransitionScreen({
       if (messageTimeout3) clearTimeout(messageTimeout3)
       if (brokerTimeout) clearTimeout(brokerTimeout)
     }
-  }, [state])
+  }, [state, leadScore, formData])
 
 
   const initiateChatTransition = async (retryCount = 0): Promise<void> => {
@@ -120,7 +120,7 @@ export default function ChatTransitionScreen({
       }
 
       // Debug the request payload before sending
-      console.log('ðŸ” DEBUG: ChatTransition API request payload:', {
+      console.log('🔍 DEBUG: ChatTransition API request payload:', {
         formData,
         sessionId,
         leadScore,
@@ -150,7 +150,7 @@ export default function ChatTransitionScreen({
         // Retry on 503 or 500 errors if we haven't exceeded max retries
         if ((response.status === 503 || response.status === 500) && retryCount < maxRetries) {
           const delay = retryDelays[retryCount]
-          console.log(`⏳ Retrying in ${delay}ms... (attempt ${retryCount + 1}/${maxRetries})`)
+          console.log(`? Retrying in ${delay}ms... (attempt ${retryCount + 1}/${maxRetries})`)
           setMessage(`Connection issue. Retrying... (${retryCount + 1}/${maxRetries})`)
           await new Promise(resolve => setTimeout(resolve, delay))
           return initiateChatTransition(retryCount + 1)
@@ -215,7 +215,7 @@ export default function ChatTransitionScreen({
         sessionStorage.setItem('lead_score', leadScore.toString())
 
         // Successfully created conversation - proceed directly to chat
-        console.log('✅ Conversation created successfully:', {
+        console.log('? Conversation created successfully:', {
           conversationId: data.conversationId,
           widgetConfig: !!data.widgetConfig,
           broker: data.widgetConfig?.customAttributes?.ai_broker_name
@@ -227,13 +227,13 @@ export default function ChatTransitionScreen({
         setMessage('Connected! Loading chat...')
 
         // Notify parent and let it handle loading the chat widget
-        console.log('🔔 Calling onTransitionComplete with conversationId:', data.conversationId)
+        console.log('?? Calling onTransitionComplete with conversationId:', data.conversationId)
         onTransitionComplete(data.conversationId)
-        console.log('✅ onTransitionComplete called successfully')
+        console.log('? onTransitionComplete called successfully')
         return
       } else if (data.fallback) {
         // Track fallback usage - this happens when Chatwoot is not configured
-        console.log('📱 Chat service unavailable, showing fallback options:', data.fallback)
+        console.log('?? Chat service unavailable, showing fallback options:', data.fallback)
         await conversionTracker.trackChatTransitionFailed(sessionId, 'api_fallback', data.fallback.type)
 
         // Handle fallback scenario gracefully
@@ -251,7 +251,7 @@ export default function ChatTransitionScreen({
       if (retryCount < maxRetries && error instanceof Error &&
           (error.message.includes('fetch') || error.message.includes('network'))) {
         const delay = retryDelays[retryCount]
-        console.log(`⏳ Network error, retrying in ${delay}ms... (attempt ${retryCount + 1}/${maxRetries})`)
+        console.log(`? Network error, retrying in ${delay}ms... (attempt ${retryCount + 1}/${maxRetries})`)
         setMessage(`Network issue. Retrying... (${retryCount + 1}/${maxRetries})`)
         await new Promise(resolve => setTimeout(resolve, delay))
         return initiateChatTransition(retryCount + 1)

@@ -334,8 +334,8 @@ export const MobileAIAssistant: React.FC<MobileAIAssistantProps> = ({
       {activeView === 'chat' && (
         <div className="flex-shrink-0 bg-white border-t">
           <div className="flex items-center gap-2 p-3">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <Image className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Attach image">
+              <Image className="h-5 w-5" aria-hidden="true" />
             </Button>
 
             <div className="flex-1">

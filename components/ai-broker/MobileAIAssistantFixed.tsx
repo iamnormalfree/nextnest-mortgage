@@ -284,8 +284,8 @@ export const MobileAIAssistantFixed: React.FC<MobileAIAssistantFixedProps> = ({
       {/* Input Area - Only show in chat view - 48px */}
       {activeView === 'chat' && (
         <div className="h-12 bg-white border-t flex items-center px-3 gap-2 flex-shrink-0">
-          <button className="w-8 h-8 flex items-center justify-center text-gray-500">
-            <Image className="w-4 h-4" />
+          <button className="w-8 h-8 flex items-center justify-center text-gray-500" aria-label="Attach image">
+            <Image className="w-4 h-4" aria-hidden="true" />
           </button>
 
           <input

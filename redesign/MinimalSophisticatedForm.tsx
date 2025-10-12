@@ -11,7 +11,14 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 
 // Import calculation functions
-import { getMarketRate, getCreditCardCommitment } from '@/lib/calculations/mortgage'
+import { getPlaceholderRate } from '@/lib/calculations/mortgage'
+
+// Simple helper for credit card debt calculation (3.5% of card limit per MAS)
+const getCreditCardCommitment = (creditCards: string): number => {
+  const numCards = parseFloat(creditCards || '0')
+  // Assume average $10,000 credit limit per card, 3.5% minimum payment
+  return numCards * 10000 * 0.035
+}
 
 // Minimal icon components
 const ChevronRight = () => (
@@ -405,7 +412,7 @@ export default function MinimalSophisticatedForm() {
                       <div>
                         <p className="text-xs uppercase tracking-wide text-stone mb-1">Best Rate Found</p>
                         <p className="text-2xl font-light">
-                          {getMarketRate(
+                          {getPlaceholderRate(
                             formData.propertyType || 'Private',
                             formData.loanType === 'refinance' ? 'refinance' : 'new_purchase'
                           ).toFixed(2)}%

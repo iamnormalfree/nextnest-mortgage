@@ -228,7 +228,7 @@ const IntelligentMortgageForm = ({ className = '' }: IntelligentMortgageFormProp
             potentialSavings: 500
           } as any
 
-          const calculatedLeadScore = calculateLeadScore(gate3CumulativeData as any, mockResults)
+          const calculatedLeadScore = calculateLeadScore(gate3CumulativeData as any, mockResults, true)
           setLeadScore(calculatedLeadScore)
 
           devLog('📊 Lead score calculated:', calculatedLeadScore)
@@ -417,13 +417,13 @@ const IntelligentMortgageForm = ({ className = '' }: IntelligentMortgageFormProp
                 </div>
 
                 {/* Progressive Form for new_purchase and refinance (legacy progressive form) */}
-                <ProgressiveForm 
+                <ProgressiveForm
                   loanType={selectedLoanType}
                   sessionId={sessionId}
-                  onStepCompletion={handleStepCompletion}
+                  onGateCompletion={handleStepCompletion}
                   onAIInsight={handleAIAgentInsights}
                   onScoreUpdate={handleScoreUpdate}
-                  isExternallySubmitting={isSubmitting}
+                  isSubmitting={isSubmitting}
                   submissionError={submissionError}
                 />
                 

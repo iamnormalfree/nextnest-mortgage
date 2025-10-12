@@ -48,6 +48,28 @@ export type AIModel =
   | 'claude-3-haiku';    // 10% - Creative explanations
 
 /**
+ * Conversation Context - Lightweight context for AI operations
+ * Used by intent router and other AI components
+ */
+export interface ConversationContext {
+  user: {
+    name: string;
+    leadScore: number;
+    loanType?: string;
+  };
+  metadata: {
+    turnCount: number;
+    lastUserMessage?: string;
+    intentHistory?: string[];
+  };
+  memory: {
+    critical: any[];
+    firm: any[];
+    casual: any[];
+  };
+}
+
+/**
  * Conversation State - Complete state of an ongoing conversation
  */
 export interface ConversationState {
@@ -71,6 +93,10 @@ export interface ConversationState {
     hasConfirmedPropertyPrice?: boolean;
     hasDiscussedLoanPackage?: boolean;
     preferredContactMethod?: 'call' | 'email' | 'whatsapp';
+    // Dr. Elena calculation tracking (Week 3 Phase 5)
+    hasCalculatedLoan?: boolean;
+    lastCalculationType?: 'max_loan' | 'affordability' | 'refinancing' | 'stamp_duty' | 'comparison';
+    lastCalculationResult?: any; // LoanCalculationResult from dr-elena-mortgage.ts
   };
   
   // Timestamps

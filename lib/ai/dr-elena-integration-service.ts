@@ -244,7 +244,14 @@ export class DrElenaIntegrationService {
   ): Promise<'greeting' | 'discovery' | 'calculation' | 'recommendation' | 'closing'> {
     try {
       const state = await this.stateManager.getState(conversationId);
-      return state?.phase || 'calculation';
+      const phase = state?.phase || 'calculation';
+
+      // Map ConversationPhase to ExplanationContext phase (simpler set)
+      if (phase === 'qualification') return 'discovery';
+      if (phase === 'objection_handling') return 'recommendation';
+      if (phase === 'escalation') return 'closing';
+
+      return phase as 'greeting' | 'discovery' | 'calculation' | 'recommendation' | 'closing';
     } catch {
       return 'calculation';
     }

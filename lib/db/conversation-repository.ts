@@ -11,10 +11,28 @@
 
 import { createClient } from '@supabase/supabase-js';
 import {
-  ConversationContext,
-  ConversationTurn,
-  CalculationAudit,
+  ConversationContext
 } from '@/lib/contracts/ai-conversation-contracts';
+
+// Define types specific to database operations
+interface ConversationTurn {
+  id?: string;
+  conversationId: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  intent?: string;
+  timestamp?: Date;
+  tokensUsed?: number;
+}
+
+interface CalculationAudit {
+  conversationId: string;
+  calculationType: string;
+  inputs: any;
+  results: any;
+  timestamp: Date;
+  masCompliant: boolean;
+}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
@@ -25,18 +43,18 @@ export class ConversationRepository {
   /**
    * Store conversation metadata and memory snapshot
    */
-  async storeConversation(context: ConversationContext): Promise<void> {
+  async storeConversation(context: any): Promise<void> {
     const { error } = await supabaseAdmin
       .from('conversations')
       .upsert({
         id: context.conversationId,
-        user_id: context.user.email,
-        created_at: context.metadata.startedAt,
+        user_id: context.user?.email || context.user?.name,
+        created_at: context.metadata?.startedAt || new Date().toISOString(),
         last_activity: new Date().toISOString(),
-        memory_snapshot: context.memory,
-        broker_persona: context.broker.persona.name,
-        lead_score: context.user.leadScore,
-        loan_type: context.user.loanType,
+        memory_snapshot: context.memory || {},
+        broker_persona: context.broker?.persona?.name || 'default',
+        lead_score: context.user?.leadScore || 0,
+        loan_type: context.user?.loanType || 'unknown',
       }, {
         onConflict: 'id',
       });
@@ -52,7 +70,7 @@ export class ConversationRepository {
   /**
    * Store individual conversation turn
    */
-  async storeTurn(turn: ConversationTurn): Promise<void> {
+  async storeTurn(turn: any): Promise<void> {
     const { error } = await supabaseAdmin
       .from('conversation_turns')
       .insert({
@@ -76,7 +94,7 @@ export class ConversationRepository {
   /**
    * Store calculation audit for Dr. Elena compliance tracking
    */
-  async storeCalculationAudit(audit: CalculationAudit): Promise<void> {
+  async storeCalculationAudit(audit: any): Promise<void> {
     const { error } = await supabaseAdmin
       .from('calculation_audit')
       .insert({
@@ -143,7 +161,7 @@ export class ConversationRepository {
     conversationId: string,
     limit: number = 50,
     offset: number = 0
-  ): Promise<ConversationTurn[]> {
+  ): Promise<any[]> {
     const { data, error } = await supabaseAdmin
       .from('conversation_turns')
       .select('*')
@@ -173,7 +191,7 @@ export class ConversationRepository {
    * Get calculation audit trail for a conversation
    * Used for compliance reporting and debugging
    */
-  async getCalculationAudits(conversationId: string): Promise<CalculationAudit[]> {
+  async getCalculationAudits(conversationId: string): Promise<any[]> {
     const { data, error } = await supabaseAdmin
       .from('calculation_audit')
       .select('*')
