@@ -43,7 +43,10 @@ export interface BrokerConversationJob {
 }
 
 /**
- * Create BullMQ queue instance
+ * Lazy initialization for BullMQ queue instance
+ *
+ * IMPORTANT: Uses lazy initialization to prevent build-time execution.
+ * Environment variables (REDIS_URL) are only available at runtime in Docker builds.
  *
  * INTEGRATION WITH EXISTING SYSTEMS:
  * - Jobs call existing functions from:
@@ -52,46 +55,60 @@ export interface BrokerConversationJob {
  *   - broker-persona.ts (analyzeMessageUrgency)
  *   - chatwoot-client.ts (sendInitialMessage, updateConversationCustomAttributes)
  */
-export const brokerQueue = new Queue<BrokerConversationJob>(
-  'broker-conversations',
-  {
-    connection: getRedisConnection(),
-    defaultJobOptions: {
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
-      removeOnComplete: {
-        age: 86400, // 24 hours
-        count: 1000,
-      },
-      removeOnFail: {
-        age: 604800, // 7 days
-      },
-    },
+let _brokerQueue: Queue<BrokerConversationJob> | null = null;
+
+export function getBrokerQueue(): Queue<BrokerConversationJob> {
+  if (!_brokerQueue) {
+    _brokerQueue = new Queue<BrokerConversationJob>(
+      'broker-conversations',
+      {
+        connection: getRedisConnection(),
+        defaultJobOptions: {
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 2000,
+          },
+          removeOnComplete: {
+            age: 86400, // 24 hours
+            count: 1000,
+          },
+          removeOnFail: {
+            age: 604800, // 7 days
+          },
+        },
+      }
+    );
   }
-);
+  return _brokerQueue;
+}
 
 /**
- * Queue events for monitoring
+ * Lazy initialization for queue events (monitoring)
  */
-export const brokerQueueEvents = new QueueEvents('broker-conversations', {
-  connection: getRedisConnection(),
-});
+let _brokerQueueEvents: QueueEvents | null = null;
 
-// Monitor queue events
-brokerQueueEvents.on('completed', ({ jobId }) => {
-  console.log(`✅ Job completed: ${jobId}`);
-});
+export function getBrokerQueueEvents(): QueueEvents {
+  if (!_brokerQueueEvents) {
+    _brokerQueueEvents = new QueueEvents('broker-conversations', {
+      connection: getRedisConnection(),
+    });
 
-brokerQueueEvents.on('failed', ({ jobId, failedReason }) => {
-  console.error(`❌ Job failed: ${jobId}`, failedReason);
-});
+    // Set up event handlers once
+    _brokerQueueEvents.on('completed', ({ jobId }) => {
+      console.log(`✅ Job completed: ${jobId}`);
+    });
 
-brokerQueueEvents.on('active', ({ jobId }) => {
-  console.log(`🔄 Job started: ${jobId}`);
-});
+    _brokerQueueEvents.on('failed', ({ jobId, failedReason }) => {
+      console.error(`❌ Job failed: ${jobId}`, failedReason);
+    });
+
+    _brokerQueueEvents.on('active', ({ jobId }) => {
+      console.log(`🔄 Job started: ${jobId}`);
+    });
+  }
+  return _brokerQueueEvents;
+}
 
 /**
  * Add new conversation to queue
@@ -128,7 +145,7 @@ export async function queueNewConversation(data: {
       priority,
     });
 
-    const job = await brokerQueue.add(
+    const job = await getBrokerQueue().add(
       'new-conversation',
       {
         type: 'new-conversation',
@@ -189,7 +206,7 @@ export async function queueIncomingMessage(data: {
       messagePreview: data.userMessage.substring(0, 50) + '...',
     });
 
-    const job = await brokerQueue.add(
+    const job = await getBrokerQueue().add(
       'incoming-message',
       {
         type: 'incoming-message',
@@ -228,12 +245,13 @@ export async function queueIncomingMessage(data: {
  */
 export async function getQueueMetrics() {
   try {
+    const queue = getBrokerQueue();
     const [waiting, active, completed, failed, delayed] = await Promise.all([
-      brokerQueue.getWaitingCount(),
-      brokerQueue.getActiveCount(),
-      brokerQueue.getCompletedCount(),
-      brokerQueue.getFailedCount(),
-      brokerQueue.getDelayedCount(),
+      queue.getWaitingCount(),
+      queue.getActiveCount(),
+      queue.getCompletedCount(),
+      queue.getFailedCount(),
+      queue.getDelayedCount(),
     ]);
 
     const metrics = {
@@ -266,12 +284,12 @@ export async function getQueueMetrics() {
  * Pause/resume queue for maintenance
  */
 export async function pauseQueue() {
-  await brokerQueue.pause();
+  await getBrokerQueue().pause();
   console.log('⏸️ Queue paused');
 }
 
 export async function resumeQueue() {
-  await brokerQueue.resume();
+  await getBrokerQueue().resume();
   console.log('▶️ Queue resumed');
 }
 
@@ -279,6 +297,6 @@ export async function resumeQueue() {
  * Emergency: Drain all jobs (for rollback)
  */
 export async function drainQueue() {
-  await brokerQueue.drain();
+  await getBrokerQueue().drain();
   console.log('🚰 Queue drained');
 }

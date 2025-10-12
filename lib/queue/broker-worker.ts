@@ -367,7 +367,10 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
- * Create BullMQ worker
+ * Lazy initialization for BullMQ worker
+ *
+ * IMPORTANT: Uses lazy initialization to prevent build-time execution.
+ * Environment variables (REDIS_URL) are only available at runtime in Docker builds.
  *
  * CONFIGURATION:
  * - Concurrency: Set via WORKER_CONCURRENCY env var (default: 3)
@@ -379,44 +382,51 @@ function delay(ms: number): Promise<void> {
  * - Runs in server environment only (not client-side)
  * - Gracefully shuts down on SIGTERM/SIGINT
  */
-export const brokerWorker = new Worker<BrokerConversationJob>(
-  'broker-conversations',
-  processConversationJob,
-  {
-    connection: getRedisConnection(),
-    concurrency: parseInt(process.env.WORKER_CONCURRENCY || '3'),
-    limiter: {
-      max: parseInt(process.env.QUEUE_RATE_LIMIT || '10'),
-      duration: 1000,
-    },
+let _brokerWorker: Worker<BrokerConversationJob> | null = null;
+
+export function getBrokerWorker(): Worker<BrokerConversationJob> {
+  if (!_brokerWorker) {
+    _brokerWorker = new Worker<BrokerConversationJob>(
+      'broker-conversations',
+      processConversationJob,
+      {
+        connection: getRedisConnection(),
+        concurrency: parseInt(process.env.WORKER_CONCURRENCY || '3'),
+        limiter: {
+          max: parseInt(process.env.QUEUE_RATE_LIMIT || '10'),
+          duration: 1000,
+        },
+      }
+    );
+
+    // Set up event handlers once
+    _brokerWorker.on('completed', (job) => {
+      console.log(`✅ Worker completed job ${job.id}`);
+    });
+
+    _brokerWorker.on('failed', (job, err) => {
+      console.error(`❌ Worker failed job ${job?.id}:`, err.message);
+    });
+
+    _brokerWorker.on('error', (err) => {
+      console.error('❌ Worker error:', err);
+    });
+
+    // Graceful shutdown handlers
+    const shutdown = async (signal: string) => {
+      console.log(`\n⚠️ ${signal} received, gracefully shutting down worker...`);
+      await _brokerWorker!.close();
+      console.log('✅ Worker closed successfully');
+      process.exit(0);
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
+
+    console.log('🚀 BullMQ worker initialized and ready to process jobs');
+    console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 3}`);
+    console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 10}/second`);
+    console.log(`   Environment: ${process.env.NODE_ENV}`);
   }
-);
-
-// Worker event handlers
-brokerWorker.on('completed', (job) => {
-  console.log(`✅ Worker completed job ${job.id}`);
-});
-
-brokerWorker.on('failed', (job, err) => {
-  console.error(`❌ Worker failed job ${job?.id}:`, err.message);
-});
-
-brokerWorker.on('error', (err) => {
-  console.error('❌ Worker error:', err);
-});
-
-// Graceful shutdown
-const shutdown = async (signal: string) => {
-  console.log(`\n⚠️ ${signal} received, gracefully shutting down worker...`);
-  await brokerWorker.close();
-  console.log('✅ Worker closed successfully');
-  process.exit(0);
-};
-
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
-
-console.log('🚀 BullMQ worker initialized and ready to process jobs');
-console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 3}`);
-console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 10}/second`);
-console.log(`   Environment: ${process.env.NODE_ENV}`);
+  return _brokerWorker;
+}
