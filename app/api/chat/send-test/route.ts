@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getBrokerForConversation } from '@/lib/ai/broker-assignment'
 
+// Force dynamic rendering - this route needs runtime environment variables
+export const dynamic = 'force-dynamic'
+
 // Test endpoint that simulates AI broker responses locally
 export async function POST(request: NextRequest) {
   try {

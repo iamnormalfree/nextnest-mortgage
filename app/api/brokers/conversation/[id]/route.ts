@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBrokerForConversation } from '@/lib/ai/broker-assignment';
 
+// Force dynamic rendering - needs runtime environment variables for Supabase
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }

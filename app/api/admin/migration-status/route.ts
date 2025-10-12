@@ -3,6 +3,9 @@ import { getMigrationStatus, getMigrationRecommendations } from '@/lib/utils/mig
 import { getQueueMetrics } from '@/lib/queue/broker-queue';
 import { getWorkerStatus } from '@/lib/queue/worker-manager';
 
+// Force dynamic rendering - needs runtime environment variables for BullMQ/Redis
+export const dynamic = 'force-dynamic'
+
 /**
  * Admin Migration Status Dashboard
  *

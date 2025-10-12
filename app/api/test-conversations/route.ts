@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Force dynamic rendering - needs runtime environment variables for Chatwoot API
+export const dynamic = 'force-dynamic'
+
 /**
  * Conversation Monitoring API
  * GET without params: Returns last 20 conversations sorted by recent activity

@@ -5,6 +5,9 @@ import { trackBotMessage, checkIfEcho } from '@/lib/utils/message-tracking'
 import { queueIncomingMessage } from '@/lib/queue/broker-queue'
 import { shouldUseBullMQ, logMigrationDecision, getMigrationStatus } from '@/lib/utils/migration-control'
 
+// Force dynamic rendering - needs runtime environment variables for Supabase, BullMQ, Chatwoot
+export const dynamic = 'force-dynamic'
+
 // Track processed message IDs to prevent duplicates
 const processedMessages = new Set<string>();
 

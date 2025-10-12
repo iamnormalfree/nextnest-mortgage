@@ -4,6 +4,9 @@ import { generateBrokerResponse } from '@/lib/ai/broker-ai-service'
 import { calculateBrokerPersona } from '@/lib/calculations/broker-persona'
 import { ProcessedLeadData } from '@/lib/integrations/chatwoot-client'
 
+// Force dynamic rendering - needs runtime environment variables for Chatwoot API
+export const dynamic = 'force-dynamic'
+
 /**
  * Chatwoot AI Webhook Handler with Dr. Elena Integration
  *

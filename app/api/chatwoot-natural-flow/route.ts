@@ -14,6 +14,9 @@ import {
 } from '@/lib/ai/natural-conversation-flow'
 import { FirstMessageGenerator } from '@/lib/ai/first-message-templates'
 
+// Force dynamic rendering - needs runtime environment variables for Chatwoot API
+export const dynamic = 'force-dynamic'
+
 const CHATWOOT_BASE_URL = process.env.CHATWOOT_BASE_URL || 'https://chat.nextnest.sg'
 const CHATWOOT_API_TOKEN = process.env.CHATWOOT_API_TOKEN
 const CHATWOOT_ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID || '1'

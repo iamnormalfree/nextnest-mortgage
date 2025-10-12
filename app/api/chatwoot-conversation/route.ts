@@ -10,6 +10,9 @@ import { getConversationDeduplicator } from '@/lib/integrations/conversation-ded
 import { queueNewConversation } from '@/lib/queue/broker-queue'
 import { shouldUseBullMQ, logMigrationDecision } from '@/lib/utils/migration-control'
 
+// Force dynamic rendering - needs runtime environment variables for Chatwoot, Supabase, BullMQ
+export const dynamic = 'force-dynamic'
+
 // Request validation schema matching ProgressiveForm Step 3 data
 const chatwootConversationSchema = z.object({
   formData: z.object({
