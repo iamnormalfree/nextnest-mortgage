@@ -1,10 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Output standalone for Docker deployment
+  output: 'standalone',
+
   // Enable static generation for marketing pages
   experimental: {
     optimizePackageImports: ['react-hook-form', 'date-fns']
   },
-  
+
   // Image optimization
   images: {
     remotePatterns: [
