@@ -51,6 +51,12 @@ const BuildingIcon = () => (
   </svg>
 )
 
+const Sparkles = () => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2v20M17 7h-10l5-5 5 5zM7 17h10l-5 5-5-5z"/>
+  </svg>
+)
+
 interface FormData {
   loanType?: 'new' | 'refinance' | 'commercial'
   name?: string
@@ -121,6 +127,7 @@ export default function SophisticatedProgressiveForm({
     isAnalyzing,
     isSubmitting,
     instantCalcResult,
+    showInstantCalc,
     leadScore,
     propertyCategory,
     control,
@@ -587,6 +594,28 @@ export default function SophisticatedProgressiveForm({
                       <p className="text-ruby text-xs mt-1">{errors.monthlyIncome.message}</p>
                     )}
                   </div>
+
+                  {/* Show instant calculation result if available */}
+                  {showInstantCalc && instantCalcResult && (
+                    <div className="mt-6 p-4 bg-gold/10 border border-gold/20">
+                      <h4 className="text-sm font-medium text-ink mb-2 flex items-center">
+                        <Sparkles />
+                        <span className="ml-2">Instant Analysis</span>
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedLoanType === 'new' && instantCalcResult.maxLoan && (
+                          <p className="text-sm text-graphite">
+                            Maximum Loan: <span className="font-mono font-medium">${instantCalcResult.maxLoan.toLocaleString()}</span>
+                          </p>
+                        )}
+                        {selectedLoanType === 'refinance' && instantCalcResult.monthlySavings && (
+                          <p className="text-sm text-graphite">
+                            Monthly Savings: <span className="font-mono font-medium text-emerald">${instantCalcResult.monthlySavings.toLocaleString()}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <button
                     type="submit"
