@@ -6,7 +6,7 @@
  * Provides a typed interface for any UI implementation
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useForm, Control, UseFormRegister, UseFormHandleSubmit, UseFormWatch, UseFormSetValue, UseFormTrigger } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LeadForm } from '@/lib/domains/forms/entities/LeadForm'
@@ -95,6 +95,10 @@ export function useProgressiveFormController({
   const [showInstantCalc, setShowInstantCalc] = useState(false)
   const [hasCalculated, setHasCalculated] = useState(false)
 
+  // Use ref to track previous values to prevent infinite loops
+  const prevFieldValuesRef = useRef<string>('')
+  const prevScoreFieldsRef = useRef<string>('')
+
   // Event publishing
   const publishEvent = useEventPublisher()
   const createEvent = useCreateEvent(sessionId)
@@ -123,10 +127,35 @@ export function useProgressiveFormController({
 
   const watchedFields = watch()
 
-  // Lead scoring logic (from ProgressiveForm) - optimize dependencies
+  // Lead scoring logic - FIXED: use ref to avoid infinite loops
   useEffect(() => {
+    const fields = watchedFields
+    
+    // Create serialized snapshot of fields that affect scoring
+    const scoreFields = JSON.stringify({
+      name: fields.name,
+      email: fields.email,
+      phone: fields.phone,
+      propertyCategory: fields.propertyCategory,
+      propertyType: fields.propertyType,
+      propertyPrice: fields.propertyPrice,
+      priceRange: fields.priceRange,
+      monthlyIncome: fields.monthlyIncome,
+      actualIncomes: fields.actualIncomes,
+      employmentType: fields.employmentType,
+      purchaseTimeline: fields.purchaseTimeline,
+      lockInStatus: fields.lockInStatus,
+      currentRate: fields.currentRate
+    })
+
+    // Only recalculate if scoring fields actually changed
+    if (scoreFields === prevScoreFieldsRef.current) {
+      return
+    }
+    
+    prevScoreFieldsRef.current = scoreFields
+
     let score = 0
-    const fields = watch()
 
     // Basic information scoring
     if (fields.name?.length > 2) score += 10
@@ -160,9 +189,9 @@ export function useProgressiveFormController({
     if (onScoreUpdate) {
       onScoreUpdate({
         total: finalScore,
-        urgency: finalScore * 0.4, // Estimate urgency as 40% of total
-        value: finalScore * 0.4, // Estimate value as 40% of total
-        qualification: finalScore * 0.2, // Estimate qualification as 20% of total
+        urgency: finalScore * 0.4,
+        value: finalScore * 0.4,
+        qualification: finalScore * 0.2,
         breakdown: {
           urgencyFactors: {},
           valueFactors: {},
@@ -171,39 +200,22 @@ export function useProgressiveFormController({
         routing: finalScore >= 75 ? 'immediate' :
                  finalScore >= 50 ? 'priority' :
                  finalScore >= 25 ? 'standard' : 'nurture',
-        confidence: 0.8, // Default confidence level
+        confidence: 0.8,
         timestamp: new Date()
       })
     }
-  }, [
-    // Specific field dependencies instead of entire object
-    watch('name'),
-    watch('email'),
-    watch('phone'),
-    watch('propertyCategory'),
-    watch('propertyType'),
-    watch('propertyPrice'),
-    watch('priceRange'),
-    watch('monthlyIncome'),
-    watch('actualIncomes'),
-    watch('employmentType'),
-    watch('purchaseTimeline'),
-    watch('lockInStatus'),
-    watch('currentRate'),
-    mappedLoanType,
-    onScoreUpdate
-  ])
+  }, [watchedFields, mappedLoanType, onScoreUpdate])
 
-  // Track field values - use ref to avoid infinite loops
+  // Track field values - FIXED: use ref to avoid infinite loops
   useEffect(() => {
-    // Only update fieldValues if we actually need them for display
-    // Using JSON.stringify comparison to check if values actually changed
     const currentValues = JSON.stringify(watchedFields)
-    const prevValues = JSON.stringify(fieldValues)
-    if (currentValues !== prevValues) {
+    
+    // Only update if values actually changed
+    if (currentValues !== prevFieldValuesRef.current) {
+      prevFieldValuesRef.current = currentValues
       setFieldValues(watchedFields)
     }
-  }, [JSON.stringify(watchedFields)])
+  }, [watchedFields])
 
   // Field change handler
   const onFieldChange = useCallback((name: string, value: any) => {
@@ -224,13 +236,13 @@ export function useProgressiveFormController({
     // Track conversion - field interaction tracking
     // Note: trackFieldInteraction method not available in current ConversionTracker
     // conversionTracker.trackFieldInteraction(name, currentStep)
-  }, [currentStep, setValue, leadForm, publishEvent, createEvent])
+  }, [currentStep, setValue, leadForm, publishEvent, createEvent, sessionId])
 
   // Calculate instant results
   const calculateInstant = useCallback(() => {
     if (hasCalculated) return
 
-    const formData = watch()
+    const formData = watchedFields
     let result = null
 
     if (mappedLoanType === 'new_purchase') {
@@ -258,7 +270,7 @@ export function useProgressiveFormController({
       setShowInstantCalc(true)
       setHasCalculated(true)
     }
-  }, [mappedLoanType, watch, hasCalculated])
+  }, [mappedLoanType, watchedFields, hasCalculated])
 
   // Instant calculation triggers (from ProgressiveForm) - use specific field dependencies
   useEffect(() => {
@@ -266,7 +278,7 @@ export function useProgressiveFormController({
       if (currentStep !== 2) return false
       if (hasCalculated) return false
 
-      const fields = watch()
+      const fields = watchedFields
 
       if (mappedLoanType === 'new_purchase') {
         return !!(
@@ -292,21 +304,7 @@ export function useProgressiveFormController({
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [
-    // Specific field dependencies
-    currentStep,
-    mappedLoanType,
-    hasCalculated,
-    watch('propertyCategory'),
-    watch('propertyType'),
-    watch('priceRange'),
-    watch('propertyPrice'),
-    watch('combinedAge'),
-    watch('currentRate'),
-    watch('outstandingLoan'),
-    watch('currentBank'),
-    calculateInstant
-  ])
+  }, [currentStep, mappedLoanType, hasCalculated, watchedFields, calculateInstant])
 
   // AI insight request handler
   const requestAIInsight = useCallback(async (fieldName: string, value: any) => {
