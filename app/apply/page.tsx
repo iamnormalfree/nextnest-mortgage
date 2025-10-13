@@ -12,9 +12,11 @@ import dynamic from 'next/dynamic'
 import type { LoanType } from '@/components/forms/SimpleLoanTypeSelector'
 import { useLoanApplicationContext } from '@/lib/hooks/useLoanApplicationContext'
 
-// Dynamic import for better performance
-const SophisticatedProgressiveForm = dynamic(
-  () => import('@/redesign/SophisticatedProgressiveForm'),
+// Using ProgressiveFormWithController for production (has working Chatwoot integration)
+const ProgressiveFormWithController = dynamic(
+  () => import('@/components/forms/ProgressiveFormWithController').then(mod => ({
+    default: mod.ProgressiveFormWithController
+  })),
   {
     ssr: false,
     loading: () => (
@@ -93,9 +95,12 @@ function ApplyPageContent() {
           {validLoanType === 'commercial' ? (
             <CommercialQuickForm sessionId={sessionId} className="w-full" />
           ) : (
-            <SophisticatedProgressiveForm
-              loanType={validLoanType === 'new_purchase' ? 'new' : validLoanType}
+            <ProgressiveFormWithController
+              loanType={validLoanType}
               sessionId={sessionId}
+              onStepCompletion={handleGateCompletion}
+              onAIInsight={handleAIInsight}
+              onScoreUpdate={handleScoreUpdate}
             />
           )}
         </div>

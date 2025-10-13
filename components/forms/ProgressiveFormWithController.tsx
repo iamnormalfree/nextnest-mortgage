@@ -1,10 +1,5 @@
-/**
- * Progressive Form with Headless Controller
- * Phase B-4: Form System Integration
- *
- * This component uses the headless controller for better separation of concerns
- * and maintains the same UI as the original ProgressiveForm
- */
+// ABOUTME: Progressive mortgage application form with 3-step flow and real-time validation
+// ABOUTME: Integrates with Chatwoot for seamless broker handoff and lead scoring
 
 'use client'
 
@@ -155,7 +150,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Full Name *
                   </label>
                   <Input
@@ -168,7 +163,7 @@ export function ProgressiveFormWithController({
                     }}
                   />
                   {errors.name && (
-                    <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.name)}</p>
+                    <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.name)}</p>
                   )}
                 </div>
               )}
@@ -179,7 +174,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Email Address *
                   </label>
                   <Input
@@ -192,7 +187,7 @@ export function ProgressiveFormWithController({
                     }}
                   />
                   {errors.email && (
-                    <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.email)}</p>
+                    <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.email)}</p>
                   )}
                 </div>
               )}
@@ -203,7 +198,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Phone Number *
                   </label>
                   <Input
@@ -216,7 +211,7 @@ export function ProgressiveFormWithController({
                     }}
                   />
                   {errors.phone && (
-                    <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.phone)}</p>
+                    <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.phone)}</p>
                   )}
                 </div>
               )}
@@ -233,7 +228,7 @@ export function ProgressiveFormWithController({
                 control={control}
                 render={({ field }) => (
                   <div>
-                    <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                    <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                       Property Category *
                     </label>
                     <Select
@@ -256,7 +251,7 @@ export function ProgressiveFormWithController({
                       </SelectContent>
                     </Select>
                     {errors.propertyCategory && (
-                      <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.propertyCategory)}</p>
+                      <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyCategory)}</p>
                     )}
                   </div>
                 )}
@@ -268,7 +263,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Property Type *
                   </label>
                   <Select
@@ -286,7 +281,7 @@ export function ProgressiveFormWithController({
                     </SelectContent>
                   </Select>
                   {errors.propertyType && (
-                    <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
+                    <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
                   )}
                 </div>
               )}
@@ -299,7 +294,7 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                         Property Price *
                       </label>
                       <Input
@@ -313,7 +308,7 @@ export function ProgressiveFormWithController({
                         }}
                       />
                       {errors.priceRange && (
-                        <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.priceRange)}</p>
+                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.priceRange)}</p>
                       )}
                     </div>
                   )}
@@ -324,7 +319,7 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                         Combined Age *
                       </label>
                       <Input
@@ -337,7 +332,7 @@ export function ProgressiveFormWithController({
                         }}
                       />
                       {errors.combinedAge && (
-                        <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.combinedAge)}</p>
+                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.combinedAge)}</p>
                       )}
                     </div>
                   )}
@@ -350,7 +345,7 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                         Current Interest Rate (%) *
                       </label>
                       <Input
@@ -364,7 +359,7 @@ export function ProgressiveFormWithController({
                         }}
                       />
                       {errors.currentRate && (
-                        <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.currentRate)}</p>
+                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.currentRate)}</p>
                       )}
                     </div>
                   )}
@@ -375,7 +370,7 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                         Outstanding Loan Amount *
                       </label>
                       <Input
@@ -389,7 +384,7 @@ export function ProgressiveFormWithController({
                         }}
                       />
                       {errors.outstandingLoan && (
-                        <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.outstandingLoan)}</p>
+                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.outstandingLoan)}</p>
                       )}
                     </div>
                   )}
@@ -400,7 +395,7 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                         Current Bank *
                       </label>
                       <Select
@@ -422,7 +417,7 @@ export function ProgressiveFormWithController({
                         </SelectContent>
                       </Select>
                       {errors.currentBank && (
-                        <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.currentBank)}</p>
+                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.currentBank)}</p>
                       )}
                     </div>
                   )}
@@ -432,20 +427,20 @@ export function ProgressiveFormWithController({
 
             {/* Show instant calculation result if available */}
             {showInstantCalc && instantCalcResult && (
-              <div className="mt-6 p-4 bg-gold/10 border border-gold/20">
-                <h4 className="text-sm font-medium text-ink mb-2">
+              <div className="mt-6 p-4 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
+                <h4 className="text-sm font-semibold text-black mb-2">
                   <Sparkles className="inline-block w-4 h-4 mr-2" />
                   Instant Analysis
                 </h4>
                 <div className="space-y-2">
                   {loanType === 'new_purchase' && instantCalcResult.maxLoan && (
-                    <p className="text-sm text-graphite">
-                      Maximum Loan: <span className="font-mono font-medium">${instantCalcResult.maxLoan.toLocaleString()}</span>
+                    <p className="text-sm text-[#666666]">
+                      Maximum Loan: <span className="font-mono font-semibold">${instantCalcResult.maxLoan.toLocaleString()}</span>
                     </p>
                   )}
                   {loanType === 'refinance' && instantCalcResult.monthlySavings && (
-                    <p className="text-sm text-graphite">
-                      Monthly Savings: <span className="font-mono font-medium text-emerald">${instantCalcResult.monthlySavings.toLocaleString()}</span>
+                    <p className="text-sm text-[#666666]">
+                      Monthly Savings: <span className="font-mono font-semibold text-[#10B981]">${instantCalcResult.monthlySavings.toLocaleString()}</span>
                     </p>
                   )}
                 </div>
@@ -462,7 +457,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Monthly Income *
                   </label>
                   <Input
@@ -476,7 +471,7 @@ export function ProgressiveFormWithController({
                     }}
                   />
                   {errors['actualIncomes.0'] && (
-                    <p className="text-ruby text-xs mt-1">Monthly income is required</p>
+                    <p className="text-[#EF4444] text-xs mt-1">Monthly income is required</p>
                   )}
                 </div>
               )}
@@ -487,7 +482,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Your Age *
                   </label>
                   <Input
@@ -500,7 +495,7 @@ export function ProgressiveFormWithController({
                     }}
                   />
                   {errors['actualAges.0'] && (
-                    <p className="text-ruby text-xs mt-1">Age is required</p>
+                    <p className="text-[#EF4444] text-xs mt-1">Age is required</p>
                   )}
                 </div>
               )}
@@ -511,7 +506,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Employment Type *
                   </label>
                   <Select
@@ -529,7 +524,7 @@ export function ProgressiveFormWithController({
                     </SelectContent>
                   </Select>
                   {errors.employmentType && (
-                    <p className="text-ruby text-xs mt-1">{getErrorMessage(errors.employmentType)}</p>
+                    <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.employmentType)}</p>
                   )}
                 </div>
               )}
@@ -540,7 +535,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-silver font-medium mb-2 block">
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
                     Existing Monthly Commitments
                   </label>
                   <Input
@@ -553,7 +548,7 @@ export function ProgressiveFormWithController({
                       field.onChange(value)
                     }}
                   />
-                  <p className="text-xs text-silver mt-1">
+                  <p className="text-xs text-[#666666] mt-1">
                     Include car loans, other mortgages, credit cards, etc.
                   </p>
                 </div>
@@ -601,10 +596,10 @@ export function ProgressiveFormWithController({
       {/* Progress Indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-ink">
+          <h3 className="text-sm font-semibold text-black">
             Step {currentStep + 1} of {formSteps.length}: {currentStepConfig.label}
           </h3>
-          <span className="text-xs text-silver">
+          <span className="text-xs text-[#666666]">
             {Math.round(progressPercentage)}% Complete
           </span>
         </div>
@@ -613,12 +608,12 @@ export function ProgressiveFormWithController({
 
       {/* Step Description */}
       <div className="mb-6">
-        <h2 className="text-2xl font-light text-ink mb-2">
+        <h2 className="text-2xl font-light text-black mb-2">
           {currentStepConfig.description}
         </h2>
         {leadScore > 0 && (
-          <div className="flex items-center gap-2 text-sm text-graphite">
-            <Shield className="w-4 h-4 text-emerald" />
+          <div className="flex items-center gap-2 text-sm text-[#666666]">
+            <Shield className="w-4 h-4 text-[#10B981]" />
             <span>Trust Score: {leadScore}%</span>
           </div>
         )}
@@ -626,14 +621,14 @@ export function ProgressiveFormWithController({
 
       {/* Form Content */}
       <form onSubmit={handleStepSubmit}>
-        <Card className="border-fog">
+        <Card className="border-[#E5E5E5]">
           <CardContent className="pt-6">
             {renderStepContent()}
 
             {/* Trust Signals */}
             {trustSignalsShown.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-fog">
-                <div className="flex items-center gap-2 text-xs text-silver">
+              <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
+                <div className="flex items-center gap-2 text-xs text-[#666666]">
                   <Shield className="w-3 h-3" />
                   <span>Bank-level security • PDPA compliant • No spam guarantee</span>
                 </div>
@@ -655,7 +650,7 @@ export function ProgressiveFormWithController({
 
               <Button
                 type="submit"
-                className="h-12 px-8 bg-gold text-ink hover:bg-gold-dark flex-1 ml-auto"
+                className="h-12 px-8 bg-[#FCD34D] text-black hover:bg-[#FBB614] flex-1 ml-auto"
                 disabled={!isValid || isSubmitting || isExternallySubmitting}
               >
                 {isSubmitting || isExternallySubmitting ? (
@@ -670,7 +665,7 @@ export function ProgressiveFormWithController({
 
             {/* Error Display */}
             {submissionError && (
-              <div className="mt-4 p-3 bg-ruby/10 border border-ruby/20 text-ruby text-sm">
+              <div className="mt-4 p-3 bg-[#EF4444]/10 border border-[#EF4444]/20 text-[#EF4444] text-sm">
                 <AlertTriangle className="inline-block w-4 h-4 mr-2" />
                 {submissionError}
               </div>
