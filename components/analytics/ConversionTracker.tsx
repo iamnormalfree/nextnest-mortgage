@@ -2,6 +2,15 @@
 
 import { useEffect } from 'react'
 
+// Inline type declarations for Railway build environment
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void
+    fbq?: (...args: any[]) => void
+    conversions?: any
+  }
+}
+
 interface ConversionEvent {
   event: 'page_view' | 'form_start' | 'form_step' | 'form_submit' | 'ai_insight_view' | 'cta_click'
   properties: {

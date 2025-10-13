@@ -2,7 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
-// Global Window interface declarations moved to types/global.d.ts
+// Inline type declarations for Railway build environment
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void
+    $chatwoot?: any
+    chatwootSettings?: any
+  }
+}
 
 interface ChatWidgetConfig {
   baseUrl: string
