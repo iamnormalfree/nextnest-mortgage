@@ -8,9 +8,9 @@
 export async function getFeatureFlags() {
   return {
     USE_SOPHISTICATED_FLOW: process.env.NODE_ENV === 'development' ||
-                           process.env.USE_SOPHISTICATED_FLOW === 'true',
+                           process.env.NEXT_PUBLIC_USE_SOPHISTICATED_FLOW === 'true',
     MOBILE_AI_BROKER_UI: process.env.NODE_ENV === 'development' ||
-                        process.env.MOBILE_AI_BROKER === 'true',
+                        process.env.NEXT_PUBLIC_MOBILE_AI_BROKER === 'true',
     PERSIST_SESSION_DATA: true,
     CHAT_PERSISTENCE: true
   }
