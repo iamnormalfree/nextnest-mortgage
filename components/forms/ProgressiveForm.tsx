@@ -48,19 +48,19 @@ const formGates: FormGate[] = [
     gateNumber: 1,
     label: 'Basic Information',
     description: 'Get your personalized rate',
-    fieldsRequired: ['name', 'email'],
-    minimumFields: 2,
+    fieldsRequired: ['name', 'email', 'phone'],
+    minimumFields: 3,
     trustLevel: 25,
-    ctaText: 'See Detailed Analysis (Email Only)'
+    ctaText: 'See Detailed Analysis'
   },
   {
     gateNumber: 2,
-    label: 'Contact Details',
-    description: 'Unlock full mortgage intelligence',
-    fieldsRequired: ['phone'],
-    minimumFields: 1,
+    label: 'Property Details',
+    description: 'Help us find your best match',
+    fieldsRequired: [],
+    minimumFields: 0,
     trustLevel: 50,
-    ctaText: 'Get Full Report (Complete Profile)'
+    ctaText: 'Get Full Analysis'
   },
   {
     gateNumber: 3,

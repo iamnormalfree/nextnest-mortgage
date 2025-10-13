@@ -13,8 +13,8 @@ import type { LoanType } from '@/components/forms/SimpleLoanTypeSelector'
 import { useLoanApplicationContext } from '@/lib/hooks/useLoanApplicationContext'
 
 // Dynamic import for better performance
-const ProgressiveForm = dynamic(
-  () => import('@/components/forms/ProgressiveForm').then(mod => ({ default: mod.ProgressiveForm })),
+const SophisticatedProgressiveForm = dynamic(
+  () => import('@/redesign/SophisticatedProgressiveForm'),
   {
     ssr: false,
     loading: () => (
@@ -93,13 +93,9 @@ function ApplyPageContent() {
           {validLoanType === 'commercial' ? (
             <CommercialQuickForm sessionId={sessionId} className="w-full" />
           ) : (
-            <ProgressiveForm
-              loanType={validLoanType}
+            <SophisticatedProgressiveForm
+              loanType={validLoanType === 'new_purchase' ? 'new' : validLoanType}
               sessionId={sessionId}
-              onGateCompletion={handleGateCompletion}
-              onAIInsight={handleAIInsight}
-              onScoreUpdate={handleScoreUpdate}
-              className="w-full"
             />
           )}
         </div>

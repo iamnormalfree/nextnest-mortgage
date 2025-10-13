@@ -2,15 +2,6 @@
 
 import { useEffect } from 'react'
 
-// Extend Window interface for analytics tools
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void
-    fbq?: (...args: any[]) => void
-    conversions?: ConversionTracker
-  }
-}
-
 interface ConversionEvent {
   event: 'page_view' | 'form_start' | 'form_step' | 'form_submit' | 'ai_insight_view' | 'cta_click'
   properties: {
@@ -33,8 +24,6 @@ interface ConversionEvent {
 interface ConversionTrackerProps {
   children: React.ReactNode
 }
-
-// Global Window interface declarations moved to types/global.d.ts
 
 class ConversionTracker {
   private sessionId: string

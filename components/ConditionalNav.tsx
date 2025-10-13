@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import Image from 'next/image'
 import Logo from '@/assets/nn-logo-nobg-img.png'
+import { FEATURE_FLAGS } from '@/lib/features/feature-flags'
 
 export function ConditionalNav() {
   const pathname = usePathname()
@@ -14,6 +15,11 @@ export function ConditionalNav() {
   if (pathname?.startsWith('/validation-dashboard') ||
       pathname?.startsWith('/redesign/') ||
       pathname?.startsWith('/chat')) {
+    return null
+  }
+
+  // Hide navigation when sophisticated flow is active on homepage
+  if (pathname === '/' && FEATURE_FLAGS.USE_SOPHISTICATED_FLOW) {
     return null
   }
 

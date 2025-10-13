@@ -23,11 +23,29 @@ const config: Config = {
         'nn-blue': '#0F4C75',
         'nn-red': '#DC2626',
         'nn-green': '#059669',
+
+        // Bloomberg/Sophisticated Flow Colors
+        'ink': '#0A0A0A',
+        'charcoal': '#1C1C1C',
+        'graphite': '#374151',
+        'silver': '#8E8E93',
+        'pearl': '#C7C7CC',
+        'fog': '#E5E5EA',
+        'mist': '#F2F2F7',
+        'gold': {
+          DEFAULT: '#FCD34D',
+          dark: '#F59E0B',
+          pale: '#FEF3C7',
+        },
+        'emerald': '#10B981',
+        'ruby': '#EF4444',
       },
       backgroundImage: {
         'nn-gradient-gold': 'linear-gradient(135deg, #FFB800 0%, #F4B942 100%)',
         'nn-gradient-calculation': 'linear-gradient(90deg, rgba(255, 184, 0, 0.1) 0%, rgba(107, 70, 193, 0.1) 100%)',
         'nn-gradient-trust': 'linear-gradient(90deg, rgba(15, 76, 117, 0.05) 0%, rgba(15, 76, 117, 0.1) 100%)',
+        'hero-gradient': 'linear-gradient(180deg, #FFFFFF 0%, #F2F2F7 100%)',
+        'gradient-gold': 'linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%)',
       },
       boxShadow: {
         'nn-soft': '0 4px 12px rgba(28, 28, 30, 0.1)',
