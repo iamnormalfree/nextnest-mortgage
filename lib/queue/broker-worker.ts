@@ -23,6 +23,10 @@ import { ChatwootClient } from '@/lib/integrations/chatwoot-client';
 // AI response generation (NEW - Phase 2)
 import { generateBrokerResponse } from '@/lib/ai/broker-ai-service';
 
+// AI Orchestrator (Week 5 - Full Intelligence Integration)
+import { getAIOrchestrator } from '@/lib/ai/ai-orchestrator';
+import { isFullAIIntelligenceEnabled } from '@/lib/utils/feature-flags';
+
 // ============================================================================
 // WORKER IMPLEMENTATION
 // ============================================================================
@@ -285,17 +289,50 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
   await delay(urgency.responseTime);
   console.log('✅ Wait complete');
 
-  // STEP 5: Generate AI response (NEW - Phase 2)
-  // Uses Vercel AI SDK via generateBrokerResponse from broker-ai-service.ts
+  // STEP 5: Generate AI response
+  // Week 5: Route through AI Orchestrator if feature flag enabled
   console.log('🧠 Step 5: Generating AI response...');
-  const aiResponse = await generateBrokerResponse({
-    message: data.userMessage || '',
-    persona,
-    leadData: data.processedLeadData,
-    conversationId: data.conversationId,
-    conversationHistory: [], // TODO: Fetch from Chatwoot in future enhancement
-  });
-  console.log(`✅ AI response generated (${aiResponse.length} chars)`);
+
+  let aiResponse: string;
+  let shouldHandoffFromAI = false;
+  let handoffReasonFromAI: string | undefined;
+
+  if (isFullAIIntelligenceEnabled()) {
+    console.log('🎯 Using AI Orchestrator (full intelligence enabled)');
+
+    // NEW PATH: Full AI Intelligence with Orchestrator
+    const orchestrator = getAIOrchestrator();
+    const orchestratorResponse = await orchestrator.processMessage({
+      conversationId: data.conversationId,
+      contactId: data.contactId,
+      userMessage: data.userMessage || '',
+      leadData: data.processedLeadData,
+      brokerPersona: persona
+    });
+
+    aiResponse = orchestratorResponse.content;
+    shouldHandoffFromAI = orchestratorResponse.shouldHandoff;
+    handoffReasonFromAI = orchestratorResponse.handoffReason;
+
+    console.log(`✅ AI Orchestrator response generated (${aiResponse.length} chars)`);
+    console.log(`   Model: ${orchestratorResponse.model}`);
+    console.log(`   Intent: ${orchestratorResponse.intent}`);
+    console.log(`   Tokens: ${orchestratorResponse.tokensUsed}`);
+
+  } else {
+    console.log('💬 Using legacy AI service (orchestrator disabled)');
+
+    // LEGACY PATH: Direct AI generation
+    aiResponse = await generateBrokerResponse({
+      message: data.userMessage || '',
+      persona,
+      leadData: data.processedLeadData,
+      conversationId: data.conversationId,
+      conversationHistory: [], // TODO: Fetch from Chatwoot in future enhancement
+    });
+
+    console.log(`✅ Legacy AI response generated (${aiResponse.length} chars)`);
+  }
 
   // STEP 6: Send response to Chatwoot (NEW METHOD - Phase 2)
   // Uses new sendMessage() method added to ChatwootClient
@@ -307,9 +344,16 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
   );
   console.log('✅ Message sent to Chatwoot, message_id:', result.message_id);
 
-  // STEP 7: Check for handoff (EXISTING LOGIC from urgency analysis)
-  if (urgency.escalate) {
+  // STEP 7: Check for handoff
+  // Week 5: Check both urgency analysis AND AI Orchestrator recommendation
+  const needsHandoff = urgency.escalate || shouldHandoffFromAI;
+
+  if (needsHandoff) {
+    const handoffReason = handoffReasonFromAI ||
+                          (urgency.escalate ? 'Customer requested escalation' : 'Complex question');
+
     console.log('🚨 Step 7: Escalation needed, triggering handoff...');
+    console.log(`   Reason: ${handoffReason}`);
 
     // Post activity message
     await chatwootClient.createActivityMessage(
@@ -322,7 +366,7 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
       data.conversationId,
       {
         ai_status: 'handoff_requested',
-        handoff_reason: urgency.escalate ? 'Customer requested escalation' : 'Complex question',
+        handoff_reason: handoffReason,
         handoff_at: new Date().toISOString(),
       }
     );
@@ -337,7 +381,7 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
       broker.id,
       1, // message_count
       true, // handoffTriggered
-      'Customer requested escalation'
+      handoffReason
     );
 
     console.log('✅ Handoff completed');

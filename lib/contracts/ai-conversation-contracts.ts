@@ -43,9 +43,9 @@ export type UserIntent =
  * AI Model Selection - Multi-model orchestration
  */
 export type AIModel = 
-  | 'gpt-4o-mini'        // 70% - Standard responses
-  | 'gpt-4o'             // 20% - Complex calculations
-  | 'claude-3-haiku';    // 10% - Creative explanations
+  | 'gpt-4o-mini'          // 70% - Standard responses
+  | 'gpt-4o'               // 20% - Complex calculations
+  | 'claude-3.5-sonnet';   // 10% - Creative explanations
 
 /**
  * Conversation Context - Lightweight context for AI operations
@@ -193,7 +193,7 @@ export interface AIFeatureFlags {
   modelWeights: {
     'gpt-4o-mini': number;
     'gpt-4o': number;
-    'claude-3-haiku': number;
+    'claude-3.5-sonnet': number;
   };
 }
 

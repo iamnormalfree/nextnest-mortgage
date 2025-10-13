@@ -20,19 +20,19 @@ export const AI_FEATURE_FLAGS: AIFeatureFlags = {
   // Week 1-2: Foundation Layer (ENABLED)
   enableIntentClassification: true,
   enableResponseAwareness: false,  // Week 4
-  
-  // Week 3: Dr. Elena Integration (DISABLED until Week 3)
-  enableCalculationExplanations: false,
-  
-  // Week 4: Memory & Optimization (DISABLED until Week 4)
-  enableMultiModelOrchestration: false,
+
+  // Week 3: Dr. Elena Integration (ENABLED)
+  enableCalculationExplanations: true,
+
+  // Week 4: Memory & Optimization (ENABLED)
+  enableMultiModelOrchestration: true,
   enableConversationSummarization: false,
-  
+
   // Multi-model weights (used when enableMultiModelOrchestration = true)
   modelWeights: {
-    'gpt-4o-mini': 0.70,   // 70% - Standard responses
-    'gpt-4o': 0.20,        // 20% - Complex calculations
-    'claude-3-haiku': 0.10 // 10% - Creative explanations
+    'gpt-4o-mini': 0.70,         // 70% - Standard responses
+    'gpt-4o': 0.20,              // 20% - Complex calculations
+    'claude-3.5-sonnet': 0.10    // 10% - Creative explanations
   }
 };
 
@@ -66,7 +66,7 @@ export function getModelWeights(): AIFeatureFlags['modelWeights'] {
   
   if (miniWeight) weights['gpt-4o-mini'] = parseFloat(miniWeight);
   if (gpt4Weight) weights['gpt-4o'] = parseFloat(gpt4Weight);
-  if (claudeWeight) weights['claude-3-haiku'] = parseFloat(claudeWeight);
+  if (claudeWeight) weights['claude-3.5-sonnet'] = parseFloat(claudeWeight);
   
   // Validate weights sum to 1.0
   const sum = Object.values(weights).reduce((a, b) => a + b, 0);
@@ -78,6 +78,18 @@ export function getModelWeights(): AIFeatureFlags['modelWeights'] {
   }
   
   return weights;
+}
+
+/**
+ * Check if full AI intelligence system is enabled
+ * Week 5: Master switch for AI Orchestrator
+ */
+export function isFullAIIntelligenceEnabled(): boolean {
+  const envValue = process.env.ENABLE_FULL_AI_INTELLIGENCE;
+  if (envValue !== undefined) {
+    return envValue === 'true' || envValue === '1';
+  }
+  return false; // Default to false for safety
 }
 
 /**

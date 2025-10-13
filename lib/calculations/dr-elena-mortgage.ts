@@ -19,10 +19,16 @@ export interface LoanCalculationInputs {
   age: number;
   citizenship: 'Citizen' | 'PR' | 'Foreigner';
   propertyCount: 1 | 2 | 3;
+  incomeType?: 'fixed' | 'variable' | 'self_employed' | 'rental' | 'mixed';
+  variableIncomeAmount?: number;
+  rentalIncomeAmount?: number;
   coApplicant?: {
     monthlyIncome: number;
     age: number;
     existingCommitments: number;
+    incomeType?: 'fixed' | 'variable' | 'self_employed' | 'rental' | 'mixed';
+    variableIncomeAmount?: number;
+    rentalIncomeAmount?: number;
   };
 }
 
@@ -108,6 +114,18 @@ const MAS_REGULATIONS = {
   }
 };
 
+/**
+ * MAS Notice 645 Income Recognition Rates
+ * Variable/self-employed/rental income subject to 70% haircut
+ */
+const INCOME_RECOGNITION_RATES = {
+  FIXED: 1.0,           // 100% recognition for salaried income
+  VARIABLE: 0.7,        // 70% recognition for commission/bonus income
+  SELF_EMPLOYED: 0.7,   // 70% recognition for self-employed income
+  RENTAL: 0.7,          // 70% recognition for rental income
+  MIXED: 0.85           // 85% recognition for mixed income (conservative estimate)
+};
+
 // BSD Progressive Rates (Buyer's Stamp Duty)
 const BSD_RATES = [
   { threshold: 180000, rate: 0.01 },
@@ -154,6 +172,93 @@ function roundFundsUp(amount: number): number {
  */
 function roundPercent(percent: number): number {
   return Math.round(percent * 100) / 100;
+}
+
+// ============================================================================
+// INCOME RECOGNITION FUNCTIONS
+// ============================================================================
+
+/**
+ * Calculate recognized income per MAS Notice 645
+ * Variable/self-employed/rental income subject to 70% haircut
+ * 
+ * @param monthlyIncome - Base monthly income
+ * @param incomeType - Type of income (defaults to 'fixed')
+ * @param variableIncomeAmount - Amount of variable income (if mixed)
+ * @param rentalIncomeAmount - Amount of rental income (if applicable)
+ * @returns Recognized income (always floor for conservative calculation)
+ * 
+ * @example
+ * // Salaried employee
+ * calculateRecognizedIncome(10000, 'fixed') // Returns 10000
+ * 
+ * @example
+ * // Self-employed individual
+ * calculateRecognizedIncome(10000, 'self_employed') // Returns 7000
+ * 
+ * @example
+ * // Mixed income (base salary + commission)
+ * calculateRecognizedIncome(10000, 'mixed', 3000) // Returns 8550
+ */
+export function calculateRecognizedIncome(
+  monthlyIncome: number,
+  incomeType: 'fixed' | 'variable' | 'self_employed' | 'rental' | 'mixed' = 'fixed',
+  variableIncomeAmount: number = 0,
+  rentalIncomeAmount: number = 0
+): number {
+  // Default to fixed income if not specified (backward compatibility)
+  if (!incomeType) {
+    return Math.floor(monthlyIncome);
+  }
+
+  // Handle different income types
+  switch (incomeType) {
+    case 'fixed':
+      // 100% recognition for salaried income
+      return Math.floor(monthlyIncome * INCOME_RECOGNITION_RATES.FIXED);
+
+    case 'variable':
+      // 70% recognition for commission/bonus income
+      return Math.floor(monthlyIncome * INCOME_RECOGNITION_RATES.VARIABLE);
+
+    case 'self_employed':
+      // 70% recognition for self-employed income
+      return Math.floor(monthlyIncome * INCOME_RECOGNITION_RATES.SELF_EMPLOYED);
+
+    case 'rental':
+      // 70% recognition for rental income
+      return Math.floor(monthlyIncome * INCOME_RECOGNITION_RATES.RENTAL);
+
+    case 'mixed':
+      // Mixed income: separate fixed and variable components
+      // Fixed component gets 100% recognition, variable gets 70%
+      const fixedComponent = monthlyIncome - variableIncomeAmount - rentalIncomeAmount;
+      const recognizedFixed = fixedComponent * INCOME_RECOGNITION_RATES.FIXED;
+      const recognizedVariable = variableIncomeAmount * INCOME_RECOGNITION_RATES.VARIABLE;
+      const recognizedRental = rentalIncomeAmount * INCOME_RECOGNITION_RATES.RENTAL;
+      
+      return Math.floor(recognizedFixed + recognizedVariable + recognizedRental);
+
+    default:
+      // Fallback to fixed if unknown type
+      return Math.floor(monthlyIncome);
+  }
+}
+
+/**
+ * Get income recognition rate for display purposes
+ */
+function getIncomeRecognitionRate(
+  incomeType: 'fixed' | 'variable' | 'self_employed' | 'rental' | 'mixed' = 'fixed'
+): number {
+  switch (incomeType) {
+    case 'fixed': return INCOME_RECOGNITION_RATES.FIXED;
+    case 'variable': return INCOME_RECOGNITION_RATES.VARIABLE;
+    case 'self_employed': return INCOME_RECOGNITION_RATES.SELF_EMPLOYED;
+    case 'rental': return INCOME_RECOGNITION_RATES.RENTAL;
+    case 'mixed': return INCOME_RECOGNITION_RATES.MIXED;
+    default: return INCOME_RECOGNITION_RATES.FIXED;
+  }
 }
 
 // ============================================================================
@@ -314,6 +419,38 @@ export function calculateMaxLoanAmount(
   const reasoning: string[] = [];
   const warnings: string[] = [];
 
+  // Step 1: Calculate recognized income (MAS Notice 645)
+  const recognizedIncome = calculateRecognizedIncome(
+    inputs.monthlyIncome,
+    inputs.incomeType,
+    inputs.variableIncomeAmount,
+    inputs.rentalIncomeAmount
+  );
+
+  const recognitionRate = getIncomeRecognitionRate(inputs.incomeType);
+  reasoning.push(
+    `Income recognition: ${inputs.incomeType || 'fixed'} @ ${(recognitionRate * 100).toFixed(0)}% ` +
+    `(S$${inputs.monthlyIncome.toLocaleString()} → S$${recognizedIncome.toLocaleString()})`
+  );
+
+  // If co-applicant exists, calculate their recognized income too
+  let totalRecognizedIncome = recognizedIncome;
+  if (inputs.coApplicant) {
+    const coApplicantRecognizedIncome = calculateRecognizedIncome(
+      inputs.coApplicant.monthlyIncome,
+      inputs.coApplicant.incomeType,
+      inputs.coApplicant.variableIncomeAmount,
+      inputs.coApplicant.rentalIncomeAmount
+    );
+    totalRecognizedIncome += coApplicantRecognizedIncome;
+    
+    const coApplicantRate = getIncomeRecognitionRate(inputs.coApplicant.incomeType);
+    reasoning.push(
+      `Co-applicant income: ${inputs.coApplicant.incomeType || 'fixed'} @ ${(coApplicantRate * 100).toFixed(0)}% ` +
+      `(S$${inputs.coApplicant.monthlyIncome.toLocaleString()} → S$${coApplicantRecognizedIncome.toLocaleString()})`
+    );
+  }
+
   // Determine LTV based on property count
   let baseLTV = MAS_REGULATIONS.LTV_LIMITS.FIRST_PROPERTY;
   if (inputs.propertyCount === 2) baseLTV = MAS_REGULATIONS.LTV_LIMITS.SECOND_PROPERTY;
@@ -346,15 +483,15 @@ export function calculateMaxLoanAmount(
     reasoning.push('MAS Notice 632: Extended tenure penalty applied');
   }
 
-  // Calculate TDSR and MSR limits
+  // Calculate TDSR and MSR limits using RECOGNIZED income
   const tdsrCalc = calculateTDSR(
-    inputs.monthlyIncome,
+    totalRecognizedIncome,
     inputs.existingCommitments,
     0,  // Will calculate iteratively
     inputs.propertyType
   );
 
-  const msrCalc = calculateMSR(inputs.monthlyIncome, inputs.propertyType);
+  const msrCalc = calculateMSR(totalRecognizedIncome, inputs.propertyType);
 
   // Determine effective monthly limit
   let effectiveMonthlyLimit = tdsrCalc.available;
@@ -408,9 +545,9 @@ export function calculateMaxLoanAmount(
 
   const totalFundsRequired = minCashRequired + stampDuty.total;
 
-  // Calculate TDSR usage
+  // Calculate TDSR usage using RECOGNIZED income
   const finalTDSR = calculateTDSR(
-    inputs.monthlyIncome,
+    totalRecognizedIncome,
     inputs.existingCommitments,
     finalPayment.monthlyPayment,
     inputs.propertyType
@@ -429,7 +566,7 @@ export function calculateMaxLoanAmount(
     monthlyPayment: finalPayment.monthlyPayment,
     stressTestPayment: finalPayment.monthlyPayment,
     tdsrUsed: finalTDSR.tdsrRatio,
-    msrUsed: msrCalc.applicable ? roundPercent((finalPayment.monthlyPayment / inputs.monthlyIncome) * 100) : null,
+    msrUsed: msrCalc.applicable ? roundPercent((finalPayment.monthlyPayment / totalRecognizedIncome) * 100) : null,
     limitingFactor,
     downPayment: roundFundsUp(downPayment),
     minCashRequired,

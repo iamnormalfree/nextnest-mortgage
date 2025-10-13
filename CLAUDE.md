@@ -1,4 +1,5 @@
 # CLAUDE.md
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 You are an experienced, pragmatic software engineer. You don't over-engineer a solution when a simple one is possible.
@@ -168,6 +169,29 @@ YOU MUST follow this debugging framework for ANY technical issue:
 - Track patterns in user feedback to improve collaboration over time
 - When you notice something that should be fixed but is unrelated to your current task, document it in your journal rather than fixing it immediately
 
+## Completion Drive Mode - ALWAYS ACTIVE
+
+### STEP 1: During Code Generation
+IMPORTANT: If you feel the completion drive and realize you're missing information, insert:
+INSERT: `#COMPLETION_DRIVE: <specific assumption/s>`
+
+OR 
+
+When uncertain about:
+- Method names, API endpoints, parameter types
+- Library usage, import paths, configuration
+- Data structures, property names, return types
+
+INSERT: `#COMPLETION_DRIVE: <specific assumption/s>`
+
+### STEP 2: After Code Generation  
+AUTOMATICALLY say: "I've completed the code. Let me check for assumptions with /validate-assumptions"
+
+### STEP 3: Clean Up
+Remove validated tags and provide summary.
+
+⚠️ This process is MANDATORY for all coding tasks.
+
 ## Development Commands
 
 ```bash
@@ -180,6 +204,11 @@ npm run start
 
 # Code quality
 npm run lint
+npm run lint:all  # Includes brand linting
+
+# Validation
+npm run validate-context
+npm run pre-implement
 ```
 
 ## Project Architecture
@@ -215,10 +244,12 @@ npm run lint
 
 ### Tech Stack Specifics
 - **Framework**: Next.js 14 with App Router
+- **UI Components**: Shadcn/ui components with Tailwind CSS
 - **Validation**: Zod schemas for type-safe form handling
-- **Styling**: Tailwind CSS with custom fonts (Gilda Display + Inter)
+- **Styling**: Tailwind CSS with custom design system
 - **Forms**: React Hook Form for performance and validation
 - **Build**: Optimized package imports for react-hook-form and date-fns
+- **Type Safety**: TypeScript strict mode with comprehensive type definitions
 
 ## Code Style Guidelines
 
@@ -256,11 +287,81 @@ Follow the clean code principles defined in `.windsurf/rules/clean-code-rules.md
 - Implement Zod schemas for validation in `lib/calculations/`
 - Follow existing patterns in `components/ContactSection.tsx`
 
-**Styling Approach:**
-- Primary palette: `#4A90E2` (primary), `#0D1B2A` (dark), `#FAF9F8` (light)
-- Container pattern: `container mx-auto px-4 sm:px-6 lg:px-8`
-- Button pattern: `bg-[#4A90E2] hover:bg-[#3A80D2] text-white`
-- Use `font-gilda` for headings, `font-sans` for body text
+**Design System - Sophisticated Flow (Single Source of Truth):**
+
+**Reference Implementation:** `/app/redesign/sophisticated-flow/page.tsx`
+**Design Tokens:** `/lib/design/tokens.ts`
+**Documentation:** `/docs/design/SINGLE_SOURCE_OF_TRUTH.md`
+
+**Core Principles:**
+1. **90% Monochrome + 10% Yellow Accent** (#FCD34D)
+   - ❌ NO purple (#7C3AED) - completely removed from design system
+   - ✅ Use yellow ONLY for primary CTAs and key metric accents
+
+2. **Sharp Rectangles - NO Rounded Corners**
+   - ❌ NEVER use: `rounded-lg`, `rounded-xl`, `rounded-full`, `rounded-md`
+   - ✅ ALWAYS use: Clean 1px borders with sharp 90-degree corners
+
+3. **Font Weights: 300/400/600 ONLY**
+   - ❌ FORBIDDEN: `font-medium` (500), `font-bold` (700)
+   - ✅ ALLOWED: `font-light` (300), `font-normal` (400), `font-semibold` (600)
+
+4. **"Rule of One" - Yellow Accent Usage**
+   - ONE yellow CTA button per viewport
+   - ONE key metric underline (optional, 2px border-bottom)
+   - ONE active state indicator
+
+5. **Glass Morphism - Navigation Only**
+   - ✅ Allowed: `bg-white/95 backdrop-blur-md` on navigation bars
+   - ❌ NOT allowed: Cards, buttons, content areas
+
+**Color Palette:**
+```typescript
+// Monochrome (90% of UI)
+Black:   #000000  // Primary text, headlines
+Stone:   #666666  // Body text, secondary
+Mist:    #E5E5E5  // Dividers, borders
+Cloud:   #F8F8F8  // Subtle backgrounds
+White:   #FFFFFF  // Primary background
+
+// Yellow Accent (10% of UI - CTAs only)
+Yellow:       #FCD34D  // Primary accent
+Yellow Hover: #FBB614  // Hover state
+
+// Semantic (System feedback only)
+Success: #10B981
+Error:   #EF4444
+```
+
+**Quick Reference:**
+```typescript
+// Import design tokens
+import { COLORS, COMPONENT_PATTERNS } from '@/lib/design/tokens'
+
+// Primary CTA (yellow)
+<button className={COMPONENT_PATTERNS.primaryButton.className}>
+  Get Started
+</button>
+
+// Secondary button (ghost)
+<button className={COMPONENT_PATTERNS.secondaryButton.className}>
+  Learn More
+</button>
+
+// Card with sharp corners
+<div className={COMPONENT_PATTERNS.card.className}>
+  {/* content */}
+</div>
+```
+
+**Quality Checklist - Before ANY UI Component:**
+- [ ] Uses colors from `/lib/design/tokens.ts` ONLY
+- [ ] NO rounded corners (sharp rectangles only)
+- [ ] Font weights are 300, 400, or 600 ONLY
+- [ ] Yellow accent on max ONE element per viewport
+- [ ] Borders are 1px (2px for metric underlines only)
+- [ ] Glass morphism ONLY on navigation
+- [ ] Monospace font for numbers
 
 ## Business Logic
 
@@ -289,3 +390,114 @@ When making changes:
 - Static generation enabled for marketing pages
 - Bundle analysis available via environment variable
 - Ready for Vercel/Netlify deployment
+
+## AI Intelligent Lead Form Architecture
+
+**Tech-Team Virtual Specialists:**
+The project employs an 8-specialist virtual team for AI-powered lead capture implementation:
+- Lead Full-Stack Architect, Frontend Engineer, Backend Engineer, AI/ML Engineer
+- DevOps Engineer, Data Engineer, Security Engineer, UX Engineer
+- Technical Project Coordinator for orchestration
+
+**Critical Problems Prevention:**
+The team identified and addresses 10 critical issues through structured roundtable formats:
+1. Architectural inconsistency → Weekly Architecture Reviews
+2. Component coupling → Event-driven architecture with TypeScript interfaces
+3. AI integration brittleness → Multi-layer fallback system with circuit breakers
+4. Missing learning loops → A/B testing framework and continuous optimization
+5. Database schema chaos → Domain-driven design with bounded contexts
+6. Configuration drift → DevOps deployment readiness checks
+7. UX fragmentation → Bi-weekly consistency workshops
+8. Data pipeline brittleness → Weekly reliability reviews
+9. Security afterthought → Security-first development with compliance gates
+10. Integration hell → Daily standup plus with integration focus
+
+**Implementation Standards:**
+- TypeScript strict mode with no `any` types
+- Test-driven development with 80% coverage minimum
+- Architecture Decision Records (ADRs) for all major decisions
+- Performance budgets: <150KB bundle, <3s load time
+- Security gates: PDPA compliance, automated vulnerability scanning
+
+**Roundtable Formats:**
+Structured collaboration sessions preventing code quality issues:
+- Architecture Review (Weekly): Interface definitions and technical debt
+- Pre-Implementation Planning (Per feature): Requirements and risk assessment
+- AI Optimization Lab (Weekly): Performance metrics and prompt engineering
+- Security & Compliance (Bi-weekly): Threat modeling and compliance checks
+- Technical Debt Tribunal (Monthly): Debt prioritization and reduction
+
+**Key Architectural Patterns:**
+- Event-driven form components with event bus pattern
+- Circuit breaker pattern for AI service resilience
+- Multi-tier processing with clear bounded contexts
+- Progressive disclosure with trust signal building
+- Real-time lead scoring with behavioral analytics
+
+For detailed implementation guidance, see `Tech-Team/` directory documentation.
+
+## Known Issues & Workarounds
+
+### TypeScript Compilation
+- **Supabase Type Issues**: Some Supabase client operations require `as any` type assertions due to incomplete type generation
+- **Global Window Types**: Consolidated in `types/global.d.ts` to avoid declaration conflicts
+- **React Hook Dependencies**: ESLint warnings for `useEffect` dependencies are non-critical
+
+### Build Configuration
+- **OpenAI API Key**: Required for `/api/chatwoot-ai-webhook` route (set `OPENAI_API_KEY` in `.env.local`)
+- **Bundle Analysis**: Enable with `ANALYZE=true npm run build`
+
+## Documentation Structure
+
+### Canonical Documentation (Always Use These)
+- **Tech Stack**: [`docs/runbooks/TECH_STACK_GUIDE.md`](../runbooks/TECH_STACK_GUIDE.md) - Authoritative tech stack reference
+- **Chatwoot Setup**: [`docs/runbooks/chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md`](../runbooks/chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md) - Complete Chatwoot integration guide
+- **AI Broker System**: [`docs/runbooks/AI_BROKER_COMPLETE_GUIDE.md`](../runbooks/AI_BROKER_COMPLETE_GUIDE.md) - Full AI broker implementation
+- **Deployment**: [`docs/runbooks/devops/production-deployment-guide.md`](../runbooks/devops/production-deployment-guide.md) - Production deployment procedures
+- **Forms Architecture**: [`docs/runbooks/FORMS_ARCHITECTURE_GUIDE.md`](../runbooks/FORMS_ARCHITECTURE_GUIDE.md) - Form optimization patterns
+
+### Documentation Organization
+- **Active Runbooks**: `docs/runbooks/` - Current operational documentation
+- **Archived Docs**: `docs/runbooks/archive/` - Superseded/deprecated documentation with deprecation notices
+- **Planning Reports**: `docs/completion_drive_plans/` - Analysis and consolidation reports
+
+### Recent Documentation Consolidation (2025-10-01)
+- **Consolidated**: 18 overlapping documents into 6 canonical guides
+- **Archived**: 9 outdated documents with proper deprecation notices
+- **Security**: Removed all hardcoded credentials (43 files cleaned)
+- **Verified**: 100% of code references validated (23 API routes, 8 components, 12 library files)
+- **Reduction**: 38% fewer documentation files to maintain
+- **See**: `docs/completion_drive_plans/runbooks_analysis.md` for complete consolidation report
+
+## Recent Updates (Phase C - Day 9)
+
+### Completed Tasks
+1. **TypeScript Error Fixes**:
+   - Resolved ~25 type errors across the codebase
+   - Fixed global interface declaration conflicts
+   - Added proper type assertions for third-party libraries
+
+2. **Code Cleanup**:
+   - Removed all backup files (`.bak`, `.backup`)
+   - Cleaned up unused CSS files
+   - Organized imports and dependencies
+
+3. **Design System Migration**:
+   - Implemented sophisticated Bloomberg-inspired design
+   - Integrated Shadcn/ui components
+   - Updated color palette and typography
+
+4. **Documentation Consolidation** (2025-10-01):
+   - Merged 18 overlapping runbooks into 6 canonical guides
+   - Removed all hardcoded credentials from 43 files
+   - Verified 100% code reference accuracy
+   - Created comprehensive archive with deprecation notices
+
+### Migration Notes
+- **Breaking Changes**: None - all changes are backward compatible
+- **Updated Files**: See git status for complete list
+- **New Patterns**:
+  - Use Shadcn components for new features
+  - Apply new color variables from Tailwind config
+  - Follow Bloomberg-inspired UI patterns for financial data
+  - **Always reference canonical documentation** (not archived versions)

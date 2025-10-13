@@ -160,6 +160,33 @@ export class DrElenaIntegrationService {
    * Build calculation inputs from lead data
    * Maps ProcessedLeadData � LoanCalculationInputs
    */
+  /**
+   * Map employment type to income type for MAS compliance
+   */
+  private mapIncomeType(
+    employmentType: string | undefined
+  ): 'fixed' | 'variable' | 'self_employed' | 'rental' | 'mixed' {
+    if (!employmentType) return 'fixed';
+    
+    const normalized = employmentType.toLowerCase();
+    
+    if (normalized.includes('self') || normalized.includes('business') || normalized.includes('entrepreneur')) {
+      return 'self_employed';
+    }
+    if (normalized.includes('commission') || normalized.includes('variable') || normalized.includes('bonus')) {
+      return 'variable';
+    }
+    if (normalized.includes('rental') || normalized.includes('property income')) {
+      return 'rental';
+    }
+    if (normalized.includes('mixed') || normalized.includes('multiple')) {
+      return 'mixed';
+    }
+    
+    // Default to fixed for salaried employment
+    return 'fixed';
+  }
+
   private buildCalculationInputs(
     leadData: ProcessedLeadData,
     overrides?: Partial<LoanCalculationInputs>
@@ -181,6 +208,7 @@ export class DrElenaIntegrationService {
       age: leadData.age || 30,
       citizenship: this.mapCitizenship(leadData.citizenship || 'Citizen'),
       propertyCount: (leadData.propertyCount || 1) as 1 | 2 | 3,
+      incomeType: this.mapIncomeType(leadData.employmentType),
 
       // Co-applicant if available
       ...(leadData.actualIncomes?.[1] && {

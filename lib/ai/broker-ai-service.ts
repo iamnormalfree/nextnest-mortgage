@@ -11,6 +11,7 @@
  */
 
 import { openai } from '@ai-sdk/openai';
+import { anthropic } from '@ai-sdk/anthropic';
 import { generateText } from 'ai';
 import { BrokerPersona } from '@/lib/calculations/broker-persona';
 import { ProcessedLeadData } from '@/lib/integrations/chatwoot-client';
@@ -28,15 +29,31 @@ interface GenerateBrokerResponseInput {
   conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
 }
 
+
+/**
+ * Select appropriate model provider based on model name
+ * Week 4 Phase 2: Multi-model orchestration support
+ */
+function selectModelProvider(modelName: string) {
+  if (modelName.startsWith('claude')) {
+    console.log(`🤖 Using Anthropic provider for: ${modelName}`);
+    return anthropic(modelName);
+  }
+  console.log(`🤖 Using OpenAI provider for: ${modelName}`);
+  return openai(modelName);
+}
+
 /**
  * Generate AI broker response using Vercel AI SDK
  *
  * Week 3 Enhancement: Integrates Dr. Elena mortgage calculations
+ * Week 4 Phase 2: Multi-model orchestration (OpenAI + Anthropic)
  *
  * Flow:
  * 1. Classify intent (calculation vs general question)
  * 2. If calculation required → Use Dr. Elena pure calculations + AI explanation
  * 3. Otherwise → Use standard AI response generation
+ * 4. Model provider selection: OpenAI (gpt-*) or Anthropic (claude-*)
  *
  * Uses existing persona definitions from lib/calculations/broker-persona.ts:
  * - Michelle Chen (aggressive, investment) - lines 27-41
@@ -85,9 +102,12 @@ export async function generateBrokerResponse(
     // Create system prompt from existing persona properties
     const systemPrompt = createSystemPromptFromPersona(persona, leadData);
 
+    // Select provider based on model name (Week 4 Phase 2)
+    const model = selectModelProvider(intent.suggestedModel);
+
     // Generate response with Vercel AI SDK
     const { text } = await generateText({
-      model: openai(intent.suggestedModel),
+      model,
       system: systemPrompt,
       messages: [
         ...conversationHistory,
@@ -272,6 +292,8 @@ function getFallbackResponse(persona: BrokerPersona, message: string): string {
  * Streaming version for future real-time chat UI
  * (Optional - not used in current Chatwoot integration)
  *
+ * Week 4 Phase 2: Multi-model orchestration support
+ *
  * Can be used for future enhancements where streaming responses are needed
  */
 export async function streamBrokerResponse(
@@ -283,8 +305,11 @@ export async function streamBrokerResponse(
 
   const { streamText } = await import('ai');
 
+  // Default to GPT-4 Turbo for streaming, with provider selection
+  const model = selectModelProvider('gpt-4-turbo');
+
   return streamText({
-    model: openai('gpt-4-turbo'),
+    model,
     system: systemPrompt,
     messages: [
       ...conversationHistory,

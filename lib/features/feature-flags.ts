@@ -1,9 +1,11 @@
 // Feature flag system for progressive rollout
 export const FEATURE_FLAGS = {
-  // Mobile UI flag with explicit viewport check
-  MOBILE_AI_BROKER_UI: typeof window !== 'undefined' && window.innerWidth < 768 ? true :
-                       process.env.NODE_ENV === 'development' ||
+  // Mobile UI flag - simple on/off switch for the feature
+  MOBILE_AI_BROKER_UI: process.env.NODE_ENV === 'development' ||
                        process.env.NEXT_PUBLIC_MOBILE_AI_BROKER === 'true',
+  // Sophisticated flow UI flag - enables gradual rollout of new homepage
+  USE_SOPHISTICATED_FLOW: process.env.NODE_ENV === 'development' ||
+                          process.env.NEXT_PUBLIC_USE_SOPHISTICATED_FLOW === 'true',
   PERSIST_SESSION_DATA: true,  // Always persist session data
   CHAT_PERSISTENCE: true       // Always persist chat messages
 } as const
