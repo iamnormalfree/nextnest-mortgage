@@ -161,6 +161,41 @@ export function ProgressiveFormWithController({
     trackStepTransition(currentStep, 'started')
   }, [currentStep, sessionId, loanType])
 
+  // Analytics: Track Tier 2 display (prevent render spam)
+  useEffect(() => {
+    if (!showInstantCalc || !instantCalcResult) return
+
+    const trackTier2Display = async () => {
+      try {
+        const event = createEvent(
+          FormEvents.PROCESSING_TIER_COMPLETED,
+          `session-${sessionId}`,
+          {
+            loanType,
+            tier: 2,
+            hasResult: true,
+            resultType: loanType === 'new_purchase' ? 'max_loan' : 'monthly_savings',
+            fieldState: {
+              hasInstantCalc: true,
+              instantCalcResult
+            },
+            timestamp: new Date()
+          }
+        )
+        await publishEvent(event)
+      } catch (error) {
+        console.warn('Analytics event failed:', error)
+      }
+    }
+
+    trackTier2Display()
+  }, [showInstantCalc, instantCalcResult, loanType, sessionId])
+
+  // Sync showJointApplicant with form field value
+  useEffect(() => {
+    setShowJointApplicant(fieldValues.hasJointApplicant || false)
+  }, [fieldValues.hasJointApplicant])
+
   // Get current step config
   const currentStepConfig = formSteps[currentStep] || formSteps[0]
 
@@ -332,13 +367,14 @@ export function ProgressiveFormWithController({
                       </label>
                       <Input
                         {...field}
-                        type="number"
+                        type="text"
                         className="font-mono"
-                        placeholder="500000"
+                        placeholder="500,000"
+                        value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                         onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0
-                          field.onChange(value)
-                          onFieldChange('priceRange', value)
+                          const parsedValue = parseFormattedNumber(e.target.value) || 0
+                          field.onChange(parsedValue)
+                          onFieldChange('priceRange', parsedValue)
                         }}
                       />
                       {errors.priceRange && (
@@ -462,30 +498,6 @@ export function ProgressiveFormWithController({
 
             {/* Show instant calculation result if available */}
             {showInstantCalc && instantCalcResult && (() => {
-              // Analytics: Track Tier 2 panel display
-              const trackTier2Display = async () => {
-                try {
-                  const event = createEvent(
-                    FormEvents.PROCESSING_TIER_COMPLETED,
-                    `session-${sessionId}`,
-                    {
-                      loanType,
-                      tier: 2,
-                      hasResult: true,
-                      resultType: loanType === 'new_purchase' ? 'max_loan' : 'monthly_savings',
-                      fieldState: {
-                        hasInstantCalc: true,
-                        instantCalcResult
-                      },
-                      timestamp: new Date()
-                    }
-                  )
-                  await publishEvent(event)
-                } catch (error) {
-                  console.warn('Analytics event failed:', error)
-                }
-              }
-              trackTier2Display()
               // Helper function to calculate monthly payment
               const calculateMonthlyPayment = (loanAmount: number, rate: number = 2.8, years: number = 25) => {
                 const monthlyRate = rate / 100 / 12
@@ -799,6 +811,17 @@ export function ProgressiveFormWithController({
                       type="button"
                       onClick={() => {
                         const newValue = !field.value
+                        
+                        // Clear Applicant 2 data when disabling joint applicant
+                        if (!newValue) {
+                          setValue('actualIncomes.1', 0)
+                          setValue('actualAges.1', 0)
+                          setValue('applicant2Commitments', 0)
+                          onFieldChange('actualIncomes.1', 0)
+                          onFieldChange('actualAges.1', 0)
+                          onFieldChange('applicant2Commitments', 0)
+                        }
+                        
                         field.onChange(newValue)
                         setShowJointApplicant(newValue)
                         onFieldChange('hasJointApplicant', newValue)
@@ -865,6 +888,7 @@ export function ProgressiveFormWithController({
                     onChange={(e) => {
                       const value = parseInt(e.target.value) || 0
                       field.onChange(value)
+                      onFieldChange('actualIncomes.0', value)
                     }}
                   />
                   {errors['actualIncomes.0'] && (
@@ -889,6 +913,7 @@ export function ProgressiveFormWithController({
                     onChange={(e) => {
                       const value = parseInt(e.target.value) || 0
                       field.onChange(value)
+                      onFieldChange('actualAges.0', value)
                     }}
                   />
                   {errors['actualAges.0'] && (
@@ -908,7 +933,10 @@ export function ProgressiveFormWithController({
                   </label>
                   <Select
                     value={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      onFieldChange('employmentType', value)
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select employment type" />
@@ -923,6 +951,31 @@ export function ProgressiveFormWithController({
                   {errors.employmentType && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.employmentType)}</p>
                   )}
+                </div>
+              )}
+            />
+
+            <Controller
+              name="creditCardCount"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                    Credit Card Count
+                  </label>
+                  <Input
+                    {...field}
+                    type="number"
+                    placeholder="2"
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value) || 0
+                      field.onChange(value)
+                      onFieldChange('creditCardCount', value)
+                    }}
+                  />
+                  <p className="text-xs text-[#666666] mt-1">
+                    Number of active credit cards
+                  </p>
                 </div>
               )}
             />
@@ -1037,6 +1090,75 @@ export function ProgressiveFormWithController({
                     </div>
                   )}
                 />
+              </div>
+            )}
+
+            {/* Tier 3 MAS Placeholder Panel */}
+            {isValid && fieldValues.actualIncomes?.[0] && fieldValues.actualAges?.[0] && (
+              <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
+                <h4 className="text-sm font-semibold text-black mb-4">
+                  <Users className="inline-block w-4 h-4 mr-2" />
+                  Complete Eligibility Analysis
+                </h4>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {/* MAS Compliance Indicators */}
+                  <div className="border-b border-[#E5E5E5] pb-3">
+                    <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
+                      MAS Compliance Check
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      <div className="flex items-center gap-2 text-sm text-[#666666]">
+                        <span className="text-[#10B981]">✓</span>
+                        <span>TDSR/MSR calculation ready</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#666666]">
+                        <span className="text-[#10B981]">✓</span>
+                        <span>Stamp duty estimation</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#666666]">
+                        <span className="text-[#10B981]">✓</span>
+                        <span>Bank comparison analysis</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Next Steps */}
+                  <div className="pt-3">
+                    <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
+                      🔒 Ready for AI Broker Analysis
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      <div className="flex items-center gap-2 text-sm text-[#666666]">
+                        <span className="text-[#999999]">🔒</span>
+                        <span>Personalized loan recommendations</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#666666]">
+                        <span className="text-[#999999]">🔒</span>
+                        <span>Real-time rate comparisons</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#666666]">
+                        <span className="text-[#999999]">🔒</span>
+                        <span>Document requirements checklist</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
+                    <div className="flex items-center gap-2 p-3 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
+                      <DollarSign className="w-4 h-4 text-[#FCD34D]" />
+                      <div>
+                        <p className="text-sm font-semibold text-black">
+                          Complete Step 3 to unlock personalized analysis
+                        </p>
+                        <p className="text-xs text-[#666666]">
+                          Get your MAS-compliant mortgage assessment
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
