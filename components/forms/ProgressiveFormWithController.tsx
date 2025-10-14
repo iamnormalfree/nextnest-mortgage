@@ -84,6 +84,7 @@ export function ProgressiveFormWithController({
   const [showChatTransition, setShowChatTransition] = useState(false)
   const [chatConfig, setChatConfig] = useState<any>(null)
   const [isFormCompleted, setIsFormCompleted] = useState(false)
+  const [showOptionalContext, setShowOptionalContext] = useState(false)
 
   // Use the headless controller
   const controller = useProgressiveFormController({
@@ -446,6 +447,86 @@ export function ProgressiveFormWithController({
                 </div>
               </div>
             )}
+
+            {/* Optional Context Block */}
+            <div className="mt-6 border-t border-[#E5E5E5] pt-6">
+              <button
+                type="button"
+                onClick={() => setShowOptionalContext(!showOptionalContext)}
+                className="w-full flex items-center justify-between p-4 bg-[#F8F8F8] border border-[#E5E5E5] hover:bg-[#E5E5E5] transition-colors duration-300"
+              >
+                <div className="flex items-center gap-2">
+                  <ChevronDown 
+                    className={`w-4 h-4 text-[#666666] transition-transform duration-300 ${
+                      showOptionalContext ? 'rotate-180' : ''
+                    }`}
+                  />
+                  <span className="text-sm text-[#666666]">Add optional context</span>
+                </div>
+                <span className="text-xs text-[#666666]">For better personalization</span>
+              </button>
+
+              {showOptionalContext && (
+                <div className="space-y-4 mt-4 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
+                  <Controller
+                    name="developmentName"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
+                        <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                          Development Name (Optional)
+                        </label>
+                        <Input
+                          {...field}
+                          type="text"
+                          placeholder="e.g., The Tampines Condo"
+                          onChange={(e) => {
+                            field.onChange(e)
+                            onFieldChange('developmentName', e.target.value)
+                          }}
+                        />
+                        <p className="text-xs text-[#666666] mt-1">
+                          Help us understand the specific property you're considering
+                        </p>
+                      </div>
+                    )}
+                  />
+
+                  <Controller
+                    name="paymentScheme"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
+                        <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                          Preferred Payment Scheme (Optional)
+                        </label>
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                            onFieldChange('paymentScheme', value)
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select payment scheme" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cash">Cash Payment</SelectItem>
+                            <SelectItem value="cpf_plus_cash">CPF + Cash</SelectItem>
+                            <SelectItem value="full_cpf">Full CPF</SelectItem>
+                            <SelectItem value="bank_loan">Bank Loan</SelectItem>
+                            <SelectItem value="not_sure">Not sure yet</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-[#666666] mt-1">
+                          This helps us tailor loan recommendations to your preferences
+                        </p>
+                      </div>
+                    )}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )
 
