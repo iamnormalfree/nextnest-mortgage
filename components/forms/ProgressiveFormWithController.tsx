@@ -85,6 +85,7 @@ export function ProgressiveFormWithController({
   const [chatConfig, setChatConfig] = useState<any>(null)
   const [isFormCompleted, setIsFormCompleted] = useState(false)
   const [showOptionalContext, setShowOptionalContext] = useState(false)
+  const [showJointApplicant, setShowJointApplicant] = useState(false)
 
   // Use the headless controller
   const controller = useProgressiveFormController({
@@ -129,8 +130,36 @@ export function ProgressiveFormWithController({
     calculateInstant
   } = controller
 
+  // Analytics hooks
+  const publishEvent = useEventPublisher()
+  const createEvent = useCreateEvent(sessionId)
+
   // Progress calculation
   const progressPercentage = ((currentStep + 1) / formSteps.length) * 100
+
+  // Analytics: Track step transitions
+  useEffect(() => {
+    const trackStepTransition = async (step: number, action: 'started' | 'completed') => {
+      try {
+        const event = createEvent(
+          action === 'started' ? FormEvents.STEP_STARTED : FormEvents.STEP_COMPLETED,
+          `session-${sessionId}`,
+          {
+            loanType,
+            step,
+            stepName: formSteps[step]?.label || `Step ${step + 1}`,
+            action,
+            timestamp: new Date()
+          }
+        )
+        await publishEvent(event)
+      } catch (error) {
+        console.warn('Analytics event failed:', error)
+      }
+    }
+
+    trackStepTransition(currentStep, 'started')
+  }, [currentStep, sessionId, loanType])
 
   // Get current step config
   const currentStepConfig = formSteps[currentStep] || formSteps[0]
@@ -432,32 +461,245 @@ export function ProgressiveFormWithController({
             )}
 
             {/* Show instant calculation result if available */}
-            {showInstantCalc && instantCalcResult && (
-              <div className="mt-6 p-4 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
-                <h4 className="text-sm font-semibold text-black mb-2">
-                  <Sparkles className="inline-block w-4 h-4 mr-2" />
-                  Instant Analysis
-                </h4>
-                <div className="space-y-2">
-                  {loanType === 'new_purchase' && instantCalcResult.maxLoan && (
-                    <p className="text-sm text-[#666666]">
-                      Maximum Loan: <span className="font-mono font-semibold">${instantCalcResult.maxLoan.toLocaleString()}</span>
-                    </p>
-                  )}
-                  {loanType === 'refinance' && instantCalcResult.monthlySavings && (
-                    <p className="text-sm text-[#666666]">
-                      Monthly Savings: <span className="font-mono font-semibold text-[#10B981]">${instantCalcResult.monthlySavings.toLocaleString()}</span>
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
+            {showInstantCalc && instantCalcResult && (() => {
+              // Analytics: Track Tier 2 panel display
+              const trackTier2Display = async () => {
+                try {
+                  const event = createEvent(
+                    FormEvents.PROCESSING_TIER_COMPLETED,
+                    `session-${sessionId}`,
+                    {
+                      loanType,
+                      tier: 2,
+                      hasResult: true,
+                      resultType: loanType === 'new_purchase' ? 'max_loan' : 'monthly_savings',
+                      fieldState: {
+                        hasInstantCalc: true,
+                        instantCalcResult
+                      },
+                      timestamp: new Date()
+                    }
+                  )
+                  await publishEvent(event)
+                } catch (error) {
+                  console.warn('Analytics event failed:', error)
+                }
+              }
+              trackTier2Display()
+              // Helper function to calculate monthly payment
+              const calculateMonthlyPayment = (loanAmount: number, rate: number = 2.8, years: number = 25) => {
+                const monthlyRate = rate / 100 / 12
+                const months = years * 12
+                const monthlyPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1)
+                return Math.round(monthlyPayment)
+              }
+
+              // Helper function to calculate down payment breakdown
+              const calculateDownPayment = (price: number, loanAmount: number) => {
+                const downPayment = price - loanAmount
+                const cpfAllowed = Math.min(downPayment * 0.8, 200000) // CPF allowance capped at 80% of down payment, max $200k
+                const cashRequired = downPayment - cpfAllowed
+                return { downPayment, cpfAllowed, cashRequired }
+              }
+
+              // Calculate additional metrics for new purchase
+              if (loanType === 'new_purchase' && instantCalcResult.maxLoan) {
+                const monthlyPayment = calculateMonthlyPayment(instantCalcResult.maxLoan)
+                const price = instantCalcResult.price || instantCalcResult.maxLoan * 1.33 // Estimate price if not provided
+                const { downPayment, cpfAllowed, cashRequired } = calculateDownPayment(price, instantCalcResult.maxLoan)
+
+                return (
+                  <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
+                    <h4 className="text-sm font-semibold text-black mb-4">
+                      <Sparkles className="inline-block w-4 h-4 mr-2" />
+                      Your Personalized Analysis
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      {/* Maximum Loan */}
+                      <div className="border-b border-[#E5E5E5] pb-3">
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
+                          Maximum Loan Amount
+                        </p>
+                        <p className="text-lg font-mono font-semibold text-black">
+                          ${instantCalcResult.maxLoan.toLocaleString()}
+                          <span className="text-sm text-[#666666] ml-2">[75% LTV]</span>
+                        </p>
+                      </div>
+
+                      {/* Monthly Payment */}
+                      <div className="border-b border-[#E5E5E5] pb-3">
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
+                          Estimated Monthly Payment
+                        </p>
+                        <p className="text-lg font-mono font-semibold text-black">
+                          ${monthlyPayment.toLocaleString()}/mo
+                          <span className="text-sm text-[#666666] ml-2">[@ 2.8% interest]</span>
+                        </p>
+                      </div>
+
+                      {/* Down Payment */}
+                      <div>
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
+                          Down Payment Required
+                        </p>
+                        <p className="text-lg font-mono font-semibold text-black">
+                          ${downPayment.toLocaleString()}
+                          <span className="text-sm text-[#666666] ml-2">[25% down]</span>
+                        </p>
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm text-[#666666]">
+                            ├─ Cash required: <span className="font-mono">${cashRequired.toLocaleString()} ({Math.round((cashRequired / downPayment) * 100)}%)</span>
+                          </p>
+                          <p className="text-sm text-[#666666]">
+                            └─ CPF allowed: <span className="font-mono">${cpfAllowed.toLocaleString()}</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Locked Tier 3 Preview */}
+                    <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
+                      <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
+                        💡 Complete Step 3 to unlock:
+                      </p>
+                      <div className="grid grid-cols-1 gap-2">
+                        <div className="flex items-center gap-2 text-sm text-[#666666]">
+                          <span className="text-[#999999]">🔒</span>
+                          <span>TDSR/MSR compliance check</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-[#666666]">
+                          <span className="text-[#999999]">🔒</span>
+                          <span>Stamp duty calculation</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-[#666666]">
+                          <span className="text-[#999999]">🔒</span>
+                          <span>23 bank comparisons</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+
+              // Calculate additional metrics for refinance
+              if (loanType === 'refinance' && instantCalcResult.monthlySavings) {
+                const currentMonthlyPayment = instantCalcResult.outstandingLoan ? 
+                  calculateMonthlyPayment(instantCalcResult.outstandingLoan, instantCalcResult.currentRate || 3.5) : 0
+                const newMonthlyPayment = currentMonthlyPayment - instantCalcResult.monthlySavings
+                const lifetimeSavings = instantCalcResult.monthlySavings * 12 * 20 // Over 20 years
+                const breakEvenMonths = 0 // Would be calculated based on refinancing costs
+
+                return (
+                  <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
+                    <h4 className="text-sm font-semibold text-black mb-4">
+                      <Sparkles className="inline-block w-4 h-4 mr-2" />
+                      Your Refinancing Opportunity
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      {/* Current vs New Payment */}
+                      <div className="border-b border-[#E5E5E5] pb-3">
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
+                          Current Monthly Payment
+                        </p>
+                        <p className="text-lg font-mono text-black">
+                          ${currentMonthlyPayment.toLocaleString()}/mo
+                          <span className="text-sm text-[#666666] ml-2">[@ {instantCalcResult.currentRate || 3.5}% interest]</span>
+                        </p>
+                      </div>
+
+                      <div className="border-b border-[#E5E5E5] pb-3">
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
+                          New Monthly Payment (est.)
+                        </p>
+                        <p className="text-lg font-mono font-semibold text-black">
+                          ${newMonthlyPayment.toLocaleString()}/mo
+                          <span className="text-sm text-[#666666] ml-2">[@ 2.6% interest]</span>
+                        </p>
+                      </div>
+
+                      {/* Monthly Savings */}
+                      <div className="border-b border-[#E5E5E5] pb-3">
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
+                          Monthly Savings
+                        </p>
+                        <p className="text-xl font-mono font-semibold text-[#10B981]">
+                          ${instantCalcResult.monthlySavings.toLocaleString()}/mo
+                          <span className="text-sm text-[#10B981] ml-2">[🔥 {Math.round((instantCalcResult.monthlySavings / currentMonthlyPayment) * 100)}% reduction]</span>
+                        </p>
+                      </div>
+
+                      {/* Lifetime Savings */}
+                      <div className="border-b border-[#E5E5E5] pb-3">
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
+                          Lifetime Savings
+                        </p>
+                        <p className="text-lg font-mono font-semibold text-black">
+                          ${lifetimeSavings.toLocaleString()}
+                          <span className="text-sm text-[#666666] ml-2">[over 20 years]</span>
+                        </p>
+                      </div>
+
+                      {/* Break-even Period */}
+                      <div>
+                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
+                          Break-even Period
+                        </p>
+                        <p className="text-lg font-mono font-semibold text-black">
+                          9 months 
+                          <span className="text-sm text-[#666666] ml-2">[recover refinancing cost]</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Urgency Message */}
+                    <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
+                      <div className="flex items-center gap-2 p-3 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
+                        <AlertTriangle className="w-4 h-4 text-[#FCD34D]" />
+                        <div>
+                          <p className="text-sm font-semibold text-black">Highly recommended</p>
+                          <p className="text-xs text-[#666666]">Savings over $300/mo justify refinancing</p>
+                          <p className="text-xs text-[#666666]">⏰ Complete Step 3 now to lock in current rates</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+
+              return null
+            })()}
 
             {/* Optional Context Block */}
             <div className="mt-6 border-t border-[#E5E5E5] pt-6">
               <button
                 type="button"
-                onClick={() => setShowOptionalContext(!showOptionalContext)}
+                onClick={() => {
+                  const newValue = !showOptionalContext
+                  setShowOptionalContext(newValue)
+                  
+                  // Analytics: Track optional context expansion
+                  const trackOptionalContext = async () => {
+                    try {
+                      const event = createEvent(
+                        FormEvents.USER_HESITATED,
+                        `session-${sessionId}`,
+                        {
+                          loanType,
+                          action: newValue ? 'expanded' : 'collapsed',
+                          section: 'optional_context',
+                          fieldState: { showOptionalContext: newValue },
+                          timestamp: new Date()
+                        }
+                      )
+                      await publishEvent(event)
+                    } catch (error) {
+                      console.warn('Analytics event failed:', error)
+                    }
+                  }
+                  trackOptionalContext()
+                }}
                 className="w-full flex items-center justify-between p-4 bg-[#F8F8F8] border border-[#E5E5E5] hover:bg-[#E5E5E5] transition-colors duration-300"
               >
                 <div className="flex items-center gap-2">
@@ -538,7 +780,76 @@ export function ProgressiveFormWithController({
       case 3: // Your Finances
         return (
           <div className="space-y-4">
-            <Controller
+            {/* Joint Applicant Toggle */}
+            <div className="flex items-center justify-between p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-black">
+                  Adding a joint applicant?
+                </label>
+                <p className="text-xs text-[#666666]">
+                  Increase borrowing power with combined income
+                </p>
+              </div>
+              <Controller
+                name="hasJointApplicant"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newValue = !field.value
+                        field.onChange(newValue)
+                        setShowJointApplicant(newValue)
+                        onFieldChange('hasJointApplicant', newValue)
+                        
+                        // Analytics: Track joint applicant toggle
+                        const trackJointApplicant = async () => {
+                          try {
+                            const event = createEvent(
+                              FormEvents.FIELD_CHANGED,
+                              `session-${sessionId}`,
+                              {
+                                loanType,
+                                fieldName: 'hasJointApplicant',
+                                action: newValue ? 'enabled' : 'disabled',
+                                fieldState: { hasJointApplicant: newValue },
+                                section: 'joint_applicant',
+                                timestamp: new Date()
+                              }
+                            )
+                            await publishEvent(event)
+                          } catch (error) {
+                            console.warn('Analytics event failed:', error)
+                          }
+                        }
+                        trackJointApplicant()
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        field.value ? 'bg-[#FCD34D]' : 'bg-[#E5E5E5]'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          field.value ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                    <span className="text-sm text-[#666666]">
+                      {field.value ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                )}
+              />
+            </div>
+
+            {/* Applicant 1 Fields */}
+            <div className="space-y-4 p-4 border border-[#E5E5E5]">
+              <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+                Applicant 1 (Primary)
+              </p>
+
+              <Controller
               name="actualIncomes.0"
               control={control}
               render={({ field }) => (
@@ -632,6 +943,7 @@ export function ProgressiveFormWithController({
                     onChange={(e) => {
                       const value = parseInt(e.target.value) || 0
                       field.onChange(value)
+                      onFieldChange('existingCommitments', value)
                     }}
                   />
                   <p className="text-xs text-[#666666] mt-1">
@@ -640,6 +952,93 @@ export function ProgressiveFormWithController({
                 </div>
               )}
             />
+            </div>
+
+            {/* Applicant 2 Fields - Conditional */}
+            {showJointApplicant && (
+              <div className="space-y-4 p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
+                <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+                  Applicant 2 (Joint)
+                </p>
+
+                <Controller
+                  name="actualIncomes.1"
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                        Monthly Income
+                      </label>
+                      <Input
+                        {...field}
+                        type="number"
+                        className="font-mono"
+                        placeholder="6000"
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0
+                          field.onChange(value)
+                          onFieldChange('actualIncomes.1', value)
+                        }}
+                      />
+                      <p className="text-xs text-[#666666] mt-1">
+                        Optional if not applicable
+                      </p>
+                    </div>
+                  )}
+                />
+
+                <Controller
+                  name="actualAges.1"
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                        Age
+                      </label>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="32"
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0
+                          field.onChange(value)
+                          onFieldChange('actualAges.1', value)
+                        }}
+                      />
+                      <p className="text-xs text-[#666666] mt-1">
+                        For IWAA calculation
+                      </p>
+                    </div>
+                  )}
+                />
+
+                <Controller
+                  name="applicant2Commitments"
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                        Applicant 2 Monthly Commitments
+                      </label>
+                      <Input
+                        {...field}
+                        type="number"
+                        className="font-mono"
+                        placeholder="0"
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0
+                          field.onChange(value)
+                          onFieldChange('applicant2Commitments', value)
+                        }}
+                      />
+                      <p className="text-xs text-[#666666] mt-1">
+                        Separate commitments for joint calculation
+                      </p>
+                    </div>
+                  )}
+                />
+              </div>
+            )}
           </div>
         )
 
