@@ -269,7 +269,10 @@ export function ProgressiveFormWithController({
                   </label>
                   <Select
                     value={field.value}
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value)
+                      onFieldChange('propertyType', value)
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
@@ -306,6 +309,7 @@ export function ProgressiveFormWithController({
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0
                           field.onChange(value)
+                          onFieldChange('priceRange', value)
                         }}
                       />
                       {errors.priceRange && (
@@ -330,6 +334,7 @@ export function ProgressiveFormWithController({
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0
                           field.onChange(value)
+                          onFieldChange('combinedAge', value)
                         }}
                       />
                       {errors.combinedAge && (
