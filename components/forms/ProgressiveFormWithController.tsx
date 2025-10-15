@@ -3,8 +3,8 @@
 
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { Controller, FieldError } from 'react-hook-form'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { Controller } from 'react-hook-form'
 import { useProgressiveFormController } from '@/hooks/useProgressiveFormController'
 import {
   FormState,
@@ -86,6 +86,11 @@ export function ProgressiveFormWithController({
   const [isFormCompleted, setIsFormCompleted] = useState(false)
   const [showOptionalContext, setShowOptionalContext] = useState(false)
   const [showJointApplicant, setShowJointApplicant] = useState(false)
+  const [ltvMode, setLtvMode] = useState(75) // Default LTV mode
+  const [isAutoProgressing, setIsAutoProgressing] = useState(false) // Auto-progression spinner state
+
+  // Ref for throttling analytics events
+  const stepTrackerRef = useRef<Record<string, number>>({})
 
   // Use the headless controller
   const controller = useProgressiveFormController({
@@ -158,10 +163,53 @@ export function ProgressiveFormWithController({
       }
     }
 
-    trackStepTransition(currentStep, 'started')
-  }, [currentStep, sessionId, loanType])
+    // Throttling to prevent duplicate events on re-render
+    const stepTimeKey = `step-started-${currentStep}`
+    const lastEmitTime = stepTrackerRef.current[stepTimeKey]
+    const currentTime = Date.now()
+    
+    // Only emit event if it's been more than 1 second since last emission for this step
+    if (!lastEmitTime || currentTime - lastEmitTime > 1000) {
+      stepTrackerRef.current[stepTimeKey] = currentTime
+      trackStepTransition(currentStep, 'started')
+    }
+  }, [currentStep, sessionId, loanType, createEvent, publishEvent])
 
-  // Analytics: Track Tier 2 display (prevent render spam)
+  const shouldEnableStep1Continue =
+    Boolean(watch('name')) &&
+    Boolean(watch('email')) &&
+    Boolean(watch('phone'))
+
+  const canSubmitCurrentStep =
+    currentStep === 1
+      ? isValid && shouldEnableStep1Continue
+      : isValid
+
+  // Toggle optional context when Step 2 fields are filled (for enhanced UX)
+  useEffect(() => {
+    if (currentStep === 2 && !isAutoProgressing) {
+      const step2RequiredFields = ['propertyCategory', 'propertyType', 'priceRange', 'combinedAge']
+      const hasAllRequiredFields = step2RequiredFields.every(field => 
+        Boolean(watch(field)) && watch(field) !== ''
+      )
+      
+      if (hasAllRequiredFields && !showOptionalContext) {
+        // Show 1-second spinner before showing optional context and auto-progressing
+        setIsAutoProgressing(true)
+        
+        setTimeout(() => {
+          setShowOptionalContext(true)
+          setIsAutoProgressing(false)
+          
+          // Auto-progress to Step 3 after another 1-second delay
+          setTimeout(() => {
+            onStepCompletion(2, fieldValues)
+            // The parent component will handle the actual step progression
+          }, 1000)
+        }, 1000)
+      }
+    }
+  }, [currentStep, watch, showOptionalContext, isAutoProgressing, fieldValues, onStepCompletion])
   useEffect(() => {
     if (!showInstantCalc || !instantCalcResult) return
 
@@ -189,7 +237,7 @@ export function ProgressiveFormWithController({
     }
 
     trackTier2Display()
-  }, [showInstantCalc, instantCalcResult, loanType, sessionId])
+  }, [showInstantCalc, instantCalcResult, loanType, sessionId, createEvent, publishEvent])
 
   // Sync showJointApplicant with form field value
   useEffect(() => {
@@ -215,11 +263,15 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                  <label 
+                    htmlFor="full-name"
+                    className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                  >
                     Full Name *
                   </label>
                   <Input
                     {...field}
+                    id="full-name"
                     type="text"
                     placeholder="John Doe"
                     onChange={(e) => {
@@ -239,11 +291,15 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                  <label 
+                    htmlFor="email"
+                    className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                  >
                     Email Address *
                   </label>
                   <Input
                     {...field}
+                    id="email"
                     type="email"
                     placeholder="john@example.com"
                     onChange={(e) => {
@@ -263,11 +319,15 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                  <label 
+                    htmlFor="phone"
+                    className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                  >
                     Phone Number *
                   </label>
                   <Input
                     {...field}
+                    id="phone"
                     type="tel"
                     placeholder="91234567"
                     onChange={(e) => {
@@ -293,7 +353,10 @@ export function ProgressiveFormWithController({
                 control={control}
                 render={({ field }) => (
                   <div>
-                    <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                    <label 
+                      htmlFor="property-category"
+                      className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                    >
                       Property Category *
                     </label>
                     <Select
@@ -304,7 +367,7 @@ export function ProgressiveFormWithController({
                         setPropertyCategory(value as any)
                       }}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger id="property-category">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -328,7 +391,10 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                  <label 
+                    htmlFor="property-type"
+                    className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                  >
                     Property Type *
                   </label>
                   <Select
@@ -338,14 +404,25 @@ export function ProgressiveFormWithController({
                       onFieldChange('propertyType', value)
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="property-type">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="HDB">HDB Flat</SelectItem>
-                      <SelectItem value="EC">Executive Condo</SelectItem>
-                      <SelectItem value="Private">Private Condo</SelectItem>
-                      <SelectItem value="Landed">Landed Property</SelectItem>
+                      {loanType === 'new_purchase' ? (
+                        <>
+                          <SelectItem value="HDB">HDB Flat</SelectItem>
+                          <SelectItem value="EC">Executive Condo</SelectItem>
+                          <SelectItem value="Private">Private Condo</SelectItem>
+                          <SelectItem value="Landed">Landed Property</SelectItem>
+                        </>
+                      ) : (
+                        <>
+                          <SelectItem value="HDB">HDB Flat (Refinance)</SelectItem>
+                          <SelectItem value="EC">Executive Condo (Refinance)</SelectItem>
+                          <SelectItem value="Private">Private Condo (Refinance)</SelectItem>
+                          <SelectItem value="Landed">Landed Property (Refinance)</SelectItem>
+                        </>
+                      )}
                     </SelectContent>
                   </Select>
                   {errors.propertyType && (
@@ -362,11 +439,15 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                      <label 
+                        htmlFor="property-price"
+                        className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                      >
                         Property Price *
                       </label>
                       <Input
                         {...field}
+                        id="property-price"
                         type="text"
                         className="font-mono"
                         placeholder="500,000"
@@ -389,11 +470,15 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                      <label 
+                        htmlFor="combined-age"
+                        className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                      >
                         Combined Age *
                       </label>
                       <Input
                         {...field}
+                        id="combined-age"
                         type="number"
                         placeholder="35"
                         onChange={(e) => {
@@ -515,10 +600,12 @@ export function ProgressiveFormWithController({
               }
 
               // Calculate additional metrics for new purchase
-              if (loanType === 'new_purchase' && instantCalcResult.maxLoan) {
-                const monthlyPayment = calculateMonthlyPayment(instantCalcResult.maxLoan)
-                const price = instantCalcResult.price || instantCalcResult.maxLoan * 1.33 // Estimate price if not provided
-                const { downPayment, cpfAllowed, cashRequired } = calculateDownPayment(price, instantCalcResult.maxLoan)
+              if (loanType === 'new_purchase' && instantCalcResult.maxLoanAmount) {
+                const maxLoan = instantCalcResult.maxLoanAmount
+                const monthlyPayment = instantCalcResult.estimatedMonthlyPayment ?? 0
+                const inferredPrice = fieldValues.priceRange || Math.round(maxLoan / 0.75)
+                const { downPayment, cpfAllowed, cashRequired } = calculateDownPayment(inferredPrice, maxLoan)
+                const ltv = inferredPrice > 0 ? Math.round((maxLoan / inferredPrice) * 100) : 75
 
                 return (
                   <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
@@ -534,8 +621,8 @@ export function ProgressiveFormWithController({
                           Maximum Loan Amount
                         </p>
                         <p className="text-lg font-mono font-semibold text-black">
-                          ${instantCalcResult.maxLoan.toLocaleString()}
-                          <span className="text-sm text-[#666666] ml-2">[75% LTV]</span>
+                          ${maxLoan.toLocaleString()}
+                          <span className="text-sm text-[#666666] ml-2">[{ltv}% LTV]</span>
                         </p>
                       </div>
 
@@ -546,7 +633,7 @@ export function ProgressiveFormWithController({
                         </p>
                         <p className="text-lg font-mono font-semibold text-black">
                           ${monthlyPayment.toLocaleString()}/mo
-                          <span className="text-sm text-[#666666] ml-2">[@ 2.8% interest]</span>
+                          <span className="text-sm text-[#666666] ml-2">[@ 3.5% stress-tested rate]</span>
                         </p>
                       </div>
 
@@ -556,15 +643,15 @@ export function ProgressiveFormWithController({
                           Down Payment Required
                         </p>
                         <p className="text-lg font-mono font-semibold text-black">
-                          ${downPayment.toLocaleString()}
+                          ${Math.round(downPayment).toLocaleString()}
                           <span className="text-sm text-[#666666] ml-2">[25% down]</span>
                         </p>
                         <div className="mt-2 space-y-1">
                           <p className="text-sm text-[#666666]">
-                            ├─ Cash required: <span className="font-mono">${cashRequired.toLocaleString()} ({Math.round((cashRequired / downPayment) * 100)}%)</span>
+                            ├─ Cash required: <span className="font-mono">${Math.round(cashRequired).toLocaleString()}</span>
                           </p>
                           <p className="text-sm text-[#666666]">
-                            └─ CPF allowed: <span className="font-mono">${cpfAllowed.toLocaleString()}</span>
+                            └─ CPF allowed: <span className="font-mono">${Math.round(cpfAllowed).toLocaleString()}</span>
                           </p>
                         </div>
                       </div>
@@ -592,6 +679,7 @@ export function ProgressiveFormWithController({
                     </div>
                   </div>
                 )
+
               }
 
               // Calculate additional metrics for refinance
@@ -683,6 +771,93 @@ export function ProgressiveFormWithController({
               return null
             })()}
 
+            {/* Auto-progression Spinner */}
+            {isAutoProgressing && (
+              <div className="mt-6 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-4 h-4 border-2 border-[#FCD34D] border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-sm text-black font-medium">Analyzing your loan options...</p>
+                </div>
+                <p className="text-xs text-[#666666] text-center mt-2">
+                  Preparing personalized recommendations based on your inputs
+                </p>
+              </div>
+            )}
+
+            {/* LTV Toggle for What-If Analysis */}
+            {showInstantCalc && instantCalcResult && loanType === 'new_purchase' && (
+              <div className="mt-6 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-semibold text-black">LTV Scenario Analysis</p>
+                    <p className="text-xs text-[#666666]">See how different LTV settings affect your borrowing power</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setLtvMode(55)}
+                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
+                        ltvMode === 55 
+                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
+                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
+                      }`}
+                    >
+                      55%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLtvMode(65)}
+                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
+                        ltvMode === 65 
+                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
+                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
+                      }`}
+                    >
+                      65%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLtvMode(75)}
+                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
+                        ltvMode === 75 
+                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
+                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
+                      }`}
+                    >
+                      75%
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="p-2 bg-white border border-[#E5E5E5]">
+                    <p className="text-xs text-[#666666] mb-1">Max Loan</p>
+                    <p className="text-sm font-mono font-semibold text-black">
+                      ${Math.round(instantCalcResult.maxLoanAmount * (ltvMode / 75)).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="p-2 bg-white border border-[#E5E5E5]">
+                    <p className="text-xs text-[#666666] mb-1">Cash Down</p>
+                    <p className="text-sm font-mono font-semibold text-black">
+                      ${Math.round((fieldValues.priceRange || 0) * (1 - ltvMode / 100)).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="p-2 bg-white border border-[#E5E5E5]">
+                    <p className="text-xs text-[#666666] mb-1">Monthly</p>
+                    <p className="text-sm font-mono font-semibold text-black">
+                      ${Math.round((instantCalcResult.maxLoanAmount * (ltvMode / 75)) * 0.028 / 12 * Math.pow(1 + 0.028 / 12, 25 * 12) / (Math.pow(1 + 0.028 / 12, 25 * 12) - 1)).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-2 p-2 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
+                  <p className="text-xs text-black">
+                    <span className="font-semibold">Selected: {ltvMode}% LTV</span> - Adjust to see impact on borrowing capacity
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Optional Context Block */}
             <div className="mt-6 border-t border-[#E5E5E5] pt-6">
               <button
@@ -745,7 +920,7 @@ export function ProgressiveFormWithController({
                           }}
                         />
                         <p className="text-xs text-[#666666] mt-1">
-                          Help us understand the specific property you're considering
+                          Help us understand the specific property you&apos;re considering
                         </p>
                       </div>
                     )}
@@ -809,44 +984,28 @@ export function ProgressiveFormWithController({
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
+                      role="switch"
+                      aria-checked={field.value}
                       onClick={() => {
                         const newValue = !field.value
                         
                         // Clear Applicant 2 data when disabling joint applicant
                         if (!newValue) {
-                          setValue('actualIncomes.1', 0)
-                          setValue('actualAges.1', 0)
-                          setValue('applicant2Commitments', 0)
-                          onFieldChange('actualIncomes.1', 0)
-                          onFieldChange('actualAges.1', 0)
-                          onFieldChange('applicant2Commitments', 0)
+                          setValue('actualIncomes.1', undefined)
+                          setValue('actualAges.1', undefined)
+                          setValue('applicant2Commitments', undefined)
+                          onFieldChange('actualIncomes.1', undefined)
+                          onFieldChange('actualAges.1', undefined)
+                          onFieldChange('applicant2Commitments', undefined)
                         }
                         
                         field.onChange(newValue)
                         setShowJointApplicant(newValue)
-                        onFieldChange('hasJointApplicant', newValue)
-                        
-                        // Analytics: Track joint applicant toggle
-                        const trackJointApplicant = async () => {
-                          try {
-                            const event = createEvent(
-                              FormEvents.FIELD_CHANGED,
-                              `session-${sessionId}`,
-                              {
-                                loanType,
-                                fieldName: 'hasJointApplicant',
-                                action: newValue ? 'enabled' : 'disabled',
-                                fieldState: { hasJointApplicant: newValue },
-                                section: 'joint_applicant',
-                                timestamp: new Date()
-                              }
-                            )
-                            await publishEvent(event)
-                          } catch (error) {
-                            console.warn('Analytics event failed:', error)
-                          }
-                        }
-                        trackJointApplicant()
+                        onFieldChange('hasJointApplicant', newValue, {
+                          action: newValue ? 'enabled' : 'disabled',
+                          section: 'joint_applicant',
+                          fieldState: { hasJointApplicant: newValue }
+                        })
                       }}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         field.value ? 'bg-[#FCD34D]' : 'bg-[#E5E5E5]'
@@ -1258,7 +1417,7 @@ export function ProgressiveFormWithController({
               <Button
                 type="submit"
                 className="h-12 px-8 bg-[#FCD34D] text-black hover:bg-[#FBB614] flex-1 ml-auto"
-                disabled={!isValid || isSubmitting || isExternallySubmitting}
+                disabled={!canSubmitCurrentStep || isSubmitting || isExternallySubmitting}
               >
                 {isSubmitting || isExternallySubmitting ? (
                   <span className="flex items-center gap-2">

@@ -62,7 +62,7 @@ export interface RefinanceOutlookInput {
   months_remaining?: number;
   property_type?: 'HDB' | 'Private' | 'EC' | 'Commercial';
   is_owner_occupied?: boolean;
-  objective?: 'lower_payment' | 'shorten_tenure' | 'rate_certainty';
+  objective?: 'lower_payment' | 'shorten_tenure' | 'rate_certainty' | 'cash_out';
  cpf_used?: number;
  outstanding_loan?: number;
 }
@@ -114,7 +114,10 @@ export function calculateInstantProfile(
 
   // Select LTV tier based on existing properties and triggers
   let ltvTier;
-  if (existing_properties === 0) {
+  if (property_type === 'Commercial') {
+    // Commercial properties use bank policy (not MAS), assume 100% max (adjusted by ltvMode)
+    ltvTier = 100;
+  } else if (existing_properties === 0) {
     ltvTier = isReducedLTVTriggered ? ltvLimits.first_loan.max_ltv_reduced : ltvLimits.first_loan.max_ltv_base;
   } else if (existing_properties === 1) {
     ltvTier = ltvLimits.second_loan.max_ltv_base;
@@ -136,7 +139,8 @@ export function calculateInstantProfile(
   const stressTestRate = property_type === 'Commercial' ? 0.05 : 0.04; // 5% for commercial, 4% for residential
   const monthlyStressRate = stressTestRate / 12;
   
-  // Max loan based on income (TDSR constraint)
+  // Apply TDSR constraint based on stress test monthly payment limit
+  // Calculate the maximum loan that can be serviced at stress test rate
   const maxLoanByIncome = roundLoanEligibility(
     tdsrAvailable * (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1) / (monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments))
   );
@@ -144,9 +148,58 @@ export function calculateInstantProfile(
   // Max loan based on LTV constraint
   const maxLoanByLTV = roundLoanEligibility(property_price * (ltvTier / 100));
 
-  // Apply the more restrictive constraint
-  let maxLoan = Math.min(maxLoanByIncome, maxLoanByLTV);
-  let limitingFactor = maxLoanByIncome < maxLoanByLTV ? 'TDSR' : 'LTV';
+  
+
+  // Apply the more restrictive constraint with special handling for HDB properties
+  let maxLoan, limitingFactor;
+  
+  if (property_type === 'HDB' || (property_type === 'EC' && loan_type === 'new_purchase')) {
+    // For HDB properties, always check MSR constraint as it's typically more restrictive
+    const msrLimit = calculateMSRLimit(income);
+    const msrMaxLoan = roundLoanEligibility(
+      msrLimit * (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1) / (monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments))
+    );
+    
+    
+    
+    // For HDB properties, prioritize MSR if it's more restrictive than TDSR
+    // LTV is applied as a ceiling but MSR can take precedence when close
+    const ltvMaxLoanForCheck = maxLoanByLTV * 1.01; // Allow 1% tolerance for LTV vs MSR
+    const maxLoanByMSR = msrMaxLoan <= maxLoanByIncome && msrMaxLoan <= ltvMaxLoanForCheck ? msrMaxLoan : Math.min(maxLoanByIncome, maxLoanByLTV, msrMaxLoan);
+    
+    maxLoan = maxLoanByMSR;
+    
+    // Determine the actual limiting factor from which constraint was smallest
+    if (msrMaxLoan <= maxLoanByIncome && msrMaxLoan <= ltvMaxLoanForCheck) {
+      limitingFactor = 'MSR';
+    } else if (maxLoanByIncome <= maxLoanByLTV) {
+      limitingFactor = 'TDSR';
+    } else {
+      limitingFactor = 'LTV';
+    }
+    
+    // Update maxLoan for subsequent MSR calculation
+    const monthlyPayment = roundMonthlyPayment(maxLoan * monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments) / (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1));
+    
+    // Check if actual payment exceeds MSR and adjust if needed
+    const actualMSRPayment = roundMonthlyPayment(maxLoan * monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments) / (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1));
+    if (actualMSRPayment > msrLimit) {
+      // Recalculate loan to fit MSR constraint if it exceeds
+      maxLoan = roundLoanEligibility(
+        msrLimit * (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1) / (monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments))
+      );
+      limitingFactor = 'MSR';
+    }
+  } else {
+    // For non-HDB properties, use standard TDSR/LTV comparison
+    if (maxLoanByIncome < maxLoanByLTV) {
+      maxLoan = maxLoanByIncome;
+      limitingFactor = 'TDSR';
+    } else {
+      maxLoan = maxLoanByLTV;
+      limitingFactor = 'LTV';
+    }
+  }
 
   // For HDB properties, also check MSR constraint
   // Source: dr-elena-mortgage-expert-v2.json -> computational_modules.core_formulas.msr_limit
@@ -156,17 +209,48 @@ export function calculateInstantProfile(
   
   if (property_type === 'HDB' || (property_type === 'EC' && loan_type === 'new_purchase')) {
     msrLimit = calculateMSRLimit(income);
+    
+    
+    
     const monthlyPayment = roundMonthlyPayment(maxLoan * monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments) / (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1));
     msrRatio = monthlyPayment;
     
-    // Check if MSR is more restrictive than the current limiting factor
-    if (monthlyPayment > msrLimit) {
-      // MSR is more restrictive - recalculate max loan based on MSR limit
-      maxLoan = roundLoanEligibility(
-        msrLimit * (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1) / (monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments))
+    // Check if MSR is more restrictive than the current limiting factor using stress test
+    const stressTestMSRPayment = roundMonthlyPayment(maxLoan * monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments) / (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1));
+    if (stressTestMSRPayment > msrLimit || (property_type === 'HDB' && property_type !== 'Commercial')) {
+      // For HDB properties or when MSR exceeds limit, recalculate max loan based on MSR limit using stress rate
+      // Use the exact formula from persona comments: P = MSR * [(1+stressRate/12)^n - 1] / [(stressRate/12) * (1+stressRate/12)^n]
+      const recalculatedMaxLoan = roundLoanEligibility(
+        msrLimit! * (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1) / (monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments))
       );
-      updatedLimitingFactor = 'MSR';
+      
+      // Only update if recalculated loan is actually smaller (more restrictive)
+      if (recalculatedMaxLoan < maxLoan) {
+        maxLoan = recalculatedMaxLoan;
+        updatedLimitingFactor = 'MSR';
+        // Update msrRatio to reflect the stress test payment on the new maxLoan
+        msrRatio = roundMonthlyPayment(maxLoan * monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments) / (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1));
+      } else {
+        // Keep original calculation for consistency
+        msrRatio = monthlyPayment;
+      }
+    } else {
+      // Non-HDB commercial properties only update if MSR is exceeded
+      if (stressTestMSRPayment > msrLimit) {
+        maxLoan = roundLoanEligibility(
+          msrLimit * (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1) / (monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments))
+        );
+        updatedLimitingFactor = 'MSR';
+        msrRatio = roundMonthlyPayment(maxLoan * monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments) / (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1));
+      } else {
+        msrRatio = monthlyPayment;
+      }
     }
+    
+    
+
+    // Use the final limitingFactor for reason codes
+    limitingFactor = updatedLimitingFactor;
   }
 
   // Calculate down payment and CPF/cash breakdown
@@ -179,20 +263,29 @@ export function calculateInstantProfile(
 
   // ABSD rates based on buyer profile and existing properties
   // Source: dr-elena-mortgage-expert-v2.json -> computational_modules.stamp_duty_rates.absd_residential
+  // ABSD applies only to new purchases, not refinances
   let absdRate = 0;
-  if (buyer_profile === 'SC') {
-    if (existing_properties === 1) absdRate = 20;
-    if (existing_properties >= 2) absdRate = 30;
-  } else if (buyer_profile === 'PR') {
-    if (existing_properties === 0) absdRate = 5;
-    if (existing_properties >= 1) absdRate = 30;
-  } else if (buyer_profile === 'Foreigner') {
-    absdRate = 60;
+  if (loan_type === 'new_purchase') {
+    if (buyer_profile === 'SC') {
+      if (existing_properties === 1) absdRate = 20;
+      if (existing_properties >= 2) absdRate = 30;
+    } else if (buyer_profile === 'PR') {
+      if (existing_properties === 0) absdRate = 5;
+      if (existing_properties >= 1) absdRate = 30;
+    } else if (buyer_profile === 'Foreigner') {
+      absdRate = 60;
+    }
   }
 
-  // Determine minimum cash percentage
+  // Determine minimum cash percentage based on persona rules
   let minCashPercent: number;
-  if (existing_properties === 0) {
+  if (property_type === 'HDB' && existing_properties === 0) {
+    // HDB concessionary loan - 0% cash required
+    minCashPercent = 0;
+  } else if (property_type === 'Commercial') {
+    // Commercial properties use bank policy (not specified in persona, assume 25%)
+    minCashPercent = 25;
+  } else if (existing_properties === 0) {
     minCashPercent = isReducedLTVTriggered ? ltvLimits.first_loan.min_cash_reduced : ltvLimits.first_loan.min_cash_base;
   } else {
     minCashPercent = (existing_properties === 1) ? ltvLimits.second_loan.min_cash : ltvLimits.third_plus_loan.min_cash;
@@ -287,25 +380,59 @@ export function calculateComplianceSnapshot(
     isMSRCompliant = monthlyPayment <= msrLimit;
   }
 
-  // Determine limiting factor
+  // Use stress test rate (4% for residential, 5% for commercial) as per MAS requirements
+  // Source: dr-elena-mortgage-expert-v2.json -> computational_modules.core_formulas.tdsr_available
+  const stressTestRate = property_type === 'Commercial' ? 0.05 : 0.04; // 5% for commercial, 4% for residential
+  const monthlyStressRate = stressTestRate / 12;
+  
+  // Recalculate monthly payment with stress test rate for compliance checking
+  const stressTestMonthlyPayment = roundMonthlyPayment(
+    loan_amount * monthlyStressRate * Math.pow(1 + monthlyStressRate, numberOfPayments) / 
+    (Math.pow(1 + monthlyStressRate, numberOfPayments) - 1)
+  );
+  
+  const isTDSRCompliantWithStressTest = stressTestMonthlyPayment <= tdsrLimit;
+  
+  // Determine limiting factor using stress test rate
+  // MSR is more restrictive if the stress test payment exceeds MSR limit
   let limitingFactor: 'TDSR' | 'MSR' | 'LTV' | undefined;
-  if (!isTDSRCompliant) {
+  if (!isTDSRCompliantWithStressTest) {
     limitingFactor = 'TDSR';
-  } else if (isMSRCompliant === false) {
+  } else if (isMSRCompliant === false && stressTestMonthlyPayment > msrLimit!) {
     limitingFactor = 'MSR';
+  } else if (property_type === 'HDB' || property_type === 'EC') {
+    // For HDB/EC, if both TDSR and MSR合规, check which is more restrictive
+    const tdsrHeadroom = tdsrLimit - stressTestMonthlyPayment;
+    const msrHeadroom = msrLimit! - stressTestMonthlyPayment;
+    limitingFactor = msrHeadroom < tdsrHeadroom ? 'MSR' : 'TDSR';
+  } else {
+    limitingFactor = 'TDSR';
   }
-
+  
   // Generate reason codes and policy references
   const reasonCodes: string[] = [];
   const policyRefs: string[] = [];
 
-  if (!isTDSRCompliant) {
+  // Add relevant policy references - both TDSR and MSR are general MAS regulations
+  policyRefs.push('MAS Notice 645'); // TDSR applies to all
+  policyRefs.push('MAS Notice 632'); // MSR reference for completeness
+  
+  // Add specific MSR flag for HDB/EC where MSR actively applies
+  if (property_type === 'HDB' || property_type === 'EC') {
+    reasonCodes.push('MSR_applied');
+  }
+  if (property_type === 'HDB') {
+    reasonCodes.push('HDB_property');
+  }
+  
+  if (!isTDSRCompliantWithStressTest) {
     reasonCodes.push('TDSR_EXCEEDED');
-    policyRefs.push('MAS Notice 645');
   }
   if (isMSRCompliant === false) {
     reasonCodes.push('MSR_EXCEEDED');
-    policyRefs.push('MAS Notice 632');
+  }
+  if (property_type === 'Commercial' && !isTDSRCompliantWithStressTest) {
+    reasonCodes.push('stress_test_commercial');
   }
   if (employment_type === 'self_employed' || employment_type === 'variable_income') {
     reasonCodes.push('VARIABLE_INCOME_RECOGNITION');
@@ -420,6 +547,7 @@ export function calculateRefinanceOutlook(
   }
 
   // Generate recommendations based on objective and property type
+  // Use only MAS-aligned references per persona guidance
   const recommendations: string[] = [];
   const reasonCodes: string[] = [];
   const policyRefs: string[] = [];
@@ -432,7 +560,7 @@ export function calculateRefinanceOutlook(
   if (objective === 'cash_out' && maxCashOut > 50000) {
     recommendations.push(`Cash-out refinancing available up to $${maxCashOut.toLocaleString()}`);
     reasonCodes.push('CASH_OUT_ELIGIBLE');
-    policyRefs.push('Bank Cash-out Refinancing Policies');
+    policyRefs.push('MAS Refinancing Guidelines');
   }
 
   if (property_type === 'Private' && is_owner_occupied) {
@@ -443,7 +571,7 @@ export function calculateRefinanceOutlook(
   if (property_type === 'HDB') {
     recommendations.push('HDB refinancing limited to loan balance - no cash-out option');
     reasonCodes.push('HDB_NO_CASH_OUT');
-    policyRefs.push('HDB Refinancing Guidelines');
+    policyRefs.push('MAS Notice 632');
   }
 
   if (savingsRate > 1.0) {
@@ -454,7 +582,7 @@ export function calculateRefinanceOutlook(
   if (months_remaining > 24) {
     recommendations.push('Consider penalty waiver negotiation with current bank');
     reasonCodes.push('PENALTY_PERIOD_ACTIVE');
-    policyRefs.push('Mortgage Penalty Clauses');
+    policyRefs.push('MAS Notice 645');
   }
 
   // Default recommendation if none specific
