@@ -78,7 +78,7 @@ export const drElenaV2Scenarios: DrElenaScenario[] = [
       msr_limit: 2400, // 8000 * 0.30
       tdsr_limit: 4200, // (8000 * 0.55) - 200 = 4200
       limiting_factor: 'MSR',
-      max_loan: 454000, // Based on MSR limit at 4% stress test: P = 2400 * [(1+0.003333)^300 - 1] / [0.003333 * (1+0.003333)^300] = 453887, rounded down
+      max_loan: 453000, // Based on MSR limit at 4% stress test: P = 2400 * [(1+0.003333)^300 - 1] / [0.003333 * (1+0.003333)^300] = 453887, rounded DOWN to nearest thousand
       min_cash_percent: 0, // HDB concessionary loan
       cpf_allowed: true
     }
