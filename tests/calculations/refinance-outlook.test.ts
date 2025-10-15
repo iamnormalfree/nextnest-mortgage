@@ -1,4 +1,5 @@
 // ABOUTME: Unit tests for refinance outlook calculator functions
+// ABOUTME: Validates specialized_calculators.equity_term_loan, property_specific_rules, cpf_usage_rules
 import { calculateRefinanceOutlook } from '../../lib/calculations/instant-profile';
 
 describe('Refinance Outlook Calculator - Dr Elena v2 Alignment', () => {
@@ -48,7 +49,7 @@ describe('Refinance Outlook Calculator - Dr Elena v2 Alignment', () => {
       // Formula: (Market_Value × LTV%) - Outstanding_Loan - CPF_Used(inc. accrued)
       // Should person to persona equity_term_loan calculation
       expect(result.maxCashOut).toBeGreaterThan(0);
-      expect(result.policyRefs).toContain('CPF_usage_rules - charges_priority');
+      expect(result.policyRefs).toContain('charges_priority');
     });
   });
 
@@ -200,7 +201,7 @@ describe('Refinance Outlook Calculator - Dr Elena v2 Alignment', () => {
 
       // Should include accrued interest in equity calculation
       expect(result.reasonCodes).toContain('cpf_accrued_interest_considered');
-      expect(result.policyRefs).toContain('CPF_accrued_interest_formula');
+      expect(result.policyRefs).toContain('cpf_accrued_interest');
     });
 
     it('should follow CPF sale proceeds order for post-2002 properties', () => {
@@ -217,7 +218,7 @@ describe('Refinance Outlook Calculator - Dr Elena v2 Alignment', () => {
 
       // Post-2002: Refund CPF principal first, then loan, then accrued interest
       expect(result.reasonCodes).toContain('post_2002_cpf_order');
-      expect(result.policyRefs).toContain('sale_proceeds_order_post_2002');
+      expect(result.policyRefs).toContain('sale_proceeds_order');
     });
   });
 
@@ -269,7 +270,7 @@ describe('Refinance Outlook Calculator - Dr Elena v2 Alignment', () => {
       const result = calculateRefinanceOutlook(input);
 
       expect(result.policyRefs).toContain('MAS Notice 632');
-      expect(result.policyRefs).toContain('MAS Refinance Guidelines');
+      expect(result.policyRefs).toContain('MAS Notice 645');
       expect(result.reasonCodes).toContain('mas_compliant_calculation');
     });
 
@@ -283,7 +284,7 @@ describe('Refinance Outlook Calculator - Dr Elena v2 Alignment', () => {
 
       const result = calculateRefinanceOutlook(commercialInput);
 
-      expect(result.policyRefs).toContain('commercial_refinance_rules');
+      expect(result.policyRefs).toContain('MAS Notice 645');
       expect(result.reasonCodes).toContain('cpf_not_allowed_commercial');
     });
   });

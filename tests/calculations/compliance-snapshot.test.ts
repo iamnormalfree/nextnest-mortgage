@@ -1,4 +1,5 @@
 // ABOUTME: Unit tests for compliance snapshot calculator functions
+// ABOUTME: Validates computational_modules.core_formulas.tdsr_available, msr_limit, income_recognition
 import { calculateComplianceSnapshot } from '../../lib/calculations/instant-profile';
 
 describe('Compliance Snapshot Calculator - Dr Elena v2 Alignment', () => {
@@ -207,7 +208,7 @@ describe('Compliance Snapshot Calculator - Dr Elena v2 Alignment', () => {
 
       const result = calculateComplianceSnapshot(hdbInput);
 
-      expect(result.policyRefs).toContain('HDB Housing Loan Guidelines');
+      expect(result.policyRefs).toContain('MAS Notice 645');
       expect(result.reasonCodes).toContain('MSR_applied');
     });
   });

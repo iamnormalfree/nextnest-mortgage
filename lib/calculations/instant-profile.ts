@@ -1,4 +1,5 @@
 // ABOUTME: Calculator functions aligned with Dr Elena v2 mortgage expert persona
+// ABOUTME: Source: dr-elena-mortgage-expert-v2.json computational_modules
 // These functions implement the core calculation logic for instant analysis, compliance, and refinance outlook
 
 export interface InstantProfileInput {

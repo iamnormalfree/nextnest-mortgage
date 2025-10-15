@@ -1,12 +1,9 @@
 // ABOUTME: Unit tests for instant profile calculator functions aligned with Dr Elena v2 persona
+// ABOUTME: Validates computational_modules.ltv_limits, rounding_rules, core_formulas
 import {
   drElenaV2Scenarios,
   extendedScenarios,
-  getScenarioById,
-  getMSRScenarios,
-  roundingTestCases,
-  incomeRecognitionCases,
-  commitmentCalculationCases
+  getScenarioById
 } from '../fixtures/dr-elena-v2-scenarios';
 
 // Calculator functions to be implemented (will fail until implemented)

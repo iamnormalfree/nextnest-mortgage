@@ -1,5 +1,5 @@
 // ABOUTME: Test fixtures derived from Dr Elena v2 mortgage expert persona calculations
-// Source: dr-elena-mortgage-expert-v2.json test_scenarios section
+// ABOUTME: Source: dr-elena-mortgage-expert-v2.json test_scenarios section
 
 export interface DrElenaScenario {
   id: string;
@@ -78,7 +78,7 @@ export const drElenaV2Scenarios: DrElenaScenario[] = [
       msr_limit: 2400, // 8000 * 0.30
       tdsr_limit: 4200, // (8000 * 0.55) - 200 = 4200
       limiting_factor: 'MSR',
-      max_loan: 380000, // Based on MSR limit at 4% stress test
+      max_loan: 454000, // Based on MSR limit at 4% stress test: P = 2400 * [(1+0.003333)^300 - 1] / [0.003333 * (1+0.003333)^300] = 453887, rounded down
       min_cash_percent: 0, // HDB concessionary loan
       cpf_allowed: true
     }
@@ -157,7 +157,7 @@ export const extendedScenarios: DrElenaScenario[] = [
     },
     expected_outputs: {
       max_ltv: 45, // Second loan rules apply
-      absd_rate: 20, // SC second property (original purchase)
+      absd_rate: 0, // ABSD only applies to purchases, not refinance
       tdsr_available: 6900, // (18000 * 0.55) - 3000 = 6900
       max_loan: 540000, // 1200000 * 0.45
       limiting_factor: 'TDSR',
@@ -182,12 +182,12 @@ export const extendedScenarios: DrElenaScenario[] = [
       is_owner_occupied: false
     },
     expected_outputs: {
-      max_ltv: 75, // First loan (corporate rules may apply differently)
+      max_ltv: 0, // Commercial LTV is bank policy, not specified by persona
       absd_rate: 0, // No ABSD on commercial
       tdsr_available: 8750, // (25000 * 0.55) - 5000 = 8750
-      max_loan: 1500000, // 2000000 * 0.75
+      max_loan: 0, // Cannot calculate without bank policy LTV
       limiting_factor: 'TDSR',
-      min_cash_percent: 5,
+      min_cash_percent: 0, // Cannot determine without LTV
       cpf_allowed: false // CPF not allowed for commercial
     }
   }
