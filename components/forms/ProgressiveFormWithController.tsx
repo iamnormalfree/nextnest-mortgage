@@ -3,7 +3,7 @@
 
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Controller } from 'react-hook-form'
 import { useProgressiveFormController } from '@/hooks/useProgressiveFormController'
 import {
@@ -19,7 +19,10 @@ import {
   useEventPublisher,
   useCreateEvent
 } from '@/lib/events/event-bus'
+import { Step3NewPurchase } from './sections/Step3NewPurchase'
+import { Step3Refinance } from './sections/Step3Refinance'
 import { cn, formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
+import { calculateInstantProfile, roundMonthlyPayment } from '@/lib/calculations/instant-profile'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -37,15 +40,16 @@ import {
   Users,
   Home,
   DollarSign,
-  TrendingUp
+  TrendingUp,
+  Info
 } from 'lucide-react'
 import ChatTransitionScreen from '@/components/forms/ChatTransitionScreen'
 import ChatWidgetLoader from '@/components/forms/ChatWidgetLoader'
-import { formSteps, propertyCategoryOptions } from '@/lib/forms/form-config'
+import { formSteps, propertyCategoryOptions, getPropertyTypeOptions } from '@/lib/forms/form-config'
 
 // Helper function to safely extract error messages
-const getErrorMessage = (error: any): string | undefined => {
-  if (!error) return undefined
+const getErrorMessage = (error: any): string => {
+  if (!error) return 'This field is required'
   if (typeof error === 'string') return error
   if (typeof error === 'object' && 'message' in error) return error.message
   return 'This field is required'
@@ -86,8 +90,7 @@ export function ProgressiveFormWithController({
   const [isFormCompleted, setIsFormCompleted] = useState(false)
   const [showOptionalContext, setShowOptionalContext] = useState(false)
   const [showJointApplicant, setShowJointApplicant] = useState(false)
-  const [ltvMode, setLtvMode] = useState(75) // Default LTV mode
-  const [isAutoProgressing, setIsAutoProgressing] = useState(false) // Auto-progression spinner state
+  const [ltvMode, setLtvMode] = useState(75) // Default LTV mode (75% with 55% option)
 
   // Ref for throttling analytics events
   const stepTrackerRef = useRef<Record<string, number>>({})
@@ -102,7 +105,7 @@ export function ProgressiveFormWithController({
     onFormComplete: (data) => {
       setIsFormCompleted(true)
       // Trigger chat transition if needed
-      if (currentStep === formSteps.length - 1) {
+      if (currentStep === 2) { // Step 3 would be index 2
         setShowChatTransition(true)
       }
     }
@@ -114,6 +117,7 @@ export function ProgressiveFormWithController({
     errors,
     isValid,
     isAnalyzing,
+    isInstantCalcLoading,
     isSubmitting,
     instantCalcResult,
     leadScore,
@@ -135,9 +139,187 @@ export function ProgressiveFormWithController({
     calculateInstant
   } = controller
 
+  const personaVersion = 'dr_elena_v2'
+
+  const propertyTypeOptions = useMemo(
+    () => getPropertyTypeOptions(loanType, propertyCategory),
+    [loanType, propertyCategory]
+  )
+
+  const refinancePropertyTypeOptions = useMemo(
+    () => getPropertyTypeOptions('refinance'),
+    []
+  )
+
+  const shouldShowPropertyTypeSelect =
+    loanType === 'new_purchase' &&
+    propertyCategory !== 'bto' &&
+    propertyCategory !== 'commercial'
+
+  const showOptionalContextToggle =
+    loanType === 'new_purchase' && propertyCategory === 'new_launch'
+
+  // Timer cleanup removed (auto-advance disabled per spec)
+
   // Analytics hooks
   const publishEvent = useEventPublisher()
   const createEvent = useCreateEvent(sessionId)
+
+  const handleLtvSelection = useCallback((mode: number) => {
+    if (ltvMode === mode) {
+      return
+    }
+
+    setLtvMode(mode)
+    calculateInstant({ force: true, ltvMode: mode })
+
+    const trackLtvToggle = async () => {
+      try {
+        const event = createEvent(
+          FormEvents.FIELD_CHANGED,
+          `session-${sessionId}`,
+          {
+            loanType,
+            personaVersion,
+            ltvMode: mode,
+            action: 'selected',
+            section: 'ltv_toggle',
+            timestamp: new Date()
+          }
+        )
+        await publishEvent(event)
+      } catch (error) {
+        console.warn('Analytics event failed:', error)
+      }
+    }
+
+    trackLtvToggle()
+  }, [ltvMode, calculateInstant, createEvent, loanType, personaVersion, publishEvent, sessionId])
+
+  // Calculate LTV comparison data based on current form values and selected LTV mode using audited calculator
+  const ltvComparisonData = useMemo(() => {
+    if (!fieldValues.priceRange && !fieldValues.propertyValue) return null
+
+    // Handle both new purchase and refinance property values
+    const propertyValue = parseFormattedNumber(
+      (fieldValues.priceRange || fieldValues.propertyValue)?.toString() || '0'
+    )
+    const income = parseFormattedNumber(fieldValues.income?.toString() || '0')
+    const commitments = parseFormattedNumber(fieldValues.commitments?.toString() || '500')
+
+    if (!propertyValue || !income) return null
+
+    try {
+      // For new purchase scenarios, use the 75% LTV calculator result as base
+      if (loanType === 'new_purchase' && instantCalcResult) {
+        const selectedProfile = calculateInstantProfile(
+          {
+            property_price: propertyValue,
+            property_type: fieldValues.propertyType || 'HDB',
+            buyer_profile: fieldValues.buyerProfile || 'SC',
+            existing_properties: Number(fieldValues.existingProperties) || 0,
+            income,
+            commitments,
+            rate: 3.6,
+            tenure: 25,
+            age: Number(fieldValues.combinedAge) || 35,
+            loan_type: 'new_purchase',
+            is_owner_occupied: true
+          },
+          ltvMode // Use selected LTV mode
+        )
+
+        // Calculate monthly payment using the selected LTV mode
+        const monthlyPayment = roundMonthlyPayment(
+          selectedProfile.maxLoan * (0.028 / 12) * Math.pow(1 + 0.028 / 12, 25 * 12) / 
+          (Math.pow(1 + 0.028 / 12, 25 * 12) - 1)
+        )
+
+        return {
+          maxLoan: selectedProfile.maxLoan,
+          downpayment: propertyValue - selectedProfile.maxLoan,
+          monthlyPayment,
+          limitingFactor: selectedProfile.limitingFactor
+        }
+      }
+
+      // Fallback: use basic calculation for refinance or missing instantCalcResult
+      const selectedProfile = calculateInstantProfile(
+        {
+          property_price: propertyValue,
+          property_type: fieldValues.propertyType || 'Private',
+          buyer_profile: fieldValues.buyerProfile || 'SC',
+          existing_properties: Number(fieldValues.existingProperties) || 0,
+          income,
+          commitments,
+          rate: 3.6,
+          tenure: 25,
+          age: Number(fieldValues.combinedAge) || 35,
+          loan_type: (loanType === 'commercial' ? 'new_purchase' : loanType) || 'new_purchase',
+          is_owner_occupied: true
+        },
+        ltvMode
+      )
+
+      const monthlyPayment = roundMonthlyPayment(
+        selectedProfile.maxLoan * (0.028 / 12) * Math.pow(1 + 0.028 / 12, 25 * 12) / 
+        (Math.pow(1 + 0.028 / 12, 25 * 12) - 1)
+      )
+
+      return {
+        maxLoan: selectedProfile.maxLoan,
+        downpayment: propertyValue - selectedProfile.maxLoan,
+        monthlyPayment,
+        limitingFactor: selectedProfile.limitingFactor
+      }
+    } catch (error) {
+      console.error('LTV comparison calculation failed:', error)
+      return null
+    }
+  }, [fieldValues, loanType, ltvMode, instantCalcResult])
+
+  useEffect(() => {
+    if (loanType !== 'new_purchase') {
+      return
+    }
+
+    const currentValue = watch('propertyType')
+
+    if (propertyCategory === 'bto') {
+      if (currentValue !== 'HDB') {
+        setValue('propertyType', 'HDB')
+        onFieldChange('propertyType', 'HDB')
+      }
+      return
+    }
+
+    if (propertyCategory === 'commercial') {
+      if (currentValue !== 'Commercial') {
+        setValue('propertyType', 'Commercial')
+        onFieldChange('propertyType', 'Commercial')
+      }
+      return
+    }
+
+    const validValues = propertyTypeOptions.map(option => option.value)
+    if (validValues.length === 0) {
+      return
+    }
+
+    if (!currentValue || !validValues.includes(currentValue)) {
+      const nextValue = validValues[0]
+      if (nextValue) {
+        setValue('propertyType', nextValue)
+        onFieldChange('propertyType', nextValue)
+      }
+    }
+  }, [loanType, propertyCategory, propertyTypeOptions, setValue, watch, onFieldChange])
+
+  useEffect(() => {
+    if (!showOptionalContextToggle && showOptionalContext) {
+      setShowOptionalContext(false)
+    }
+  }, [showOptionalContextToggle, showOptionalContext])
 
   // Progress calculation
   const progressPercentage = ((currentStep + 1) / formSteps.length) * 100
@@ -185,31 +367,49 @@ export function ProgressiveFormWithController({
       ? isValid && shouldEnableStep1Continue
       : isValid
 
-  // Toggle optional context when Step 2 fields are filled (for enhanced UX)
-  useEffect(() => {
-    if (currentStep === 2 && !isAutoProgressing) {
-      const step2RequiredFields = ['propertyCategory', 'propertyType', 'priceRange', 'combinedAge']
-      const hasAllRequiredFields = step2RequiredFields.every(field => 
-        Boolean(watch(field)) && watch(field) !== ''
-      )
-      
-      if (hasAllRequiredFields && !showOptionalContext) {
-        // Show 1-second spinner before showing optional context and auto-progressing
-        setIsAutoProgressing(true)
-        
-        setTimeout(() => {
-          setShowOptionalContext(true)
-          setIsAutoProgressing(false)
-          
-          // Auto-progress to Step 3 after another 1-second delay
-          setTimeout(() => {
-            onStepCompletion(2, fieldValues)
-            // The parent component will handle the actual step progression
-          }, 1000)
-        }, 1000)
-      }
+  // Helper function to get employment recognition rate (Dr Elena v2 persona aligned)
+  const getEmploymentRecognitionRate = (employmentType: string) => {
+    switch (employmentType) {
+      case 'employed':
+        return 1.0 // 100% recognition for employed
+      case 'self-employed':
+        return 0.7 // 70% recognition for self-employed (2-year NOA requirement)
+      case 'contract':
+      case 'variable':
+        return 0.6 // 60% recognition for contract/freelance or variable income
+      case 'other':
+        return 0.5
+      case 'not-working':
+      case 'unemployed':
+      default:
+        return 0.0 // 0% recognition for unemployed
     }
-  }, [currentStep, watch, showOptionalContext, isAutoProgressing, fieldValues, onStepCompletion])
+  }
+
+  // Helper function to calculate liabilities total (credit_card, overdraft, guarantor formulas)
+  const calculateTotalLiabilities = (creditCardCount: number, existingCommitments: number, employmentType: string, monthlyIncome?: number) => {
+    // Credit card minimum payments: 3% of credit limit or S$50 minimum, whichever is higher
+    const creditCardPayments = Math.max(creditCardCount * 50, creditCardCount * 3000 * 0.03)
+    
+    // Total monthly commitments
+    const totalCommitments = creditCardPayments + existingCommitments
+    
+    // Apply income recognition based on employment type with safeguard for negative income
+    const recognitionRate = getEmploymentRecognitionRate(employmentType)
+    const recognizedIncome = monthlyIncome && monthlyIncome > 0 ? monthlyIncome * recognitionRate : 0
+    
+    return {
+      creditCardPayments,
+      existingCommitments,
+      totalCommitments,
+      recognizedIncome,
+      recognitionRate,
+      tdsrImpact: monthlyIncome ? (totalCommitments / recognizedIncome) * 100 : 0
+    }
+  }
+
+  // Manual optional context toggle - REMOVED AUTO-ADVANCE (per spec)
+  // Users now control when to expand optional context themselves
   useEffect(() => {
     if (!showInstantCalc || !instantCalcResult) return
 
@@ -220,6 +420,8 @@ export function ProgressiveFormWithController({
           `session-${sessionId}`,
           {
             loanType,
+            personaVersion,
+            ltvMode,
             tier: 2,
             hasResult: true,
             resultType: loanType === 'new_purchase' ? 'max_loan' : 'monthly_savings',
@@ -237,7 +439,7 @@ export function ProgressiveFormWithController({
     }
 
     trackTier2Display()
-  }, [showInstantCalc, instantCalcResult, loanType, sessionId, createEvent, publishEvent])
+  }, [showInstantCalc, instantCalcResult, loanType, sessionId, createEvent, publishEvent, ltvMode])
 
   // Sync showJointApplicant with form field value
   useEffect(() => {
@@ -386,51 +588,88 @@ export function ProgressiveFormWithController({
               />
             )}
 
-            <Controller
-              name="propertyType"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label 
-                    htmlFor="property-type"
-                    className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
-                  >
-                    Property Type *
-                  </label>
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => {
-                      field.onChange(value)
-                      onFieldChange('propertyType', value)
-                    }}
-                  >
-                    <SelectTrigger id="property-type">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {loanType === 'new_purchase' ? (
-                        <>
-                          <SelectItem value="HDB">HDB Flat</SelectItem>
-                          <SelectItem value="EC">Executive Condo</SelectItem>
-                          <SelectItem value="Private">Private Condo</SelectItem>
-                          <SelectItem value="Landed">Landed Property</SelectItem>
-                        </>
-                      ) : (
-                        <>
-                          <SelectItem value="HDB">HDB Flat (Refinance)</SelectItem>
-                          <SelectItem value="EC">Executive Condo (Refinance)</SelectItem>
-                          <SelectItem value="Private">Private Condo (Refinance)</SelectItem>
-                          <SelectItem value="Landed">Landed Property (Refinance)</SelectItem>
-                        </>
+            {loanType === 'new_purchase' && (
+              <Controller
+                name="propertyType"
+                control={control}
+                render={({ field }) => {
+                  if (!shouldShowPropertyTypeSelect) {
+                    return null
+                  }
+
+                  return (
+                    <div>
+                      <label 
+                        htmlFor="property-type"
+                        className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                      >
+                        Property Type *
+                      </label>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          onFieldChange('propertyType', value)
+                        }}
+                      >
+                        <SelectTrigger id="property-type">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {propertyTypeOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.propertyType && (
+                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
                       )}
-                    </SelectContent>
-                  </Select>
-                  {errors.propertyType && (
-                    <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
-                  )}
-                </div>
-              )}
-            />
+                    </div>
+                  )
+                }}
+              />
+            )}
+
+            {/* Show property type selector for refinance */}
+            {loanType === 'refinance' && (
+              <Controller
+                name="propertyType"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label 
+                      htmlFor="property-type"
+                      className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                    >
+                      Property Type *
+                    </label>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        onFieldChange('propertyType', value)
+                      }}
+                    >
+                      <SelectTrigger id="property-type">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {refinancePropertyTypeOptions.map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.propertyType && (
+                      <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
+                    )}
+                  </div>
+                )}
+              />
+            )}
 
             {loanType === 'new_purchase' ? (
               <>
@@ -582,7 +821,19 @@ export function ProgressiveFormWithController({
             )}
 
             {/* Show instant calculation result if available */}
-            {showInstantCalc && instantCalcResult && (() => {
+            {isInstantCalcLoading && (
+              <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5] animate-pulse">
+                <div className="flex items-center gap-2 text-sm font-semibold text-black">
+                  <Sparkles className="w-4 h-4 text-[#F59E0B]" />
+                  <span>Analyzing...</span>
+                </div>
+                <p className="text-xs text-[#666666] mt-2">
+                  Dr Elena is calibrating your persona-aligned loan estimate. This takes about a second.
+                </p>
+              </div>
+            )}
+
+            {!isInstantCalcLoading && showInstantCalc && instantCalcResult && (() => {
               // Helper function to calculate monthly payment
               const calculateMonthlyPayment = (loanAmount: number, rate: number = 2.8, years: number = 25) => {
                 const monthlyRate = rate / 100 / 12
@@ -591,21 +842,24 @@ export function ProgressiveFormWithController({
                 return Math.round(monthlyPayment)
               }
 
-              // Helper function to calculate down payment breakdown
-              const calculateDownPayment = (price: number, loanAmount: number) => {
-                const downPayment = price - loanAmount
-                const cpfAllowed = Math.min(downPayment * 0.8, 200000) // CPF allowance capped at 80% of down payment, max $200k
-                const cashRequired = downPayment - cpfAllowed
-                return { downPayment, cpfAllowed, cashRequired }
-              }
-
-              // Calculate additional metrics for new purchase
               if (loanType === 'new_purchase' && instantCalcResult.maxLoanAmount) {
+                const propertyPrice = instantCalcResult.propertyPrice ?? Number(fieldValues.priceRange ?? 0)
                 const maxLoan = instantCalcResult.maxLoanAmount
-                const monthlyPayment = instantCalcResult.estimatedMonthlyPayment ?? 0
-                const inferredPrice = fieldValues.priceRange || Math.round(maxLoan / 0.75)
-                const { downPayment, cpfAllowed, cashRequired } = calculateDownPayment(inferredPrice, maxLoan)
-                const ltv = inferredPrice > 0 ? Math.round((maxLoan / inferredPrice) * 100) : 75
+                const rateAssumption = instantCalcResult.rateAssumption ?? 2.8
+                const monthlyPayment = instantCalcResult.estimatedMonthlyPayment ?? calculateMonthlyPayment(maxLoan, rateAssumption)
+                const downPayment = instantCalcResult.downPayment ?? Math.max(propertyPrice - maxLoan, 0)
+                const cpfAllowedAmount = instantCalcResult.cpfAllowedAmount ?? Math.min(downPayment * 0.8, 200000)
+                const cashRequired = Math.max(downPayment - cpfAllowedAmount, 0)
+                const minCashPercent = instantCalcResult.minCashPercent ?? (propertyPrice > 0 ? Math.round((cashRequired / propertyPrice) * 100) : 0)
+                const minCashRequired = instantCalcResult.minCashRequired ?? cashRequired
+                const ltvPercent = typeof instantCalcResult.ltvRatio === 'number'
+                  ? instantCalcResult.ltvRatio
+                  : (propertyPrice > 0 ? Math.round((maxLoan / propertyPrice) * 100) : ltvMode)
+                const tenureCapYears = instantCalcResult.tenureCapYears
+                const tenureCapSource = instantCalcResult.tenureCapSource
+                const limitingFactor = instantCalcResult.limitingFactor
+                const reasonCodes: string[] = instantCalcResult.reasonCodes ?? []
+                const policyRefs: string[] = instantCalcResult.policyRefs ?? []
 
                 return (
                   <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
@@ -613,51 +867,95 @@ export function ProgressiveFormWithController({
                       <Sparkles className="inline-block w-4 h-4 mr-2" />
                       Your Personalized Analysis
                     </h4>
-                    
+
                     <div className="grid grid-cols-1 gap-4">
-                      {/* Maximum Loan */}
                       <div className="border-b border-[#E5E5E5] pb-3">
                         <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
                           Maximum Loan Amount
                         </p>
                         <p className="text-lg font-mono font-semibold text-black">
                           ${maxLoan.toLocaleString()}
-                          <span className="text-sm text-[#666666] ml-2">[{ltv}% LTV]</span>
+                          <span className="text-sm text-[#666666] ml-2">[{ltvPercent}% LTV]</span>
                         </p>
+                        {limitingFactor && (
+                          <p className="text-xs text-[#666666] mt-1">Limiting factor: {limitingFactor}</p>
+                        )}
                       </div>
 
-                      {/* Monthly Payment */}
                       <div className="border-b border-[#E5E5E5] pb-3">
                         <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
                           Estimated Monthly Payment
                         </p>
                         <p className="text-lg font-mono font-semibold text-black">
                           ${monthlyPayment.toLocaleString()}/mo
-                          <span className="text-sm text-[#666666] ml-2">[@ 3.5% stress-tested rate]</span>
+                          <span className="text-sm text-[#666666] ml-2">[@ {rateAssumption}% assumed rate]</span>
                         </p>
                       </div>
 
-                      {/* Down Payment */}
                       <div>
                         <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
                           Down Payment Required
                         </p>
                         <p className="text-lg font-mono font-semibold text-black">
                           ${Math.round(downPayment).toLocaleString()}
-                          <span className="text-sm text-[#666666] ml-2">[25% down]</span>
+                          {propertyPrice > 0 && (
+                            <span className="text-sm text-[#666666] ml-2">[{(downPayment / propertyPrice * 100).toFixed(1)}% down]</span>
+                          )}
                         </p>
                         <div className="mt-2 space-y-1">
                           <p className="text-sm text-[#666666]">
                             ├─ Cash required: <span className="font-mono">${Math.round(cashRequired).toLocaleString()}</span>
                           </p>
                           <p className="text-sm text-[#666666]">
-                            └─ CPF allowed: <span className="font-mono">${Math.round(cpfAllowed).toLocaleString()}</span>
+                            └─ CPF allowed: <span className="font-mono">${Math.round(cpfAllowedAmount).toLocaleString()}</span>
+                          </p>
+                          <p className="text-sm text-[#666666]">
+                            └─ Persona min cash ({minCashPercent}%): <span className="font-mono">${Math.round(minCashRequired).toLocaleString()}</span>
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Locked Tier 3 Preview */}
+                    {(tenureCapYears || reasonCodes.length > 0 || policyRefs.length > 0) && (
+                      <div className="mt-4 space-y-3 border-t border-[#E5E5E5] pt-4">
+                        {tenureCapYears && (
+                          <p className="text-xs text-[#666666]">
+                            Tenure capped at {tenureCapYears} years ({tenureCapSource === 'age' ? 'age trigger' : 'regulation'}).
+                          </p>
+                        )}
+                        {reasonCodes.length > 0 && (
+                          <div>
+                            <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">Reason codes</p>
+                            <div className="flex flex-wrap gap-2">
+                              {reasonCodes.map((code) => (
+                                <span
+                                  key={code}
+                                  className="text-[11px] uppercase tracking-wide bg-[#F8F8F8] border border-[#E5E5E5] px-2 py-1 text-[#666666]"
+                                >
+                                  {code}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {policyRefs.length > 0 && (
+                          <div>
+                            <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">Policy references</p>
+                            <div className="flex flex-wrap gap-2">
+                              {policyRefs.map((ref) => (
+                                <span
+                                  key={ref}
+                                  className="text-[11px] bg-[#F8F8F8] border border-[#E5E5E5] px-2 py-1 text-[#666666]"
+                                >
+                                  {ref}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
                       <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
                         💡 Complete Step 3 to unlock:
@@ -684,8 +982,8 @@ export function ProgressiveFormWithController({
 
               // Calculate additional metrics for refinance
               if (loanType === 'refinance' && instantCalcResult.monthlySavings) {
-                const currentMonthlyPayment = instantCalcResult.outstandingLoan ? 
-                  calculateMonthlyPayment(instantCalcResult.outstandingLoan, instantCalcResult.currentRate || 3.5) : 0
+                // Use currentMonthlyPayment from calculateRefinanceOutlook() which handles missing rates
+                const currentMonthlyPayment = instantCalcResult.currentMonthlyPayment ?? 0
                 const newMonthlyPayment = currentMonthlyPayment - instantCalcResult.monthlySavings
                 const lifetimeSavings = instantCalcResult.monthlySavings * 12 * 20 // Over 20 years
                 const breakEvenMonths = 0 // Would be calculated based on refinancing costs
@@ -771,18 +1069,7 @@ export function ProgressiveFormWithController({
               return null
             })()}
 
-            {/* Auto-progression Spinner */}
-            {isAutoProgressing && (
-              <div className="mt-6 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-4 h-4 border-2 border-[#FCD34D] border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-sm text-black font-medium">Analyzing your loan options...</p>
-                </div>
-                <p className="text-xs text-[#666666] text-center mt-2">
-                  Preparing personalized recommendations based on your inputs
-                </p>
-              </div>
-            )}
+            
 
             {/* LTV Toggle for What-If Analysis */}
             {showInstantCalc && instantCalcResult && loanType === 'new_purchase' && (
@@ -795,7 +1082,18 @@ export function ProgressiveFormWithController({
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setLtvMode(55)}
+                      onClick={() => handleLtvSelection(75)}
+                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
+                        ltvMode === 75 
+                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
+                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
+                      }`}
+                    >
+                      75% (Default)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleLtvSelection(55)}
                       className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
                         ltvMode === 55 
                           ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
@@ -804,51 +1102,38 @@ export function ProgressiveFormWithController({
                     >
                       55%
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setLtvMode(65)}
-                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                        ltvMode === 65 
-                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
-                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
-                      }`}
-                    >
-                      65%
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setLtvMode(75)}
-                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                        ltvMode === 75 
-                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
-                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
-                      }`}
-                    >
-                      75%
-                    </button>
                   </div>
+                </div>
+
+                <div className="mt-3 flex items-start gap-2 text-xs text-[#666666]">
+                  <Info className="w-4 h-4 text-[#666666]" aria-hidden="true" />
+                  <span>
+                    75% LTV matches Dr Elena&apos;s baseline persona for first-time buyers. Switch to 55% if you want a conservative investment scenario with more cash buffer.
+                  </span>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="p-2 bg-white border border-[#E5E5E5]">
-                    <p className="text-xs text-[#666666] mb-1">Max Loan</p>
-                    <p className="text-sm font-mono font-semibold text-black">
-                      ${Math.round(instantCalcResult.maxLoanAmount * (ltvMode / 75)).toLocaleString()}
-                    </p>
+                {ltvComparisonData ? (
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div className="p-2 bg-white border border-[#E5E5E5]">
+                      <p className="text-xs text-[#666666] mb-1">Max Loan</p>
+                      <p className="text-sm font-mono font-semibold text-black">
+                        ${ltvComparisonData.maxLoan.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-[#666666] mt-1">({ltvMode}% LTV)</p>
+                    </div>
+                    <div className="p-2 bg-white border border-[#E5E5E5]">
+                      <p className="text-xs text-[#666666] mb-1">Monthly Payment</p>
+                      <p className="text-sm font-mono font-semibold text-black">
+                        ${ltvComparisonData.monthlyPayment.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-[#666666] mt-1">${ltvComparisonData.downpayment.toLocaleString()} down</p>
+                    </div>
                   </div>
-                  <div className="p-2 bg-white border border-[#E5E5E5]">
-                    <p className="text-xs text-[#666666] mb-1">Cash Down</p>
-                    <p className="text-sm font-mono font-semibold text-black">
-                      ${Math.round((fieldValues.priceRange || 0) * (1 - ltvMode / 100)).toLocaleString()}
-                    </p>
+                ) : (
+                  <div className="p-4 text-center text-[#666666]">
+                    <p className="text-sm">Complete all fields to see LTV analysis</p>
                   </div>
-                  <div className="p-2 bg-white border border-[#E5E5E5]">
-                    <p className="text-xs text-[#666666] mb-1">Monthly</p>
-                    <p className="text-sm font-mono font-semibold text-black">
-                      ${Math.round((instantCalcResult.maxLoanAmount * (ltvMode / 75)) * 0.028 / 12 * Math.pow(1 + 0.028 / 12, 25 * 12) / (Math.pow(1 + 0.028 / 12, 25 * 12) - 1)).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
+                )}
                 
                 <div className="mt-2 p-2 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
                   <p className="text-xs text-black">
@@ -858,109 +1143,194 @@ export function ProgressiveFormWithController({
               </div>
             )}
 
-            {/* Optional Context Block */}
-            <div className="mt-6 border-t border-[#E5E5E5] pt-6">
-              <button
-                type="button"
-                onClick={() => {
-                  const newValue = !showOptionalContext
-                  setShowOptionalContext(newValue)
-                  
-                  // Analytics: Track optional context expansion
-                  const trackOptionalContext = async () => {
-                    try {
-                      const event = createEvent(
-                        FormEvents.USER_HESITATED,
-                        `session-${sessionId}`,
-                        {
-                          loanType,
-                          action: newValue ? 'expanded' : 'collapsed',
-                          section: 'optional_context',
-                          fieldState: { showOptionalContext: newValue },
-                          timestamp: new Date()
-                        }
-                      )
-                      await publishEvent(event)
-                    } catch (error) {
-                      console.warn('Analytics event failed:', error)
+            {showOptionalContextToggle && (
+              <div className="mt-6 border-t border-[#E5E5E5] pt-6">
+                {/* Optional Context Block */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newValue = !showOptionalContext
+                    setShowOptionalContext(newValue)
+
+                    // Analytics: Track optional context expansion
+                    const trackOptionalContext = async () => {
+                      try {
+                        const event = createEvent(
+                      FormEvents.USER_HESITATED,
+                      `session-${sessionId}`,
+                      {
+                        loanType,
+                        personaVersion,
+                        ltvMode,
+                        action: newValue ? 'expanded' : 'collapsed',
+                        section: 'optional_context',
+                            fieldState: { showOptionalContext: newValue },
+                            timestamp: new Date()
+                          }
+                        )
+                        await publishEvent(event)
+                      } catch (error) {
+                        console.warn('Analytics event failed:', error)
+                      }
                     }
-                  }
-                  trackOptionalContext()
-                }}
-                className="w-full flex items-center justify-between p-4 bg-[#F8F8F8] border border-[#E5E5E5] hover:bg-[#E5E5E5] transition-colors duration-300"
-              >
-                <div className="flex items-center gap-2">
-                  <ChevronDown 
-                    className={`w-4 h-4 text-[#666666] transition-transform duration-300 ${
-                      showOptionalContext ? 'rotate-180' : ''
-                    }`}
-                  />
-                  <span className="text-sm text-[#666666]">Add optional context</span>
-                </div>
-                <span className="text-xs text-[#666666]">For better personalization</span>
-              </button>
+                    trackOptionalContext()
+                  }}
+                  className="w-full flex items-center justify-between p-4 bg-[#F8F8F8] border border-[#E5E5E5] hover:bg-[#E5E5E5] transition-colors duration-300"
+                >
+                  <div className="flex items-center gap-2">
+                    <ChevronDown
+                      className={`w-4 h-4 text-[#666666] transition-transform duration-300 ${
+                        showOptionalContext ? 'rotate-180' : ''
+                      }`}
+                    />
+                    <span className="text-sm text-[#666666]">Add optional context</span>
+                  </div>
+                  <span className="text-xs text-[#666666]">For better personalization</span>
+                </button>
 
-              {showOptionalContext && (
-                <div className="space-y-4 mt-4 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
-                  <Controller
-                    name="developmentName"
-                    control={control}
-                    render={({ field }) => (
-                      <div>
-                        <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                          Development Name (Optional)
-                        </label>
-                        <Input
-                          {...field}
-                          type="text"
-                          placeholder="e.g., The Tampines Condo"
-                          onChange={(e) => {
-                            field.onChange(e)
-                            onFieldChange('developmentName', e.target.value)
-                          }}
-                        />
-                        <p className="text-xs text-[#666666] mt-1">
-                          Help us understand the specific property you&apos;re considering
-                        </p>
-                      </div>
-                    )}
-                  />
+                {showOptionalContext && (
+                  <div className="space-y-4 mt-4 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
+                    <Controller
+                      name="developmentName"
+                      control={control}
+                      render={({ field }) => (
+                        <div>
+                          <label
+                            htmlFor="development-name"
+                            className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                          >
+                            Development Name (Optional)
+                          </label>
+                          <Input
+                            {...field}
+                            id="development-name"
+                            type="text"
+                            placeholder="e.g., The Tampines Condo"
+                            onChange={(e) => {
+                              field.onChange(e)
+                              onFieldChange('developmentName', e.target.value)
+                            }}
+                          />
+                          <p className="text-xs text-[#666666] mt-1">
+                            Help us understand the specific property you&apos;re considering
+                          </p>
+                        </div>
+                      )}
+                    />
 
-                  <Controller
-                    name="paymentScheme"
-                    control={control}
-                    render={({ field }) => (
-                      <div>
-                        <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                          Preferred Payment Scheme (Optional)
-                        </label>
-                        <Select
-                          value={field.value}
-                          onValueChange={(value) => {
-                            field.onChange(value)
-                            onFieldChange('paymentScheme', value)
-                          }}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select payment scheme" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="cash">Cash Payment</SelectItem>
-                            <SelectItem value="cpf_plus_cash">CPF + Cash</SelectItem>
-                            <SelectItem value="full_cpf">Full CPF</SelectItem>
-                            <SelectItem value="bank_loan">Bank Loan</SelectItem>
-                            <SelectItem value="not_sure">Not sure yet</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-[#666666] mt-1">
-                          This helps us tailor loan recommendations to your preferences
-                        </p>
-                      </div>
-                    )}
-                  />
-                </div>
-              )}
-            </div>
+                    <Controller
+                      name="paymentScheme"
+                      control={control}
+                      render={({ field }) => (
+                        <div>
+                          <label
+                            htmlFor="payment-scheme"
+                            className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                          >
+                            Preferred Payment Scheme (Optional)
+                          </label>
+                          <Select
+                            value={field.value}
+                            onValueChange={(value) => {
+                              field.onChange(value)
+                              onFieldChange('paymentScheme', value)
+                            }}
+                          >
+                            <SelectTrigger id="payment-scheme">
+                              <SelectValue placeholder="Select payment scheme" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="cash">Cash Payment</SelectItem>
+                              <SelectItem value="cpf_plus_cash">CPF + Cash</SelectItem>
+                              <SelectItem value="full_cpf">Full CPF</SelectItem>
+                              <SelectItem value="bank_loan">Bank Loan</SelectItem>
+                              <SelectItem value="not_sure">Not sure yet</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-[#666666] mt-1">
+                            This helps us tailor loan recommendations to your preferences
+                          </p>
+                        </div>
+                      )}
+                    />
+
+                    <Controller
+                      name="unitType"
+                      control={control}
+                      render={({ field }) => (
+                        <div>
+                          <label
+                            htmlFor="unit-type"
+                            className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                          >
+                            Unit Type (Optional)
+                          </label>
+                          <Select
+                            value={field.value}
+                            onValueChange={(value) => {
+                              field.onChange(value)
+                              onFieldChange('unitType', value)
+                            }}
+                          >
+                            <SelectTrigger id="unit-type">
+                              <SelectValue placeholder="Select unit type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1-bedroom">1 Bedroom</SelectItem>
+                              <SelectItem value="2-bedroom">2 Bedroom</SelectItem>
+                              <SelectItem value="3-bedroom">3 Bedroom</SelectItem>
+                              <SelectItem value="4-bedroom">4 Bedroom</SelectItem>
+                              <SelectItem value="penthouse">Penthouse</SelectItem>
+                              <SelectItem value="not_sure">Not sure yet</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-[#666666] mt-1">
+                            Helps us estimate size-based loan adjustments
+                          </p>
+                        </div>
+                      )}
+                    />
+
+                    <Controller
+                      name="topDate"
+                      control={control}
+                      render={({ field }) => (
+                        <div>
+                          <label
+                            htmlFor="top-date"
+                            className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                          >
+                            Expected TOP Date (Optional)
+                          </label>
+                          <Select
+                            value={field.value}
+                            onValueChange={(value) => {
+                              field.onChange(value)
+                              onFieldChange('topDate', value)
+                            }}
+                          >
+                            <SelectTrigger id="top-date">
+                              <SelectValue placeholder="Select TOP date" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="2025">2025</SelectItem>
+                              <SelectItem value="2026">2026</SelectItem>
+                              <SelectItem value="2027">2027</SelectItem>
+                              <SelectItem value="2028">2028</SelectItem>
+                              <SelectItem value="2029">2029</SelectItem>
+                              <SelectItem value="not_sure">Not sure yet</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-[#666666] mt-1">
+                            Knowing your TOP helps us align payment milestones
+                          </p>
+                        </div>
+                      )}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )
 
@@ -1025,300 +1395,25 @@ export function ProgressiveFormWithController({
               />
             </div>
 
-            {/* Applicant 1 Fields */}
-            <div className="space-y-4 p-4 border border-[#E5E5E5]">
-              <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-                Applicant 1 (Primary)
-              </p>
-
-              <Controller
-              name="actualIncomes.0"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Monthly Income *
-                  </label>
-                  <Input
-                    {...field}
-                    type="number"
-                    className="font-mono"
-                    placeholder="8000"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0
-                      field.onChange(value)
-                      onFieldChange('actualIncomes.0', value)
-                    }}
-                  />
-                  {errors['actualIncomes.0'] && (
-                    <p className="text-[#EF4444] text-xs mt-1">Monthly income is required</p>
-                  )}
-                </div>
-              )}
-            />
-
-            <Controller
-              name="actualAges.0"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Your Age *
-                  </label>
-                  <Input
-                    {...field}
-                    type="number"
-                    placeholder="35"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0
-                      field.onChange(value)
-                      onFieldChange('actualAges.0', value)
-                    }}
-                  />
-                  {errors['actualAges.0'] && (
-                    <p className="text-[#EF4444] text-xs mt-1">Age is required</p>
-                  )}
-                </div>
-              )}
-            />
-
-            <Controller
-              name="employmentType"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Employment Type *
-                  </label>
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => {
-                      field.onChange(value)
-                      onFieldChange('employmentType', value)
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select employment type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="employed">Employed (Full-time)</SelectItem>
-                      <SelectItem value="self-employed">Self-Employed</SelectItem>
-                      <SelectItem value="contract">Contract/Freelance</SelectItem>
-                      <SelectItem value="unemployed">Unemployed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.employmentType && (
-                    <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.employmentType)}</p>
-                  )}
-                </div>
-              )}
-            />
-
-            <Controller
-              name="creditCardCount"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Credit Card Count
-                  </label>
-                  <Input
-                    {...field}
-                    type="number"
-                    placeholder="2"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0
-                      field.onChange(value)
-                      onFieldChange('creditCardCount', value)
-                    }}
-                  />
-                  <p className="text-xs text-[#666666] mt-1">
-                    Number of active credit cards
-                  </p>
-                </div>
-              )}
-            />
-
-            <Controller
-              name="existingCommitments"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Existing Monthly Commitments
-                  </label>
-                  <Input
-                    {...field}
-                    type="number"
-                    className="font-mono"
-                    placeholder="0"
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0
-                      field.onChange(value)
-                      onFieldChange('existingCommitments', value)
-                    }}
-                  />
-                  <p className="text-xs text-[#666666] mt-1">
-                    Include car loans, other mortgages, credit cards, etc.
-                  </p>
-                </div>
-              )}
-            />
-            </div>
-
-            {/* Applicant 2 Fields - Conditional */}
-            {showJointApplicant && (
-              <div className="space-y-4 p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-                <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-                  Applicant 2 (Joint)
-                </p>
-
-                <Controller
-                  name="actualIncomes.1"
-                  control={control}
-                  render={({ field }) => (
-                    <div>
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                        Monthly Income
-                      </label>
-                      <Input
-                        {...field}
-                        type="number"
-                        className="font-mono"
-                        placeholder="6000"
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0
-                          field.onChange(value)
-                          onFieldChange('actualIncomes.1', value)
-                        }}
-                      />
-                      <p className="text-xs text-[#666666] mt-1">
-                        Optional if not applicable
-                      </p>
-                    </div>
-                  )}
-                />
-
-                <Controller
-                  name="actualAges.1"
-                  control={control}
-                  render={({ field }) => (
-                    <div>
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                        Age
-                      </label>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="32"
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0
-                          field.onChange(value)
-                          onFieldChange('actualAges.1', value)
-                        }}
-                      />
-                      <p className="text-xs text-[#666666] mt-1">
-                        For IWAA calculation
-                      </p>
-                    </div>
-                  )}
-                />
-
-                <Controller
-                  name="applicant2Commitments"
-                  control={control}
-                  render={({ field }) => (
-                    <div>
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                        Applicant 2 Monthly Commitments
-                      </label>
-                      <Input
-                        {...field}
-                        type="number"
-                        className="font-mono"
-                        placeholder="0"
-                        onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0
-                          field.onChange(value)
-                          onFieldChange('applicant2Commitments', value)
-                        }}
-                      />
-                      <p className="text-xs text-[#666666] mt-1">
-                        Separate commitments for joint calculation
-                      </p>
-                    </div>
-                  )}
-                />
-              </div>
-            )}
-
-            {/* Tier 3 MAS Placeholder Panel */}
-            {isValid && fieldValues.actualIncomes?.[0] && fieldValues.actualAges?.[0] && (
-              <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
-                <h4 className="text-sm font-semibold text-black mb-4">
-                  <Users className="inline-block w-4 h-4 mr-2" />
-                  Complete Eligibility Analysis
-                </h4>
-                
-                <div className="grid grid-cols-1 gap-4">
-                  {/* MAS Compliance Indicators */}
-                  <div className="border-b border-[#E5E5E5] pb-3">
-                    <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
-                      MAS Compliance Check
-                    </p>
-                    <div className="grid grid-cols-1 gap-2">
-                      <div className="flex items-center gap-2 text-sm text-[#666666]">
-                        <span className="text-[#10B981]">✓</span>
-                        <span>TDSR/MSR calculation ready</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-[#666666]">
-                        <span className="text-[#10B981]">✓</span>
-                        <span>Stamp duty estimation</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-[#666666]">
-                        <span className="text-[#10B981]">✓</span>
-                        <span>Bank comparison analysis</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Next Steps */}
-                  <div className="pt-3">
-                    <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
-                      🔒 Ready for AI Broker Analysis
-                    </p>
-                    <div className="grid grid-cols-1 gap-2">
-                      <div className="flex items-center gap-2 text-sm text-[#666666]">
-                        <span className="text-[#999999]">🔒</span>
-                        <span>Personalized loan recommendations</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-[#666666]">
-                        <span className="text-[#999999]">🔒</span>
-                        <span>Real-time rate comparisons</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-[#666666]">
-                        <span className="text-[#999999]">🔒</span>
-                        <span>Document requirements checklist</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* CTA */}
-                  <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
-                    <div className="flex items-center gap-2 p-3 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
-                      <DollarSign className="w-4 h-4 text-[#FCD34D]" />
-                      <div>
-                        <p className="text-sm font-semibold text-black">
-                          Complete Step 3 to unlock personalized analysis
-                        </p>
-                        <p className="text-xs text-[#666666]">
-                          Get your MAS-compliant mortgage assessment
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {loanType === 'new_purchase' ? (
+              <Step3NewPurchase
+                onFieldChange={onFieldChange}
+                showJointApplicant={showJointApplicant}
+                errors={errors}
+                getErrorMessage={getErrorMessage}
+                control={control}
+              />
+            ) : (
+              <Step3Refinance
+                onFieldChange={onFieldChange}
+                showJointApplicant={showJointApplicant}
+                errors={errors}
+                getErrorMessage={getErrorMessage}
+                fieldValues={fieldValues}
+                control={control}
+                setValue={setValue}
+                watch={watch}
+              />
             )}
           </div>
         )

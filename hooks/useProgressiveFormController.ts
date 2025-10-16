@@ -15,11 +15,11 @@ import { FormStep, LeadScore, AIInsightResponse, LoanType } from '@/lib/contract
 import { conversionTracker } from '@/lib/analytics/conversion-tracking'
 import { eventBus, FormEvents, useEventPublisher, useCreateEvent } from '@/lib/events/event-bus'
 import {
-  calculateInstantEligibility,
   calculateRefinancingSavings,
   calculateIWAA,
   getPlaceholderRate
 } from '@/lib/calculations/mortgage'
+import { calculateInstantProfile, roundMonthlyPayment, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
 import { formSteps, getDefaultValues } from '@/lib/forms/form-config'
 
 // Interface for the controller's return value
@@ -30,6 +30,7 @@ export interface ProgressiveFormController {
   errors: any
   isValid: boolean
   isAnalyzing: boolean
+  isInstantCalcLoading: boolean
   isSubmitting: boolean
   instantCalcResult: any
   leadScore: number
@@ -49,10 +50,18 @@ export interface ProgressiveFormController {
   // Actions
   next: (data: any) => Promise<void>
   prev: () => void
-  onFieldChange: (name: string, value: any) => void
+  onFieldChange: (name: string, value: any, context?: FieldChangeContext) => void
   requestAIInsight: (fieldName: string, value: any) => Promise<void>
   setPropertyCategory: (category: 'resale' | 'new_launch' | 'bto' | 'commercial' | null) => void
-  calculateInstant: () => void
+  calculateInstant: (options?: { force?: boolean; ltvMode?: number }) => void
+}
+
+interface FieldChangeContext {
+  action?: string
+  section?: string
+  fieldState?: Record<string, any>
+  tier?: number
+  metadata?: Record<string, any>
 }
 
 interface UseProgressiveFormControllerProps {
@@ -89,11 +98,21 @@ export function useProgressiveFormController({
   const [propertyCategory, setPropertyCategory] = useState<'resale' | 'new_launch' | 'bto' | 'commercial' | null>('resale')
   const [leadScore, setLeadScore] = useState(0)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isInstantCalcLoading, setIsInstantCalcLoading] = useState(false)
   const [instantCalcResult, setInstantCalcResult] = useState<any>(null)
   const [fieldValues, setFieldValues] = useState<Record<string, any>>({})
   const [trustSignalsShown, setTrustSignalsShown] = useState<string[]>([])
   const [showInstantCalc, setShowInstantCalc] = useState(false)
   const [hasCalculated, setHasCalculated] = useState(false)
+  const instantCalcTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (instantCalcTimerRef.current) {
+        clearTimeout(instantCalcTimerRef.current)
+      }
+    }
+  }, [])
 
   // Use ref to track previous values to prevent infinite loops
   const prevFieldValuesRef = useRef<string>('')
@@ -145,7 +164,11 @@ export function useProgressiveFormController({
       employmentType: fields.employmentType,
       purchaseTimeline: fields.purchaseTimeline,
       lockInStatus: fields.lockInStatus,
-      currentRate: fields.currentRate
+      currentRate: fields.currentRate,
+      // New refinance Step 3 fields
+      refinancingGoals: fields.refinancingGoals,
+      ownerOccupied: fields.ownerOccupied,
+      monthsRemaining: fields.monthsRemaining
     })
 
     // Only recalculate if scoring fields actually changed
@@ -218,59 +241,204 @@ export function useProgressiveFormController({
   }, [watchedFields])
 
   // Field change handler
-  const onFieldChange = useCallback((name: string, value: any) => {
+  const onFieldChange = useCallback((name: string, value: any, context?: FieldChangeContext) => {
     setValue(name, value)
     leadForm.setFieldValue(name, value, currentStep)
+
+    const inferredAction =
+      typeof value === 'boolean'
+        ? value ? 'enabled' : 'disabled'
+        : value === null || value === undefined || value === ''
+          ? 'cleared'
+          : 'changed'
+
+    const baseFieldState = { [name]: value }
+    const fieldState = context?.fieldState
+      ? { ...context.fieldState, ...baseFieldState }
+      : baseFieldState
+
+    const eventPayload: Record<string, any> = {
+      loanType: mappedLoanType,
+      fieldName: name,
+      fieldValue: value,
+      fieldState,
+      step: currentStep,
+      action: context?.action ?? inferredAction,
+      section: context?.section,
+      tier: context?.tier,
+      timestamp: new Date(),
+      ...context?.metadata
+    }
 
     // Publish field change event
     publishEvent(createEvent(
       FormEvents.FIELD_CHANGED,
-      sessionId, // aggregateId
-      {
-        fieldName: name,
-        fieldValue: value,
-        step: currentStep
-      }
+      `session-${sessionId}`,
+      eventPayload
     ))
 
     // Track conversion - field interaction tracking
     // Note: trackFieldInteraction method not available in current ConversionTracker
     // conversionTracker.trackFieldInteraction(name, currentStep)
-  }, [currentStep, setValue, leadForm, publishEvent, createEvent, sessionId])
+  }, [currentStep, setValue, leadForm, publishEvent, createEvent, sessionId, mappedLoanType])
 
   // Calculate instant results
-  const calculateInstant = useCallback(() => {
-    if (hasCalculated) return
+  const calculateInstant = useCallback((options: { force?: boolean; ltvMode?: number } = {}) => {
+    const { force = false, ltvMode: ltvOverride } = options
+    if (hasCalculated && !force) return
 
     const formData = watchedFields
     let result = null
 
     if (mappedLoanType === 'new_purchase') {
-      const eligibility = calculateInstantEligibility(
-        formData.priceRange || 500000, // propertyPrice
-        formData.propertyType || 'HDB', // propertyType
-        formData.combinedAge || 35, // combinedAge
-        0.75 // ltvRatio (optional, defaults to 0.75)
-      )
+      const parseNumber = (value: any, fallback: number) => {
+        const parsed = Number(value)
+        return Number.isFinite(parsed) ? parsed : fallback
+      }
 
-      result = eligibility
+      const ltvModeValue = ltvOverride ?? 75
+      const rawPrice = formData.priceRange ?? formData.propertyPrice ?? 0
+      const propertyPrice = parseNumber(rawPrice, 0)
+      if (propertyPrice <= 0) {
+        result = null
+      } else {
+        const rawPropertyType: string | undefined = formData.propertyType || (propertyCategory === 'commercial' ? 'Commercial' : undefined)
+        const personaPropertyType: 'HDB' | 'Private' | 'EC' | 'Commercial' = (() => {
+          switch (rawPropertyType) {
+            case 'Private':
+            case 'Landed':
+              return 'Private'
+            case 'EC':
+              return 'EC'
+            case 'Commercial':
+              return 'Commercial'
+            case 'HDB':
+            default:
+              return 'HDB'
+          }
+        })()
+
+        const buyerProfile = (formData.buyerProfile as 'SC' | 'PR' | 'Foreigner') || 'SC'
+        const existingProperties = parseNumber(formData.existingProperties, 0)
+        const age = parseNumber(formData.combinedAge, 35)
+        const tenure = Math.max(parseNumber(formData.requestedTenure, 25), 1)
+        const income = Math.max(parseNumber(formData.actualIncomes?.[0] ?? formData.monthlyIncome, 8000), 0)
+        const commitments = Math.max(parseNumber(formData.existingCommitments, 0), 0)
+        const rateAssumption = getPlaceholderRate(personaPropertyType, mappedLoanType)
+
+        const profile = calculateInstantProfile({
+          property_price: propertyPrice,
+          property_type: personaPropertyType,
+          buyer_profile: buyerProfile,
+          existing_properties: existingProperties,
+          income,
+          commitments,
+          rate: rateAssumption,
+          tenure,
+          age,
+          loan_type: 'new_purchase',
+          is_owner_occupied: true
+        }, ltvModeValue)
+
+        const monthlyPayment = roundMonthlyPayment(
+          profile.maxLoan * ((rateAssumption / 100 / 12) * Math.pow(1 + rateAssumption / 100 / 12, tenure * 12)) /
+          (Math.pow(1 + rateAssumption / 100 / 12, tenure * 12) - 1)
+        )
+
+        const minCashRequired = Math.round((profile.minCashPercent / 100) * propertyPrice)
+
+        result = {
+          propertyPrice,
+          propertyType: personaPropertyType,
+          ltvRatio: profile.maxLTV,
+          maxLoanAmount: profile.maxLoan,
+          downPayment: profile.downpaymentRequired,
+          estimatedMonthlyPayment: monthlyPayment,
+          minCashPercent: profile.minCashPercent,
+          minCashRequired,
+          cpfAllowed: profile.cpfAllowed,
+          cpfAllowedAmount: profile.cpfAllowedAmount,
+          tenureCapYears: profile.tenureCapYears,
+          tenureCapSource: profile.tenureCapSource,
+          limitingFactor: profile.limitingFactor,
+          tdsrAvailable: profile.tdsrAvailable,
+          absdRate: profile.absdRate,
+          reasonCodes: profile.reasonCodes,
+          policyRefs: profile.policyRefs,
+          ltvMode: ltvModeValue,
+          rateAssumption,
+          personaProfile: profile
+        }
+      }
     } else if (mappedLoanType === 'refinance') {
-      const savings = calculateRefinancingSavings(
-        formData.currentRate || 3.0, // currentRate
-        formData.outstandingLoan || 400000, // outstandingLoan
-        formData.remainingTenure || 20, // remainingTenure (optional)
-        formData.propertyValue // propertyValue (optional)
-      )
+      const parseNumber = (value: any, fallback: number) => {
+        const parsed = Number(value)
+        return Number.isFinite(parsed) ? parsed : fallback
+      }
 
-      result = savings
+      const propertyValue = parseNumber(formData.propertyValue, 0)
+      const outstandingLoan = parseNumber(formData.outstandingLoan, 0)
+      const currentRate = parseNumber(formData.currentRate, 0) // 0 means not provided
+      const monthsRemaining = parseNumber(formData.monthsRemaining, 0)
+
+      const propertyType = formData.propertyType || 'Private'
+      const isOwnerOccupied = typeof formData.ownerOccupied === 'boolean' ? formData.ownerOccupied : true
+      const refinancingGoals = Array.isArray(formData.refinancingGoals) ? formData.refinancingGoals : []
+      const primaryGoal = refinancingGoals.find((goal: string) => goal !== 'cash_out') ??
+                         (refinancingGoals.includes('cash_out') ? 'cash_out' : 'lower_monthly_payment')
+
+      const mapGoalToObjective = (goal: string) => {
+        switch (goal) {
+          case 'shorten_tenure': return 'shorten_tenure' as const
+          case 'rate_certainty': return 'rate_certainty' as const
+          case 'cash_out': return 'cash_out' as const
+          default: return 'lower_payment' as const
+        }
+      }
+
+      const outlook = calculateRefinanceOutlook({
+        property_value: propertyValue,
+        current_balance: outstandingLoan,
+        current_rate: currentRate, // Will use default estimation if 0
+        months_remaining: monthsRemaining,
+        property_type: propertyType as any,
+        is_owner_occupied: isOwnerOccupied,
+        objective: mapGoalToObjective(primaryGoal),
+        outstanding_loan: outstandingLoan
+      })
+
+      // Map to format expected by UI
+      result = {
+        monthlySavings: outlook?.projectedMonthlySavings ?? 0,
+        currentMonthlyPayment: outlook?.currentMonthlyPayment ?? 0,
+        currentRate: currentRate,
+        outstandingLoan: outstandingLoan,
+        maxCashOut: outlook?.maxCashOut ?? 0,
+        timingGuidance: outlook?.timingGuidance ?? 'Provide current loan details to generate refinance insights.',
+        reasonCodes: outlook?.reasonCodes ?? [],
+        policyRefs: outlook?.policyRefs ?? [],
+        ltvCapApplied: outlook?.ltvCapApplied ?? 0,
+        cpfRedemptionAmount: outlook?.cpfRedemptionAmount ?? 0
+      }
     }
 
     if (result) {
+      if (instantCalcTimerRef.current) {
+        clearTimeout(instantCalcTimerRef.current)
+      }
+
       setInstantCalcResult(result)
-      setShowInstantCalc(true)
+      setIsInstantCalcLoading(true)
+      setShowInstantCalc(false)
+
+      instantCalcTimerRef.current = setTimeout(() => {
+        setShowInstantCalc(true)
+        setIsInstantCalcLoading(false)
+      }, 1000)
+
       setHasCalculated(true)
     }
-  }, [mappedLoanType, watchedFields, hasCalculated])
+  }, [mappedLoanType, watchedFields, hasCalculated, propertyCategory])
 
   // Instant calculation triggers (from ProgressiveForm) - use specific field dependencies
   useEffect(() => {
@@ -340,7 +508,6 @@ export function useProgressiveFormController({
       // async tracking operations. This matches the fix in ProgressiveForm.tsx
       // ============================================================================
 
-      console.log('✅ Form validation passed - updating UI state immediately')
 
       // Update lead form (synchronous domain logic)
       Object.entries(data).forEach(([key, value]) => {
@@ -360,7 +527,7 @@ export function useProgressiveFormController({
         const nextStep = currentStep + 1
         setCurrentStep(nextStep)
         leadForm.progressToStep(nextStep)
-        console.log('🎯 UI state updated - now at step:', nextStep)
+
       }
 
       // Notify parent (synchronous callback)
@@ -380,7 +547,7 @@ export function useProgressiveFormController({
         data,
         Date.now()
       )
-        .then(() => console.log('📊 Analytics tracked successfully'))
+        
         .catch(error => console.error('⚠️ Analytics tracking failed (non-critical):', error))
 
       // Publish event (fire-and-forget, truly non-blocking)
@@ -394,7 +561,7 @@ export function useProgressiveFormController({
             data
           }
         ))
-        console.log('📡 Event published successfully')
+
       } catch (error) {
         console.error('⚠️ Event publishing failed (non-critical):', error)
       }
@@ -403,13 +570,12 @@ export function useProgressiveFormController({
       if (isLastStep && onFormComplete) {
         try {
           onFormComplete(leadForm.formData)
-          console.log('✅ Form completion callback executed')
+
         } catch (error) {
           console.error('⚠️ Form completion callback failed:', error)
         }
       }
 
-      console.log('✅ Successfully processed step transition')
     } catch (error) {
       console.error('❌ Critical error progressing to next step:', error)
       // Even on error, log detailed info for debugging
@@ -430,6 +596,7 @@ export function useProgressiveFormController({
     errors,
     isValid,
     isAnalyzing,
+    isInstantCalcLoading,
     isSubmitting,
     instantCalcResult,
     leadScore,
