@@ -536,10 +536,20 @@ export function calculateRefinanceOutlook(
   const totalPayments = monthsRemaining > 0 ? monthsRemaining : 25 * 12;
   const effectiveBalance = activeLoanBalance > 0 ? activeLoanBalance : 0;
 
-  const currentMonthlyPayment = (effectiveBalance > 0 && current_rate > 0)
+  // If current_rate not provided, estimate using a conservative rate (3.5% for residential, 4.0% for commercial)
+  // This allows savings calculations to work even when user hasn't provided exact current rate
+  const effectiveCurrentRate = current_rate > 0
+    ? current_rate
+    : (property_type === 'Commercial' ? 4.0 : 3.5);
+
+  if (current_rate === 0 && effectiveBalance > 0) {
+    reasonCodeSet.add('current_rate_estimated');
+  }
+
+  const currentMonthlyPayment = effectiveBalance > 0
     ? roundMonthlyPayment(
-        effectiveBalance * ((current_rate / 100 / 12) * Math.pow(1 + current_rate / 100 / 12, totalPayments)) /
-        (Math.pow(1 + current_rate / 100 / 12, totalPayments) - 1)
+        effectiveBalance * ((effectiveCurrentRate / 100 / 12) * Math.pow(1 + effectiveCurrentRate / 100 / 12, totalPayments)) /
+        (Math.pow(1 + effectiveCurrentRate / 100 / 12, totalPayments) - 1)
       )
     : undefined;
 
