@@ -174,7 +174,9 @@ Successfully executed all 4 workstreams of the progressive form calculation corr
 
 ### Fix Applied
 
-**Changes Made (lines 527-554):**
+**Changes Made:**
+
+**1. Calculator Function (`lib/calculations/instant-profile.ts` lines 527-554):**
 - Added default rate estimation: 3.5% residential, 4.0% commercial when `current_rate === 0`
 - Calculator now returns valid monthly payment when loan balance exists
 - Added `current_rate_estimated` reason code for transparency:
@@ -192,10 +194,45 @@ Successfully executed all 4 workstreams of the progressive form calculation corr
     : undefined;
   ```
 
+**2. Controller Hook (`hooks/useProgressiveFormController.ts` lines 373-423):**
+- **CRITICAL:** Replaced legacy `calculateRefinancingSavings()` with persona-aligned `calculateRefinanceOutlook()`
+- Old function didn't handle missing current_rate, causing $0 payment calculation
+- New function uses default rate estimation from calculator fix
+- Added proper field mapping for UI compatibility:
+  ```typescript
+  const outlook = calculateRefinanceOutlook({
+    property_value: propertyValue,
+    current_balance: outstandingLoan,
+    current_rate: currentRate, // Will use default estimation if 0
+    months_remaining: monthsRemaining,
+    property_type: propertyType as any,
+    is_owner_occupied: isOwnerOccupied,
+    objective: mapGoalToObjective(primaryGoal),
+    outstanding_loan: outstandingLoan
+  })
+
+  result = {
+    monthlySavings: outlook?.projectedMonthlySavings ?? 0,
+    currentMonthlyPayment: outlook?.currentMonthlyPayment ?? 0,
+    // ... other fields
+  }
+  ```
+
+**3. UI Component (`components/forms/ProgressiveFormWithController.tsx` line 986):**
+- Changed from recalculating payment to using calculator result:
+  ```typescript
+  // OLD: const currentMonthlyPayment = instantCalcResult.outstandingLoan ?
+  //   calculateMonthlyPayment(...) : 0
+
+  // NEW: Use currentMonthlyPayment from calculateRefinanceOutlook()
+  const currentMonthlyPayment = instantCalcResult.currentMonthlyPayment ?? 0
+  ```
+
 **Test Verification:**
 - All 226 tests passing ✅
 - Refinance outlook now displays proper current payments instead of "$0/mo"
 - Eliminated "Infinity% reduction" error
+- Controller now uses persona-aligned calculator throughout
 
 ---
 
@@ -292,7 +329,7 @@ if (tdsrAvailableBase <= 100) {
 
 ## Files Modified Summary
 
-### Calculator Functions (3 files)
+### Calculator Functions (4 files)
 1. `lib/calculations/instant-profile.ts` - 9 modifications
    - Added `stressRateApplied` to ComplianceSnapshotResult interface
    - Fixed stress rate logic with `Math.max(quoted_rate, stress_floor)`
@@ -302,12 +339,22 @@ if (tdsrAvailableBase <= 100) {
    - **Fixed refinance $0 payment bug:** Added default rate estimation (3.5%/4.0%)
    - **Added `current_rate_estimated` reason code** for transparency when estimating rates
 
-2. `lib/calculations/dr-elena-constants.ts` - Verified (no changes)
+2. `hooks/useProgressiveFormController.ts` - 1 major modification
+   - **CRITICAL:** Replaced legacy `calculateRefinancingSavings()` with `calculateRefinanceOutlook()`
+   - Added import for `calculateRefinanceOutlook` from instant-profile
+   - Rewrote refinance calculation logic (lines 373-423) to use persona-aligned calculator
+   - Added proper field mapping between calculator result and UI expectations
 
-3. `tests/calculations/compliance-snapshot.test.ts` - Fixed 1 expectation
+3. `lib/calculations/dr-elena-constants.ts` - Verified (no changes)
 
-### UI Components (3 files)
-1. `components/forms/sections/Step3NewPurchase.tsx` - 7 modifications
+4. `tests/calculations/compliance-snapshot.test.ts` - Fixed 1 expectation
+
+### UI Components (4 files)
+1. `components/forms/ProgressiveFormWithController.tsx` - 1 critical modification
+   - **Fixed line 986:** Changed from recalculating payment to using `currentMonthlyPayment` from calculator result
+   - Eliminates "$0/mo" display by using persona-aligned calculator value with default rate handling
+
+2. `components/forms/sections/Step3NewPurchase.tsx` - 7 modifications
    - Removed `loanAmount` dependency (line 142)
    - Fixed TDSR calculation (lines 186-195)
    - Fixed MSR calculation (lines 186-195)
@@ -315,14 +362,14 @@ if (tdsrAvailableBase <= 100) {
    - **Fixed hardcoded reasons:** Now uses persona `reasonCodes` and `policyRefs` (lines 167-202)
    - **Added `codeMap`** to translate snake_case codes to user-friendly messages
 
-2. `components/forms/sections/Step3Refinance.tsx` - 5 modifications (lines 92-150)
+3. `components/forms/sections/Step3Refinance.tsx` - 5 modifications (lines 92-150)
    - Removed `propertyValue` and `outstandingLoan` dependencies (line 94)
    - Calculate TDSR/MSR ratios directly from income (lines 109-121)
    - Updated error message to "Complete income and age to check eligibility"
    - Set default limits: TDSR 55%, MSR 30%
    - Fixed HDB/EC MSR conditional logic
 
-3. `components/forms/__tests__/Step3NewPurchase.test.tsx` - Fixed 1 expectation
+4. `components/forms/__tests__/Step3NewPurchase.test.tsx` - Fixed 1 expectation
 
 ### Test Files (2 files)
 1. `tests/calculations/refinance-outlook.test.ts` - Added 10 tests
