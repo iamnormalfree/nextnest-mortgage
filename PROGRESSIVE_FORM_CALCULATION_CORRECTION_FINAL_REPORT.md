@@ -14,6 +14,7 @@ Successfully executed all 4 workstreams of the progressive form calculation corr
 **Test Results:** 226/226 passing (100%) ✅
 - All user-reported TDSR/MSR display issues fixed
 - TDSR limiting factor semantics implemented (Option B)
+- **P0 blockers resolved:** Refinance $0 payment bug + Step3NewPurchase persona reasonCodes
 
 ---
 
@@ -156,6 +157,98 @@ Successfully executed all 4 workstreams of the progressive form calculation corr
 
 ---
 
+### Issue #3: Refinance $0 Current Payment Bug
+
+**Problem:** Refinance calculator displayed "$0/mo" for current monthly payment when `current_rate` not provided
+- Symptom: "Current Monthly Payment: $0/mo" and "Infinity% reduction" message
+- Root cause: Calculator required both `effectiveBalance > 0 && current_rate > 0`, returning `undefined` when rate missing
+- Impact: Refinance savings calculations failed completely without user-provided rate
+
+### Root Cause Analysis
+
+**File:** `lib/calculations/instant-profile.ts`
+
+1. **Line 539-544:** Calculator returns `undefined` when `current_rate === 0`
+2. **Missing logic:** No default rate estimation for incomplete data scenarios
+3. **Division by zero:** Caused "Infinity% reduction" display in UI
+
+### Fix Applied
+
+**Changes Made (lines 527-554):**
+- Added default rate estimation: 3.5% residential, 4.0% commercial when `current_rate === 0`
+- Calculator now returns valid monthly payment when loan balance exists
+- Added `current_rate_estimated` reason code for transparency:
+  ```typescript
+  const effectiveCurrentRate = current_rate > 0
+    ? current_rate
+    : (property_type === 'Commercial' ? 4.0 : 3.5);
+
+  if (current_rate === 0 && effectiveBalance > 0) {
+    reasonCodeSet.add('current_rate_estimated');
+  }
+
+  const currentMonthlyPayment = effectiveBalance > 0
+    ? roundMonthlyPayment(...)
+    : undefined;
+  ```
+
+**Test Verification:**
+- All 226 tests passing ✅
+- Refinance outlook now displays proper current payments instead of "$0/mo"
+- Eliminated "Infinity% reduction" error
+
+---
+
+### Issue #4: Step3NewPurchase Hardcoded Reasons
+
+**Problem:** Step 3 New Purchase used hardcoded strings instead of persona-derived `reasonCodes` and `policyRefs`
+- Was displaying: "TDSR ratio is above compliance threshold" (hardcoded)
+- Should display: Persona-derived reason codes + policy references (MAS Notice 645, 632)
+- Impact: Regulatory context not surfaced to users
+
+### Root Cause Analysis
+
+**File:** `components/forms/sections/Step3NewPurchase.tsx`
+
+1. **Lines 171-174:** Used hardcoded reason strings
+2. **Missing:** Calculator provides `reasonCodes` and `policyRefs` but component ignored them
+3. **Residual risk:** Noted in remediation plan line 16 as "handcrafted copy instead of persona-derived reason codes"
+
+### Fix Applied
+
+**Changes Made (lines 167-202):**
+- Replaced hardcoded strings with persona-derived `reasonCodes` from calculator
+- Added `codeMap` to translate snake_case codes to user-friendly messages
+- Now displays policy references (MAS Notice 645, 632):
+  ```typescript
+  // Use persona-derived reason codes and policy references from calculator
+  const reasons: string[] = []
+
+  if (calculatorResult.reasonCodes && calculatorResult.reasonCodes.length > 0) {
+    reasons.push(...calculatorResult.reasonCodes.map(code => {
+      const codeMap: Record<string, string> = {
+        'tdsr_binding': 'TDSR ratio is above compliance threshold',
+        'msr_binding': 'MSR ratio is above the 30% cap',
+        'ltv_binding': 'Loan-to-value ceiling reached based on property price',
+        // ... 9 more codes
+      }
+      return codeMap[code] || code
+    }))
+  }
+
+  // Add policy references if available
+  if (calculatorResult.policyRefs && calculatorResult.policyRefs.length > 0) {
+    reasons.push(`Policy references: ${calculatorResult.policyRefs.join(', ')}`)
+  }
+  ```
+
+**Test Verification:**
+- All 40 Step3NewPurchase tests passing ✅
+- MAS readiness panel now displays persona-aligned regulatory context
+- Pattern matches Step3Refinance (both flows consistent)
+
+---
+
 ## Final Test Status
 
 ### Overall: 226/226 tests passing (100%) ✅
@@ -200,23 +293,27 @@ if (tdsrAvailableBase <= 100) {
 ## Files Modified Summary
 
 ### Calculator Functions (3 files)
-1. `lib/calculations/instant-profile.ts` - 7 modifications
+1. `lib/calculations/instant-profile.ts` - 9 modifications
    - Added `stressRateApplied` to ComplianceSnapshotResult interface
    - Fixed stress rate logic with `Math.max(quoted_rate, stress_floor)`
    - Fixed policy references (HDB/EC vs Private/Commercial)
    - Changed CPF accrued interest to monthly compounding
    - Used `DR_ELENA_INCOME_RECOGNITION` and `DR_ELENA_STRESS_TEST_FLOORS` constants
+   - **Fixed refinance $0 payment bug:** Added default rate estimation (3.5%/4.0%)
+   - **Added `current_rate_estimated` reason code** for transparency when estimating rates
 
 2. `lib/calculations/dr-elena-constants.ts` - Verified (no changes)
 
 3. `tests/calculations/compliance-snapshot.test.ts` - Fixed 1 expectation
 
 ### UI Components (3 files)
-1. `components/forms/sections/Step3NewPurchase.tsx` - 6 modifications
+1. `components/forms/sections/Step3NewPurchase.tsx` - 7 modifications
    - Removed `loanAmount` dependency (line 142)
    - Fixed TDSR calculation (lines 186-195)
    - Fixed MSR calculation (lines 186-195)
    - Updated default limits and error message
+   - **Fixed hardcoded reasons:** Now uses persona `reasonCodes` and `policyRefs` (lines 167-202)
+   - **Added `codeMap`** to translate snake_case codes to user-friendly messages
 
 2. `components/forms/sections/Step3Refinance.tsx` - 5 modifications (lines 92-150)
    - Removed `propertyValue` and `outstandingLoan` dependencies (line 94)
@@ -250,6 +347,8 @@ if (tdsrAvailableBase <= 100) {
 - ✅ TDSR limiting factor semantics (Option B implemented)
 - ✅ Step 3 New Purchase TDSR/MSR display fix
 - ✅ Step 3 Refinance TDSR/MSR display fix
+- ✅ Refinance $0 payment bug fix (P0)
+- ✅ Step3NewPurchase persona reasonCodes fix (P0)
 - ✅ All 226 tests passing
 
 ### Recommended Follow-Up (Not Blocking)
@@ -282,6 +381,7 @@ if (tdsrAvailableBase <= 100) {
 4. **Zero Regressions:** All existing functionality preserved ✅
 5. **Documentation:** Comprehensive reports and audit trails ✅
 6. **User-Reported Issues:** Both TDSR/MSR display issues fixed ✅
+7. **P0 Blockers:** Refinance $0 payment bug + persona reasonCodes fixed ✅
 
 **Minor Outstanding (Not Blocking):**
 1. Refinance controller uses legacy function (works correctly, optimization opportunity)
@@ -317,12 +417,16 @@ The progressive form calculation correction plan has been **successfully execute
 2. ✅ Step 3 New Purchase TDSR/MSR display
 3. ✅ Step 3 Refinance TDSR/MSR display
 4. ✅ TDSR limiting factor semantics (Option B)
-5. ✅ All 226 tests passing
+5. ✅ **Refinance $0 payment bug** (P0 - default rate estimation)
+6. ✅ **Step3NewPurchase persona reasonCodes** (P0 - regulatory context)
+7. ✅ All 226 tests passing
 
 ### User Impact
 - Users now see TDSR/MSR ratios as soon as they enter income and age
 - Commitments default to 0, allowing immediate eligibility feedback
 - Consistent UX across both new purchase and refinance flows
 - Clear rejection messaging when TDSR is breached
+- **Refinance savings now display correctly** even when current rate not provided (uses conservative estimates)
+- **Regulatory context visible** via MAS Notice references in readiness panels
 
 **Recommendation:** Ready to merge immediately. Controller refinance path optimization can follow in next PR per phased approach.
