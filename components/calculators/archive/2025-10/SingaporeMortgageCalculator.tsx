@@ -1,3 +1,24 @@
+/**
+ * ARCHIVED: 2025-10-17
+ *
+ * REASON FOR ARCHIVAL:
+ * This simple standalone calculator component was used for marketing campaigns
+ * (Reddit, LinkedIn, HardwareZone) but is no longer needed as campaigns are being discontinued.
+ *
+ * DEPENDENCIES:
+ * - Uses lib/calculations/mortgage.ts (legacy calculator, also being archived)
+ * - Used by: app/campaigns/* and app/calculators/* (all archived)
+ *
+ * REPLACED BY:
+ * The main application now uses:
+ * - components/forms/ProgressiveFormWithController.tsx (production form)
+ * - lib/calculations/instant-profile.ts (Dr Elena v2 calculations)
+ *
+ * MIGRATION NOTE:
+ * If simple calculator is needed in future, extract the UI and wire it to
+ * instant-profile.ts instead of the legacy mortgage.ts calculator.
+ */
+
 'use client'
 
 import { useState } from 'react'
