@@ -117,6 +117,56 @@ npm run lint         # Code quality check
 
 ---
 
+## Root Directory Requirements
+
+**Allowed at repository root:**
+
+**Package & Configuration:**
+- `package.json`, `package-lock.json` - NPM dependencies
+- `tsconfig.json`, `tsconfig.tsbuildinfo` - TypeScript config
+- `next.config.js` - Next.js configuration
+- `postcss.config.js` - CSS processing
+- `jest.config.mjs`, `jest.setup.ts` - Test configuration
+- `components.json` - Shadcn/ui config
+- `tailwind.config.ts` - Design system (canonical)
+- `tailwind.bloomberg.config.ts` - Historical reference (archived 2025-10-17)
+
+**Environment & Deployment:**
+- `.env.example`, `.env.local` - Environment variables
+- `.gitignore`, `.dockerignore` - VCS exclusions
+- `.eslintrc.json` - Linting rules
+- `.mcp.json` - MCP server config
+- `docker-compose.yml`, `Dockerfile` - Container config
+- `railway.toml`, `Procfile` - Deployment config
+
+**Documentation (5 files only):**
+- `README.md` - Project overview
+- `CLAUDE.md` - AI assistant instructions
+- `CANONICAL_REFERENCES.md` - Tier 1 file catalog
+- `AGENTS.md` - Agent configuration
+- `SKILL.md` - Skill definitions
+
+**Data Sources:**
+- `dr-elena-mortgage-expert-v2.json` - Canonical Dr Elena v2 persona
+- `next-env.d.ts` - Auto-generated Next.js types
+
+**FORBIDDEN at root:**
+- `*.log` files - Should be in `logs/` directory or `.gitignore`
+- `test-*.ts`, `test-*.js`, `test-*.json` - Should be in `tests/` or `scripts/test-data/`
+- `*.backup`, `*.new`, `*.tmp.*` - Delete or archive to `docs/reports/investigations/`
+- `*.patch` files - Archive to `docs/reports/investigations/`
+- Script files (`*.py`, `*.ps1`, `*.sh`) - Should be in `scripts/`
+- Temp files (`_*.js`, `_*.py`, `nul`, `temp*`) - Delete
+- `verify-*.js` - Should be in `scripts/`
+
+**Directory structure at root:**
+- Standard Next.js: `app/`, `components/`, `lib/`, `public/`, `styles/`
+- Project-specific: `docs/`, `scripts/`, `tests/`, `hooks/`
+- Data: `data/`, `database/`, `supabase/`
+- Archives: `_archived/`, `backups/` (if needed)
+
+---
+
 ## Task Management
 
 - Use TodoWrite tool to track all tasks
