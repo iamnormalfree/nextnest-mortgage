@@ -11,7 +11,44 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { LoanCalculationInputs, LoanCalculationResult } from '@/lib/calculations/dr-elena-mortgage';
+
+// Legacy types for backwards compatibility
+interface LoanCalculationInputs {
+  propertyPrice: number;
+  propertyType: 'HDB' | 'EC' | 'Private' | 'Commercial';
+  monthlyIncome: number;
+  existingCommitments: number;
+  age: number;
+  citizenship: 'Citizen' | 'PR' | 'Foreigner';
+  propertyCount: 1 | 2 | 3;
+  incomeType?: 'fixed' | 'variable' | 'self_employed' | 'rental' | 'mixed';
+  coApplicant?: {
+    monthlyIncome: number;
+    age: number;
+    existingCommitments: number;
+  };
+}
+
+interface LoanCalculationResult {
+  maxLoan: number;
+  ltvApplied: number;
+  ltvPenalty: boolean;
+  monthlyPayment: number;
+  stressTestPayment: number;
+  tdsrUsed: number;
+  msrUsed: number | null;
+  limitingFactor: 'TDSR' | 'MSR' | 'LTV';
+  downPayment: number;
+  minCashRequired: number;
+  cpfAllowed: number;
+  stampDuty: number;
+  totalFundsRequired: number;
+  maxTenure: number;
+  recommendedTenure: number;
+  reasoning: string[];
+  masCompliant: boolean;
+  warnings: string[];
+}
 
 // ============================================================================
 // SUPABASE CLIENT - Lazy Initialization

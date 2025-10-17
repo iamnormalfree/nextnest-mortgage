@@ -12,11 +12,50 @@
  * @version 1.0.0
  */
 
-import { calculateMaxLoanAmount, LoanCalculationInputs, LoanCalculationResult } from '@/lib/calculations/dr-elena-mortgage';
+import { calculateInstantProfile, InstantProfileInput, InstantProfileResult } from '@/lib/calculations/instant-profile';
 import { explainCalculation, ExplanationContext } from '@/lib/ai/dr-elena-explainer';
 import { ConversationStateManager } from '@/lib/ai/conversation-state-manager';
 import { BrokerPersona } from '@/lib/calculations/broker-persona';
 import { ProcessedLeadData } from '@/lib/integrations/chatwoot-client';
+
+// Legacy interface mapping for backwards compatibility
+interface LoanCalculationInputs {
+  propertyPrice: number;
+  propertyType: 'HDB' | 'EC' | 'Private' | 'Commercial';
+  monthlyIncome: number;
+  existingCommitments: number;
+  age: number;
+  citizenship: 'Citizen' | 'PR' | 'Foreigner';
+  propertyCount: 1 | 2 | 3;
+  incomeType?: 'fixed' | 'variable' | 'self_employed' | 'rental' | 'mixed';
+  coApplicant?: {
+    monthlyIncome: number;
+    age: number;
+    existingCommitments: number;
+  };
+}
+
+// Legacy result type - mapped from InstantProfileResult
+interface LoanCalculationResult {
+  maxLoan: number;
+  ltvApplied: number;
+  ltvPenalty: boolean;
+  monthlyPayment: number;
+  stressTestPayment: number;
+  tdsrUsed: number;
+  msrUsed: number | null;
+  limitingFactor: 'TDSR' | 'MSR' | 'LTV';
+  downPayment: number;
+  minCashRequired: number;
+  cpfAllowed: number;
+  stampDuty: number;
+  totalFundsRequired: number;
+  maxTenure: number;
+  recommendedTenure: number;
+  reasoning: string[];
+  masCompliant: boolean;
+  warnings: string[];
+}
 
 /**
  * Request parameters for calculation with AI explanation
@@ -88,7 +127,11 @@ export class DrElenaIntegrationService {
       });
 
       // Step 2: Run pure calculations (deterministic, no AI)
-      const calculation = calculateMaxLoanAmount(calculationInputs);
+      const instantProfile = calculateInstantProfile(
+        this.mapToInstantProfileInput(calculationInputs),
+        calculationInputs.propertyCount === 1 ? 75 : 55 // LTV mode based on property count
+      );
+      const calculation = this.mapToLegacyResult(instantProfile, calculationInputs);
 
       console.log(` Calculation complete:`, {
         maxLoan: calculation.maxLoan,
@@ -401,6 +444,87 @@ export class DrElenaIntegrationService {
       chatResponse: fallbackMessage,
       calculationType: 'max_loan',
       recorded: false
+    };
+  }
+
+  /**
+   * Map LoanCalculationInputs to InstantProfileInput
+   */
+  private mapToInstantProfileInput(inputs: LoanCalculationInputs): InstantProfileInput {
+    // Map citizenship: Citizen → SC, PR → PR, Foreigner → Foreigner
+    const buyer_profile = inputs.citizenship === 'Citizen' ? 'SC' :
+                         inputs.citizenship === 'PR' ? 'PR' : 'Foreigner';
+
+    // Default rate and tenure - these were not in old interface
+    const rate = 3.5; // Market average
+    const tenure = 25; // Standard tenure
+
+    return {
+      property_price: inputs.propertyPrice,
+      property_type: inputs.propertyType,
+      buyer_profile,
+      existing_properties: inputs.propertyCount - 1, // Old: 1-3, New: 0-2
+      income: inputs.monthlyIncome,
+      commitments: inputs.existingCommitments,
+      rate,
+      tenure,
+      age: inputs.age,
+      loan_type: 'new_purchase'
+    };
+  }
+
+  /**
+   * Map InstantProfileResult to legacy LoanCalculationResult
+   */
+  private mapToLegacyResult(
+    instant: InstantProfileResult,
+    inputs: LoanCalculationInputs
+  ): LoanCalculationResult {
+    // Calculate monthly payment from maxLoan
+    const rate = 3.5 / 100 / 12; // Monthly rate
+    const tenure = 25 * 12; // Total payments
+    const monthlyPayment = instant.maxLoan > 0
+      ? Math.ceil(instant.maxLoan * rate * Math.pow(1 + rate, tenure) / (Math.pow(1 + rate, tenure) - 1))
+      : 0;
+
+    // Stress test payment (4% floor)
+    const stressRate = Math.max(instant.stressRateApplied, 0.04) / 12;
+    const stressTestPayment = instant.maxLoan > 0
+      ? Math.ceil(instant.maxLoan * stressRate * Math.pow(1 + stressRate, tenure) / (Math.pow(1 + stressRate, tenure) - 1))
+      : 0;
+
+    // Calculate TDSR used percentage
+    const tdsrUsed = inputs.monthlyIncome > 0
+      ? Math.round((stressTestPayment + inputs.existingCommitments) / inputs.monthlyIncome * 100)
+      : 0;
+
+    // MSR if applicable
+    const msrUsed = instant.msrLimit !== undefined
+      ? Math.round(stressTestPayment / inputs.monthlyIncome * 100)
+      : null;
+
+    // ABSD calculation (simplified - using instant.absdRate)
+    const stampDuty = Math.round(inputs.propertyPrice * (instant.absdRate / 100));
+
+    return {
+      maxLoan: instant.maxLoan,
+      ltvApplied: instant.maxLTV,
+      ltvPenalty: instant.maxLTV < 75,
+      monthlyPayment,
+      stressTestPayment,
+      tdsrUsed,
+      msrUsed,
+      limitingFactor: instant.limitingFactor,
+      downPayment: instant.downpaymentRequired,
+      minCashRequired: Math.round(inputs.propertyPrice * (instant.minCashPercent / 100)),
+      cpfAllowed: instant.cpfAllowedAmount,
+      stampDuty,
+      totalFundsRequired: instant.downpaymentRequired + stampDuty,
+      maxTenure: instant.tenureCapYears,
+      recommendedTenure: instant.tenureCapYears,
+      reasoning: instant.reasonCodes,
+      masCompliant: instant.maxLoan > 0 && tdsrUsed <= 55,
+      warnings: instant.policyRefs
     };
   }
 

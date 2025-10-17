@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import SingaporeMortgageCalculator from '@/components/calculators/SingaporeMortgageCalculator'
+import SingaporeMortgageCalculator from '@/components/calculators/archive/2025-10/SingaporeMortgageCalculator'
 
 export const metadata: Metadata = {
   title: 'Executive Mortgage Intelligence - Commercial Property Calculator | NextNest',

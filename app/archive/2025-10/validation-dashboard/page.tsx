@@ -1,3 +1,21 @@
+/**
+ * ARCHIVED: 2025-10-17
+ *
+ * REASON FOR ARCHIVAL:
+ * Internal debugging tool created for context validation between system layers.
+ * Never integrated into user-facing application, no navigation links exist.
+ *
+ * PURPOSE:
+ * Validated form data through calculations, forms, API, and documentation layers
+ * to ensure alignment across the system.
+ *
+ * REPLACED BY:
+ * Modern form testing uses:
+ * - Jest/React Testing Library for component tests
+ * - Integration tests for API layer validation
+ * - This tool is preserved for historical reference only
+ */
+
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -8,7 +26,7 @@ import { calculateUrgencyProfile } from '@/lib/calculations/urgency-calculator'
 
 /**
  * Context Validation Dashboard
- * 
+ *
  * Purpose: Visualize how different system layers respond to the same input
  * This helps identify gaps, conflicts, and ensure 100% context alignment
  * across calculations, forms, API, and documentation layers.

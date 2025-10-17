@@ -8,7 +8,7 @@ _Last reviewed: 2025-09-28_
 
 ## Current State Snapshot
 - **Web app** runs on Next.js 14.2 (App Router) with React 18 and TypeScript 5.6.
-- **Design system** is Tailwind + shadcn/ui with brand tokens stored under `lib/design-tokens`; Bloomberg theme work lives alongside production tokens via `tailwind.bloomberg.config.ts`.
+- **Design system** is Tailwind + shadcn/ui with brand tokens stored under `lib/design-tokens`; Bloomberg design tokens (ink, gold, charcoal, etc.) are merged into tailwind.config.ts.
 - **Forms** use React Hook Form + Zod with progressive multi-step shells under `components/forms/` and orchestration logic in `lib/forms/`.
 - **Chat surface** at `chat.nextnest.sg` is backed by Chatwoot; AI brokers run through OpenAI with hand-off automation via `lib/integrations/chatwoot-client.ts` and n8n workflows.
 - **Data layer** relies on Supabase (lead storage + event logging) and Langfuse for LLM traceability.

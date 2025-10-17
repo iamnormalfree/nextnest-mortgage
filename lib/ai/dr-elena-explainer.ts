@@ -11,8 +11,29 @@
 
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
-import { LoanCalculationResult } from '@/lib/calculations/dr-elena-mortgage';
 import { BrokerPersona } from '@/lib/calculations/broker-persona';
+
+// Legacy type for backwards compatibility
+interface LoanCalculationResult {
+  maxLoan: number;
+  ltvApplied: number;
+  ltvPenalty: boolean;
+  monthlyPayment: number;
+  stressTestPayment: number;
+  tdsrUsed: number;
+  msrUsed: number | null;
+  limitingFactor: 'TDSR' | 'MSR' | 'LTV';
+  downPayment: number;
+  minCashRequired: number;
+  cpfAllowed: number;
+  stampDuty: number;
+  totalFundsRequired: number;
+  maxTenure: number;
+  recommendedTenure: number;
+  reasoning: string[];
+  masCompliant: boolean;
+  warnings: string[];
+}
 
 // ============================================================================
 // TYPESCRIPT INTERFACES

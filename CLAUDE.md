@@ -90,7 +90,7 @@ Always find root cause, never fix symptoms:
 ## Project Quick Reference
 
 **Tech Stack:** Next.js 14 + TypeScript + Tailwind + Shadcn/ui + Supabase
-**Design System:** See `docs/DESIGN_SYSTEM.md` for complete design tokens and patterns
+**Design System:** Single `tailwind.config.ts` is source of truth for both NextNest brand and Bloomberg colors. Bloomberg config archived 2025-10-17 after successful merge of all 12 color tokens. See `docs/DESIGN_SYSTEM.md` for complete design tokens and patterns.
 **Architecture:** See `docs/ARCHITECTURE.md` for full project structure and patterns
 **Known Issues:** See `docs/KNOWN_ISSUES.md` for current workarounds
 

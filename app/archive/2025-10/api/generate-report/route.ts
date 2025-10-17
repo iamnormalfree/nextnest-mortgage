@@ -1,3 +1,20 @@
+/**
+ * ARCHIVED: 2025-10-17
+ *
+ * REASON FOR ARCHIVAL:
+ * Abandoned API endpoint for PDF report generation feature that was never completed.
+ * Zero frontend integration - no component or page calls this endpoint.
+ *
+ * PURPOSE:
+ * Was designed to generate comprehensive mortgage reports with analysis and recommendations.
+ * Database storage functionality commented out ("// in production").
+ *
+ * REPLACED BY:
+ * Report generation is now handled by:
+ * - AI broker chat providing personalized recommendations
+ * - Email-based detailed analysis reports
+ */
+
 import { NextRequest, NextResponse } from 'next/server'
 import { mortgageFormSchema } from '@/lib/validation/mortgage-schemas'
 import { calculateMortgage } from '@/lib/calculations/mortgage'
