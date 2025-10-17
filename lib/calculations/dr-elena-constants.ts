@@ -25,7 +25,10 @@ export const DR_ELENA_TENURE_TRIGGERS = Object.freeze({
 export const DR_ELENA_STRESS_TEST_FLOORS = Object.freeze({
   residential: modules.core_formulas.tdsr_available.stress_test_rates.residential / 100,
   nonResidential: modules.core_formulas.tdsr_available.stress_test_rates.non_residential / 100
-}) as const;
+}) as Readonly<{
+  residential: number;
+  nonResidential: number;
+}>;
 
 // Source: computational_modules.income_recognition
 export const DR_ELENA_INCOME_RECOGNITION = Object.freeze({
@@ -33,7 +36,12 @@ export const DR_ELENA_INCOME_RECOGNITION = Object.freeze({
   variableIncome: modules.income_recognition.variable_income.default_recognition_rate,
   selfEmployed: modules.income_recognition.self_employed_income.recognition_rate,
   rentalIncome: modules.income_recognition.rental_income.recognition_rate
-}) as const;
+}) as Readonly<{
+  fixedIncome: number;
+  variableIncome: number;
+  selfEmployed: number;
+  rentalIncome: number;
+}>;
 
 const creditCardRateMatch = modules.commitment_calculations.credit_cards.formula.match(/0\.0?3/);
 const overdraftRateMatch = modules.commitment_calculations.overdraft_facilities.formula.match(/0\.0?5/);
@@ -51,7 +59,11 @@ export const DR_ELENA_COMMITMENT_RATES = Object.freeze({
   guarantor: {
     rate: guarantorRateMatch ? Number(guarantorRateMatch[0]) : 0.2
   }
-}) as const;
+}) as Readonly<{
+  creditCards: { rate: number; minimum: number };
+  overdraft: { rate: number };
+  guarantor: { rate: number };
+}>;
 
 // Source: computational_modules.cpf_usage_rules
 export const DR_ELENA_CPF_USAGE_RULES = Object.freeze({
@@ -61,7 +73,14 @@ export const DR_ELENA_CPF_USAGE_RULES = Object.freeze({
     post2002: [...modules.cpf_usage_rules.sale_proceeds_order.post_2002],
     pre2002: [...modules.cpf_usage_rules.sale_proceeds_order.pre_2002]
   }
-}) as const;
+}) as Readonly<{
+  withdrawalLimitPercent: number;
+  chargesPriority: string[];
+  saleProceedsOrder: {
+    post2002: string[];
+    pre2002: string[];
+  };
+}>;
 
 // Source: computational_modules.rounding_rules
 export const DR_ELENA_ROUNDING_RULES = Object.freeze({
@@ -77,7 +96,11 @@ export const DR_ELENA_ROUNDING_RULES = Object.freeze({
     rule: modules.rounding_rules.monthly_payments.rule,
     formula: modules.rounding_rules.monthly_payments.formula
   }
-}) as const;
+}) as Readonly<{
+  loanEligibility: { rule: string; formula: string };
+  fundsRequired: { rule: string; formula: string };
+  monthlyPayments: { rule: string; formula: string };
+}>;
 
 // Source: computational_modules.stamp_duty_rates.absd_rates
 export const DR_ELENA_ABSD_RATES = Object.freeze({
@@ -108,7 +131,7 @@ export const DR_ELENA_ABSD_RATES = Object.freeze({
     foreignerForeigner: { ...modules.stamp_duty_rates.absd_rates.married_couples.foreigner_foreigner }
   },
   jointPurchaseRule: modules.stamp_duty_rates.absd_rates.joint_purchase_non_married.rule
-}) as const;
+});
 
 // Source: profile_metadata.links and computational_modules references
 export const DR_ELENA_POLICY_REFERENCES = Object.freeze({
@@ -116,4 +139,9 @@ export const DR_ELENA_POLICY_REFERENCES = Object.freeze({
   msr: 'MAS Notice 632',
   cpfAccruedInterest: 'cpf_accrued_interest',
   saleProceedsOrder: 'sale_proceeds_order'
-}) as const;
+}) as Readonly<{
+  tdsr: string;
+  msr: string;
+  cpfAccruedInterest: string;
+  saleProceedsOrder: string;
+}>;

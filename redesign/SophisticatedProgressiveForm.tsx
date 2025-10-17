@@ -603,7 +603,7 @@ export default function SophisticatedProgressiveForm({
                         <span className="ml-2">Instant Analysis</span>
                       </h4>
                       <div className="space-y-2">
-                        {(selectedLoanType === 'new' || selectedLoanType === 'new_purchase') && instantCalcResult.maxLoan && (
+                        {selectedLoanType === 'new' && instantCalcResult.maxLoan && (
                           <p className="text-sm text-graphite">
                             Maximum Loan: <span className="font-mono font-medium">${instantCalcResult.maxLoan.toLocaleString()}</span>
                           </p>

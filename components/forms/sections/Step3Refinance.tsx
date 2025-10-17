@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertTriangle } from 'lucide-react'
 import { calculateComplianceSnapshot, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
-import { MortgageFormData } from '@/lib/contracts/form-contracts'
 
 interface Step3RefinanceProps {
   onFieldChange: (field: string, value: any, analytics?: any) => void
@@ -16,9 +15,9 @@ interface Step3RefinanceProps {
   errors: any
   getErrorMessage: (error: any) => string
   fieldValues: any
-  control: Control<MortgageFormData>
-  setValue: UseFormSetValue<MortgageFormData>
-  watch: UseFormWatch<MortgageFormData>
+  control: Control<any>
+  setValue: UseFormSetValue<any>
+  watch: UseFormWatch<any>
 }
 
 export function Step3Refinance({ 

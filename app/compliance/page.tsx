@@ -24,10 +24,6 @@ export default function ComplianceDashboard() {
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('30d')
 
-  useEffect(() => {
-    fetchComplianceReport()
-  }, [fetchComplianceReport])
-
   const fetchComplianceReport = useCallback(async () => {
     setLoading(true)
     try {
@@ -55,6 +51,10 @@ export default function ComplianceDashboard() {
       setLoading(false)
     }
   }, [timeRange])
+
+  useEffect(() => {
+    fetchComplianceReport()
+  }, [fetchComplianceReport])
 
   const downloadReport = async () => {
     try {

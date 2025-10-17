@@ -44,7 +44,7 @@
 
 ## Code Style Guidelines
 
-Follow the clean code principles defined in `.windsurf/rules/clean-code-rules.mdc`:
+Follow the clean code principles defined in `CLAUDE.md`:
 - Use meaningful names that reveal purpose
 - Extract magic numbers to named constants
 - Keep functions small and focused (single responsibility)

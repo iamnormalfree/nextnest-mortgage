@@ -27,12 +27,12 @@
 
 import React, { useState } from 'react'
 // import { LoanTypeSelector } from './LoanTypeSelector'
-import SimpleLoanTypeSelector from './SimpleLoanTypeSelector'
+// import SimpleLoanTypeSelector from './SimpleLoanTypeSelector' // File no longer exists - archived code
 import { ProgressiveForm } from './ProgressiveForm'
 // import CommercialQuickForm from './CommercialQuickForm' // Archived - not in primary flow
 import { calculateUrgencyProfile } from '@/lib/calculations/urgency-calculator'
 import { calculateLeadScore } from '@/lib/calculations/mortgage'
-import { generateMortgageInsights } from '@/lib/insights/mortgage-insights-generator'
+// import { generateMortgageInsights } from '@/lib/insights/mortgage-insights-generator' // File removed - archived code
 import { Target, TrendingUp, Lightbulb } from 'lucide-react'
 
 /**
@@ -205,14 +205,14 @@ const IntelligentMortgageForm = ({ className = '' }: IntelligentMortgageFormProp
         
         // Generate intelligent insights locally IMMEDIATELY
         devLog('📊 Gate 2 cumulative data:', gate2CumulativeData)
-        const gate2Insights = generateMortgageInsights(gate2CumulativeData as any, 2)
-        devLog('📊 Generated insights:', gate2Insights)
-        
-        if (gate2Insights.length > 0) {
-          setAiInsights(gate2Insights as any)
-        } else {
-          devWarn('⚠️ No insights generated for Gate 2')
-        }
+        // const gate2Insights = generateMortgageInsights(gate2CumulativeData as any, 2) // Function removed - archived code
+        // devLog('📊 Generated insights:', gate2Insights)
+
+        // if (gate2Insights.length > 0) {
+        //   setAiInsights(gate2Insights as any)
+        // } else {
+        //   devWarn('⚠️ No insights generated for Gate 2')
+        // }
         
         // Submit to AI analysis but don't let it overwrite our local insights
         await submitToAIAnalysis(gate2CumulativeData, 'gate2', 'G2')
@@ -231,11 +231,11 @@ const IntelligentMortgageForm = ({ className = '' }: IntelligentMortgageFormProp
         }
         
         // Generate comprehensive insights with full data IMMEDIATELY
-        const gate3Insights = generateMortgageInsights(gate3CumulativeData as any, 3)
-        if (gate3Insights.length > 0) {
-          devLog('📊 Generated local insights for Gate 3:', gate3Insights)
-          setAiInsights(gate3Insights as any)
-        }
+        // const gate3Insights = generateMortgageInsights(gate3CumulativeData as any, 3) // Function removed - archived code
+        // if (gate3Insights.length > 0) {
+        //   devLog('📊 Generated local insights for Gate 3:', gate3Insights)
+        //   setAiInsights(gate3Insights as any)
+        // }
         
         // Submit to AI analysis but don't let it overwrite our local insights
         await submitToAIAnalysis(gate3CumulativeData, 'gate3', 'G3')
@@ -412,10 +412,8 @@ const IntelligentMortgageForm = ({ className = '' }: IntelligentMortgageFormProp
 
             {/* Loan Type Selector - Using simplified version for debugging */}
             <div className="max-w-4xl mx-auto">
-              <SimpleLoanTypeSelector
-                onSelect={handleLoanTypeSelect}
-                redirectToApply={true}
-              />
+              {/* SimpleLoanTypeSelector removed - archived code with broken dependencies */}
+              <p className="text-center text-graphite">This form has been archived. Use /apply for the current form.</p>
             </div>
           </>
         ) : (

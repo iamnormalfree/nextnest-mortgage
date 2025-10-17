@@ -9,7 +9,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { getEmploymentRecognitionRate, calculateInstantProfile } from '@/lib/calculations/instant-profile'
-import { MortgageFormData } from '@/lib/contracts/form-contracts'
 
 type LiabilityKey = 'propertyLoans' | 'carLoans' | 'creditCards' | 'personalLines'
 
@@ -28,7 +27,7 @@ interface Step3NewPurchaseProps {
   showJointApplicant: boolean
   errors: any
   getErrorMessage: (error: any) => string
-  control: Control<MortgageFormData>
+  control: Control<any>
   instantCalcResult?: {
     maxLoanAmount?: number
     propertyPrice?: number

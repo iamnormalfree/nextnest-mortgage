@@ -98,15 +98,18 @@ jest.mock('@/components/ui/select', () => {
     const context = React.useContext(SelectContext)
     return React.createElement('button', { ...props, ref, type: 'button' }, props.children)
   })
+  SelectTrigger.displayName = 'SelectTrigger'
 
   const SelectValue = React.forwardRef<HTMLSpanElement, any>(({ placeholder, ...props }, ref) => {
     const context = React.useContext(SelectContext)
     return React.createElement('span', { ...props, ref }, context?.value ?? placeholder ?? '')
   })
+  SelectValue.displayName = 'SelectValue'
 
   const SelectContent = React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) => {
     return React.createElement('div', { ...props, ref, role: 'listbox' }, children)
   })
+  SelectContent.displayName = 'SelectContent'
 
   const SelectItem = React.forwardRef<HTMLDivElement, any>(({ children, value, ...props }, ref) => {
     const context = React.useContext(SelectContext)
@@ -121,6 +124,7 @@ jest.mock('@/components/ui/select', () => {
       children
     )
   })
+  SelectItem.displayName = 'SelectItem'
 
   return {
     Select,

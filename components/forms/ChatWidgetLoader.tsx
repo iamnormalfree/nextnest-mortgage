@@ -42,177 +42,11 @@ export default function ChatWidgetLoader({
   const maxRetries = 3
   const isDevelopment = process.env.NODE_ENV === 'development'
 
-  useEffect(() => {
-    // Check if widget is already loaded
-    if (window.$chatwoot && scriptLoadedRef.current) {
-      console.log('Chatwoot widget already loaded')
-      handleWidgetReady()
-      return
-    }
-
-    // In development, check if we should use mock mode
-    if (isDevelopment && config.baseUrl === 'https://chat.nextnest.sg') {
-      console.warn('⚠️ Development Mode: Chatwoot server may not be accessible')
-      console.warn('💡 Tip: Set up a local Chatwoot instance or use a staging server')
-      console.warn('📧 Fallback contact: assist@nextnest.sg | 📱 +65 8334 1445')
-    }
-
-    // Add a flag to prevent double loading in StrictMode
-    const cancelled = { value: false }
-
-    const load = async () => {
-      if (!cancelled.value) {
-        await loadChatwootScript(cancelled)
-      }
-    }
-
-    load()
-
-    return () => {
-      cancelled.value = true
-      // Only cleanup if in production or if widget actually loaded
-      if (!isDevelopment || scriptLoadedRef.current) {
-        cleanup()
-      }
-    }
-  }, [config.baseUrl, config.websiteToken, autoOpen, isDevelopment, handleWidgetReady, cleanup, loadChatwootScript])
-
-  const loadChatwootScript = useCallback(async (cancelled: { value: boolean }) => {
-    try {
-      console.log('Loading Chatwoot widget script...')
-
-      // Early exit if already cancelled
-      if (cancelled.value) {
-        console.log('Load cancelled before start')
-        return
-      }
-
-      setIsLoading(true)
-      setHasError(false)
-
-      // First, do a quick health check to see if the server is reachable
-      if (!isDevelopment || config.baseUrl.includes('localhost')) {
-        try {
-          const healthCheckUrl = `${config.baseUrl}/api/v1/widget/config?website_token=${config.websiteToken}`
-          console.log('Checking Chatwoot server availability...')
-          const controller = new AbortController()
-          const healthTimeout = setTimeout(() => controller.abort(), 5000)
-          
-          const healthResponse = await fetch(healthCheckUrl, {
-            signal: controller.signal,
-            mode: 'no-cors' // Use no-cors to avoid CORS issues during health check
-          })
-          clearTimeout(healthTimeout)
-          console.log('Chatwoot server appears to be reachable')
-        } catch (healthError) {
-          console.warn('Chatwoot server health check failed:', healthError)
-          if (isDevelopment) {
-            console.warn('In development mode - showing fallback UI')
-            // In development, fail fast if server is not reachable
-            handleLoadError(new Error(`Development: Chatwoot server at ${config.baseUrl} is not reachable`))
-            return
-          }
-          // In production, continue anyway - the widget might still load
-        }
-      }
-
-      // Set timeout for widget loading (increased to 30 seconds for slower connections)
-      timeoutRef.current = setTimeout(() => {
-        if (!scriptLoadedRef.current) {
-          handleLoadError(new Error(`Widget loading timeout - unable to reach ${config.baseUrl}`))
-        }
-      }, 30000)
-
-      // Configure Chatwoot before script loads
-      window.chatwootSettings = {
-        hideMessageBubble: config.hideMessageBubble,
-        position: config.position,
-        locale: config.locale,
-        type: 'expanded_bubble',
-        
-        // Custom attributes for context
-        customAttributes: {
-          ...config.customAttributes,
-          conversationId: config.conversationId,
-          source: 'progressive_form'
-        },
-
-        // Event handlers
-        onLoad: () => {
-          console.log('Chatwoot widget loaded successfully')
-          clearTimeout(timeoutRef.current!)
-          scriptLoadedRef.current = true
-          setIsLoading(false)
-          
-          // Auto-open chat if requested
-          if (autoOpen && window.$chatwoot) {
-            setTimeout(() => {
-              try {
-                window.$chatwoot.toggle('open')
-                console.log('Chat widget opened automatically')
-              } catch (err) {
-                console.error('Failed to auto-open chat:', err)
-              }
-            }, 500)
-          }
-          
-          handleWidgetReady()
-        },
-
-        onError: (error: any) => {
-          console.error('Chatwoot widget error:', error)
-          handleLoadError(new Error('Widget initialization failed'))
-        }
-      }
-
-      // Check again if cancelled before DOM manipulation
-      if (cancelled.value) {
-        console.log('Load cancelled before script creation')
-        return
-      }
-
-      // Check if script element already exists
-      const existingScript = document.querySelector(`script[src*="${config.baseUrl}/packs/js/sdk.js"]`)
-      if (existingScript) {
-        console.log('Removing existing Chatwoot script')
-        existingScript.remove()
-      }
-
-      // First check if the Chatwoot server is reachable
-      console.log(`Attempting to load widget from: ${config.baseUrl}`)
-
-      // Load Chatwoot script
-      const script = document.createElement('script')
-      script.src = `${config.baseUrl}/packs/js/sdk.js`
-      script.defer = true
-      script.async = true
-      
-      script.onerror = (e) => {
-        clearTimeout(timeoutRef.current!)
-        console.error('Script load error:', e)
-        handleLoadError(new Error(`Failed to load chat widget script from ${config.baseUrl}/packs/js/sdk.js - Server may be unreachable`))
-      }
-
-      // Add website token as data attribute
-      script.setAttribute('data-website-token', config.websiteToken)
-
-      // Final check before adding to DOM
-      if (!cancelled.value) {
-        document.head.appendChild(script)
-        console.log('Chatwoot script element added to DOM')
-      } else {
-        console.log('Load cancelled before adding script to DOM')
-      }
-
-    } catch (error) {
-      handleLoadError(error as Error)
-    }
-  }, [config.baseUrl, config.websiteToken, isDevelopment]) // eslint-disable-line react-hooks/exhaustive-deps
-
+  // All useCallback hooks must be defined BEFORE useEffect to avoid "used before declaration" errors
   const handleWidgetReady = useCallback(() => {
     setIsLoading(false)
     setHasError(false)
-    
+
     // Track successful load
     if (window.gtag) {
       window.gtag('event', 'chat_widget_loaded', {
@@ -225,49 +59,9 @@ export default function ChatWidgetLoader({
     onLoad()
   }, [onLoad])
 
-  const handleLoadError = useCallback((error: Error) => {
-    console.error('Chat widget load error:', error)
-    console.error('Config being used:', {
-      baseUrl: config.baseUrl,
-      websiteToken: config.websiteToken,
-      conversationId: config.conversationId
-    })
-    setIsLoading(false)
-    setHasError(true)
-    
-    // Clear timeout if it exists
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-
-    // Retry logic with exponential backoff
-    if (retryCountRef.current < maxRetries) {
-      retryCountRef.current++
-      const retryDelay = Math.min(2000 * Math.pow(2, retryCountRef.current - 1), 10000)
-      console.log(`Retrying widget load (attempt ${retryCountRef.current}/${maxRetries}) in ${retryDelay}ms...`)
-      
-      setTimeout(() => {
-        cleanup()
-        const cancelled = { value: false }
-        loadChatwootScript(cancelled)
-      }, retryDelay)
-    } else {
-      // Track failed load
-      if (window.gtag) {
-        window.gtag('event', 'chat_widget_error', {
-          event_category: 'errors',
-          event_label: error.message,
-          value: 0
-        })
-      }
-
-      onError(error)
-    }
-  }, [config, cleanup, loadChatwootScript, onError])
-
   const cleanup = useCallback(() => {
     console.log('Cleaning up Chatwoot widget...')
-    
+
     // Clear timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -302,6 +96,213 @@ export default function ChatWidgetLoader({
 
     scriptLoadedRef.current = false
   }, [config.baseUrl])
+
+  const handleLoadError = useCallback((error: Error) => {
+    console.error('Chat widget load error:', error)
+    console.error('Config being used:', {
+      baseUrl: config.baseUrl,
+      websiteToken: config.websiteToken,
+      conversationId: config.conversationId
+    })
+    setIsLoading(false)
+    setHasError(true)
+
+    // Clear timeout if it exists
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+
+    // Retry logic with exponential backoff
+    if (retryCountRef.current < maxRetries) {
+      retryCountRef.current++
+      const retryDelay = Math.min(2000 * Math.pow(2, retryCountRef.current - 1), 10000)
+      console.log(`Retrying widget load (attempt ${retryCountRef.current}/${maxRetries}) in ${retryDelay}ms...`)
+
+      setTimeout(() => {
+        cleanup()
+        const cancelled = { value: false }
+        loadChatwootScript(cancelled)
+      }, retryDelay)
+    } else {
+      // Track failed load
+      if (window.gtag) {
+        window.gtag('event', 'chat_widget_error', {
+          event_category: 'errors',
+          event_label: error.message,
+          value: 0
+        })
+      }
+
+      onError(error)
+    }
+  }, [config, cleanup, onError]) // loadChatwootScript will be added when it's defined
+
+  const loadChatwootScript = useCallback(async (cancelled: { value: boolean }) => {
+    try {
+      console.log('Loading Chatwoot widget script...')
+
+      // Early exit if already cancelled
+      if (cancelled.value) {
+        console.log('Load cancelled before start')
+        return
+      }
+
+      setIsLoading(true)
+      setHasError(false)
+
+      // First, do a quick health check to see if the server is reachable
+      if (!isDevelopment || config.baseUrl.includes('localhost')) {
+        try {
+          const healthCheckUrl = `${config.baseUrl}/api/v1/widget/config?website_token=${config.websiteToken}`
+          console.log('Checking Chatwoot server availability...')
+          const controller = new AbortController()
+          const healthTimeout = setTimeout(() => controller.abort(), 5000)
+
+          const healthResponse = await fetch(healthCheckUrl, {
+            signal: controller.signal,
+            mode: 'no-cors' // Use no-cors to avoid CORS issues during health check
+          })
+          clearTimeout(healthTimeout)
+          console.log('Chatwoot server appears to be reachable')
+        } catch (healthError) {
+          console.warn('Chatwoot server health check failed:', healthError)
+          if (isDevelopment) {
+            console.warn('In development mode - showing fallback UI')
+            // In development, fail fast if server is not reachable
+            handleLoadError(new Error(`Development: Chatwoot server at ${config.baseUrl} is not reachable`))
+            return
+          }
+          // In production, continue anyway - the widget might still load
+        }
+      }
+
+      // Set timeout for widget loading (increased to 30 seconds for slower connections)
+      timeoutRef.current = setTimeout(() => {
+        if (!scriptLoadedRef.current) {
+          handleLoadError(new Error(`Widget loading timeout - unable to reach ${config.baseUrl}`))
+        }
+      }, 30000)
+
+      // Configure Chatwoot before script loads
+      window.chatwootSettings = {
+        hideMessageBubble: config.hideMessageBubble,
+        position: config.position,
+        locale: config.locale,
+        type: 'expanded_bubble',
+
+        // Custom attributes for context
+        customAttributes: {
+          ...config.customAttributes,
+          conversationId: config.conversationId,
+          source: 'progressive_form'
+        },
+
+        // Event handlers
+        onLoad: () => {
+          console.log('Chatwoot widget loaded successfully')
+          clearTimeout(timeoutRef.current!)
+          scriptLoadedRef.current = true
+          setIsLoading(false)
+
+          // Auto-open chat if requested
+          if (autoOpen && window.$chatwoot) {
+            setTimeout(() => {
+              try {
+                window.$chatwoot.toggle('open')
+                console.log('Chat widget opened automatically')
+              } catch (err) {
+                console.error('Failed to auto-open chat:', err)
+              }
+            }, 500)
+          }
+
+          handleWidgetReady()
+        },
+
+        onError: (error: any) => {
+          console.error('Chatwoot widget error:', error)
+          handleLoadError(new Error('Widget initialization failed'))
+        }
+      }
+
+      // Check again if cancelled before DOM manipulation
+      if (cancelled.value) {
+        console.log('Load cancelled before script creation')
+        return
+      }
+
+      // Check if script element already exists
+      const existingScript = document.querySelector(`script[src*="${config.baseUrl}/packs/js/sdk.js"]`)
+      if (existingScript) {
+        console.log('Removing existing Chatwoot script')
+        existingScript.remove()
+      }
+
+      // First check if the Chatwoot server is reachable
+      console.log(`Attempting to load widget from: ${config.baseUrl}`)
+
+      // Load Chatwoot script
+      const script = document.createElement('script')
+      script.src = `${config.baseUrl}/packs/js/sdk.js`
+      script.defer = true
+      script.async = true
+
+      script.onerror = (e) => {
+        clearTimeout(timeoutRef.current!)
+        console.error('Script load error:', e)
+        handleLoadError(new Error(`Failed to load chat widget script from ${config.baseUrl}/packs/js/sdk.js - Server may be unreachable`))
+      }
+
+      // Add website token as data attribute
+      script.setAttribute('data-website-token', config.websiteToken)
+
+      // Final check before adding to DOM
+      if (!cancelled.value) {
+        document.head.appendChild(script)
+        console.log('Chatwoot script element added to DOM')
+      } else {
+        console.log('Load cancelled before adding script to DOM')
+      }
+
+    } catch (error) {
+      handleLoadError(error as Error)
+    }
+  }, [config.baseUrl, config.websiteToken, isDevelopment, autoOpen, handleWidgetReady, handleLoadError])
+
+  useEffect(() => {
+    // Check if widget is already loaded
+    if (window.$chatwoot && scriptLoadedRef.current) {
+      console.log('Chatwoot widget already loaded')
+      handleWidgetReady()
+      return
+    }
+
+    // In development, check if we should use mock mode
+    if (isDevelopment && config.baseUrl === 'https://chat.nextnest.sg') {
+      console.warn('⚠️ Development Mode: Chatwoot server may not be accessible')
+      console.warn('💡 Tip: Set up a local Chatwoot instance or use a staging server')
+      console.warn('📧 Fallback contact: assist@nextnest.sg | 📱 +65 8334 1445')
+    }
+
+    // Add a flag to prevent double loading in StrictMode
+    const cancelled = { value: false }
+
+    const load = async () => {
+      if (!cancelled.value) {
+        await loadChatwootScript(cancelled)
+      }
+    }
+
+    load()
+
+    return () => {
+      cancelled.value = true
+      // Only cleanup if in production or if widget actually loaded
+      if (!isDevelopment || scriptLoadedRef.current) {
+        cleanup()
+      }
+    }
+  }, [config.baseUrl, config.websiteToken, autoOpen, isDevelopment, handleWidgetReady, cleanup, loadChatwootScript])
 
   // Public methods exposed via ref
   const openChat = () => {

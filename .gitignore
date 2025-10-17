@@ -44,3 +44,11 @@ nul
 
 # Deployment setup files with secrets
 *_SETUP.md
+
+# Playwright MCP screenshots (AI debugging artifacts)
+.playwright-mcp/
+
+# Build caches
+.swc/
+
+# Keep .codex and .factory per user request (alternative Claude configs)

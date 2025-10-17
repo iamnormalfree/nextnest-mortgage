@@ -215,9 +215,13 @@ export function calculateInstantProfile(
       return 0;
     }
     if (existing_properties === 0) {
-      return reducedLtvTriggered ? loanTier.min_cash_reduced : loanTier.min_cash_base;
+      // First loan has both min_cash_base and min_cash_reduced
+      const firstLoan = loanTier as typeof DR_ELENA_LTV_LIMITS.firstLoan;
+      return reducedLtvTriggered ? firstLoan.min_cash_reduced : firstLoan.min_cash_base;
     }
-    return loanTier.min_cash ?? 25;
+    // Second and third+ loans only have min_cash
+    const otherLoan = loanTier as typeof DR_ELENA_LTV_LIMITS.secondLoan | typeof DR_ELENA_LTV_LIMITS.thirdPlusLoan;
+    return otherLoan.min_cash ?? 25;
   })();
 
   const downpaymentRequired = roundFundsRequired(Math.max(property_price - maxLoan, 0));
@@ -428,7 +432,7 @@ export function calculateComplianceSnapshot(
   const isTDSRCompliantWithStressTest = stressTestMonthlyPayment <= tdsrLimit;
   
   // Calculate MSR ratio and compliance using stress test payment for HDB/EC
-  if (property_type === 'HDB' || property_type === 'EC' && msrLimit !== undefined) {
+  if ((property_type === 'HDB' || property_type === 'EC') && msrLimit !== undefined) {
     msrRatio = recognizedIncome > 0 ? Math.round((stressTestMonthlyPayment / recognizedIncome) * 100) : 0;
     isMSRCompliant = stressTestMonthlyPayment <= msrLimit;
   }

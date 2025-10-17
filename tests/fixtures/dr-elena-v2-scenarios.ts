@@ -130,6 +130,7 @@ export const drElenaV2Scenarios: DrElenaScenario[] = [
     expected_outputs: {
       max_ltv: 75,
       absd_rate: 0,
+      tdsr_available: 4200, // (8000 * 0.55) - 200 = 4200
       msr_limit: 2400, // 8000 * 0.30
       tdsr_limit: 4200, // (8000 * 0.55) - 200 = 4200
       limiting_factor: 'MSR',
@@ -442,6 +443,7 @@ export const negativeScenarios: DrElenaScenario[] = [
     expected_outputs: {
       max_ltv: 75,
       absd_rate: 0,
+      tdsr_available: 750, // (5000 * 0.55) - 2000 = 750
       msr_limit: 1500, // 5000 * 0.30
       tdsr_limit: 750, // (5000 * 0.55) - 2000 = 750
       limiting_factor: 'MSR',

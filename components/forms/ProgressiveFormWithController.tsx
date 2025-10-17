@@ -622,7 +622,7 @@ export function ProgressiveFormWithController({
                 control={control}
                 render={({ field }) => {
                   if (!shouldShowPropertyTypeSelect) {
-                    return null
+                    return <></>
                   }
 
                   return (
