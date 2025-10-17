@@ -39,6 +39,33 @@ const incomeSchema = z.number()
 const ageSchema = z.number()
   .min(21, 'Minimum age for mortgage is 21')
   .max(100, 'Please enter a valid age')
+const variableIncomesSchema = z.object({
+  0: z.number().min(0, 'Variable income cannot be negative').max(9999999, 'Please enter a valid amount'),
+  1: z.number().min(0, 'Variable income cannot be negative').max(9999999, 'Please enter a valid amount').optional()
+})
+const employmentDetailsSchema = z.object({
+  'self-employed': z.object({
+    businessAgeYears: z.union([z.string(), z.number()]).optional(),
+    noaSubmitted: z.boolean().optional(),
+    averageReportedIncome: z.union([z.string(), z.number()]).optional()
+  }),
+  variable: z.object({
+    averagePastTwelveMonths: z.union([z.string(), z.number()]).optional(),
+    lowestObservedIncome: z.union([z.string(), z.number()]).optional()
+  })
+})
+const liabilityDetailsSchema = z.object({
+  enabled: z.boolean().optional(),
+  outstandingBalance: z.union([z.number(), z.string()]).optional(),
+  monthlyPayment: z.union([z.number(), z.string()]).optional()
+})
+const liabilitiesSchema = z.object({
+  propertyLoans: liabilityDetailsSchema.optional(),
+  carLoans: liabilityDetailsSchema.optional(),
+  creditCards: liabilityDetailsSchema.optional(),
+  personalLines: liabilityDetailsSchema.optional(),
+  otherCommitments: z.string().optional()
+})
 
 // ============================================================================
 // BASE SCHEMA FOR ALL LOAN TYPES - GATE-BASED STRUCTURE
@@ -74,12 +101,15 @@ const baseLeadSchema = z.object({
 export const newPurchaseSchema = baseLeadSchema.extend({
   loanType: z.literal('new_purchase'),
   purchaseTimeline: z.enum(['this_month', 'next_3_months', '3_6_months', 'exploring']),
-  propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed']),
+  propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
   priceRange: z.number().min(300000).max(5000000),
   ipaStatus: z.enum(['have_ipa', 'applied', 'starting', 'what_is_ipa']),
   firstTimeBuyer: z.boolean(),
   downPaymentReady: z.boolean().optional(),
-  cpfUsage: z.enum(['yes', 'no', 'unsure']).optional()
+  cpfUsage: z.enum(['yes', 'no', 'unsure']).optional(),
+  actualVariableIncomes: variableIncomesSchema.optional(),
+  employmentDetails: employmentDetailsSchema.optional(),
+  liabilities: liabilitiesSchema.optional()
 })
 
 // Refinancing specific schema
@@ -90,17 +120,22 @@ export const refinanceSchema = baseLeadSchema.extend({
   currentBank: z.string().min(1),
   outstandingLoan: z.number().min(10000).max(10000000),
   propertyValue: z.number().min(100000).max(20000000),
-  propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed']),
+  propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
   yearsPurchased: z.number().min(0).max(50),
   refinanceReason: z.enum(['lower_rate', 'cash_out', 'better_terms', 'debt_consolidation']),
-  cashOutAmount: z.number().min(0).max(2000000).optional()
+  cashOutAmount: z.number().min(0).max(2000000).optional(),
+  // New Step 3 refinance fields
+  refinancingGoals: z.array(z.enum(['lower_monthly_payment', 'shorten_tenure', 'rate_certainty', 'cash_out'])),
+  cashOutReason: z.string().optional(),
+  monthsRemaining: z.number().min(0).max(360).describe('How many months remaining in lock-in'),
+  ownerOccupied: z.boolean().default(true).describe('Is this your primary residence?')
 })
 
 // Equity loan specific schema
 export const equityLoanSchema = baseLeadSchema.extend({
   loanType: z.literal('equity_loan'),
   propertyValue: z.number().min(200000).max(20000000),
-  propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed']),
+  propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
   existingLoan: z.number().min(0).max(10000000),
   equityAmount: z.number().min(50000).max(3000000),
   purpose: z.enum(['business', 'investment', 'renovation', 'education', 'other']),
@@ -179,7 +214,8 @@ export const validatePropertyValue = (value: number, propertyType: string): bool
     HDB: 200000,
     EC: 500000,
     Private: 600000,
-    Landed: 1000000
+    Landed: 1000000,
+    Commercial: 500000
   }
   return value >= minimums[propertyType as keyof typeof minimums]
 }
@@ -189,7 +225,8 @@ export const validateLoanAmount = (loanAmount: number, propertyValue: number, pr
     HDB: 0.9,    // 90% for citizens
     EC: 0.9,     // 90% for citizens
     Private: 0.75, // 75% for first property
-    Landed: 0.75   // 75% for first property
+    Landed: 0.75,  // 75% for first property
+    Commercial: 0.7 // 70% typical bank policy
   }
   
   const maxLoan = propertyValue * ltvLimits[propertyType as keyof typeof ltvLimits]
@@ -212,17 +249,8 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
     })
   }
   
-  // Gate 1: Basic Information (Name + Email)
+  // Gate 1: Basic Information (Name + Email + Phone)
   if (gateNumber === 1) {
-    return z.object({
-      loanType: z.enum(['new_purchase', 'refinance', 'equity_loan']),
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-      email: z.string().email('Please enter a valid email address')
-    })
-  }
-  
-  // Gate 2: Contact Details (Add Phone)
-  if (gateNumber === 2) {
     return z.object({
       loanType: z.enum(['new_purchase', 'refinance', 'equity_loan']),
       name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -231,56 +259,129 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
     })
   }
   
-  // Gate 3: Optimization Parameters
+  // Gate 2: What You Need (Property Details)
+  if (gateNumber === 2) {
+    const baseGate2Schema = z.object({
+      loanType: z.enum(['new_purchase', 'refinance', 'equity_loan']),
+      name: z.string().min(2, 'Name must be at least 2 characters'),
+      email: z.string().email('Please enter a valid email address'),
+      phone: singaporePhoneSchema
+    })
+
+    // Add loan-type specific fields for Step 2
+    switch (loanType) {
+      case 'new_purchase':
+        return baseGate2Schema.extend({
+          propertyCategory: z.enum(['resale', 'new_launch', 'bto', 'commercial'], {
+            message: 'Please select a property category'
+          }),
+          propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial'], {
+            message: 'Please select property type'
+          }),
+          priceRange: z.number().min(300000, 'Minimum property price is $300,000').max(5000000, 'Property price seems too high'),
+          combinedAge: z.number().min(18, 'Combined age must be at least 18').max(120, 'Please verify combined age'),
+          // Optional fields for context block
+          developmentName: z.string().optional(),
+          paymentScheme: z.enum(['cash', 'cpf_plus_cash', 'full_cpf', 'bank_loan', 'not_sure']).optional()
+        })
+      
+      case 'refinance':
+        return baseGate2Schema.extend({
+          propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial'], {
+            message: 'Please select property type'
+          }),
+          currentRate: z.number().min(1, 'Current rate must be at least 1%').max(10, 'Please verify current rate'),
+          lockInStatus: z.enum(['ending_soon', 'no_lock', 'locked', 'not_sure']),
+          outstandingLoan: z.number().min(0, 'Outstanding loan cannot be negative').max(10000000, 'Loan amount seems too high'),
+          currentBank: z.string().min(1, 'Please select your current bank'),
+          propertyValue: z.number().min(300000, 'Minimum property value is $300,000').max(10000000, 'Property value seems too high').optional(),
+          remainingTenure: z.number().min(1, 'Remaining tenure is required').max(35, 'Remaining tenure cannot exceed 35 years').optional()
+        })
+      
+      case 'equity_loan':
+        return baseGate2Schema.extend({
+          propertyValue: z.number().min(500000, 'Minimum property value for equity loan is $500,000').max(10000000, 'Property value seems too high'),
+          equityNeeded: z.number().min(100000, 'Minimum equity loan amount is $100,000').max(5000000, 'Equity loan seems too high'),
+          propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial'], {
+            message: 'Please select property type'
+          }),
+          purpose: z.enum(['investment', 'renovation', 'business', 'education', 'other'], {
+            message: 'Please select loan purpose'
+          })
+        })
+      
+      default:
+        return baseGate2Schema
+    }
+  }
+  
+  // Gate 3: Your Finances
   if (gateNumber === 3) {
     const baseGate3Schema = z.object({
       loanType: z.enum(['new_purchase', 'refinance', 'equity_loan']),
       name: z.string().min(2, 'Name must be at least 2 characters'),
       email: z.string().email('Please enter a valid email address'),
       phone: singaporePhoneSchema,
-      // Gate 3 specific fields
-      monthlyIncome: z.number()
-        .min(0, 'Income cannot be negative')
-        .max(9999999, 'Please enter a valid income amount'),
+      // Step 3 specific fields (actual field names from form)
+      actualIncomes: z.object({
+        0: z.number().min(0, 'Applicant 1 income is required').max(9999999, 'Please enter a valid income amount'),
+        1: z.number().min(0, 'Income cannot be negative').max(9999999, 'Please enter a valid income amount').optional()
+      }),
+      actualAges: z.object({
+        0: z.number().min(18, 'Must be at least 18 years old').max(80, 'Please verify your age'),
+        1: z.number().min(18, 'Must be at least 18 years old').max(80, 'Please verify your age').optional()
+      }),
+      employmentType: z.enum(['employed', 'self-employed', 'variable', 'not-working', 'other', 'contract'], {
+        message: 'Please select your employment type'
+      }),
+      actualVariableIncomes: variableIncomesSchema.optional(),
+      employmentDetails: employmentDetailsSchema.optional(),
+      liabilities: liabilitiesSchema.optional(),
+      creditCardCount: z.number().min(0, 'Credit card count cannot be negative').max(20, 'Please verify the number').optional(),
       existingCommitments: z.number()
         .min(0, 'Commitments cannot be negative')
         .max(9999999, 'Please enter a valid amount')
         .optional(),
-      packagePreference: z.enum(['lowest_rate', 'flexibility', 'stability', 'features'], {
-        message: 'Please select what matters most to you'
-      }),
-      riskTolerance: z.enum(['conservative', 'moderate', 'aggressive'], {
-        message: 'Please select your risk appetite'
-      }),
-      planningHorizon: z.enum(['short_term', 'medium_term', 'long_term'], {
-        message: 'Please select your planning timeline'
-      })
+      hasJointApplicant: z.boolean().optional()
     })
     
-    // Add loan-type specific fields from Gate 2
+    // Extend with loan-type specific fields that were validated in Step 2
     switch (loanType) {
       case 'new_purchase':
         return baseGate3Schema.extend({
-          propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed']),
-          priceRange: z.number().min(300000, 'Minimum property price is $300,000'),
-          purchaseTimeline: z.enum(['this_month', 'next_3_months', '3_6_months', 'exploring']),
-          ipaStatus: z.enum(['have_ipa', 'applied', 'starting', 'what_is_ipa']),
-          firstTimeBuyer: z.boolean()
+          // Step 2 fields (carry forward)
+          propertyCategory: z.enum(['resale', 'new_launch', 'bto', 'commercial']),
+          propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
+          priceRange: z.number().min(300000, 'Minimum property price is $300,000').max(5000000, 'Property price seems too high'),
+          combinedAge: z.number().min(18, 'Combined age must be at least 18').max(120, 'Please verify combined age'),
+          // Optional Step 2 fields
+          developmentName: z.string().optional(),
+          paymentScheme: z.enum(['cash', 'cpf_plus_cash', 'full_cpf', 'bank_loan', 'not_sure']).optional()
         })
       
       case 'refinance':
         return baseGate3Schema.extend({
+          // Step 2 fields (carry forward)
+          propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
           currentRate: z.number().min(1, 'Current rate must be at least 1%').max(10, 'Please verify current rate'),
           lockInStatus: z.enum(['ending_soon', 'no_lock', 'locked', 'not_sure']),
+          outstandingLoan: z.number().min(0, 'Outstanding loan cannot be negative').max(10000000, 'Loan amount seems too high'),
           currentBank: z.string().min(1, 'Please select your current bank'),
-          propertyValue: z.number().min(300000, 'Minimum property value is $300,000'),
-          outstandingLoan: z.number().min(0, 'Outstanding loan cannot be negative')
+          propertyValue: z.number().min(300000, 'Minimum property value is $300,000').max(10000000, 'Property value seems too high').optional(),
+          remainingTenure: z.number().min(1, 'Remaining tenure is required').max(35, 'Remaining tenure cannot exceed 35 years').optional(),
+          refinancingGoals: z.array(z.enum(['lower_monthly_payment', 'shorten_tenure', 'rate_certainty', 'cash_out'])).optional(),
+          cashOutAmount: z.number().min(0, 'Cash-out amount cannot be negative').max(2000000, 'Cash-out amount seems too high').optional(),
+          cashOutReason: z.string().optional(),
+          monthsRemaining: z.number().min(0, 'Months remaining cannot be negative').max(360, 'Please verify the months remaining').optional(),
+          ownerOccupied: z.boolean().optional()
         })
       
       case 'equity_loan':
         return baseGate3Schema.extend({
-          propertyValue: z.number().min(500000, 'Minimum property value for equity loan is $500,000'),
-          equityNeeded: z.number().min(100000, 'Minimum equity loan amount is $100,000'),
+          // Step 2 fields (carry forward)
+          propertyValue: z.number().min(500000, 'Minimum property value for equity loan is $500,000').max(10000000, 'Property value seems too high'),
+          equityNeeded: z.number().min(100000, 'Minimum equity loan amount is $100,000').max(5000000, 'Equity loan seems too high'),
+          propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
           purpose: z.enum(['investment', 'renovation', 'business', 'education', 'other'])
         })
       
@@ -301,7 +402,7 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
   switch (loanType) {
     case 'new_purchase':
       return fullSchema.extend({
-        propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed']),
+        propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
         priceRange: z.number().min(300000, 'Minimum property price is $300,000'),
         purchaseTimeline: z.enum(['this_month', 'next_3_months', '3_6_months', 'exploring']),
         ipaStatus: z.enum(['have_ipa', 'applied', 'starting', 'what_is_ipa']),

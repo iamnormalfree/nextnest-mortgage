@@ -358,15 +358,7 @@ export function ProgressiveFormWithController({
     }
   }, [currentStep, sessionId, loanType, createEvent, publishEvent])
 
-  const shouldEnableStep1Continue =
-    Boolean(watch('name')) &&
-    Boolean(watch('email')) &&
-    Boolean(watch('phone'))
-
-  const canSubmitCurrentStep =
-    currentStep === 1
-      ? isValid && shouldEnableStep1Continue
-      : isValid
+  const canSubmitCurrentStep = isValid
 
   // Helper function to get employment recognition rate (Dr Elena v2 persona aligned)
   const getEmploymentRecognitionRate = (employmentType: string) => {
@@ -1387,6 +1379,7 @@ export function ProgressiveFormWithController({
                 errors={errors}
                 getErrorMessage={getErrorMessage}
                 control={control}
+                instantCalcResult={instantCalcResult}
               />
             ) : (
               <Step3Refinance

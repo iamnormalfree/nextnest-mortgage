@@ -31,6 +31,8 @@ interface InstantAnalysisCardProps {
 }
 
 export function InstantAnalysisCard({ isVisible, isLoading, result, className }: InstantAnalysisCardProps) {
+  const [showDetails, setShowDetails] = React.useState(false)
+
   if (!isVisible) {
     return null
   }
@@ -72,41 +74,58 @@ export function InstantAnalysisCard({ isVisible, isLoading, result, className }:
       <div className={cn(bodyPadding, 'space-y-5')}>
         <div className="text-center">
           <CheckCircle className="mx-auto h-8 w-8 text-emerald" aria-hidden="true" />
-          <p className="mt-3 text-sm font-semibold text-ink">Instant analysis complete</p>
-          <p className="mt-2 text-xs leading-relaxed text-graphite">
-            Instant estimate using default assumptions. Our AI broker will refine the numbers before consultation.
-          </p>
-        </div>
-
-        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
           {isRefinance ? (
             <>
-              <MetricCard label="Current payment" value={formatCurrency(result.currentPayment)} emphasize />
-              <MetricCard label="Estimated new payment" value={formatCurrency(result.newPayment)} highlight />
-              <MetricCard label="Monthly savings" value={formatCurrency(result.monthlySavings)} highlight positive />
-              <MetricCard label="Annual savings" value={formatCurrency(result.yearlySavings)} positive />
+              <p className="mt-3 text-2xl font-semibold text-ink">You could save</p>
+              <p className="mt-2 text-3xl font-bold text-emerald">{formatCurrency(result.monthlySavings)}/month</p>
+              <p className="mt-2 text-sm text-graphite">
+                Based on your current loan details
+              </p>
             </>
           ) : (
             <>
-              <MetricCard
-                label={`Max loan (${Math.round((result.ltvUsed ?? 0) * 100)}% LTV)`}
-                value={formatCurrency(result.maxLoan)}
-                highlight
-              />
-              <MetricCard
-                label={`Monthly payment @ ${(result.interestRate ?? 2.8).toFixed(1)}%`}
-                value={formatCurrency(result.monthlyPayment)}
-              />
-              <MetricCard
-                label="Stress test payment @ 4%"
-                value={formatCurrency(result.stressTestPayment)}
-              />
-              <MetricCard
-                label="Max tenure"
-                value={result.tenureLimit ? `${result.tenureLimit} years` : ''}
-              />
+              <p className="mt-3 text-2xl font-semibold text-ink">You qualify for up to</p>
+              <p className="mt-2 text-3xl font-bold text-emerald">{formatCurrency(result.maxLoan)}</p>
+              <p className="mt-2 text-sm text-graphite">
+                Based on your income and property details
+              </p>
             </>
           )}
+        </div>
+
+        {showDetails && (
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+            {isRefinance ? (
+              <>
+                <MetricCard label="Current Payment" value={formatCurrency(result.currentPayment)} emphasize />
+                <MetricCard label="Estimated New Payment" value={formatCurrency(result.newPayment)} highlight />
+                <MetricCard label="Monthly Savings" value={formatCurrency(result.monthlySavings)} highlight positive />
+                <MetricCard label="Annual Savings" value={formatCurrency(result.yearlySavings)} positive />
+              </>
+            ) : (
+              <>
+                <MetricCard
+                  label="Down Payment"
+                  value={formatCurrency((result.maxLoan ?? 0) * 0.25)} // Approximate
+                  emphasize
+                />
+                <MetricCard
+                  label="Monthly Payment"
+                  value={formatCurrency(result.monthlyPayment)}
+                />
+              </>
+            )}
+          </div>
+        )}
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-sm text-gold hover:text-gold-dark font-semibold transition-colors"
+          >
+            {showDetails ? 'Hide details' : 'View full breakdown'}
+          </button>
         </div>
       </div>
     </section>
