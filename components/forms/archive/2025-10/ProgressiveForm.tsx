@@ -1,7 +1,41 @@
 /**
+ * ABANDONED: 2025-10-17
+ *
+ * REASON FOR ABANDONMENT:
+ * Legacy gate-based form only used by IntelligentMortgageForm.tsx (which itself is
+ * not in production). Production uses ProgressiveFormWithController.tsx.
+ *
+ * ARCHITECTURE:
+ * - Gate-based progression with LeadForm domain entity
+ * - Event bus integration (FormEvents.FIELD_CHANGED, AI_INSIGHT_REQUESTED)
+ * - Field-level AI insight triggering on significant fields
+ * - Calls /api/ai-insights endpoint
+ *
+ * REPLACED BY:
+ * - components/forms/ProgressiveFormWithController.tsx (step-based architecture)
+ * - Client-side instant calculations vs. API-dependent insights
+ * - Direct Chatwoot integration for AI interaction
+ *
+ * USEFUL PATTERNS PRESERVED:
+ * - Field-level AI insight triggering (alternative to instant calculation)
+ * - Trust signal system with deduplication
+ * - LeadForm entity pattern (still exists in lib/domains/forms/entities/)
+ * - Progressive trust level visualization
+ * Documented in docs/runbooks/FORMS_ARCHITECTURE_GUIDE.md (Legacy Patterns section)
+ *
+ * VERIFICATION QUESTIONS ANSWERED:
+ * - LeadForm entity: Still exists, production uses hybrid approach (entity + RHF)
+ * - Event bus: Fully integrated in production
+ * - IPA Status field: Type exists in contract but NOT in UI (future enhancement)
+ * - Urgency calculation: Production uses lead scoring instead
+ *
+ * ARCHIVED: components/forms/archive/2025-10/ProgressiveForm.tsx
+ */
+
+/**
  * Progressive Form Architecture
  * Lead: Sarah Lim - Senior Frontend Engineer
- * 
+ *
  * Gate-based progressive disclosure form with AI insights
  * Implements micro-commitment ladder for trust building
  */

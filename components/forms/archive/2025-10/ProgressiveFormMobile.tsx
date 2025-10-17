@@ -1,6 +1,38 @@
 // ABOUTME: Mobile-first progressive mortgage application form with touch optimization
 // ABOUTME: Uses native touch events (no framer-motion) and debounced calculations
 
+/**
+ * ABANDONED: 2025-10-17
+ *
+ * REASON FOR ABANDONMENT:
+ * This mobile-specific form was created as a separate implementation but fell 32 hours
+ * out of sync with the production form (ProgressiveFormWithController.tsx).
+ *
+ * MISSING FEATURES (vs production):
+ * - Step 3 (Your Finances) - entire step not implemented
+ * - Dr Elena v2 calculations and instant analysis
+ * - Chatwoot handoff and ChatTransitionScreen integration
+ * - Session persistence via useLoanApplicationStorage
+ * - Joint applicant support
+ * - Commercial loan support
+ * - Event bus integration for analytics
+ *
+ * DECISION:
+ * Use single responsive form approach instead (ProgressiveFormWithController.tsx with
+ * mobile-optimized CSS). Maintaining two forms creates unnecessary technical debt.
+ *
+ * REPLACED BY:
+ * components/forms/ProgressiveFormWithController.tsx (enhanced with responsive design)
+ *
+ * PRESERVED CONCEPTS:
+ * - Native touch events (48px minimum touch targets)
+ * - Debounced calculations (performance optimization)
+ * - Mobile-first field ordering
+ * These patterns documented in docs/runbooks/FORMS_ARCHITECTURE_GUIDE.md
+ *
+ * ARCHIVED: components/forms/archive/2025-10/ProgressiveFormMobile.tsx
+ */
+
 'use client'
 
 import React, { useState, useMemo, useCallback, TouchEvent } from 'react'

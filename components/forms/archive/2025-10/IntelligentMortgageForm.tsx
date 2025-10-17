@@ -1,3 +1,28 @@
+/**
+ * ABANDONED: 2025-10-17
+ *
+ * REASON FOR ABANDONMENT:
+ * This form wrapper was part of the gate-based architecture but is no longer used
+ * in production. Zero imports found across the codebase.
+ *
+ * ARCHITECTURE:
+ * - Gate-based progression (G0 → G1 → G2 → G3)
+ * - Wraps ProgressiveForm.tsx (also abandoned)
+ * - Calls /api/forms/analyze endpoint (still exists but not used during form flow)
+ *
+ * REPLACED BY:
+ * - components/forms/ProgressiveFormWithController.tsx (step-based, cleaner architecture)
+ * - Direct Chatwoot integration vs. separate AI insights API
+ *
+ * USEFUL PATTERNS PRESERVED:
+ * - AI insight formatting functions (lines 249-297)
+ * - Type-based insight card styling
+ * - Trust signal progressive display
+ * Documented in docs/runbooks/FORMS_ARCHITECTURE_GUIDE.md (Legacy Patterns section)
+ *
+ * ARCHIVED: components/forms/archive/2025-10/IntelligentMortgageForm.tsx
+ */
+
 'use client'
 
 import React, { useState } from 'react'
