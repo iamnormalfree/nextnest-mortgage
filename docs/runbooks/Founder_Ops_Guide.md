@@ -21,15 +21,15 @@ This guide explains how the homepage, forms, AI broker UI, and Chatwoot integrat
 ## 1) High-level layers
 
 - __Pages (Routes)__
-  - `app/page.tsx` — Homepage
-  - `app/redesign/sophisticated-flow/page.tsx` — Sophisticated landing + form (code-split)
+  - `app/page.tsx` — Production homepage (sophisticated landing + loan type selector)
+  - `app/apply/page.tsx` — Progressive mortgage application form
   - `app/layout.tsx` — Global wrapper (fonts, globals, conditional nav)
 
 - __Components__
   - `components/HeroSection.tsx`, `components/ServicesSection.tsx`, `components/ContactSection.tsx`
-  - `components/forms/IntelligentMortgageForm.tsx` (orchestrator)
-  - `components/forms/ProgressiveForm.tsx` (main UI + engine today)
-  - `redesign/SophisticatedProgressiveForm.tsx` (modern Bloomberg-style UI)
+  - `components/forms/ProgressiveFormWithController.tsx` (PRODUCTION - main form at /apply)
+  - `components/forms/sections/Step3NewPurchase.tsx`, `components/forms/sections/Step3Refinance.tsx`
+  - `components/archive/2025-10/redesign-experiments/SophisticatedProgressiveForm.tsx` (archived experimental UI)
 
 - __Engine / Domain (business logic)__
   - `lib/domains/forms/entities/LeadForm.ts` (domain state)
@@ -61,16 +61,18 @@ This guide explains how the homepage, forms, AI broker UI, and Chatwoot integrat
 
 ## 3) The form flow (main app)
 
-1) __Entry__: `components/forms/IntelligentMortgageForm.tsx`
-   - Orchestrates loan type selection, Gate 2 / Gate 3 submissions, and Chatwoot creation after Gate 3.
+1) __Entry__: Homepage at `app/page.tsx`
+   - Loan type selection that routes to `/apply?loanType=...`
 
-2) __Main form__: `components/forms/ProgressiveForm.tsx`
-   - Holds the step model (Loan Type → Who You Are → What You Need → Your Finances).
-   - Uses Zod schemas from `lib/validation/mortgage-schemas.ts` and syncs all values to `LeadForm`.
-   - Triggers instant calculations from `lib/calculations/mortgage.ts` when enough fields are present.
-   - Publishes analytics/events through `lib/analytics/conversion-tracking.ts` and `lib/events/event-bus.ts`.
+2) __Main form__: `components/forms/ProgressiveFormWithController.tsx`
+   - Production form at `/app/apply/page.tsx` (1,517 lines)
+   - Holds the step model (Step 0: Loan Type → Step 1: Who You Are → Step 2: What You Need → Step 3: Your Finances)
+   - Uses form contracts from `lib/contracts/form-contracts.ts`
+   - Triggers instant calculations from `lib/calculations/instant-profile.ts` (Dr Elena v2 engine)
+   - Publishes analytics/events through `lib/analytics/conversion-tracking.ts` and `lib/events/event-bus.ts`
+   - After completion, hands off to Chatwoot via `components/forms/ChatTransitionScreen.tsx`
 
-__Note__: We are extracting the “engine” from this file into a headless controller hook so multiple UIs can reuse the same logic.
+__Note__: This form uses headless controller hook `hooks/useProgressiveFormController.ts` for state management.
 
 ---
 
@@ -89,21 +91,24 @@ Think of it as the single source of truth for a user’s form session.
 
 ## 5) Validation & calculations
 
-- __Zod Schemas__: `lib/validation/mortgage-schemas.ts`
-  - Define required fields and types per step and loan type.
-  - UI must bind to the same keys (e.g., `priceRange`, `combinedAge`).
+- __Form Contracts__: `lib/contracts/form-contracts.ts`
+  - Define interfaces for form state, inputs, and results
+  - Source of truth for field names and types
 
-- __Calculators__: `lib/calculations/mortgage.ts`
-  - Power instant eligibility (new purchase) and refinancing savings.
-  - Triggered only when enough fields are complete (same rules across UIs).
+- __Calculators__: `lib/calculations/instant-profile.ts` (Dr Elena v2)
+  - Power instant eligibility (new purchase) and refinancing savings
+  - Uses MAS regulatory constants from `lib/calculations/dr-elena-constants.ts`
+  - Triggered automatically in Step 3 when enough fields are complete
+  - Functions: `calculateInstantProfile()`, `calculateRefinanceOutlook()`, `calculateComplianceSnapshot()`
 
 ---
 
-## 6) Sophisticated flow (redesign)
+## 6) Landing page (production homepage)
 
-- `app/redesign/sophisticated-flow/page.tsx` — lightweight landing that __code-splits__ the form UI.
-- `redesign/SophisticatedProgressiveForm.tsx` — clean Tailwind UI wired to the same engine (headless controller).
-- Hides global nav for faster paint and follows Bloomberg tokens (48px controls, minimal effects, 200ms transitions).
+- `app/page.tsx` — Production homepage with sophisticated design
+- Loan type selector that routes users to `/apply?loanType=new_purchase|refinance|commercial`
+- Bloomberg-inspired design: 48px controls, minimal effects, 200ms transitions, yellow accent CTAs
+- Follows design system from `lib/design/tokens.ts`
 
 ---
 

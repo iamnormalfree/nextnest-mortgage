@@ -214,7 +214,7 @@ className="font-semibold" // 600
 - **Design Principles:** `/docs/design/DESIGN_PRINCIPLES.md`
 - **Color Usage Guide:** `/docs/design/precise-color-usage-guide.md`
 - **Component Guide:** `/docs/design/balanced-premium-components-guide.md`
-- **Implementation:** `/app/redesign/sophisticated-flow/page.tsx`
+- **Implementation:** `/app/page.tsx` (production homepage)
 - **Design Tokens:** `/lib/design/tokens.ts`
 
 ---
@@ -234,7 +234,7 @@ The design system succeeds when:
 
 Questions about design system?
 1. Check `/lib/design/tokens.ts` for patterns
-2. Reference `/app/redesign/sophisticated-flow/page.tsx`
+2. Reference `/app/page.tsx` (production homepage)
 3. Review this document
 4. Ask in #design-system Slack channel
 
