@@ -1,31 +1,26 @@
 # NextNest Design System - Single Source of Truth
 
-**Last Updated:** 2025-10-13
-**Status:** ✅ Active
-**Reference Implementation:** `/app/redesign/sophisticated-flow/page.tsx`
+**Last Updated:** 2025-10-18 (Path References Updated)
+**Status:** ✅ Active (Production)
+**Reference Implementation:** `/app/page.tsx` (production homepage)
+**Historical:** `/app/redesign/sophisticated-flow/page.tsx` (archived 2025-10)
 
 ---
 
 ## 🎯 Purpose
 
-This document establishes the **sophisticated flow** as the canonical design system for all NextNest UI development going forward.
+This document establishes the **sophisticated flow** as the canonical design system for all NextNest UI development going forward. The design system is now live in production at `/app/page.tsx`.
 
 ## 📍 Source of Truth Location
 
 ### Primary Reference
-- **File:** `/app/redesign/sophisticated-flow/page.tsx`
-- **Route:** `/redesign/sophisticated-flow` (or `/` when feature flag enabled)
+- **File:** `/app/page.tsx` (production homepage)
+- **Route:** `/` (live in production)
 - **Design Tokens:** `/lib/design/tokens.ts`
 
-### Feature Flag Control
-```typescript
-// .env.local
-NEXT_PUBLIC_USE_SOPHISTICATED_FLOW=true  // Enable on homepage
-
-// lib/features/feature-flags.ts
-USE_SOPHISTICATED_FLOW: process.env.NODE_ENV === 'development' ||
-                        process.env.NEXT_PUBLIC_USE_SOPHISTICATED_FLOW === 'true'
-```
+### Archived Experiments
+- **Location:** `components/archive/2025-10/redesign-experiments/`
+- **Previous Path:** `/app/redesign/sophisticated-flow/page.tsx` (archived 2025-10)
 
 ---
 
@@ -157,7 +152,7 @@ Before merging ANY UI component:
 ## 🔄 Update Process
 
 ### When Design System Changes:
-1. **Update Reference:** Modify `/app/redesign/sophisticated-flow/page.tsx`
+1. **Update Reference:** Modify `/app/page.tsx` (production homepage)
 2. **Update Tokens:** Sync `/lib/design/tokens.ts`
 3. **Update Docs:** Document change in this file
 4. **Communicate:** Notify team in Slack/email

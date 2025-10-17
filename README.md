@@ -67,12 +67,12 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 ## 🎨 Design System
 
-**Single Source of Truth:** `/app/redesign/sophisticated-flow/page.tsx`
+**Single Source of Truth:** `/app/page.tsx` (production homepage)
+**Historical:** `/app/redesign/sophisticated-flow/page.tsx` (archived 2025-10)
 
 ### Quick Setup
 ```bash
-# Enable the new design system
-echo "NEXT_PUBLIC_USE_SOPHISTICATED_FLOW=true" >> .env.local
+# Design system is now active in production
 npm run dev
 ```
 
@@ -86,7 +86,7 @@ npm run dev
 ### Key Files
 - **Design Tokens:** `/lib/design/tokens.ts`
 - **Documentation:** `/docs/design/SINGLE_SOURCE_OF_TRUTH.md`
-- **Setup Guide:** `/SOPHISTICATED_FLOW_SETUP.md`
+- **Archived Experiments:** `/components/archive/2025-10/redesign-experiments/`
 
 ### Component Patterns
 ```typescript

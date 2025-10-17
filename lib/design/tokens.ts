@@ -1,7 +1,8 @@
 /**
  * NextNest Design Tokens - Single Source of Truth
  *
- * Reference Implementation: /app/redesign/sophisticated-flow/page.tsx
+ * Reference Implementation: /app/page.tsx (production homepage)
+ * Historical: /app/redesign/sophisticated-flow/page.tsx (archived 2025-10)
  *
  * Design System: 90% Monochrome + 10% Yellow Accent
  * Visual Style: Sharp rectangles, clean borders, subtle depth
@@ -193,10 +194,11 @@ export const COMPONENT_PATTERNS = {
 
 /**
  * Migration Guide
+ * Note: redesign/ experiments archived to components/archive/2025-10/redesign-experiments/
  */
 export const MIGRATION_GUIDE = {
-  from: '/app/redesign/page.tsx (old design with purple accent)',
-  to: '/app/redesign/sophisticated-flow/page.tsx (current single source of truth)',
+  from: '/app/redesign/ (archived 2025-10 - old design experiments)',
+  to: '/app/page.tsx (current production homepage)',
 
   steps: [
     '1. Replace all purple (#7C3AED, #6D28D9) with yellow (#FCD34D, #FBB614)',
@@ -207,10 +209,9 @@ export const MIGRATION_GUIDE = {
     '6. Follow "Rule of One" for yellow usage',
   ],
 
-  featureFlag: {
-    name: 'NEXT_PUBLIC_USE_SOPHISTICATED_FLOW',
-    location: 'lib/features/feature-flags.ts',
-    usage: 'Set to "true" in .env.local to enable new design',
+  archivedLocations: {
+    sophisticatedFlow: 'app/archive/2025-10/redesign-experiments/sophisticated-flow/',
+    components: 'components/archive/2025-10/redesign-experiments/redesign/',
   },
 }
 

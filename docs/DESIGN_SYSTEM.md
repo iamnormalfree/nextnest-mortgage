@@ -4,7 +4,8 @@
 
 ## Reference Files
 
-- **Reference Implementation:** `/app/redesign/sophisticated-flow/page.tsx`
+- **Reference Implementation:** `/app/page.tsx` (production homepage)
+- **Historical:** `/app/redesign/sophisticated-flow/page.tsx` (archived 2025-10)
 - **Design Tokens:** `/lib/design/tokens.ts`
 - **Documentation:** `/docs/design/SINGLE_SOURCE_OF_TRUTH.md`
 
