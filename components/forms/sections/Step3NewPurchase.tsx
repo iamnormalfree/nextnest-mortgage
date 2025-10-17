@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Control, Controller, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -29,6 +29,22 @@ interface Step3NewPurchaseProps {
   errors: any
   getErrorMessage: (error: any) => string
   control: Control<MortgageFormData>
+  instantCalcResult?: {
+    maxLoanAmount?: number
+    propertyPrice?: number
+    rateAssumption?: number
+    estimatedMonthlyPayment?: number
+    downPayment?: number
+    cpfAllowedAmount?: number
+    minCashPercent?: number
+    minCashRequired?: number
+    ltvRatio?: number
+    tenureCapYears?: number
+    tenureCapSource?: string
+    limitingFactor?: string
+    reasonCodes?: string[]
+    policyRefs?: string[]
+  }
 }
 
 const LIABILITY_CONFIG: Array<{ key: LiabilityKey; label: string; balanceLabel: string; paymentLabel: string; analyticsKey: string }> = [
@@ -71,15 +87,17 @@ const ensureNumber = (value: unknown): number => {
   return 0
 }
 
-export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, getErrorMessage, control }: Step3NewPurchaseProps) {
+export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, getErrorMessage, control, instantCalcResult }: Step3NewPurchaseProps) {
+  const [hasCommitments, setHasCommitments] = useState<boolean | null>(null)
+
   const primaryIncome = ensureNumber(useWatch({ control, name: 'actualIncomes.0' }))
   const variableIncome = ensureNumber(useWatch({ control, name: 'actualVariableIncomes.0' }))
   const age = ensureNumber(useWatch({ control, name: 'actualAges.0' }))
   const employmentType = (useWatch({ control, name: 'employmentType' }) as string) || 'employed'
   const employmentDetails = useWatch({ control, name: 'employmentDetails' }) as Record<string, any> | undefined
   const liabilitiesRaw = useWatch({ control, name: 'liabilities' }) as Partial<LiabilityState> | undefined
-  const propertyValue = ensureNumber(useWatch({ control, name: 'propertyValue' }))
-  const loanAmount = ensureNumber(useWatch({ control, name: 'loanAmount' }))
+  const propertyValue = ensureNumber(useWatch({ control, name: 'priceRange' }))
+  const loanAmount = ensureNumber(instantCalcResult?.maxLoanAmount)
   const propertyType = (useWatch({ control, name: 'propertyType' }) as string) || 'Private'
 
   const liabilities: LiabilityState = useMemo(() => {
@@ -113,6 +131,18 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
       return total + ensureNumber(details.monthlyPayment)
     }, 0)
   }, [liabilities])
+
+  // Clear all commitment fields when user selects "No" to having commitments
+  useEffect(() => {
+    if (hasCommitments === false) {
+      LIABILITY_CONFIG.forEach((config) => {
+        onFieldChange(`liabilities.${config.key}.enabled`, false)
+        onFieldChange(`liabilities.${config.key}.outstandingBalance`, '')
+        onFieldChange(`liabilities.${config.key}.monthlyPayment`, '')
+      })
+      onFieldChange('liabilities.otherCommitments', '')
+    }
+  }, [hasCommitments, onFieldChange])
 
   const recognitionRate = getEmploymentRecognitionRate(employmentType)
 
@@ -201,15 +231,33 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
       reasons.push('Eligible for mortgage financing')
     }
 
-    // Calculate TDSR: (total monthly commitments / income) * 100
-    // TDSR limit is 55% of income
-    const tdsrRatio = effectiveIncome > 0 ? (totalMonthlyCommitments / effectiveIncome) * 100 : 0
+    // Calculate monthly mortgage payment for the NEW loan
+    // Formula: M = P * [r(1+r)^n] / [(1+r)^n - 1]
+    // Using MAS stress test rate (4% for residential properties)
+    const stressTestRate = 4.0 // MAS stress test rate for residential
+    const monthlyRate = stressTestRate / 100 / 12
+    const tenureYears = 25 // Standard assumption for new purchase
+    const numberOfPayments = tenureYears * 12
 
-    // Calculate MSR: Use calculator MSR limit if available
-    // For HDB/EC properties, MSR limit is 30% of income
+    let monthlyMortgagePayment = 0
+    if (loanAmount > 0 && monthlyRate > 0) {
+      const numerator = monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)
+      const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1
+      monthlyMortgagePayment = Math.ceil(loanAmount * (numerator / denominator))
+    }
+
+    // Calculate TDSR: (New Mortgage Payment + Existing Commitments) / Income × 100%
+    // TDSR limit is 55% of income (MAS regulation)
+    const tdsrRatio = effectiveIncome > 0
+      ? ((monthlyMortgagePayment + totalMonthlyCommitments) / effectiveIncome) * 100
+      : 0
+
+    // Calculate MSR: (New Mortgage Payment ONLY) / Income × 100%
+    // MSR limit is 30% of income (applies to HDB/EC properties only)
+    // Note: MSR does NOT include existing debts, only the new mortgage payment
     const msrLimitAmount = calculatorResult.msrLimit ?? (effectiveIncome * 0.30)
     const msrRatio = effectiveIncome > 0 && msrLimitAmount > 0
-      ? (totalMonthlyCommitments / effectiveIncome) * 100
+      ? (monthlyMortgagePayment / effectiveIncome) * 100
       : 0
 
     return {
@@ -220,7 +268,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
       msrLimit: 30,
       reasons
     }
-  }, [age, propertyValue, propertyType, effectiveIncome, totalMonthlyCommitments])
+  }, [age, propertyValue, propertyType, effectiveIncome, totalMonthlyCommitments, loanAmount, instantCalcResult])
 
   const renderSelfEmployedPanel = () => {
     if (employmentType !== 'self-employed') return null
@@ -556,123 +604,168 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
       <div className="space-y-4">
         <h3 className="text-sm font-semibold text-black">Financial Commitments</h3>
 
-        <div className="space-y-4 p-4 border border-[#E5E5E5]">
-          {LIABILITY_CONFIG.map((config) => (
-            <div key={config.key} className="space-y-3">
+        <div className="space-y-6 p-4 border border-[#E5E5E5]">
+          {/* Single gate question */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-semibold text-[#000000] text-sm">
+                Do you have any existing loans or commitments?
+              </h4>
+              <p className="text-xs text-[#666666] mt-1">
+                Property loans, car loans, credit cards, etc.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setHasCommitments(false)}
+                className={`px-6 py-2 border text-sm font-semibold ${
+                  hasCommitments === false
+                    ? 'bg-[#000000] text-white border-[#000000]'
+                    : 'bg-white text-[#666666] border-[#E5E5E5] hover:border-[#000000]'
+                }`}
+              >
+                No
+              </button>
+              <button
+                type="button"
+                onClick={() => setHasCommitments(true)}
+                className={`px-6 py-2 border text-sm font-semibold ${
+                  hasCommitments === true
+                    ? 'bg-[#000000] text-white border-[#000000]'
+                    : 'bg-white text-[#666666] border-[#E5E5E5] hover:border-[#000000]'
+                }`}
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+
+          {/* Only show if Yes */}
+          {hasCommitments && (
+            <div className="space-y-4 pl-4 border-l-2 border-[#E5E5E5]">
+              <h5 className="font-semibold text-[#000000] text-sm">
+                Tell us about your commitments
+              </h5>
+
+              {LIABILITY_CONFIG.map((config) => (
+                <div key={config.key} className="space-y-3">
+                  <Controller
+                    name={`liabilities.${config.key}.enabled` as const}
+                    control={control}
+                    render={({ field }) => (
+                      <div className="flex items-center justify-between">
+                        <label htmlFor={`liability-${config.key}`} className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+                          {config.label}
+                        </label>
+                        <Checkbox
+                          id={`liability-${config.key}`}
+                          checked={Boolean(field.value)}
+                          onCheckedChange={(checked) => {
+                            const enabled = checked === true
+                            field.onChange(enabled)
+                            onFieldChange(`liabilities.${config.key}.enabled`, enabled, {
+                              section: 'liabilities_panel',
+                              action: 'toggle',
+                              metadata: {
+                                liabilityType: config.key,
+                                analyticsKey: config.analyticsKey,
+                                timestamp: new Date()
+                              }
+                            })
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  {liabilities[config.key].enabled && (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Controller
+                        name={`liabilities.${config.key}.outstandingBalance` as const}
+                        control={control}
+                        render={({ field }) => (
+                          <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
+                            <span>{config.balanceLabel}</span>
+                            <Input
+                              {...field}
+                              type="number"
+                              className="font-mono"
+                              placeholder="0"
+                              onChange={(event) => {
+                                field.onChange(event.target.value)
+                                onFieldChange(`liabilities.${config.key}.outstandingBalance`, ensureNumber(event.target.value), {
+                                  section: 'liabilities_panel',
+                                  action: 'balance_updated',
+                                  metadata: {
+                                    liabilityType: config.key,
+                                    newValue: ensureNumber(event.target.value),
+                                    timestamp: new Date()
+                                  }
+                                })
+                              }}
+                            />
+                          </label>
+                        )}
+                      />
+
+                      <Controller
+                        name={`liabilities.${config.key}.monthlyPayment` as const}
+                        control={control}
+                        render={({ field }) => (
+                          <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
+                            <span>{config.paymentLabel}</span>
+                            <Input
+                              {...field}
+                              type="number"
+                              className="font-mono"
+                              placeholder="0"
+                              onChange={(event) => {
+                                field.onChange(event.target.value)
+                                onFieldChange(`liabilities.${config.key}.monthlyPayment`, ensureNumber(event.target.value), {
+                                  section: 'liabilities_panel',
+                                  action: 'payment_updated',
+                                  metadata: {
+                                    liabilityType: config.key,
+                                    newValue: ensureNumber(event.target.value),
+                                    timestamp: new Date()
+                                  }
+                                })
+                              }}
+                            />
+                          </label>
+                        )}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+
               <Controller
-                name={`liabilities.${config.key}.enabled` as const}
+                name="liabilities.otherCommitments"
                 control={control}
                 render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <label htmlFor={`liability-${config.key}`} className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-                      {config.label}
-                    </label>
-                    <Checkbox
-                      id={`liability-${config.key}`}
-                      checked={Boolean(field.value)}
-                      onCheckedChange={(checked) => {
-                        const enabled = checked === true
-                        field.onChange(enabled)
-                        onFieldChange(`liabilities.${config.key}.enabled`, enabled, {
+                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
+                    <span>Other commitments (optional)</span>
+                    <textarea
+                      {...field}
+                      rows={3}
+                      className="w-full border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-black"
+                      placeholder="School fees, guarantor obligations, allowances"
+                      onChange={(event) => {
+                        field.onChange(event.target.value)
+                        onFieldChange('liabilities.otherCommitments', event.target.value, {
                           section: 'liabilities_panel',
-                          action: 'toggle',
-                          metadata: {
-                            liabilityType: config.key,
-                            analyticsKey: config.analyticsKey,
-                            timestamp: new Date()
-                          }
+                          action: 'updated_freeform',
+                          metadata: { length: event.target.value.length, timestamp: new Date() }
                         })
                       }}
                     />
-                  </div>
+                  </label>
                 )}
               />
-
-              {liabilities[config.key].enabled && (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Controller
-                    name={`liabilities.${config.key}.outstandingBalance` as const}
-                    control={control}
-                    render={({ field }) => (
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
-                        <span>{config.balanceLabel}</span>
-                        <Input
-                          {...field}
-                          type="number"
-                          className="font-mono"
-                          placeholder="0"
-                          onChange={(event) => {
-                            field.onChange(event.target.value)
-                            onFieldChange(`liabilities.${config.key}.outstandingBalance`, ensureNumber(event.target.value), {
-                              section: 'liabilities_panel',
-                              action: 'balance_updated',
-                              metadata: {
-                                liabilityType: config.key,
-                                newValue: ensureNumber(event.target.value),
-                                timestamp: new Date()
-                              }
-                            })
-                          }}
-                        />
-                      </label>
-                    )}
-                  />
-
-                  <Controller
-                    name={`liabilities.${config.key}.monthlyPayment` as const}
-                    control={control}
-                    render={({ field }) => (
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
-                        <span>{config.paymentLabel}</span>
-                        <Input
-                          {...field}
-                          type="number"
-                          className="font-mono"
-                          placeholder="0"
-                          onChange={(event) => {
-                            field.onChange(event.target.value)
-                            onFieldChange(`liabilities.${config.key}.monthlyPayment`, ensureNumber(event.target.value), {
-                              section: 'liabilities_panel',
-                              action: 'payment_updated',
-                              metadata: {
-                                liabilityType: config.key,
-                                newValue: ensureNumber(event.target.value),
-                                timestamp: new Date()
-                              }
-                            })
-                          }}
-                        />
-                      </label>
-                    )}
-                  />
-                </div>
-              )}
             </div>
-          ))}
-
-          <Controller
-            name="liabilities.otherCommitments"
-            control={control}
-            render={({ field }) => (
-              <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
-                <span>Other commitments</span>
-                <textarea
-                  {...field}
-                  rows={3}
-                  className="w-full border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-black"
-                  placeholder="School fees, guarantor obligations, allowances"
-                  onChange={(event) => {
-                    field.onChange(event.target.value)
-                    onFieldChange('liabilities.otherCommitments', event.target.value, {
-                      section: 'liabilities_panel',
-                      action: 'updated_freeform',
-                      metadata: { length: event.target.value.length, timestamp: new Date() }
-                    })
-                  }}
-                />
-              </label>
-            )}
-          />
+          )}
         </div>
       </div>
 
