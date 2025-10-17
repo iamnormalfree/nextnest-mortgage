@@ -91,6 +91,7 @@ export function ProgressiveFormWithController({
   const [showOptionalContext, setShowOptionalContext] = useState(false)
   const [showJointApplicant, setShowJointApplicant] = useState(false)
   const [ltvMode, setLtvMode] = useState(75) // Default LTV mode (75% with 55% option)
+  const [showAnalysisDetails, setShowAnalysisDetails] = useState(false)
 
   // Ref for throttling analytics events
   const stepTrackerRef = useRef<Record<string, number>>({})
@@ -453,6 +454,41 @@ export function ProgressiveFormWithController({
   const handleStepSubmit = handleSubmit(async (data) => {
     await next(data)
   })
+
+  /**
+   * Translates Dr Elena v2 persona codes into user-friendly summary
+   *
+   * @param calcResult - Result from calculateNewPurchaseProfile
+   * @returns 1-2 sentence summary explaining the result in plain English
+   */
+  const generateUserFriendlySummary = useCallback((calcResult: any): string => {
+    const summaryParts: string[] = []
+
+    // Start with primary limiting factor
+    if (calcResult.limitingFactor === 'MSR') {
+      summaryParts.push('Based on your income, you can borrow comfortably within MSR guidelines.')
+    } else if (calcResult.limitingFactor === 'TDSR') {
+      summaryParts.push('Your loan amount is optimized for healthy debt servicing.')
+    } else if (calcResult.limitingFactor === 'LTV') {
+      summaryParts.push('Loan amount is set by property price and loan-to-value limits.')
+    }
+
+    // Add tenure context if capped
+    const tenureCapped = calcResult.reasonCodes?.includes('tenure_cap_property_limit') ||
+                         calcResult.reasonCodes?.includes('tenure_cap_age_limit')
+
+    if (tenureCapped) {
+      summaryParts.push('Your loan tenure is capped at 25 years per MAS regulations.')
+    }
+
+    // Add CPF context if applicable
+    const cpfAllowed = calcResult.cpfAllowedAmount > 0
+    if (cpfAllowed) {
+      summaryParts.push('You can use CPF for your down payment.')
+    }
+
+    return summaryParts.join(' ')
+  }, [])
 
   // Render step content
   const renderStepContent = () => {
@@ -862,119 +898,68 @@ export function ProgressiveFormWithController({
                 const policyRefs: string[] = instantCalcResult.policyRefs ?? []
 
                 return (
-                  <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
-                    <h4 className="text-sm font-semibold text-black mb-4">
-                      <Sparkles className="inline-block w-4 h-4 mr-2" />
-                      Your Personalized Analysis
+                  <div className="mt-6 p-8 bg-white border border-[#E5E5E5]">
+                    <h4 className="text-2xl font-semibold text-[#000000] mb-4">
+                      ✨ You qualify for up to
                     </h4>
 
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="border-b border-[#E5E5E5] pb-3">
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
-                          Maximum Loan Amount
-                        </p>
-                        <p className="text-lg font-mono font-semibold text-black">
-                          ${maxLoan.toLocaleString()}
-                          <span className="text-sm text-[#666666] ml-2">[{ltvPercent}% LTV]</span>
-                        </p>
-                        {limitingFactor && (
-                          <p className="text-xs text-[#666666] mt-1">Limiting factor: {limitingFactor}</p>
-                        )}
-                      </div>
-
-                      <div className="border-b border-[#E5E5E5] pb-3">
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
-                          Estimated Monthly Payment
-                        </p>
-                        <p className="text-lg font-mono font-semibold text-black">
-                          ${monthlyPayment.toLocaleString()}/mo
-                          <span className="text-sm text-[#666666] ml-2">[@ {rateAssumption}% assumed rate]</span>
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
-                          Down Payment Required
-                        </p>
-                        <p className="text-lg font-mono font-semibold text-black">
-                          ${Math.round(downPayment).toLocaleString()}
-                          {propertyPrice > 0 && (
-                            <span className="text-sm text-[#666666] ml-2">[{(downPayment / propertyPrice * 100).toFixed(1)}% down]</span>
-                          )}
-                        </p>
-                        <div className="mt-2 space-y-1">
-                          <p className="text-sm text-[#666666]">
-                            ├─ Cash required: <span className="font-mono">${Math.round(cashRequired).toLocaleString()}</span>
-                          </p>
-                          <p className="text-sm text-[#666666]">
-                            └─ CPF allowed: <span className="font-mono">${Math.round(cpfAllowedAmount).toLocaleString()}</span>
-                          </p>
-                          <p className="text-sm text-[#666666]">
-                            └─ Persona min cash ({minCashPercent}%): <span className="font-mono">${Math.round(minCashRequired).toLocaleString()}</span>
-                          </p>
-                        </div>
-                      </div>
+                    <div className="text-5xl font-semibold text-[#000000] mb-6">
+                      ${maxLoan.toLocaleString()}
                     </div>
 
-                    {(tenureCapYears || reasonCodes.length > 0 || policyRefs.length > 0) && (
-                      <div className="mt-4 space-y-3 border-t border-[#E5E5E5] pt-4">
-                        {tenureCapYears && (
-                          <p className="text-xs text-[#666666]">
-                            Tenure capped at {tenureCapYears} years ({tenureCapSource === 'age' ? 'age trigger' : 'regulation'}).
-                          </p>
-                        )}
-                        {reasonCodes.length > 0 && (
-                          <div>
-                            <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">Reason codes</p>
-                            <div className="flex flex-wrap gap-2">
-                              {reasonCodes.map((code) => (
-                                <span
-                                  key={code}
-                                  className="text-[11px] uppercase tracking-wide bg-[#F8F8F8] border border-[#E5E5E5] px-2 py-1 text-[#666666]"
-                                >
-                                  {code}
-                                </span>
-                              ))}
-                            </div>
+                    <p className="text-[#666666] text-base mb-8">
+                      {generateUserFriendlySummary(instantCalcResult)}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowAnalysisDetails(!showAnalysisDetails)}
+                      className="text-[#666666] hover:text-[#000000] underline text-sm"
+                    >
+                      {showAnalysisDetails ? 'Hide details' : 'View full breakdown'}
+                    </button>
+
+                    {showAnalysisDetails && (
+                      <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-[#666666]">Monthly Payment</span>
+                            <span className="text-sm font-mono text-[#000000]">
+                              ${monthlyPayment.toLocaleString()}/mo
+                            </span>
                           </div>
-                        )}
-                        {policyRefs.length > 0 && (
-                          <div>
-                            <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">Policy references</p>
-                            <div className="flex flex-wrap gap-2">
-                              {policyRefs.map((ref) => (
-                                <span
-                                  key={ref}
-                                  className="text-[11px] bg-[#F8F8F8] border border-[#E5E5E5] px-2 py-1 text-[#666666]"
-                                >
-                                  {ref}
-                                </span>
-                              ))}
-                            </div>
+
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-[#666666]">Down Payment</span>
+                            <span className="text-sm font-mono text-[#000000]">
+                              ${Math.round(downPayment).toLocaleString()}
+                            </span>
                           </div>
-                        )}
+
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-[#666666]">Cash Required</span>
+                            <span className="text-sm font-mono text-[#000000]">
+                              ${Math.round(cashRequired).toLocaleString()}
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-[#666666]">CPF Allowed</span>
+                            <span className="text-sm font-mono text-[#000000]">
+                              ${Math.round(cpfAllowedAmount).toLocaleString()}
+                            </span>
+                          </div>
+
+                          {tenureCapYears && (
+                            <div className="pt-4 border-t border-[#E5E5E5]">
+                              <p className="text-xs text-[#666666]">
+                                Tenure capped at {tenureCapYears} years ({tenureCapSource === 'age' ? 'age limit' : 'regulation'})
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
-
-                    <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
-                      <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
-                        💡 Complete Step 3 to unlock:
-                      </p>
-                      <div className="grid grid-cols-1 gap-2">
-                        <div className="flex items-center gap-2 text-sm text-[#666666]">
-                          <span className="text-[#999999]">🔒</span>
-                          <span>TDSR/MSR compliance check</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-[#666666]">
-                          <span className="text-[#999999]">🔒</span>
-                          <span>Stamp duty calculation</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-[#666666]">
-                          <span className="text-[#999999]">🔒</span>
-                          <span>23 bank comparisons</span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 )
 
