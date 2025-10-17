@@ -105,7 +105,7 @@ export function ProgressiveFormWithController({
     onFormComplete: (data) => {
       setIsFormCompleted(true)
       // Trigger chat transition if needed
-      if (currentStep === 2) { // Step 3 would be index 2
+      if (currentStep === 3) { // Step 4 (Your Finances) is index 3
         setShowChatTransition(true)
       }
     }
