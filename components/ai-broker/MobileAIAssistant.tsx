@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import {
-  Send, Mic, Camera, Image, FileText, MoreHorizontal,
+  Send, Mic, Camera, Image as ImageIcon, FileText, MoreHorizontal,
   Phone, ArrowLeft, Star, TrendingUp, AlertCircle,
   CheckCircle2, Clock, DollarSign, Home, Calculator
 } from 'lucide-react'
@@ -335,7 +335,7 @@ export const MobileAIAssistant: React.FC<MobileAIAssistantProps> = ({
         <div className="flex-shrink-0 bg-white border-t">
           <div className="flex items-center gap-2 p-3">
             <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Attach image">
-              <Image className="h-5 w-5" aria-hidden="true" />
+              <ImageIcon className="h-5 w-5" />
             </Button>
 
             <div className="flex-1">

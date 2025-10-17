@@ -89,6 +89,7 @@ export interface RefinanceOutlookInput {
 
 export interface RefinanceOutlookResult {
   projectedMonthlySavings?: number;
+  currentMonthlyPayment?: number;
   maxCashOut: number;
   timingGuidance: string;
   recommendations: string[];
@@ -705,6 +706,7 @@ export function calculateRefinanceOutlook(
 
   return {
     projectedMonthlySavings,
+    currentMonthlyPayment,
     maxCashOut,
     timingGuidance,
     recommendations: Array.from(recommendationSet),

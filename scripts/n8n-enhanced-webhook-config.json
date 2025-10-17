@@ -1,0 +1,134 @@
+{
+  "name": "NextNest Enhanced AI Broker Flow",
+  "nodes": [
+    {
+      "id": "webhook",
+      "name": "Chatwoot Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "webhookId": "chatwoot-enhanced",
+      "parameters": {
+        "path": "chatwoot-enhanced",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "filter-events",
+      "name": "Filter Valid Events",
+      "type": "n8n-nodes-base.if",
+      "position": [450, 300],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.event}}",
+              "operation": "oneOf",
+              "value2": "conversation_created,message_created"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "filter-duplicates",
+      "name": "Filter Duplicate Messages",
+      "type": "n8n-nodes-base.code",
+      "position": [650, 300],
+      "parameters": {
+        "jsCode": "// Filter out duplicate form submissions and system messages\nconst message = $input.item.json.message;\nconst conversation = $input.item.json.conversation;\n\n// Skip form submission messages\nif (message?.content?.includes('📝 Form Submission:') ||\n    message?.content?.includes('• Loan Type:')) {\n  return null;\n}\n\n// Skip system messages\nif (message?.content?.includes('added AI-Broker') ||\n    message?.content?.includes('Conversation was reopened') ||\n    message?.content?.includes('generating a response')) {\n  return null;\n}\n\n// Skip if this is a bot message (prevent echo)\nif (message?.sender?.type === 'agent' ||\n    message?.message_type === 'outgoing') {\n  return null;\n}\n\n// For conversation_created, only process if it has lead data\nif ($input.item.json.event === 'conversation_created') {\n  if (!conversation?.custom_attributes?.lead_score) {\n    return null;\n  }\n}\n\n// Pass through valid events\nreturn $input.item;"
+      }
+    },
+    {
+      "id": "http-request",
+      "name": "Call Enhanced Flow API",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://nextnest.sg/api/chatwoot-enhanced-flow",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1050, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"processed\": $json.handled } }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "webhook": {
+      "main": [
+        [
+          {
+            "node": "filter-events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filter-events": {
+      "main": [
+        [
+          {
+            "node": "filter-duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filter-duplicates": {
+      "main": [
+        [
+          {
+            "node": "http-request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http-request": {
+      "main": [
+        [
+          {
+            "node": "respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

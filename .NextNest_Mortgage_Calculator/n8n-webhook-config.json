@@ -1,0 +1,269 @@
+{
+  "webhook_configuration": {
+    "endpoint": "/webhook/nextnest-leads",
+    "method": "POST",
+    "authentication": "none",
+    "response_mode": "lastNode",
+    "options": {
+      "rawBody": false,
+      "responseHeaders": {
+        "Access-Control-Allow-Origin": "https://nextnest.sg",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
+    }
+  },
+  
+  "expected_payload_schema": {
+    "type": "object",
+    "required": [
+      "name", "email", "phone", "loanQuantum", "propertyValue", 
+      "propertyType", "timeline", "calculationResults"
+    ],
+    "properties": {
+      "loanQuantum": {
+        "type": "number",
+        "description": "Requested loan amount in SGD",
+        "minimum": 50000
+      },
+      "propertyValue": {
+        "type": "number", 
+        "description": "Property valuation in SGD",
+        "minimum": 100000
+      },
+      "currentBank": {
+        "type": "string",
+        "description": "Current mortgage bank (if refinancing)",
+        "examples": ["DBS", "OCBC", "UOB", "Maybank", "HSBC"]
+      },
+      "propertyType": {
+        "type": "string",
+        "enum": ["HDB", "Private", "Commercial"],
+        "description": "Singapore property classification"
+      },
+      "timeline": {
+        "type": "string", 
+        "enum": ["immediate", "soon", "planning", "exploring"],
+        "description": "Urgency level for mortgage solution"
+      },
+      "ltvRatio": {
+        "type": "number",
+        "description": "Loan-to-value ratio calculated (%)",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "potentialMonthlySavings": {
+        "type": "number",
+        "description": "Calculated monthly savings opportunity (SGD)"
+      },
+      "refinancingCostBenefit": {
+        "type": "number", 
+        "description": "Net benefit after costs over loan term (SGD)"
+      },
+      "name": {
+        "type": "string",
+        "description": "Contact full name",
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "email": {
+        "type": "string",
+        "format": "email",
+        "description": "Contact email address"
+      },
+      "phone": {
+        "type": "string",
+        "description": "Singapore phone number",
+        "pattern": "^(\\+65)?[689]\\d{7}$"
+      },
+      "source": {
+        "type": "string",
+        "default": "website_calculator",
+        "description": "Lead source attribution"
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Form submission timestamp"
+      },
+      "calculationResults": {
+        "type": "object",
+        "description": "Complete mortgage calculation results",
+        "properties": {
+          "monthlyPayment": {"type": "number"},
+          "totalInterest": {"type": "number"},
+          "ltvRatio": {"type": "number"},
+          "tdsr": {"type": "number"},
+          "msr": {"type": "number"},
+          "potentialSavings": {"type": "number"},
+          "refinancingCostBenefit": {"type": "number"},
+          "breakEvenPeriod": {"type": "number"}
+        }
+      }
+    }
+  },
+
+  "n8n_workflow_integration": {
+    "step_1_webhook_trigger": {
+      "node_type": "Webhook",
+      "configuration": {
+        "httpMethod": "POST",
+        "path": "nextnest-leads",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": false
+        }
+      }
+    },
+
+    "step_2_data_processing": {
+      "node_type": "Function",
+      "description": "Process and validate mortgage calculator data",
+      "code": "// Extract and validate mortgage data\nconst payload = items[0].json;\n\n// Calculate lead scoring\nconst leadScore = {\n  urgency: payload.timeline === 'immediate' ? 10 : \n           payload.timeline === 'soon' ? 8 : \n           payload.timeline === 'planning' ? 6 : 4,\n  \n  value: payload.loanQuantum > 1000000 ? 10 : \n         payload.loanQuantum > 500000 ? 8 : \n         payload.loanQuantum > 200000 ? 6 : 4,\n  \n  savings: payload.potentialMonthlySavings > 300 ? 10 : \n           payload.potentialMonthlySavings > 150 ? 8 : \n           payload.potentialMonthlySavings > 50 ? 6 : 4\n};\n\nconst totalScore = (leadScore.urgency + leadScore.value + leadScore.savings) / 3;\n\n// Route based on property type and loan amount\nconst routingDecision = {\n  crm: payload.propertyType === 'Commercial' || payload.loanQuantum > 800000 ? 'hubspot' : 'airtable',\n  priority: totalScore >= 8 ? 'high' : totalScore >= 6 ? 'medium' : 'low',\n  followUpSequence: payload.timeline === 'immediate' ? 'urgent_24h' : 'standard_nurture'\n};\n\nreturn [{\n  json: {\n    ...payload,\n    leadScore: totalScore,\n    routing: routingDecision,\n    processedAt: new Date().toISOString()\n  }\n}];"
+    },
+
+    "step_3_crm_routing": {
+      "node_type": "Switch",
+      "description": "Route to appropriate CRM based on lead type",
+      "routes": [
+        {
+          "condition": "={{$json.routing.crm === 'hubspot'}}",
+          "output": "hubspot_commercial"
+        },
+        {
+          "condition": "={{$json.routing.crm === 'airtable'}}",
+          "output": "airtable_residential"
+        }
+      ]
+    },
+
+    "step_4a_hubspot_commercial": {
+      "node_type": "HubSpot",
+      "operation": "Create Contact",
+      "configuration": {
+        "email": "={{$json.email}}",
+        "firstname": "={{$json.name.split(' ')[0]}}",
+        "lastname": "={{$json.name.split(' ').slice(1).join(' ')}}",
+        "phone": "={{$json.phone}}",
+        "property_type": "={{$json.propertyType}}",
+        "loan_amount": "={{$json.loanQuantum}}",
+        "potential_savings": "={{$json.potentialMonthlySavings}}",
+        "lead_source": "NextNest Calculator",
+        "lead_score": "={{$json.leadScore}}",
+        "timeline": "={{$json.timeline}}"
+      }
+    },
+
+    "step_4b_airtable_residential": {
+      "node_type": "Airtable",
+      "operation": "Create",
+      "configuration": {
+        "base": "NextNest_CRM",
+        "table": "Residential_Leads",
+        "fields": {
+          "Name": "={{$json.name}}",
+          "Email": "={{$json.email}}",
+          "Phone": "={{$json.phone}}",
+          "Property Type": "={{$json.propertyType}}",
+          "Loan Amount": "={{$json.loanQuantum}}",
+          "Property Value": "={{$json.propertyValue}}",
+          "Monthly Savings": "={{$json.potentialMonthlySavings}}",
+          "Lead Score": "={{$json.leadScore}}",
+          "Timeline": "={{$json.timeline}}",
+          "Source": "Website Calculator",
+          "Status": "New Lead",
+          "Created": "={{$json.processedAt}}"
+        }
+      }
+    },
+
+    "step_5_immediate_response": {
+      "node_type": "Email",
+      "description": "Send immediate confirmation email",
+      "configuration": {
+        "to": "={{$json.email}}",
+        "subject": "Your Singapore Mortgage Analysis - NextNest",
+        "html": "<!DOCTYPE html>\n<html>\n<body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>\n  <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>\n    <h2 style='color: #4A90E2;'>Your Mortgage Analysis Request Confirmed</h2>\n    \n    <p>Hi {{$json.name.split(' ')[0]}},</p>\n    \n    <p>Thank you for using our Singapore Mortgage Calculator. We're already analyzing all 286 bank packages to find your optimal solution.</p>\n    \n    <div style='background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;'>\n      <h3 style='margin-top: 0; color: #2d3748;'>Your Analysis Summary:</h3>\n      <ul style='margin: 0;'>\n        <li><strong>Property Value:</strong> ${{$json.propertyValue.toLocaleString()}} SGD</li>\n        <li><strong>Loan Amount:</strong> ${{$json.loanQuantum.toLocaleString()}} SGD</li>\n        <li><strong>Property Type:</strong> {{$json.propertyType}}</li>\n        <li><strong>Potential Monthly Savings:</strong> ${{$json.potentialMonthlySavings.toFixed(0)}} SGD</li>\n      </ul>\n    </div>\n    \n    <p><strong>What happens next:</strong></p>\n    <ol>\n      <li>Our AI analyzes your situation against all available packages</li>\n      <li>We prepare your personalized optimization report</li>\n      <li>You'll receive your complete analysis within 24 hours</li>\n      <li>Optional: Schedule a 15-minute call to discuss options</li>\n    </ol>\n    \n    <p>Questions? Reply to this email or WhatsApp us at <strong>+65 8888 8888</strong></p>\n    \n    <p>Best regards,<br>\n    The NextNest Team<br>\n    Singapore's Most Transparent Mortgage Advisor</p>\n  </div>\n</body>\n</html>"
+      }
+    },
+
+    "step_6_internal_notification": {
+      "node_type": "Telegram",
+      "description": "Notify team of new high-value lead",
+      "condition": "={{$json.leadScore >= 8}}",
+      "configuration": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "🎯 HIGH-VALUE LEAD ALERT\n\n" +
+               "Name: {{$json.name}}\n" +
+               "Property: {{$json.propertyType}} - ${{$json.propertyValue.toLocaleString()}}\n" +
+               "Loan: ${{$json.loanQuantum.toLocaleString()}}\n" +
+               "Savings: ${{$json.potentialMonthlySavings}}/month\n" +
+               "Timeline: {{$json.timeline}}\n" +
+               "Lead Score: {{$json.leadScore}}/10\n\n" +
+               "CRM: {{$json.routing.crm}}\n" +
+               "Priority: {{$json.routing.priority}}"
+      }
+    }
+  },
+
+  "testing_payload": {
+    "description": "Sample payload for testing webhook integration",
+    "sample_data": {
+      "loanQuantum": 640000,
+      "propertyValue": 800000,
+      "currentBank": "DBS",
+      "propertyType": "Private",
+      "timeline": "immediate",
+      "ltvRatio": 80.0,
+      "potentialMonthlySavings": 247,
+      "refinancingCostBenefit": 73890,
+      "name": "John Tan Wei Ming",
+      "email": "john.tan@example.com",
+      "phone": "+6591234567",
+      "source": "website_calculator",
+      "timestamp": "2025-08-27T12:00:00.000Z",
+      "calculationResults": {
+        "monthlyPayment": 2456,
+        "totalInterest": 296420,
+        "ltvRatio": 80.0,
+        "tdsr": 35.2,
+        "msr": 28.1,
+        "potentialSavings": 247,
+        "refinancingCostBenefit": 73890,
+        "breakEvenPeriod": 16.2
+      }
+    }
+  },
+
+  "error_handling": {
+    "webhook_timeout": 30000,
+    "retry_attempts": 3,
+    "fallback_actions": [
+      {
+        "condition": "webhook_failure",
+        "action": "save_to_spreadsheet",
+        "notification": "telegram_alert"
+      },
+      {
+        "condition": "crm_failure", 
+        "action": "email_to_admin",
+        "data_backup": "google_sheets"
+      }
+    ]
+  },
+
+  "compliance_settings": {
+    "data_retention": "2_years",
+    "consent_tracking": true,
+    "pdpa_compliance": {
+      "purpose": "Mortgage consultation and financial advisory services",
+      "consent_method": "explicit_checkbox",
+      "withdrawal_process": "email_unsubscribe_link"
+    },
+    "security_headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-XSS-Protection": "1; mode=block"
+    }
+  }
+}

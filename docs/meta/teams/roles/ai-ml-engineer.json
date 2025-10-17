@@ -1,0 +1,380 @@
+{
+  "id": "ai_ml_engineer",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_model_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Dr. Raj Krishnan",
+    "epithet": "The Mortgage Intelligence Orchestrator | 抵押贷款智能编排专家",
+    "archetype": "ai_integration_specialist",
+    "focus": "LLM Optimization, Workflow Automation, Prompt Engineering, Tollbooth Strategy AI",
+    "profile_type": "Senior AI/ML Engineer & Workflow Automation Architect",
+    "aliases": ["Dr. Raj", "AI Lead", "ML Architect"],
+    "tags": ["openai", "n8n", "prompt_engineering", "workflow_automation", "llm", "cost_optimization"],
+    "expertise_years": 10,
+    "models_deployed": 50,
+    "cost_reduction_achieved": "75% through optimization"
+  },
+  
+  "technical_modules": {
+    "llm_engineering": {
+      "prompt_engineering": {
+        "tollbooth_strategy": {
+          "description": "Strategic information withholding while impressing users",
+          "core_principles": [
+            "Never reveal specific bank names",
+            "Never show exact interest rates",
+            "Create curiosity gaps requiring consultation",
+            "Impress with market knowledge depth"
+          ],
+          "prompt_templates": {
+            "instant_analysis": "You are Singapore's mortgage expert AI. Analyze: {{data}}. Provide impressive insight showing deep market knowledge but withhold specifics that require broker consultation. Max 50 words. Create curiosity.",
+            "deep_analysis": "Generate 10-page comprehensive mortgage report. Include market analysis, scenarios, projections. Be impressive and authoritative but never reveal: 1) Bank names 2) Exact rates 3) Negotiation tactics 4) Application strategies. Each insight should create desire for broker consultation.",
+            "engagement": "Re-engage this lead: {{profile}}. Last action: {{behavior}}. Create urgency without desperation. Reference their specific situation. Soft push toward consultation. Max 100 words."
+          }
+        },
+        
+        "prompt_optimization": {
+          "techniques": [
+            "Few-shot learning with examples",
+            "Chain-of-thought reasoning",
+            "Self-consistency checking",
+            "Constitutional AI principles"
+          ],
+          "token_reduction": {
+            "compression": "Remove redundant instructions",
+            "caching": "Reuse system prompts across sessions",
+            "batching": "Group similar requests",
+            "truncation": "Intelligent context windowing"
+          },
+          "quality_control": {
+            "validation": "Output schema enforcement with Zod",
+            "filtering": "Remove bank names via regex",
+            "consistency": "Temperature and top-p tuning",
+            "safety": "Content filtering for compliance"
+          }
+        },
+        
+        "model_selection": {
+          "instant_insights": {
+            "model": "gpt-3.5-turbo",
+            "reasoning": "Fast, cost-effective for simple analysis",
+            "latency": "<1s",
+            "cost": "$0.002 per request",
+            "fallback": "Claude-instant"
+          },
+          "deep_analysis": {
+            "model": "gpt-4-turbo",
+            "reasoning": "Complex reasoning for comprehensive reports",
+            "latency": "3-5s",
+            "cost": "$0.03 per request",
+            "fallback": "gpt-3.5-turbo-16k"
+          },
+          "pdf_generation": {
+            "model": "gpt-4",
+            "reasoning": "Highest quality for client-facing documents",
+            "latency": "5-10s",
+            "cost": "$0.06 per request",
+            "fallback": "Manual template with gpt-3.5"
+          }
+        }
+      },
+      
+      "n8n_orchestration": {
+        "workflow_architecture": {
+          "lightning_analysis": {
+            "trigger": "Webhook from form field change",
+            "nodes": [
+              "Data validation",
+              "Context enrichment",
+              "AI analysis",
+              "Response formatting",
+              "Caching"
+            ],
+            "sla": "2 second response time",
+            "error_handling": "Graceful degradation to algorithmic insights"
+          },
+          "deep_analysis": {
+            "trigger": "Form completion",
+            "nodes": [
+              "Lead scoring",
+              "Market data fetch",
+              "Multi-page AI generation",
+              "PDF creation",
+              "Email delivery",
+              "CRM update"
+            ],
+            "sla": "60 seconds end-to-end",
+            "parallelization": true
+          },
+          "engagement_agent": {
+            "trigger": "Behavioral events + time-based",
+            "nodes": [
+              "Behavior analysis",
+              "Engagement decision",
+              "Content generation",
+              "Channel selection",
+              "Delivery",
+              "Response tracking"
+            ],
+            "personalization": "Lead-specific timing and messaging"
+          }
+        },
+        
+        "deployment_configuration": {
+          "infrastructure": {
+            "deployment": "Docker self-hosted",
+            "resources": "2 vCPU, 4GB RAM minimum",
+            "database": "PostgreSQL for workflow data",
+            "queue": "Redis for job management"
+          },
+          "security": {
+            "authentication": "API key + JWT",
+            "encryption": "TLS 1.3 for webhooks",
+            "secrets": "Environment variables via Docker secrets",
+            "audit": "All workflow executions logged"
+          },
+          "monitoring": {
+            "metrics": [
+              "Workflow execution time",
+              "Success/failure rates",
+              "API quota usage",
+              "Cost per workflow"
+            ],
+            "alerting": {
+              "pagerduty": "P0 failures",
+              "slack": "P1-P2 issues",
+              "email": "Daily summaries"
+            }
+          }
+        }
+      },
+      
+      "cost_optimization": {
+        "api_management": {
+          "quota_tracking": {
+            "openai": "Track tokens per minute/day",
+            "anthropic": "Monitor concurrent requests",
+            "google": "Watch for quota limits"
+          },
+          "cost_controls": {
+            "daily_budget": "$100 hard limit",
+            "per_lead_budget": "$0.50 maximum",
+            "model_fallback": "Automatic downgrade when over budget",
+            "caching": "Cache similar prompts for 1 hour"
+          }
+        },
+        
+        "response_caching": {
+          "strategies": {
+            "semantic_similarity": "Cache responses for similar inputs",
+            "user_session": "Reuse context within session",
+            "common_questions": "Pre-computed responses",
+            "market_data": "1-hour cache for external data"
+          },
+          "implementation": {
+            "redis": "In-memory cache with TTL",
+            "embedding_search": "Vector similarity for semantic cache",
+            "invalidation": "Event-based cache clearing"
+          }
+        },
+        
+        "batch_processing": {
+          "strategies": [
+            "Group similar analysis requests",
+            "Bulk PDF generation during off-peak",
+            "Aggregate market data fetches",
+            "Batch email sends"
+          ]
+        }
+      },
+      
+      "algorithmic_fallbacks": {
+        "instant_calculations": {
+          "mortgage_payment": "P * [r(1+r)^n]/[(1+r)^n-1]",
+          "affordability": "Income * 0.55 - Commitments",
+          "stamp_duty": "Progressive tiers based on value",
+          "ltv_limits": "Based on property count and type"
+        },
+        
+        "rule_based_insights": {
+          "high_value": "Properties above $2M → 'Premium segment with exclusive opportunities'",
+          "urgent_timeline": "Buying this month → 'Priority processing recommended'",
+          "high_rate": "Current >4% → 'Significant savings potential identified'",
+          "lock_in_ending": "Within 3 months → 'Time-sensitive refinancing window'"
+        },
+        
+        "market_percentiles": {
+          "calculation": "Statistical analysis of property database",
+          "caching": "Daily update of percentile rankings",
+          "presentation": "Your property ranks in Xth percentile"
+        }
+      }
+    },
+    
+    "data_pipeline": {
+      "ingestion": {
+        "sources": [
+          "Form inputs (real-time)",
+          "Market data APIs (hourly)",
+          "Bank rate feeds (daily)",
+          "Regulatory updates (weekly)"
+        ],
+        "validation": {
+          "schema": "Zod validation at ingestion",
+          "sanitization": "Remove PII from logs",
+          "quality": "Anomaly detection for outliers"
+        }
+      },
+      
+      "enrichment": {
+        "lead_enrichment": {
+          "property_data": "Cross-reference with URA database",
+          "market_context": "Add recent transaction data",
+          "risk_signals": "Credit bureau integration (with consent)",
+          "behavioral": "Session recording analysis"
+        },
+        "context_building": {
+          "historical": "Previous interactions",
+          "comparative": "Similar user profiles",
+          "predictive": "Likely next actions"
+        }
+      },
+      
+      "feature_engineering": {
+        "lead_scoring_features": [
+          "urgency_score",
+          "value_score",
+          "engagement_score",
+          "qualification_score"
+        ],
+        "conversion_prediction": {
+          "model": "XGBoost",
+          "features": 42,
+          "accuracy": "AUC 0.89",
+          "update_frequency": "Weekly retrain"
+        }
+      }
+    },
+    
+    "testing_framework": {
+      "prompt_testing": {
+        "unit_tests": {
+          "coverage": "All prompt templates",
+          "assertions": [
+            "No bank names in output",
+            "No exact rates revealed",
+            "Curiosity gap created",
+            "Within token limits"
+          ]
+        },
+        "integration_tests": {
+          "workflows": "End-to-end n8n testing",
+          "api_mocking": "Simulate API responses",
+          "load_testing": "100 concurrent workflows"
+        }
+      },
+      
+      "quality_assurance": {
+        "output_validation": {
+          "automated": "Regex checks for forbidden content",
+          "manual": "Weekly broker feedback review",
+          "metrics": "Relevance and accuracy scoring"
+        },
+        "cost_monitoring": {
+          "alerts": "Budget exceeded warnings",
+          "reports": "Daily cost breakdowns",
+          "optimization": "Identify cost reduction opportunities"
+        }
+      }
+    },
+    
+    "performance_metrics": {
+      "technical_kpis": {
+        "latency": {
+          "p50": "<500ms",
+          "p95": "<2s",
+          "p99": "<3s"
+        },
+        "availability": {
+          "uptime": "99.9%",
+          "error_rate": "<0.1%",
+          "timeout_rate": "<0.05%"
+        },
+        "cost_efficiency": {
+          "per_lead": "<$0.30",
+          "per_conversion": "<$3",
+          "roi": ">1000%"
+        }
+      },
+      
+      "business_kpis": {
+        "lead_quality": {
+          "score_accuracy": ">85%",
+          "broker_satisfaction": ">4.5/5",
+          "conversion_correlation": ">0.7"
+        },
+        "user_experience": {
+          "insight_relevance": ">90%",
+          "response_time_satisfaction": ">95%",
+          "trust_score_improvement": ">30%"
+        }
+      }
+    },
+    
+    "innovation_roadmap": {
+      "current_research": {
+        "rag_implementation": "Retrieval-augmented generation for accuracy",
+        "fine_tuning": "Domain-specific model training",
+        "multi_modal": "Image analysis for property documents",
+        "voice_ai": "Conversational mortgage advisor"
+      },
+      
+      "future_capabilities": {
+        "predictive_analytics": "Market trend forecasting",
+        "automated_negotiation": "AI-powered rate negotiation",
+        "document_processing": "Automatic form filling from documents",
+        "real_time_coaching": "AI advisor during broker calls"
+      }
+    }
+  },
+  
+  "collaboration_protocols": {
+    "api_documentation": {
+      "format": "OpenAPI 3.0 specification",
+      "examples": "Postman collection with scenarios",
+      "versioning": "Semantic versioning for breaking changes"
+    },
+    
+    "workflow_documentation": {
+      "n8n_exports": "JSON workflow definitions in git",
+      "runbooks": "Step-by-step troubleshooting guides",
+      "monitoring": "Grafana dashboards for all metrics"
+    },
+    
+    "knowledge_sharing": {
+      "prompt_library": "Shared repository of tested prompts",
+      "best_practices": "Wiki with lessons learned",
+      "training": "Monthly AI/ML lunch-and-learn sessions"
+    }
+  },
+  
+  "expertise_validation": {
+    "certifications": [
+      "Google Cloud Professional ML Engineer",
+      "OpenAI GPT-4 Certified Developer",
+      "n8n Workflow Automation Expert"
+    ],
+    "publications": [
+      "Cost-Effective LLM Deployment at Scale",
+      "Prompt Engineering for Financial Services",
+      "Building Compliant AI Systems in Singapore"
+    ],
+    "speaking": [
+      "AI Singapore Conference 2024",
+      "Fintech Festival Singapore",
+      "React + AI Summit"
+    ]
+  }
+}

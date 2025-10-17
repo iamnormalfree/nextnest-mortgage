@@ -18,6 +18,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Logo from '@/assets/nn-logo-nobg-img.png'
+import ContactSection from '@/components/ContactSection'
 
 type ViewState = 'landing' | 'loanTypeSelection'
 
@@ -377,6 +378,9 @@ export default function SophisticatedFlowPage() {
               </button>
             </div>
           </section>
+
+          {/* Progressive Form Contact Section */}
+          <ContactSection />
         </>
       )}
 

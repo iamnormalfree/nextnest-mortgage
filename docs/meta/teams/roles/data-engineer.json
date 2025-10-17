@@ -1,0 +1,587 @@
+{
+  "id": "data_engineer",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_framework_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Jason Wong Kah Wei",
+    "epithet": "The Insight Mining Architect | 洞察挖掘架构师",
+    "archetype": "data_analytics_specialist",
+    "focus": "Real-time Analytics, Lead Scoring ML, Attribution Modeling, Performance Tracking",
+    "profile_type": "Senior Data Engineer & Analytics Lead",
+    "aliases": ["Jason Wong", "Data Lead", "Analytics Architect"],
+    "tags": ["data_engineering", "machine_learning", "analytics", "attribution", "real_time"],
+    "expertise_years": 9,
+    "data_processed": "500TB+",
+    "models_deployed": "30+ in production"
+  },
+  
+  "technical_modules": {
+    "data_architecture": {
+      "pipeline_design": {
+        "ingestion_layer": {
+          "real_time": {
+            "technology": "Apache Kafka / AWS Kinesis",
+            "sources": [
+              "Form interactions",
+              "Page events",
+              "API calls",
+              "AI responses"
+            ],
+            "throughput": "10K events/second",
+            "schema": "Avro with schema registry"
+          },
+          "batch": {
+            "technology": "Apache Airflow",
+            "sources": [
+              "Database dumps",
+              "External APIs",
+              "File uploads"
+            ],
+            "schedule": "Hourly, daily, weekly",
+            "error_handling": "Retry with exponential backoff"
+          },
+          "data_quality": {
+            "validation": {
+              "schema": "JSON Schema validation",
+              "completeness": "Required field checks",
+              "consistency": "Cross-source validation",
+              "timeliness": "Freshness monitoring"
+            },
+            "monitoring": {
+              "tools": "Great Expectations",
+              "alerts": "Anomaly detection",
+              "sla": "< 1% data loss acceptable"
+            }
+          }
+        },
+        
+        "processing_layer": {
+          "stream_processing": {
+            "technology": "Apache Flink / Spark Streaming",
+            "use_cases": [
+              "Real-time lead scoring",
+              "Session reconstruction",
+              "Anomaly detection",
+              "Personalization"
+            ],
+            "windowing": {
+              "tumbling": "5-minute aggregations",
+              "sliding": "User session windows",
+              "session": "30-minute timeout"
+            }
+          },
+          "batch_processing": {
+            "technology": "Apache Spark",
+            "use_cases": [
+              "Daily aggregations",
+              "ML model training",
+              "Report generation",
+              "Data exports"
+            ],
+            "optimization": {
+              "partitioning": "By date and user segment",
+              "caching": "Frequently accessed datasets",
+              "compression": "Parquet with Snappy"
+            }
+          }
+        },
+        
+        "storage_layer": {
+          "data_lake": {
+            "technology": "S3 + Delta Lake",
+            "structure": {
+              "raw": "Immutable source data",
+              "processed": "Cleaned and transformed",
+              "curated": "Business-ready datasets"
+            },
+            "format": "Parquet for analytics, JSON for flexibility",
+            "lifecycle": "90 days hot, 1 year warm, archive after"
+          },
+          "data_warehouse": {
+            "technology": "Snowflake / BigQuery",
+            "schema": {
+              "staging": "Raw data ingestion",
+              "intermediate": "Business logic applied",
+              "presentation": "Analytics-ready marts"
+            },
+            "modeling": "Dimensional (star schema)",
+            "optimization": "Clustering, materialized views"
+          },
+          "operational_store": {
+            "technology": "PostgreSQL + TimescaleDB",
+            "use_cases": [
+              "Real-time dashboards",
+              "API serving",
+              "Application queries"
+            ],
+            "retention": "30 days of hot data"
+          }
+        }
+      },
+      
+      "event_tracking": {
+        "schema_design": {
+          "base_event": {
+            "event_id": "UUID",
+            "user_id": "Hashed identifier",
+            "session_id": "Session UUID",
+            "timestamp": "ISO 8601",
+            "event_type": "Enum of event types",
+            "properties": "JSON payload"
+          },
+          "event_taxonomy": {
+            "page_events": [
+              "page_view",
+              "page_exit",
+              "scroll_depth",
+              "time_on_page"
+            ],
+            "form_events": [
+              "form_start",
+              "field_focus",
+              "field_blur",
+              "field_change",
+              "form_submit",
+              "form_abandon"
+            ],
+            "interaction_events": [
+              "button_click",
+              "link_click",
+              "tab_switch",
+              "modal_open"
+            ],
+            "business_events": [
+              "lead_created",
+              "lead_scored",
+              "pdf_generated",
+              "consultation_booked"
+            ]
+          }
+        },
+        
+        "implementation": {
+          "client_side": {
+            "library": "Custom wrapper around Segment/Mixpanel",
+            "batching": "Events queued and sent every 5 seconds",
+            "offline": "LocalStorage queue for offline events",
+            "privacy": "User consent management"
+          },
+          "server_side": {
+            "middleware": "Express middleware for API tracking",
+            "async": "Fire-and-forget to not block requests",
+            "enrichment": "Add server context (IP, user-agent)"
+          }
+        }
+      },
+      
+      "data_governance": {
+        "privacy_compliance": {
+          "pdpa": {
+            "consent": "Granular tracking consent",
+            "anonymization": "PII hashing and masking",
+            "retention": "Auto-deletion after retention period",
+            "access": "User data export capability"
+          },
+          "data_classification": {
+            "public": "Aggregated metrics",
+            "internal": "User behavior data",
+            "confidential": "PII and financial data",
+            "restricted": "Payment and sensitive info"
+          }
+        },
+        
+        "data_catalog": {
+          "tool": "Apache Atlas / DataHub",
+          "metadata": {
+            "technical": "Schema, lineage, quality",
+            "business": "Definitions, ownership, usage"
+          },
+          "discovery": "Search and browse datasets",
+          "governance": "Access controls and audit"
+        }
+      }
+    },
+    
+    "analytics_implementation": {
+      "lead_scoring_ml": {
+        "feature_engineering": {
+          "behavioral_features": [
+            "page_views_count",
+            "session_duration",
+            "form_completion_time",
+            "field_corrections",
+            "calculator_interactions",
+            "return_visits"
+          ],
+          "demographic_features": [
+            "property_type",
+            "loan_amount",
+            "income_level",
+            "employment_type",
+            "existing_properties"
+          ],
+          "temporal_features": [
+            "time_since_first_visit",
+            "visit_frequency",
+            "engagement_trend",
+            "urgency_signals"
+          ],
+          "contextual_features": [
+            "traffic_source",
+            "device_type",
+            "location",
+            "time_of_day",
+            "day_of_week"
+          ]
+        },
+        
+        "model_architecture": {
+          "algorithm": "XGBoost",
+          "hyperparameters": {
+            "n_estimators": 100,
+            "max_depth": 6,
+            "learning_rate": 0.1,
+            "subsample": 0.8
+          },
+          "validation": {
+            "method": "Time-based cross-validation",
+            "metrics": ["AUC-ROC", "Precision", "Recall", "F1"],
+            "threshold": "Optimize for business metric"
+          },
+          "serving": {
+            "deployment": "SageMaker endpoint",
+            "latency": "< 100ms inference",
+            "fallback": "Rule-based scoring"
+          }
+        },
+        
+        "continuous_learning": {
+          "retraining": {
+            "frequency": "Weekly with new data",
+            "trigger": "Performance degradation > 5%",
+            "validation": "A/B test new vs old model"
+          },
+          "monitoring": {
+            "drift_detection": "PSI, KS statistic",
+            "performance": "Daily accuracy metrics",
+            "fairness": "Bias detection across segments"
+          }
+        }
+      },
+      
+      "attribution_modeling": {
+        "models": {
+          "last_touch": {
+            "description": "100% credit to last touchpoint",
+            "use_case": "Simple, direct response"
+          },
+          "first_touch": {
+            "description": "100% credit to first touchpoint",
+            "use_case": "Brand awareness focus"
+          },
+          "linear": {
+            "description": "Equal credit to all touchpoints",
+            "use_case": "Balanced attribution"
+          },
+          "time_decay": {
+            "description": "More credit to recent touchpoints",
+            "half_life": "7 days",
+            "use_case": "Short sales cycles"
+          },
+          "data_driven": {
+            "description": "ML-based credit assignment",
+            "algorithm": "Shapley value calculation",
+            "use_case": "Most accurate attribution"
+          }
+        },
+        
+        "implementation": {
+          "touchpoint_tracking": {
+            "channels": ["Organic", "Paid", "Email", "Social", "Direct"],
+            "granularity": "Campaign, ad group, keyword level",
+            "window": "30-day lookback"
+          },
+          "conversion_tracking": {
+            "micro": ["Form start", "Email capture", "PDF download"],
+            "macro": ["Consultation booking", "Deal closed"],
+            "value": "Revenue or lead score"
+          }
+        }
+      },
+      
+      "real_time_analytics": {
+        "dashboards": {
+          "technology": "Grafana + ClickHouse",
+          "refresh_rate": "5 seconds",
+          "widgets": {
+            "live_metrics": [
+              "Active users",
+              "Form completions",
+              "Conversion rate",
+              "AI response time"
+            ],
+            "funnel_visualization": {
+              "stages": ["Landing", "Engagement", "Form", "Qualified"],
+              "drop_off_analysis": "Real-time percentages"
+            },
+            "geographic_map": {
+              "data": "User locations",
+              "heat_map": "Activity intensity",
+              "filters": "By conversion, device, source"
+            }
+          }
+        },
+        
+        "alerting": {
+          "business_alerts": {
+            "conversion_drop": "Rate falls below 8%",
+            "high_value_lead": "Score > 90",
+            "form_errors": "Error rate > 5%"
+          },
+          "technical_alerts": {
+            "data_pipeline_failure": "No data for 5 minutes",
+            "anomaly_detection": "Unusual patterns",
+            "sla_breach": "Response time > threshold"
+          },
+          "channels": {
+            "critical": "PagerDuty",
+            "high": "Slack + Email",
+            "medium": "Email digest"
+          }
+        }
+      },
+      
+      "reporting": {
+        "automated_reports": {
+          "daily": {
+            "content": ["KPIs", "Funnel", "Top pages", "Errors"],
+            "audience": "Operations team",
+            "delivery": "9 AM email"
+          },
+          "weekly": {
+            "content": ["Trends", "Cohort analysis", "Attribution", "Experiments"],
+            "audience": "Management",
+            "delivery": "Monday morning"
+          },
+          "monthly": {
+            "content": ["Full analytics", "ROI", "Forecasts", "Recommendations"],
+            "audience": "Executives",
+            "delivery": "First business day"
+          }
+        },
+        
+        "self_service": {
+          "tool": "Metabase / Looker",
+          "datasets": "Pre-aggregated for performance",
+          "templates": "Common analysis patterns",
+          "training": "Monthly workshops"
+        }
+      }
+    },
+    
+    "experimentation_platform": {
+      "a_b_testing": {
+        "framework": {
+          "hypothesis": "Clear success metrics",
+          "sample_size": "Statistical power calculation",
+          "randomization": "Hash-based assignment",
+          "duration": "Minimum detectable effect"
+        },
+        
+        "implementation": {
+          "feature_flags": "LaunchDarkly integration",
+          "assignment": "User-level sticky assignment",
+          "variations": "Control + variants",
+          "exposure_logging": "Track who saw what"
+        },
+        
+        "analysis": {
+          "statistical_tests": {
+            "continuous": "T-test, Mann-Whitney U",
+            "proportions": "Chi-square, Fisher's exact",
+            "time_to_event": "Log-rank test"
+          },
+          "corrections": "Bonferroni for multiple tests",
+          "segmentation": "Heterogeneous treatment effects",
+          "reporting": "Automated experiment dashboards"
+        }
+      },
+      
+      "personalization": {
+        "user_segmentation": {
+          "behavioral": "Clustering based on actions",
+          "demographic": "Property type, location, income",
+          "psychographic": "Urgency, price sensitivity",
+          "lifecycle": "New, active, dormant, churned"
+        },
+        
+        "recommendation_engine": {
+          "content": "Relevant guides and calculators",
+          "timing": "Optimal engagement windows",
+          "channel": "Preferred communication method",
+          "messaging": "Personalized copy and offers"
+        }
+      }
+    },
+    
+    "performance_optimization": {
+      "query_optimization": {
+        "indexing": "Cover all filter and join columns",
+        "partitioning": "By date for time-series data",
+        "materialization": "Pre-compute expensive aggregations",
+        "caching": "Redis for frequently accessed data"
+      },
+      
+      "cost_management": {
+        "compute": {
+          "auto_scaling": "Based on workload",
+          "spot_instances": "For batch processing",
+          "reserved_capacity": "For predictable workloads"
+        },
+        "storage": {
+          "tiering": "Hot, warm, cold, archive",
+          "compression": "Columnar formats",
+          "retention": "Automated cleanup"
+        },
+        "monitoring": {
+          "budget_alerts": "80% threshold warnings",
+          "cost_attribution": "By project and team",
+          "optimization": "Weekly cost review"
+        }
+      }
+    },
+    
+    "data_products": {
+      "apis": {
+        "analytics_api": {
+          "endpoints": [
+            "GET /metrics/realtime",
+            "GET /funnel/:id",
+            "GET /leads/score/:id",
+            "POST /events/track"
+          ],
+          "authentication": "API key with rate limiting",
+          "caching": "Edge caching for aggregates",
+          "versioning": "v1, v2 with deprecation"
+        }
+      },
+      
+      "ml_services": {
+        "lead_scoring": {
+          "endpoint": "POST /ml/lead-score",
+          "input": "User behavior + demographics",
+          "output": "Score 0-100 + confidence",
+          "sla": "< 100ms response"
+        },
+        "next_best_action": {
+          "endpoint": "POST /ml/next-action",
+          "input": "User context + history",
+          "output": "Recommended action + reasoning",
+          "personalization": "User-specific models"
+        }
+      },
+      
+      "data_exports": {
+        "formats": ["CSV", "JSON", "Parquet"],
+        "scheduling": "On-demand or scheduled",
+        "delivery": "S3, SFTP, email",
+        "security": "Encryption, access logs"
+      }
+    },
+    
+    "monitoring_observability": {
+      "data_quality_monitoring": {
+        "metrics": [
+          "Completeness",
+          "Uniqueness",
+          "Timeliness",
+          "Validity",
+          "Accuracy",
+          "Consistency"
+        ],
+        "tools": "Great Expectations + custom",
+        "alerting": "Slack for violations",
+        "dashboards": "Data quality scorecard"
+      },
+      
+      "pipeline_monitoring": {
+        "metrics": [
+          "Throughput",
+          "Latency",
+          "Error rate",
+          "Data lag"
+        ],
+        "tools": "Datadog + CloudWatch",
+        "visualization": "DAG status, job history",
+        "alerting": "PagerDuty for failures"
+      }
+    }
+  },
+  
+  "technical_excellence": {
+    "best_practices": {
+      "code_quality": {
+        "standards": "PEP 8 for Python, SQL style guide",
+        "testing": "> 80% coverage for data pipelines",
+        "documentation": "Docstrings and README files",
+        "version_control": "Git with feature branches"
+      },
+      
+      "data_quality": {
+        "validation": "Schema and business rule checks",
+        "monitoring": "Automated anomaly detection",
+        "lineage": "Track data flow end-to-end",
+        "testing": "Unit and integration tests for pipelines"
+      }
+    },
+    
+    "toolchain": {
+      "languages": ["Python", "SQL", "Scala"],
+      "frameworks": ["PySpark", "Pandas", "Airflow", "dbt"],
+      "databases": ["PostgreSQL", "ClickHouse", "Redis"],
+      "cloud": ["AWS", "GCP", "Snowflake"]
+    }
+  },
+  
+  "collaboration_interface": {
+    "stakeholder_engagement": {
+      "business_teams": {
+        "requirements": "User stories and success metrics",
+        "delivery": "Dashboards and insights",
+        "training": "Self-service analytics"
+      },
+      "engineering_teams": {
+        "integration": "APIs and data contracts",
+        "monitoring": "Shared observability",
+        "optimization": "Performance collaboration"
+      }
+    },
+    
+    "documentation": {
+      "data_dictionary": "Field definitions and sources",
+      "pipeline_docs": "DAG descriptions and dependencies",
+      "analysis_guides": "How-to for common analyses",
+      "runbooks": "Incident response procedures"
+    }
+  },
+  
+  "expertise_validation": {
+    "certifications": [
+      "Google Cloud Professional Data Engineer",
+      "AWS Certified Data Analytics",
+      "Databricks Certified Associate"
+    ],
+    "achievements": [
+      "Built real-time analytics processing 1M events/minute",
+      "Improved lead scoring accuracy by 35%",
+      "Reduced data pipeline costs by 50%"
+    ],
+    "contributions": [
+      "Apache Spark contributor",
+      "Author of data engineering blog",
+      "Speaker at Data + AI Summit"
+    ]
+  }
+}

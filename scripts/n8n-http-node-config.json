@@ -1,0 +1,41 @@
+{
+  "node": "HTTP Request",
+  "name": "Check Existing Broker via REST",
+  "type": "n8n-nodes-base.httpRequest",
+  "parameters": {
+    "method": "GET",
+    "url": "=https://[YOUR-PROJECT-REF].supabase.co/rest/v1/broker_conversations",
+    "authentication": "genericCredentialType",
+    "genericAuthType": "httpHeaderAuth",
+    "sendHeaders": true,
+    "headerParameters": {
+      "parameters": [
+        {
+          "name": "apikey",
+          "value": "[YOUR-SUPABASE-ANON-KEY]"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer [YOUR-SUPABASE-ANON-KEY]"
+        }
+      ]
+    },
+    "sendQuery": true,
+    "queryParameters": {
+      "parameters": [
+        {
+          "name": "conversation_id",
+          "value": "=eq.{{$json[\"conversationId\"]}}"
+        },
+        {
+          "name": "status",
+          "value": "eq.active"
+        },
+        {
+          "name": "select",
+          "value": "*,ai_brokers(*)"
+        }
+      ]
+    }
+  }
+}

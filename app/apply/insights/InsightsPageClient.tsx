@@ -57,7 +57,7 @@ export function InsightsPageClient({ initialMobileState }: InsightsPageClientPro
         // Note: ResponsiveBrokerShell will handle the fallback internally
       }
     }
-  }, [sessionId])
+  }, [sessionId, conversationParam])
 
   useEffect(() => {
     // Simulate fetching AI analysis results
@@ -118,7 +118,7 @@ export function InsightsPageClient({ initialMobileState }: InsightsPageClientPro
     }
 
     fetchAnalysis()
-  }, [sessionId])  // Removed setInsights - it should be a stable function
+  }, [sessionId, setInsights])
 
   const handleBrokerConsultation = () => {
     // If Chatwoot conversation exists, use it

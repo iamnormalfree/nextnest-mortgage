@@ -1,0 +1,11 @@
+{
+  "custom_models": [
+    {
+      "model_display_name": "GLM 4.6",
+      "model": "glm-4.6",
+      "base_url": "https://api.z.ai/api/anthropic",
+      "api_key": "5fb40b01ff8d4e92988b875b2bd2de71.hPhmOQnb3lSHCMhU",
+      "provider": "anthropic"
+    }
+  ]
+}

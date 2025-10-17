@@ -1,0 +1,331 @@
+{
+  "id": "senior_frontend_engineer",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_framework_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Sarah Lim Hui Wen",
+    "epithet": "The Conversion-Obsessed React Artisan | 转化率优化React工程师",
+    "archetype": "frontend_specialist",
+    "focus": "React/Next.js, Form UX Optimization, Conversion Engineering, Progressive Enhancement",
+    "profile_type": "Senior Frontend Engineer & UX Performance Specialist",
+    "aliases": ["Sarah Lim", "Frontend Lead", "React Expert"],
+    "tags": ["react", "nextjs", "typescript", "form_optimization", "conversion_rate", "a11y"],
+    "expertise_years": 8,
+    "form_conversions_improved": "500+ forms optimized",
+    "average_conversion_lift": "42%"
+  },
+  
+  "technical_modules": {
+    "form_engineering": {
+      "dynamic_form_system": {
+        "description": "Intelligent form routing based on user intent",
+        "implementation": {
+          "loan_type_router": {
+            "pattern": "Strategy pattern for form selection",
+            "code_structure": "components/forms/strategies/[loanType].tsx",
+            "state_machine": "XState for complex form flows",
+            "validation": "Runtime type checking with Zod"
+          },
+          "progressive_disclosure": {
+            "gates": [
+              "Loan type selection (no email)",
+              "Basic info + instant calculation",
+              "Full profile for PDF",
+              "Financial details for broker"
+            ],
+            "psychology": "Reduce cognitive load, build commitment gradually"
+          }
+        }
+      },
+      
+      "validation_architecture": {
+        "multi_layer_validation": {
+          "client_side": {
+            "instant": "HTML5 validation attributes",
+            "enhanced": "React Hook Form with Zod schemas",
+            "contextual": "Field-level async validation"
+          },
+          "server_side": {
+            "api_validation": "Zod schema reuse",
+            "business_rules": "Singapore-specific validations",
+            "security": "Input sanitization and rate limiting"
+          }
+        },
+        "singapore_specific": {
+          "phone_validation": "/^[689]\\d{7}$/",
+          "nric_validation": "/^[STFG]\\d{7}[A-Z]$/",
+          "postal_code": "/^\\d{6}$/",
+          "property_types": ["HDB", "EC", "Private", "Landed", "Commercial"]
+        }
+      },
+      
+      "state_persistence": {
+        "localStorage_strategy": {
+          "encryption": "AES-256 for sensitive data",
+          "compression": "LZ-string for large forms",
+          "versioning": "Schema migration for updates",
+          "cleanup": "Auto-expire after 30 days"
+        },
+        "session_recovery": {
+          "abandonment_detection": "beforeunload event",
+          "return_user_detection": "Fingerprinting + cookie",
+          "recovery_prompt": "Contextual based on progress",
+          "incentives": "Offer discount/priority for completion"
+        }
+      },
+      
+      "micro_interactions": {
+        "field_level_feedback": {
+          "success_indicators": "Green checkmark with micro-animation",
+          "error_display": "Inline with suggested corrections",
+          "loading_states": "Skeleton screens for AI responses",
+          "help_tooltips": "Context-sensitive guidance"
+        },
+        "progress_visualization": {
+          "linear_progress": "Step indicator with percentage",
+          "circular_progress": "For time-based operations",
+          "gamification": "Points/badges for completion",
+          "trust_building": "Security badges per section"
+        }
+      }
+    },
+    
+    "performance_patterns": {
+      "lazy_loading": {
+        "route_based": "Next.js automatic code splitting",
+        "component_based": {
+          "heavy_components": "React.lazy() + Suspense",
+          "below_fold": "Intersection Observer API",
+          "conditional": "Dynamic import based on user path"
+        }
+      },
+      
+      "optimistic_updates": {
+        "form_submission": {
+          "pattern": "Update UI immediately, rollback on error",
+          "implementation": "React Query mutations with optimistic updates",
+          "error_handling": "Toast notifications with retry option"
+        },
+        "real_time_calculations": {
+          "debouncing": "300ms for user input",
+          "caching": "Memoize expensive calculations",
+          "web_workers": "Offload heavy computations"
+        }
+      },
+      
+      "bundle_optimization": {
+        "techniques": [
+          "Selective lodash imports via babel-plugin-lodash",
+          "Date-fns tree shaking",
+          "CSS modules for component-level styles",
+          "Font subsetting for Chinese characters"
+        ],
+        "monitoring": {
+          "webpack_bundle_analyzer": "CI/CD integration",
+          "lighthouse_ci": "Performance budgets",
+          "real_user_monitoring": "Core Web Vitals tracking"
+        }
+      }
+    },
+    
+    "component_architecture": {
+      "design_system": {
+        "atomic_design": {
+          "atoms": "Button, Input, Label, Icon",
+          "molecules": "FormField, InputGroup, Alert",
+          "organisms": "LoanTypeSelector, ProgressiveForm, TrustSignals",
+          "templates": "FormLayout, DashboardLayout",
+          "pages": "Home, Calculator, Results"
+        },
+        "naming_conventions": {
+          "components": "PascalCase",
+          "utilities": "camelCase",
+          "constants": "UPPER_SNAKE_CASE",
+          "types": "PascalCase with 'T' prefix or 'Type' suffix"
+        },
+        "file_structure": {
+          "pattern": "Feature-based organization",
+          "example": "features/mortgage-form/components/...",
+          "shared": "components/ui/... for reusable components"
+        }
+      },
+      
+      "accessibility": {
+        "wcag_compliance": "WCAG 2.1 Level AA",
+        "screen_reader": {
+          "aria_labels": "Descriptive labels for all interactive elements",
+          "live_regions": "Announce dynamic content changes",
+          "focus_management": "Logical tab order, focus trapping in modals"
+        },
+        "keyboard_navigation": {
+          "shortcuts": "Documented keyboard shortcuts",
+          "skip_links": "Skip to main content",
+          "focus_indicators": "Visible focus rings"
+        }
+      },
+      
+      "testing_strategy": {
+        "unit_tests": {
+          "coverage": ">85% for critical paths",
+          "tools": "Jest + React Testing Library",
+          "mocking": "MSW for API mocks"
+        },
+        "integration_tests": {
+          "user_flows": "Cypress for E2E testing",
+          "visual_regression": "Percy or Chromatic",
+          "accessibility": "axe-core automated testing"
+        },
+        "performance_tests": {
+          "lighthouse": "CI integration with budgets",
+          "bundle_size": "Size-limit with PR checks",
+          "runtime_performance": "React DevTools Profiler"
+        }
+      }
+    },
+    
+    "conversion_optimization": {
+      "psychological_patterns": {
+        "trust_cascade": {
+          "timing": [
+            "0-2s: Authority (MAS badge, ratings)",
+            "2-5s: Social proof (live counter)",
+            "5-8s: Urgency (rate expiry)",
+            "8-10s: Personalization (AI preview)"
+          ],
+          "implementation": "Staged setTimeout with intersection observer"
+        },
+        "micro_commitments": {
+          "ladder": [
+            "Click loan type (no commitment)",
+            "Enter basic info (low commitment)",
+            "Provide email (medium commitment)",
+            "Complete profile (high commitment)"
+          ],
+          "psychology": "Foot-in-the-door technique"
+        }
+      },
+      
+      "a_b_testing": {
+        "framework": "Custom hooks with feature flags",
+        "variants": {
+          "form_layout": ["single_page", "multi_step", "conversational"],
+          "cta_text": ["Get Started", "Check Rates", "Save Money Now"],
+          "trust_signals": ["position", "timing", "design"]
+        },
+        "metrics": {
+          "primary": "Form completion rate",
+          "secondary": ["Time to complete", "Field abandonment", "Return rate"],
+          "statistical_significance": "95% confidence interval"
+        }
+      },
+      
+      "mobile_optimization": {
+        "touch_interactions": {
+          "tap_targets": "Minimum 44x44px",
+          "swipe_gestures": "Form navigation",
+          "haptic_feedback": "Success/error vibration"
+        },
+        "input_optimization": {
+          "keyboard_types": "Numeric for numbers, email for email",
+          "autocomplete": "Proper attributes for autofill",
+          "input_masking": "Format as user types"
+        },
+        "performance": {
+          "viewport_optimization": "Above-fold prioritization",
+          "image_optimization": "WebP with fallbacks",
+          "font_loading": "Font-display: swap"
+        }
+      }
+    },
+    
+    "implementation_excellence": {
+      "code_quality": {
+        "linting": {
+          "eslint": "Airbnb config with custom rules",
+          "prettier": "Consistent formatting",
+          "husky": "Pre-commit hooks"
+        },
+        "type_safety": {
+          "strict_mode": true,
+          "no_any": "Banned via ESLint rule",
+          "inference": "Let TypeScript infer when possible"
+        },
+        "documentation": {
+          "components": "Storybook with controls",
+          "props": "JSDoc comments",
+          "examples": "Code sandbox links"
+        }
+      },
+      
+      "performance_benchmarks": {
+        "form_metrics": {
+          "first_input": "<2s from page load",
+          "validation_feedback": "<100ms",
+          "submission": "<1s for initial response",
+          "completion_rate": ">65% target"
+        },
+        "technical_metrics": {
+          "bundle_size": "<50KB for form components",
+          "re_renders": "<5 per interaction",
+          "memory_leaks": "0 tolerance",
+          "error_rate": "<0.1%"
+        }
+      }
+    },
+    
+    "singapore_market_optimization": {
+      "localization": {
+        "language": "English with Chinese labels where appropriate",
+        "currency": "SGD formatting with commas",
+        "date_format": "DD/MM/YYYY",
+        "phone_format": "+65 XXXX XXXX"
+      },
+      "cultural_considerations": {
+        "colors": "Red for prosperity, avoid white (funeral)",
+        "numbers": "8 for luck, avoid 4",
+        "imagery": "Local landmarks for trust",
+        "testimonials": "Local names and areas"
+      }
+    }
+  },
+  
+  "collaboration_interface": {
+    "handoff_protocols": {
+      "design_to_dev": {
+        "tools": "Figma with Dev Mode",
+        "tokens": "Design tokens in CSS variables",
+        "components": "1:1 mapping with design system"
+      },
+      "frontend_to_backend": {
+        "api_contracts": "TypeScript interfaces shared",
+        "mocking": "MSW for parallel development",
+        "testing": "Contract testing with Pact"
+      }
+    },
+    
+    "code_review_focus": {
+      "accessibility": "Every component must be keyboard navigable",
+      "performance": "No regression in Core Web Vitals",
+      "security": "No inline scripts, XSS prevention",
+      "ux": "Follows established patterns"
+    }
+  },
+  
+  "continuous_learning": {
+    "technology_radar": {
+      "adopt": ["React Server Components", "Suspense"],
+      "trial": ["Qwik", "Solid.js"],
+      "assess": ["HTMX", "Alpine.js"],
+      "hold": ["Class components", "Redux"]
+    },
+    
+    "skill_development": {
+      "current_focus": "AI-driven UX patterns",
+      "certifications": "Google UX Design Certificate",
+      "conferences": ["React Conf", "Next.js Conf"],
+      "open_source": "Contributor to React Hook Form"
+    }
+  }
+}

@@ -331,5 +331,143 @@ describe('Refinance Outlook Calculator - Dr Elena v2 Alignment', () => {
       expect(result.maxCashOut).toBe(0);
       expect(result.reasonCodes).toContain('negative_equity_no_refinance');
     });
+
+  // TDD TESTS: CPF Accrued Interest Monthly Compounding (SHOULD FAIL initially)
+  describe('CPF Accrued Interest - Monthly Compounding Formula', () => {
+    it('should use monthly compounding NOT simple interest for 5-year property', () => {
+      // Test: 100,000 CPF for 5 years (60 months)
+      // WRONG: simple interest = 100000 * 0.025 * 5 = 12,500
+      // CORRECT: monthly compound = 100000 * ((1 + 0.025/12)^60 - 1) ≈ 13,300
+      const input = {
+        property_value: 800000,
+        outstanding_loan: 400000,
+        cpf_used: 100000,
+        property_age: 5,
+        property_type: 'Private' as const,
+        is_owner_occupied: true
+      };
+
+      const result = calculateRefinanceOutlook(input);
+
+      const expectedAccruedInterest = Math.round(100000 * (Math.pow(1 + 0.025/12, 60) - 1));
+      expect(expectedAccruedInterest).toBe(13300);
+
+      const expectedRedemption = 100000 + expectedAccruedInterest;
+      expect(result.cpfRedemptionAmount).toBe(expectedRedemption); // 113,300
+
+      // Should NOT be simple interest (112,500)
+      const wrongSimpleInterest = 100000 + Math.round(100000 * 0.025 * 5);
+      expect(result.cpfRedemptionAmount).not.toBe(wrongSimpleInterest);
+    });
+
+    it('should calculate correctly for 10-year holding period', () => {
+      const input = {
+        property_value: 1200000,
+        outstanding_loan: 600000,
+        cpf_used: 200000,
+        property_age: 10,
+        property_type: 'Private' as const,
+        is_owner_occupied: true
+      };
+
+      const result = calculateRefinanceOutlook(input);
+
+      const expectedAccruedInterest = Math.round(200000 * (Math.pow(1 + 0.025/12, 120) - 1));
+      expect(expectedAccruedInterest).toBe(56738);
+
+      expect(result.cpfRedemptionAmount).toBe(200000 + expectedAccruedInterest); // 256,738
+    });
+
+    it('should calculate correctly for 1-year holding period', () => {
+      const input = {
+        property_value: 800000,
+        outstanding_loan: 400000,
+        cpf_used: 100000,
+        property_age: 1,
+        property_type: 'Private' as const,
+        is_owner_occupied: true
+      };
+
+      const result = calculateRefinanceOutlook(input);
+
+      const expectedAccruedInterest = Math.round(100000 * (Math.pow(1 + 0.025/12, 12) - 1));
+      expect(expectedAccruedInterest).toBe(2529);
+
+      expect(result.cpfRedemptionAmount).toBe(100000 + expectedAccruedInterest); // 102,529
+    });
+  });
+
+  describe('Investment Property LTV Caps', () => {
+    it('should apply 70% LTV for private investment properties', () => {
+      const investmentInput = {
+        property_value: 1000000,
+        outstanding_loan: 500000,
+        cpf_used: 100000,
+        property_age: 5,
+        property_type: 'Private' as const,
+        is_owner_occupied: false
+      };
+
+      const ownerInput = {
+        ...investmentInput,
+        is_owner_occupied: true
+      };
+
+      const investmentResult = calculateRefinanceOutlook(investmentInput);
+      const ownerResult = calculateRefinanceOutlook(ownerInput);
+
+      expect(investmentResult.ltvCapApplied).toBe(70);
+      expect(ownerResult.ltvCapApplied).toBe(75);
+      expect(investmentResult.maxCashOut).toBeLessThan(ownerResult.maxCashOut);
+    });
+  });
+
+  describe('Timing Windows Validation', () => {
+    it('should map 0-3 months to immediate window', () => {
+      [0, 2, 3].forEach(months => {
+        const result = calculateRefinanceOutlook({
+          months_remaining: months,
+          property_type: 'Private' as const,
+          property_value: 1000000,
+          outstanding_loan: 600000
+        });
+        expect(result.reasonCodes).toContain('timing_immediate_window');
+      });
+    });
+
+    it('should map 4-6 months to critical window', () => {
+      const result = calculateRefinanceOutlook({
+        months_remaining: 5,
+        property_type: 'Private' as const,
+        property_value: 1000000,
+        outstanding_loan: 600000
+      });
+      expect(result.reasonCodes).toContain('timing_critical_window');
+    });
+
+    it('should map 7-18 months to planning window', () => {
+      [7, 12, 18].forEach(months => {
+        const result = calculateRefinanceOutlook({
+          months_remaining: months,
+          property_type: 'Private' as const,
+          property_value: 1000000,
+          outstanding_loan: 600000
+        });
+        expect(result.reasonCodes).toContain('timing_planning_window');
+      });
+    });
+
+    it('should map 19+ months to long window', () => {
+      [19, 24, 36].forEach(months => {
+        const result = calculateRefinanceOutlook({
+          months_remaining: months,
+          property_type: 'Private' as const,
+          property_value: 1000000,
+          outstanding_loan: 600000
+        });
+        expect(result.reasonCodes).toContain('timing_long_window');
+      });
+    });
+  });
   });
 });

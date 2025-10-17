@@ -137,7 +137,7 @@ export function LoanApplicationProvider({ children }: { children: ReactNode }) {
       })
     }
     setIsInitialized(true)
-  }, [])
+  }, [data.sessionId])
 
   // Persist data to localStorage whenever it changes
   useLoanApplicationStorage(data, data.sessionId)

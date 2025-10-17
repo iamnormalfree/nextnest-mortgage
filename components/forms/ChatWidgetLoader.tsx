@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 
 // Inline type declarations for Railway build environment
 declare global {
@@ -75,9 +75,9 @@ export default function ChatWidgetLoader({
         cleanup()
       }
     }
-  }, [config.baseUrl, config.websiteToken, autoOpen, isDevelopment])
+  }, [config.baseUrl, config.websiteToken, autoOpen, isDevelopment, handleWidgetReady, cleanup, loadChatwootScript])
 
-  const loadChatwootScript = async (cancelled: { value: boolean }) => {
+  const loadChatwootScript = useCallback(async (cancelled: { value: boolean }) => {
     try {
       console.log('Loading Chatwoot widget script...')
 
@@ -207,9 +207,9 @@ export default function ChatWidgetLoader({
     } catch (error) {
       handleLoadError(error as Error)
     }
-  }
+  }, [config.baseUrl, config.websiteToken, isDevelopment]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleWidgetReady = () => {
+  const handleWidgetReady = useCallback(() => {
     setIsLoading(false)
     setHasError(false)
     
@@ -223,9 +223,9 @@ export default function ChatWidgetLoader({
     }
 
     onLoad()
-  }
+  }, [onLoad])
 
-  const handleLoadError = (error: Error) => {
+  const handleLoadError = useCallback((error: Error) => {
     console.error('Chat widget load error:', error)
     console.error('Config being used:', {
       baseUrl: config.baseUrl,
@@ -263,9 +263,9 @@ export default function ChatWidgetLoader({
 
       onError(error)
     }
-  }
+  }, [config, cleanup, loadChatwootScript, onError])
 
-  const cleanup = () => {
+  const cleanup = useCallback(() => {
     console.log('Cleaning up Chatwoot widget...')
     
     // Clear timeout
@@ -301,7 +301,7 @@ export default function ChatWidgetLoader({
     }
 
     scriptLoadedRef.current = false
-  }
+  }, [config.baseUrl])
 
   // Public methods exposed via ref
   const openChat = () => {

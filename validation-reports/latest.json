@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-09-03T02:59:54.726Z",
+  "duration": 14001,
+  "passed": false,
+  "errors": [
+    "Form does not implement cumulative submission strategy",
+    "Missing urgency mapping for loan type: equity_loan",
+    "TypeScript compilation failed - run `npx tsc --noEmit` for details"
+  ],
+  "warnings": [
+    "Field 'purpose' not found in app/api/forms/analyze/route.ts",
+    "Field 'purpose' not found in lib/calculations/urgency-calculator.ts",
+    "Linting issues found - run `npm run lint` for details",
+    "Documentation missing: NEXTNEST_GATE_STRUCTURE_ROUNDTABLE.md",
+    "Documentation missing: AI_INTELLIGENT_LEAD_FORM_IMPLEMENTATION_PLAN.md",
+    "Documentation missing: ROUNDTABLE_PROGRESSIVE_FORM_N8N_INTEGRATION.md",
+    "Documentation missing: NEXTNEST_CONTEXT_VALIDATION_FRAMEWORK.md"
+  ],
+  "validationResults": {},
+  "reportContent": [
+    {
+      "timestamp": "2025-09-03T02:59:54.731Z",
+      "type": "phase",
+      "content": "PHASE 1: DOMAIN KNOWLEDGE VALIDATION"
+    },
+    {
+      "timestamp": "2025-09-03T02:59:54.734Z",
+      "type": "success",
+      "content": "Mortgage calculations validated"
+    }
+  ]
+}

@@ -29,11 +29,29 @@ export interface Percentage {
 // ============================================================================
 
 export type LoanType = 'new_purchase' | 'refinance' | 'commercial'
-export type PropertyType = 'HDB' | 'EC' | 'Private' | 'Landed'
+export type PropertyType = 'HDB' | 'EC' | 'Private' | 'Landed' | 'Commercial'
 export type PropertyCategory = 'resale' | 'new_launch' | 'bto' | 'commercial'
 export type PurchaseTimeline = 'this_month' | 'next_3_months' | '3_6_months' | 'exploring'
 export type IPAStatus = 'have_ipa' | 'applied' | 'starting' | 'what_is_ipa'
 export type LockInStatus = 'ending_soon' | 'no_lock' | 'locked' | 'not_sure'
+
+export type RefinancingGoal = 'lower_monthly_payment' | 'shorten_tenure' | 'rate_certainty' | 'cash_out'
+export type CashOutReason = 'renovation' | 'investment' | 'debt_consolidation' | 'education' | 'emergency' | 'other'
+
+export interface RefinanceObjectives {
+  goals: RefinancingGoal[]
+  cashOutAmount?: number
+  cashOutReason?: CashOutReason
+  ownerOccupied: boolean
+  monthsRemaining: number | undefined
+}
+
+export interface MASReadinessMetrics {
+  tdsrRatio?: number
+  tdsrLimit: number
+  msrRatio?: number  
+  msrLimit: number
+}
 
 export interface LoanTypeOption {
   type: LoanType

@@ -1,0 +1,72 @@
+{
+  "name": "NN AI Broker - FIXED",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwoot-ai-broker",
+        "options": {}
+      },
+      "id": "fe628289-fe6d-4a18-89c2-87af0d0821ad",
+      "name": "Chatwoot Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        112
+      ],
+      "webhookId": "chatwoot-ai-broker"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0473c621-b1ab-4e0a-83f2-8ab4978bbfbc",
+              "leftValue": "={{ $json.body.event || $json.event }}",
+              "rightValue": "message_created",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "588a209b-dbed-4978-b036-f3c93f5d0929",
+              "leftValue": "={{ $json.body.message?.message_type || $json.message?.message_type || $json.body.message_type || $json.message_type }}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "bc6210fc-7494-41a4-8772-3473797836d8",
+              "leftValue": "={{ $json.body.message?.sender?.type || $json.message?.sender?.type || $json.body.sender?.type || $json.sender?.type || 'contact' }}",
+              "rightValue": "contact",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1136,
+        112
+      ],
+      "id": "5290cbb7-74eb-48a9-895c-098c39fa0184",
+      "name": "If - Check Message Type"
+    }
+  ]
+}

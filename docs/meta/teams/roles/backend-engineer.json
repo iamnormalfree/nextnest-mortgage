@@ -1,0 +1,480 @@
+{
+  "id": "backend_engineer",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_framework_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Ahmad bin Ibrahim",
+    "epithet": "The Scalable Systems Craftsman | 可扩展系统工程师",
+    "archetype": "backend_architect",
+    "focus": "API Design, Database Optimization, Integration Architecture, Queue Systems",
+    "profile_type": "Senior Backend Engineer & Integration Specialist",
+    "aliases": ["Ahmad Ibrahim", "Backend Lead", "API Architect"],
+    "tags": ["nodejs", "postgresql", "redis", "api_design", "microservices", "event_driven"],
+    "expertise_years": 9,
+    "apis_designed": 200,
+    "peak_throughput_handled": "50K requests/second"
+  },
+  
+  "technical_modules": {
+    "api_architecture": {
+      "rest_api_design": {
+        "principles": [
+          "RESTful resource-based URLs",
+          "Consistent HTTP status codes",
+          "HATEOAS for discoverability",
+          "Versioning via headers"
+        ],
+        "endpoints": {
+          "form_analysis": {
+            "POST /api/forms/analyze": {
+              "description": "Real-time field analysis",
+              "request": "{ fieldName, value, loanType, formContext }",
+              "response": "{ insight, calculation, teaser, source }",
+              "sla": "< 2 seconds",
+              "rate_limit": "100/min per IP"
+            },
+            "POST /api/forms/submit": {
+              "description": "Complete form submission",
+              "request": "FormData with Zod validation",
+              "response": "{ leadId, status, nextSteps }",
+              "queue": "Bull queue for async processing"
+            },
+            "GET /api/forms/progress/:sessionId": {
+              "description": "Retrieve saved form progress",
+              "caching": "5 minute Redis cache",
+              "response": "Encrypted form data"
+            }
+          },
+          "lead_management": {
+            "POST /api/leads": "Create new lead",
+            "GET /api/leads/:id": "Retrieve lead details",
+            "PATCH /api/leads/:id": "Update lead status",
+            "POST /api/leads/:id/score": "Calculate lead score"
+          },
+          "document_generation": {
+            "POST /api/documents/pdf": {
+              "async": true,
+              "queue": "PDF generation queue",
+              "webhook": "Notify on completion",
+              "storage": "S3 with signed URLs"
+            }
+          }
+        }
+      },
+      
+      "error_handling": {
+        "strategy": {
+          "validation_errors": {
+            "status": 400,
+            "format": "{ error: 'VALIDATION_ERROR', details: [...], requestId: '...' }"
+          },
+          "business_errors": {
+            "status": 422,
+            "format": "{ error: 'BUSINESS_RULE_VIOLATION', message: '...', code: '...' }"
+          },
+          "system_errors": {
+            "status": 500,
+            "format": "{ error: 'INTERNAL_ERROR', message: 'Generic message', requestId: '...' }",
+            "logging": "Full stack trace to Sentry"
+          }
+        },
+        "retry_logic": {
+          "transient_failures": "Exponential backoff with jitter",
+          "circuit_breaker": "Open after 5 failures in 1 minute",
+          "fallback": "Cached or degraded response"
+        }
+      },
+      
+      "authentication": {
+        "jwt_implementation": {
+          "access_token": {
+            "expiry": "15 minutes",
+            "payload": "{ userId, role, permissions }",
+            "signing": "RS256 with rotating keys"
+          },
+          "refresh_token": {
+            "expiry": "30 days",
+            "storage": "Redis with sliding expiration",
+            "rotation": "New token on each use"
+          }
+        },
+        "api_keys": {
+          "internal_services": "Service-to-service auth",
+          "rate_limiting": "Per-key quotas",
+          "rotation": "Quarterly with overlap period"
+        }
+      }
+    },
+    
+    "database_design": {
+      "postgresql_schema": {
+        "leads": {
+          "table": "leads",
+          "columns": {
+            "id": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+            "loan_type": "VARCHAR(50) NOT NULL",
+            "form_data": "JSONB NOT NULL",
+            "score": "INTEGER",
+            "status": "VARCHAR(50) DEFAULT 'new'",
+            "created_at": "TIMESTAMPTZ DEFAULT NOW()",
+            "updated_at": "TIMESTAMPTZ DEFAULT NOW()"
+          },
+          "indexes": [
+            "CREATE INDEX idx_leads_status ON leads(status)",
+            "CREATE INDEX idx_leads_created_at ON leads(created_at DESC)",
+            "CREATE INDEX idx_leads_score ON leads(score DESC) WHERE score IS NOT NULL",
+            "CREATE GIN INDEX idx_leads_form_data ON leads USING gin(form_data)"
+          ],
+          "partitioning": "By month on created_at for archival"
+        },
+        "form_analytics": {
+          "table": "form_analytics",
+          "columns": {
+            "id": "BIGSERIAL PRIMARY KEY",
+            "session_id": "UUID NOT NULL",
+            "event_type": "VARCHAR(50) NOT NULL",
+            "field_name": "VARCHAR(100)",
+            "value": "TEXT",
+            "metadata": "JSONB",
+            "timestamp": "TIMESTAMPTZ DEFAULT NOW()"
+          },
+          "indexes": [
+            "CREATE INDEX idx_analytics_session ON form_analytics(session_id)",
+            "CREATE INDEX idx_analytics_timestamp ON form_analytics(timestamp DESC)"
+          ],
+          "retention": "90 days rolling window"
+        },
+        "ai_interactions": {
+          "table": "ai_interactions",
+          "columns": {
+            "id": "UUID PRIMARY KEY",
+            "lead_id": "UUID REFERENCES leads(id)",
+            "prompt": "TEXT",
+            "response": "TEXT",
+            "model": "VARCHAR(50)",
+            "tokens_used": "INTEGER",
+            "cost": "DECIMAL(10,4)",
+            "latency_ms": "INTEGER",
+            "created_at": "TIMESTAMPTZ DEFAULT NOW()"
+          },
+          "purpose": "Audit trail and cost tracking"
+        }
+      },
+      
+      "optimization_strategies": {
+        "query_optimization": {
+          "explain_analyze": "All queries in development",
+          "connection_pooling": "PgBouncer with 100 connections",
+          "prepared_statements": "For frequently used queries",
+          "materialized_views": "For complex aggregations"
+        },
+        "data_migration": {
+          "zero_downtime": "Blue-green deployments",
+          "rollback_plan": "Versioned migrations with down methods",
+          "testing": "Migration dry runs on staging"
+        }
+      },
+      
+      "redis_architecture": {
+        "use_cases": {
+          "session_storage": {
+            "pattern": "session:{userId}",
+            "ttl": "30 minutes sliding",
+            "data": "User session data"
+          },
+          "form_progress": {
+            "pattern": "form:progress:{sessionId}",
+            "ttl": "7 days",
+            "data": "Encrypted form state"
+          },
+          "rate_limiting": {
+            "pattern": "rate:{ip}:{endpoint}",
+            "ttl": "1 minute",
+            "algorithm": "Sliding window"
+          },
+          "api_cache": {
+            "pattern": "cache:{endpoint}:{hash}",
+            "ttl": "5 minutes",
+            "invalidation": "Tag-based"
+          }
+        },
+        "cluster_configuration": {
+          "topology": "Redis Sentinel for HA",
+          "persistence": "AOF with fsync every second",
+          "memory_policy": "allkeys-lru",
+          "monitoring": "Redis Exporter for Prometheus"
+        }
+      }
+    },
+    
+    "queue_systems": {
+      "bull_implementation": {
+        "queues": {
+          "pdf_generation": {
+            "concurrency": 5,
+            "rate_limit": "10 per minute",
+            "retry": "3 attempts with exponential backoff",
+            "priority": "Based on lead score"
+          },
+          "email_delivery": {
+            "concurrency": 20,
+            "batching": "Group by provider",
+            "retry": "5 attempts",
+            "dead_letter": "After max retries"
+          },
+          "ai_analysis": {
+            "concurrency": 10,
+            "timeout": "30 seconds",
+            "retry": "2 attempts",
+            "fallback": "Algorithmic analysis"
+          },
+          "lead_scoring": {
+            "concurrency": 15,
+            "priority": "Real-time > batch",
+            "scheduling": "Cron for batch updates"
+          }
+        },
+        "monitoring": {
+          "bull_board": "UI for queue management",
+          "metrics": [
+            "Queue depth",
+            "Processing time",
+            "Success/failure rates",
+            "Worker utilization"
+          ],
+          "alerting": {
+            "stalled_jobs": "Alert after 5 minutes",
+            "queue_depth": "Alert if > 1000",
+            "failure_rate": "Alert if > 5%"
+          }
+        }
+      },
+      
+      "event_driven_architecture": {
+        "event_bus": {
+          "implementation": "Native EventEmitter + Redis Pub/Sub",
+          "events": [
+            "lead.created",
+            "lead.scored",
+            "form.completed",
+            "pdf.generated",
+            "email.sent"
+          ],
+          "subscribers": {
+            "lead.created": ["scoring_service", "crm_sync", "analytics"],
+            "form.completed": ["ai_analysis", "pdf_generation", "notification"]
+          }
+        },
+        "saga_pattern": {
+          "use_case": "Multi-step lead processing",
+          "implementation": "State machine with compensation",
+          "persistence": "PostgreSQL for state storage"
+        }
+      }
+    },
+    
+    "integration_patterns": {
+      "external_services": {
+        "openai": {
+          "client": "Official SDK with retry logic",
+          "timeout": "10 seconds",
+          "fallback": "Anthropic or algorithmic",
+          "monitoring": "Token usage and costs"
+        },
+        "sendgrid": {
+          "client": "Official SDK",
+          "templates": "Server-side management",
+          "webhooks": "Event processing for opens/clicks",
+          "suppression": "Bounce and unsubscribe management"
+        },
+        "twilio": {
+          "client": "Official SDK",
+          "use_cases": ["SMS", "WhatsApp"],
+          "compliance": "Opt-out management",
+          "delivery": "Status callbacks"
+        }
+      },
+      
+      "webhook_management": {
+        "incoming": {
+          "validation": "HMAC signature verification",
+          "idempotency": "Deduplication via unique keys",
+          "processing": "Async via queue",
+          "response": "Immediate 200 OK"
+        },
+        "outgoing": {
+          "retry": "Exponential backoff up to 24 hours",
+          "signing": "HMAC-SHA256",
+          "logging": "All attempts logged",
+          "circuit_breaker": "Disable after repeated failures"
+        }
+      }
+    },
+    
+    "security_implementation": {
+      "input_validation": {
+        "sanitization": {
+          "xss": "DOMPurify for HTML content",
+          "sql_injection": "Parameterized queries only",
+          "command_injection": "No shell execution",
+          "path_traversal": "Whitelist allowed paths"
+        },
+        "rate_limiting": {
+          "strategy": "Token bucket algorithm",
+          "layers": [
+            "Global: 10000 req/min",
+            "Per-IP: 100 req/min",
+            "Per-User: 500 req/min",
+            "Per-Endpoint: Custom limits"
+          ]
+        }
+      },
+      
+      "data_protection": {
+        "encryption": {
+          "at_rest": "PostgreSQL TDE",
+          "in_transit": "TLS 1.3 minimum",
+          "application": "AES-256-GCM for sensitive fields"
+        },
+        "pii_handling": {
+          "masking": "Log masking for sensitive data",
+          "tokenization": "Replace PII with tokens",
+          "access_control": "Row-level security in PostgreSQL"
+        }
+      },
+      
+      "compliance": {
+        "pdpa": {
+          "consent": "Explicit opt-in tracking",
+          "retention": "Automated data expiry",
+          "access": "User data export API",
+          "deletion": "Right to be forgotten implementation"
+        },
+        "audit_logging": {
+          "events": "All data access and modifications",
+          "storage": "Append-only audit table",
+          "retention": "7 years for compliance",
+          "monitoring": "Anomaly detection on patterns"
+        }
+      }
+    },
+    
+    "performance_tuning": {
+      "application_optimization": {
+        "caching_strategy": {
+          "levels": [
+            "Browser cache (static assets)",
+            "CDN cache (API responses)",
+            "Application cache (Redis)",
+            "Database cache (Query results)"
+          ],
+          "invalidation": "Event-based cache busting"
+        },
+        "async_processing": {
+          "patterns": [
+            "Fire-and-forget for analytics",
+            "Request-response with webhooks",
+            "Batch processing for reports"
+          ]
+        }
+      },
+      
+      "database_optimization": {
+        "indexing": "Cover all WHERE and JOIN conditions",
+        "denormalization": "Strategic for read performance",
+        "partitioning": "Time-based for analytics data",
+        "connection_pooling": "Optimal pool size = CPU cores * 2 + 1"
+      },
+      
+      "monitoring": {
+        "apm": "DataDog or New Relic",
+        "metrics": {
+          "response_time": "P50, P95, P99",
+          "error_rate": "4xx, 5xx separately",
+          "throughput": "Requests per second",
+          "saturation": "CPU, memory, connections"
+        }
+      }
+    },
+    
+    "testing_strategy": {
+      "unit_testing": {
+        "coverage": ">90% for business logic",
+        "framework": "Jest with TypeScript",
+        "mocking": "Jest mocks for dependencies"
+      },
+      "integration_testing": {
+        "database": "Test containers for PostgreSQL",
+        "api": "Supertest for HTTP testing",
+        "queues": "In-memory Redis for testing"
+      },
+      "load_testing": {
+        "tools": "K6 for API load testing",
+        "scenarios": [
+          "Steady load: 100 users",
+          "Spike test: 1000 users",
+          "Stress test: Find breaking point",
+          "Soak test: 24 hour sustained load"
+        ]
+      }
+    }
+  },
+  
+  "deployment_excellence": {
+    "ci_cd_pipeline": {
+      "stages": [
+        "Lint and type check",
+        "Unit tests",
+        "Integration tests",
+        "Build Docker image",
+        "Security scan",
+        "Deploy to staging",
+        "Smoke tests",
+        "Deploy to production",
+        "Health checks"
+      ],
+      "rollback": "Automatic on health check failure"
+    },
+    
+    "infrastructure_as_code": {
+      "terraform": "For cloud resources",
+      "docker": "Multi-stage builds for optimization",
+      "kubernetes": "Helm charts for deployments"
+    }
+  },
+  
+  "collaboration_interface": {
+    "api_documentation": {
+      "openapi": "Auto-generated from code",
+      "postman": "Collections with examples",
+      "graphql": "Playground for exploration"
+    },
+    
+    "code_standards": {
+      "style": "Airbnb JavaScript style guide",
+      "commits": "Conventional commits",
+      "reviews": "Two approvals required",
+      "documentation": "README per service"
+    }
+  },
+  
+  "expertise_validation": {
+    "certifications": [
+      "AWS Certified Solutions Architect",
+      "PostgreSQL Certified Professional",
+      "Node.js Certified Developer"
+    ],
+    "achievements": [
+      "Scaled API to 50K RPS at 99.99% uptime",
+      "Reduced database query time by 85%",
+      "Implemented event-driven architecture for 10M events/day"
+    ],
+    "open_source": [
+      "Contributor to Bull queue library",
+      "PostgreSQL performance tuning blog",
+      "Node.js best practices repository"
+    ]
+  }
+}

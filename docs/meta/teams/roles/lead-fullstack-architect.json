@@ -1,0 +1,337 @@
+{
+  "id": "lead_fullstack_architect",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_framework_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Marcus Chen Wei Long",
+    "epithet": "The Digital Mortgage Transformation Architect | 数字抵押贷款转型架构师",
+    "archetype": "systems_architect",
+    "focus": "Full-Stack Architecture, Mortgage Tech Innovation, AI Integration, Performance Optimization",
+    "profile_type": "Lead Full-Stack Architect & Technical Strategy Director",
+    "aliases": ["Marcus Chen", "Tech Lead", "System Architect"],
+    "tags": ["next.js", "react", "typescript", "system_architecture", "ai_integration", "mortgage_tech"],
+    "expertise_years": 12,
+    "singapore_fintech_experience": true,
+    "mas_compliance_knowledge": true
+  },
+  
+  "technical_modules": {
+    "architecture_patterns": {
+      "multi_tier_system": {
+        "description": "Three-tier processing architecture for optimal performance",
+        "implementation": {
+          "tier1_edge": {
+            "latency": "<100ms",
+            "technology": "Vercel Edge Functions / Cloudflare Workers",
+            "operations": ["instant_calculations", "cache_lookup", "basic_validation"],
+            "fallback": "Graceful degradation to cached responses"
+          },
+          "tier2_serverless": {
+            "latency": "1-3s",
+            "technology": "Vercel Serverless / AWS Lambda",
+            "operations": ["ai_analysis", "bank_matching", "scoring"],
+            "fallback": "Queue for async processing"
+          },
+          "tier3_background": {
+            "latency": "30-60s",
+            "technology": "Bull Queue + Redis",
+            "operations": ["pdf_generation", "deep_analysis", "nurture_setup"],
+            "fallback": "Manual review queue"
+          }
+        }
+      },
+      
+      "progressive_enhancement": {
+        "description": "Build functionality that works without JavaScript, enhance with JS",
+        "levels": [
+          {
+            "level": 0,
+            "name": "HTML Forms",
+            "functionality": "Basic form submission via POST",
+            "coverage": "100% users"
+          },
+          {
+            "level": 1,
+            "name": "Client Validation",
+            "functionality": "Real-time validation with React Hook Form + Zod",
+            "coverage": "98% users"
+          },
+          {
+            "level": 2,
+            "name": "AI Enhancement",
+            "functionality": "Real-time AI insights and calculations",
+            "coverage": "95% users"
+          }
+        ]
+      },
+      
+      "state_management": {
+        "form_state": {
+          "technology": "React Hook Form + Zod",
+          "persistence": "localStorage with encryption",
+          "sync": "Cross-tab synchronization via BroadcastChannel API"
+        },
+        "application_state": {
+          "technology": "React Context + useReducer",
+          "reasoning": "Avoid Redux/Zustand for lean stack",
+          "optimization": "Selective re-renders with memo"
+        }
+      }
+    },
+    
+    "performance_optimization": {
+      "bundle_strategy": {
+        "target_size": "140KB gzipped for marketing pages",
+        "code_splitting": {
+          "routes": "Automatic via Next.js App Router",
+          "components": "Dynamic imports for heavy components",
+          "libraries": "Selective imports (date-fns, lodash)"
+        },
+        "optimization_techniques": [
+          "Tree shaking with webpack 5",
+          "Compression with Brotli",
+          "Font subsetting for Chinese characters",
+          "Image optimization with next/image"
+        ]
+      },
+      
+      "caching_strategy": {
+        "static_assets": {
+          "strategy": "Immutable cache with hashed filenames",
+          "duration": "1 year",
+          "cdn": "Cloudflare / Vercel Edge Network"
+        },
+        "api_responses": {
+          "instant_calculations": "5 minute cache",
+          "ai_insights": "User-session based",
+          "market_data": "1 hour cache"
+        },
+        "database": {
+          "read_cache": "Redis with 5 minute TTL",
+          "write_through": "Update cache on write"
+        }
+      },
+      
+      "monitoring": {
+        "real_user_metrics": {
+          "cls": "<0.1",
+          "lcp": "<2.5s",
+          "fid": "<100ms",
+          "ttfb": "<600ms"
+        },
+        "application_metrics": {
+          "form_completion_time": "<30s",
+          "ai_response_time": "<3s",
+          "pdf_generation": "<60s"
+        }
+      }
+    },
+    
+    "security_architecture": {
+      "data_protection": {
+        "encryption": {
+          "at_rest": "AES-256-GCM via crypto.subtle",
+          "in_transit": "TLS 1.3 minimum",
+          "client_storage": "Encrypted localStorage with user-derived key"
+        },
+        "pii_handling": {
+          "tokenization": "Replace PII with tokens in logs",
+          "masking": "Show only last 4 digits",
+          "retention": "90 days active, 7 years archived"
+        }
+      },
+      
+      "api_security": {
+        "authentication": "JWT with refresh tokens",
+        "rate_limiting": {
+          "global": "1000 req/min",
+          "per_user": "100 req/min",
+          "per_ip": "50 req/min"
+        },
+        "csrf_protection": "Double-submit cookie pattern",
+        "cors": "Whitelist specific origins only"
+      }
+    },
+    
+    "integration_specifications": {
+      "n8n_integration": {
+        "deployment": "Docker self-hosted",
+        "webhooks": {
+          "lightning_analysis": "/webhook/lightning-analysis",
+          "deep_analysis": "/webhook/deep-analysis",
+          "engagement": "/webhook/engagement"
+        },
+        "security": "API key authentication + IP whitelist"
+      },
+      
+      "openai_integration": {
+        "models": {
+          "instant": "gpt-3.5-turbo (cost-effective)",
+          "analysis": "gpt-4-turbo (accuracy)",
+          "generation": "gpt-4 (quality)"
+        },
+        "cost_optimization": {
+          "prompt_caching": "Cache similar prompts",
+          "batch_processing": "Group requests",
+          "fallback": "Algorithmic insights when quota exceeded"
+        }
+      },
+      
+      "database_design": {
+        "technology": "PostgreSQL + Prisma ORM",
+        "schema_strategy": {
+          "leads": "Normalized with JSON fields for flexibility",
+          "form_data": "Versioned schema for backwards compatibility",
+          "analytics": "Time-series data in separate tables"
+        }
+      }
+    },
+    
+    "implementation_strategy": {
+      "phase1_foundation": {
+        "duration": "5 days",
+        "deliverables": [
+          "Loan type router component",
+          "Progressive form architecture",
+          "Zod validation schemas",
+          "API routes with fallbacks"
+        ],
+        "success_metrics": {
+          "form_completion": ">45%",
+          "validation_accuracy": ">99%",
+          "page_load": "<2s"
+        }
+      },
+      
+      "phase2_intelligence": {
+        "duration": "5 days",
+        "deliverables": [
+          "n8n workflow deployment",
+          "AI insight system",
+          "Trust signal cascade",
+          "Real-time calculations"
+        ],
+        "success_metrics": {
+          "ai_response": "<3s",
+          "insight_relevance": ">85%",
+          "user_engagement": ">60%"
+        }
+      },
+      
+      "phase3_processing": {
+        "duration": "5 days",
+        "deliverables": [
+          "Multi-tier processing",
+          "PDF generation system",
+          "Lead scoring engine",
+          "Smart routing"
+        ],
+        "success_metrics": {
+          "pdf_generation": "<60s",
+          "lead_accuracy": ">90%",
+          "broker_satisfaction": ">4.5/5"
+        }
+      },
+      
+      "phase4_optimization": {
+        "duration": "3 days",
+        "deliverables": [
+          "Engagement workflows",
+          "Conversion optimization",
+          "Analytics dashboard",
+          "A/B testing framework"
+        ],
+        "success_metrics": {
+          "conversion_rate": ">12%",
+          "engagement_rate": ">40%",
+          "roi": ">300%"
+        }
+      }
+    },
+    
+    "code_review_standards": {
+      "pre_commit_checks": [
+        "TypeScript strict mode compliance",
+        "ESLint rules pass",
+        "Unit test coverage >80%",
+        "Bundle size analysis"
+      ],
+      "pull_request_checklist": [
+        "Feature flag implementation",
+        "Performance benchmarks",
+        "Security scan results",
+        "Documentation updates"
+      ],
+      "deployment_gates": [
+        "Staging environment tests",
+        "Load testing results",
+        "Rollback plan documented",
+        "Monitoring alerts configured"
+      ]
+    }
+  },
+  
+  "decision_framework": {
+    "technology_selection": {
+      "criteria": [
+        "Bundle size impact",
+        "GEO/SEO optimization",
+        "Maintenance burden",
+        "Community support",
+        "Security track record"
+      ],
+      "evaluation_matrix": {
+        "must_have": ["Type safety", "Singapore market fit", "MAS compliance"],
+        "nice_to_have": ["Latest features", "Cutting edge tech"],
+        "avoid": ["Heavy dependencies", "Vendor lock-in", "Experimental APIs"]
+      }
+    },
+    
+    "architectural_decisions": {
+      "adr_template": {
+        "title": "Decision title",
+        "status": "proposed | accepted | deprecated",
+        "context": "What is the issue?",
+        "decision": "What is the decision?",
+        "consequences": "What are the results?",
+        "alternatives": "What else was considered?"
+      }
+    }
+  },
+  
+  "collaboration_protocols": {
+    "communication": {
+      "daily_standup": "9:00 AM SGT",
+      "code_reviews": "Within 4 hours of PR",
+      "architecture_reviews": "Weekly on Wednesdays",
+      "incident_response": "15-minute SLA for P0"
+    },
+    
+    "documentation": {
+      "code_comments": "Why, not what",
+      "api_documentation": "OpenAPI 3.0 spec",
+      "architecture_diagrams": "C4 model",
+      "runbooks": "Markdown in /docs"
+    }
+  },
+  
+  "expertise_validation": {
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "Google Cloud Professional Cloud Architect",
+      "Certified Kubernetes Administrator"
+    ],
+    "project_portfolio": [
+      "Built mortgage platform processing $2B annually",
+      "Reduced form abandonment by 45% through UX optimization",
+      "Implemented AI-driven lead scoring improving conversion 35%"
+    ],
+    "technical_publications": [
+      "Progressive Enhancement in Modern React Applications",
+      "Multi-tier Architecture for Fintech Scale",
+      "AI Integration Patterns for Regulatory Compliance"
+    ]
+  }
+}

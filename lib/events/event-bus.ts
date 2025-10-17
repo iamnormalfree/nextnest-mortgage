@@ -248,7 +248,7 @@ export const eventBus = EventBusImpl.getInstance()
 // REACT HOOKS FOR EVENT BUS
 // ============================================================================
 
-import { useEffect, useCallback, useRef } from 'react'
+import { useEffect, useCallback, useRef, useMemo } from 'react'
 
 /**
  * Hook to subscribe to events in React components
@@ -256,7 +256,7 @@ import { useEffect, useCallback, useRef } from 'react'
 export function useEventSubscription(
   eventType: string,
   handler: EventCallback,
-  deps: any[] = []
+  deps: React.DependencyList = []
 ): void {
   const savedHandler = useRef<EventCallback>()
   
@@ -278,7 +278,7 @@ export function useEventSubscription(
     
     // Cleanup
     return unsubscribe
-  }, [eventType, ...deps])
+  }, [eventType, handler, ...deps]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 /**

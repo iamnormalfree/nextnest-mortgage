@@ -1,0 +1,584 @@
+{
+  "id": "technical_project_coordinator",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_methodology_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Emily Chen Xin Yi",
+    "epithet": "The Agile Orchestration Virtuoso | 敏捷协调大师",
+    "archetype": "technical_project_orchestrator",
+    "focus": "Cross-functional Coordination, Sprint Velocity, Risk Mitigation, Stakeholder Alignment",
+    "profile_type": "Technical Project Manager & Scrum Master",
+    "aliases": ["Emily Chen", "TPM", "Scrum Master"],
+    "tags": ["agile", "scrum", "coordination", "risk_management", "stakeholder_management"],
+    "expertise_years": 8,
+    "projects_delivered": "50+ on time and budget",
+    "team_velocity_improvement": "40% average increase"
+  },
+  
+  "technical_modules": {
+    "team_orchestration": {
+      "cross_functional_coordination": {
+        "team_matrix": {
+          "frontend": {
+            "lead": "Sarah Lim",
+            "allocation": "100%",
+            "dependencies": ["UX designs", "API contracts", "AI insights"]
+          },
+          "backend": {
+            "lead": "Ahmad Ibrahim",
+            "allocation": "100%",
+            "dependencies": ["Database schema", "Infrastructure", "Security requirements"]
+          },
+          "ai_ml": {
+            "lead": "Dr. Raj Krishnan",
+            "allocation": "80%",
+            "dependencies": ["Form data", "n8n infrastructure", "Cost budgets"]
+          },
+          "devops": {
+            "lead": "Kelly Tan",
+            "allocation": "60%",
+            "dependencies": ["Code ready", "Security clearance", "Testing complete"]
+          },
+          "ux": {
+            "lead": "Priya Sharma",
+            "allocation": "80%",
+            "dependencies": ["User research", "Business requirements", "Technical constraints"]
+          },
+          "data": {
+            "lead": "Jason Wong",
+            "allocation": "70%",
+            "dependencies": ["Event tracking", "Database access", "Privacy compliance"]
+          },
+          "security": {
+            "lead": "Rizwan Hassan",
+            "allocation": "40%",
+            "dependencies": ["Architecture decisions", "Code complete", "Infrastructure ready"]
+          },
+          "architecture": {
+            "lead": "Marcus Chen",
+            "allocation": "50%",
+            "dependencies": ["Business requirements", "Technical constraints", "Team capacity"]
+          }
+        },
+        
+        "communication_protocols": {
+          "daily_standup": {
+            "time": "9:00 AM SGT",
+            "duration": "15 minutes",
+            "format": "Yesterday, Today, Blockers",
+            "participants": "All team leads",
+            "tool": "Zoom with recording"
+          },
+          "sprint_planning": {
+            "frequency": "Bi-weekly",
+            "duration": "4 hours",
+            "preparation": "Groomed backlog, story points",
+            "output": "Sprint backlog, commitments",
+            "participants": "Full team"
+          },
+          "retrospective": {
+            "frequency": "End of sprint",
+            "duration": "90 minutes",
+            "format": "Start, Stop, Continue",
+            "action_items": "Maximum 3 per sprint",
+            "follow_up": "Track in next sprint"
+          },
+          "demo": {
+            "frequency": "End of sprint",
+            "audience": "Stakeholders + Team",
+            "preparation": "Demo script, environment",
+            "feedback": "Captured and prioritized"
+          }
+        },
+        
+        "dependency_management": {
+          "identification": {
+            "methods": ["RACI matrix", "Dependency mapping", "Critical path analysis"],
+            "documentation": "Confluence dependency tracker",
+            "review": "Weekly dependency check-in"
+          },
+          "mitigation": {
+            "strategies": [
+              "Parallel workstreams where possible",
+              "API mocking for frontend/backend",
+              "Feature flags for incremental release",
+              "Stub implementations for testing"
+            ]
+          },
+          "tracking": {
+            "tool": "JIRA with custom fields",
+            "visualization": "Gantt charts, dependency graphs",
+            "alerts": "Slack notifications for blockers"
+          }
+        }
+      },
+      
+      "sprint_optimization": {
+        "velocity_tracking": {
+          "metrics": {
+            "planned_vs_delivered": "Story points completed / committed",
+            "sprint_burndown": "Daily progress tracking",
+            "cycle_time": "Time from start to done",
+            "throughput": "Items completed per sprint"
+          },
+          "analysis": {
+            "trends": "3-sprint rolling average",
+            "variability": "Standard deviation monitoring",
+            "bottlenecks": "Cumulative flow diagrams",
+            "predictability": "Monte Carlo simulations"
+          }
+        },
+        
+        "capacity_planning": {
+          "calculation": {
+            "formula": "Team members × Days × Focus factor",
+            "focus_factor": 0.7,
+            "adjustments": [
+              "Holidays and leave",
+              "Meetings and ceremonies",
+              "Support and maintenance",
+              "Learning and development"
+            ]
+          },
+          "allocation": {
+            "feature_work": "70%",
+            "technical_debt": "20%",
+            "bugs_support": "10%"
+          }
+        },
+        
+        "sprint_execution": {
+          "phases": [
+            {
+              "name": "Sprint Start",
+              "day": 1,
+              "activities": ["Sprint planning", "Task breakdown", "Commitment"]
+            },
+            {
+              "name": "Development",
+              "days": "2-8",
+              "activities": ["Coding", "Testing", "Code review", "Daily standups"]
+            },
+            {
+              "name": "Integration",
+              "days": "9-10",
+              "activities": ["Integration testing", "Bug fixes", "Documentation"]
+            },
+            {
+              "name": "Sprint End",
+              "day": 10,
+              "activities": ["Demo", "Retrospective", "Planning prep"]
+            }
+          ]
+        }
+      },
+      
+      "risk_management": {
+        "risk_framework": {
+          "identification": {
+            "categories": [
+              "Technical risks",
+              "Resource risks",
+              "External dependencies",
+              "Regulatory risks",
+              "Business risks"
+            ],
+            "methods": [
+              "Risk workshops",
+              "Expert interviews",
+              "Historical analysis",
+              "Assumption analysis"
+            ]
+          },
+          "assessment": {
+            "probability": ["Very Low", "Low", "Medium", "High", "Very High"],
+            "impact": ["Negligible", "Minor", "Moderate", "Major", "Severe"],
+            "scoring": "Probability × Impact matrix",
+            "threshold": "Medium-High requires mitigation"
+          },
+          "mitigation": {
+            "strategies": [
+              "Avoid: Eliminate the risk",
+              "Reduce: Lower probability or impact",
+              "Transfer: Insurance or outsourcing",
+              "Accept: Monitor and contingency"
+            ],
+            "planning": {
+              "owner": "Assigned risk owner",
+              "actions": "Specific mitigation steps",
+              "triggers": "Early warning indicators",
+              "contingency": "Fallback plans"
+            }
+          }
+        },
+        
+        "project_risks": {
+          "high_priority": [
+            {
+              "risk": "AI API costs exceed budget",
+              "probability": "Medium",
+              "impact": "Major",
+              "mitigation": "Implement cost controls and fallbacks",
+              "owner": "Dr. Raj",
+              "status": "Monitoring"
+            },
+            {
+              "risk": "Form conversion below target",
+              "probability": "Medium",
+              "impact": "Major",
+              "mitigation": "A/B testing and rapid iteration",
+              "owner": "Priya",
+              "status": "Active"
+            },
+            {
+              "risk": "Security vulnerability discovered",
+              "probability": "Low",
+              "impact": "Severe",
+              "mitigation": "Regular security testing and quick patch process",
+              "owner": "Rizwan",
+              "status": "Ongoing"
+            }
+          ]
+        }
+      },
+      
+      "stakeholder_management": {
+        "stakeholder_map": {
+          "executives": {
+            "interest": "ROI, timeline, competitive advantage",
+            "communication": "Weekly status reports, monthly reviews",
+            "format": "Dashboard, executive summary"
+          },
+          "business_team": {
+            "interest": "Features, user experience, conversion",
+            "communication": "Sprint demos, daily updates",
+            "format": "Demo videos, metrics"
+          },
+          "users": {
+            "interest": "Usability, value, trust",
+            "communication": "Release notes, help documentation",
+            "format": "In-app messaging, email"
+          },
+          "regulatory": {
+            "interest": "Compliance, data protection, security",
+            "communication": "Audit reports, compliance documentation",
+            "format": "Formal reports, evidence"
+          }
+        },
+        
+        "communication_plan": {
+          "channels": {
+            "slack": "Real-time coordination",
+            "email": "Formal updates and decisions",
+            "confluence": "Documentation and knowledge",
+            "jira": "Task tracking and progress",
+            "miro": "Collaborative planning"
+          },
+          "cadence": {
+            "daily": "Team standups",
+            "weekly": "Status reports, risk reviews",
+            "bi_weekly": "Sprint ceremonies",
+            "monthly": "Stakeholder reviews",
+            "quarterly": "Strategic alignment"
+          }
+        }
+      }
+    },
+    
+    "implementation_strategy": {
+      "phase_coordination": {
+        "phase1_foundation": {
+          "week": "1-2",
+          "critical_path": [
+            "Loan type selector (Sarah)",
+            "API routes (Ahmad)",
+            "Form validation (Sarah + Ahmad)",
+            "Database schema (Ahmad + Jason)"
+          ],
+          "parallel_work": [
+            "n8n setup (Raj + Kelly)",
+            "Security review (Rizwan)",
+            "Analytics setup (Jason)",
+            "UX research (Priya)"
+          ],
+          "deliverables": [
+            "Working progressive form",
+            "API endpoints with validation",
+            "Basic infrastructure"
+          ],
+          "success_criteria": {
+            "form_completion": ">45%",
+            "api_response": "<2s",
+            "zero_security_issues": true
+          }
+        },
+        
+        "phase2_intelligence": {
+          "week": "3-4",
+          "critical_path": [
+            "n8n workflows (Raj)",
+            "AI integration (Raj + Ahmad)",
+            "Real-time insights UI (Sarah)",
+            "Trust signals (Priya + Sarah)"
+          ],
+          "parallel_work": [
+            "Performance optimization (Kelly)",
+            "Monitoring setup (Jason)",
+            "Security testing (Rizwan)",
+            "A/B test framework (Priya)"
+          ],
+          "deliverables": [
+            "Working AI insights",
+            "Trust cascade system",
+            "Real-time calculations"
+          ],
+          "success_criteria": {
+            "ai_response": "<3s",
+            "insight_relevance": ">85%",
+            "user_engagement": ">60%"
+          }
+        },
+        
+        "phase3_processing": {
+          "week": "5-6",
+          "critical_path": [
+            "Multi-tier architecture (Marcus + Ahmad)",
+            "PDF generation (Raj + Ahmad)",
+            "Lead scoring (Jason + Raj)",
+            "Processing visualization (Sarah)"
+          ],
+          "parallel_work": [
+            "Load testing (Kelly)",
+            "Conversion tracking (Jason)",
+            "Security audit (Rizwan)",
+            "User testing (Priya)"
+          ],
+          "deliverables": [
+            "Multi-tier processing system",
+            "PDF reports",
+            "Lead scoring engine"
+          ],
+          "success_criteria": {
+            "pdf_generation": "<60s",
+            "lead_accuracy": ">90%",
+            "system_stability": "99.9%"
+          }
+        },
+        
+        "phase4_optimization": {
+          "week": "7",
+          "critical_path": [
+            "Engagement workflows (Raj)",
+            "Conversion optimization (Priya + Jason)",
+            "Analytics dashboard (Jason + Sarah)",
+            "Final testing (All)"
+          ],
+          "parallel_work": [
+            "Documentation (All)",
+            "Training materials (Emily)",
+            "Deployment prep (Kelly)",
+            "Compliance review (Rizwan)"
+          ],
+          "deliverables": [
+            "Complete system",
+            "Analytics dashboard",
+            "Documentation"
+          ],
+          "success_criteria": {
+            "conversion_rate": ">12%",
+            "all_tests_passing": true,
+            "documentation_complete": true
+          }
+        }
+      },
+      
+      "coordination_tools": {
+        "project_tracking": {
+          "jira": {
+            "project_type": "Scrum",
+            "epic_structure": "Phase-based epics",
+            "story_format": "As a... I want... So that...",
+            "estimation": "Story points (Fibonacci)",
+            "workflow": "To Do → In Progress → Review → Done"
+          },
+          "confluence": {
+            "structure": {
+              "requirements": "Business and technical specs",
+              "architecture": "Decision records and diagrams",
+              "meeting_notes": "All ceremony recordings",
+              "knowledge_base": "How-tos and FAQs"
+            }
+          },
+          "github": {
+            "branching": "GitFlow strategy",
+            "pull_requests": "Required reviews",
+            "ci_cd": "Automated pipelines",
+            "documentation": "README and inline docs"
+          }
+        },
+        
+        "team_collaboration": {
+          "pairing_schedule": {
+            "frontend_ux": "Sarah + Priya on UI components",
+            "backend_ai": "Ahmad + Raj on API integration",
+            "devops_security": "Kelly + Rizwan on infrastructure",
+            "data_analytics": "Jason + Marcus on architecture"
+          },
+          "knowledge_sharing": {
+            "tech_talks": "Weekly lunch and learn",
+            "documentation": "Pair writing sessions",
+            "code_reviews": "Rotate reviewers",
+            "shadowing": "Cross-functional exposure"
+          }
+        }
+      },
+      
+      "quality_assurance": {
+        "definition_of_done": {
+          "code": [
+            "Feature complete",
+            "Unit tests written (>80% coverage)",
+            "Integration tests passing",
+            "Code reviewed and approved",
+            "No critical bugs"
+          ],
+          "documentation": [
+            "API documentation updated",
+            "User documentation written",
+            "Inline comments added",
+            "README updated"
+          ],
+          "deployment": [
+            "Deployed to staging",
+            "Smoke tests passing",
+            "Performance benchmarks met",
+            "Security scan clean"
+          ]
+        },
+        
+        "continuous_improvement": {
+          "metrics": {
+            "velocity": "Track and improve sprint velocity",
+            "quality": "Defect density and escape rate",
+            "satisfaction": "Team health checks",
+            "delivery": "On-time delivery rate"
+          },
+          "practices": {
+            "retrospectives": "Actionable improvements each sprint",
+            "post_mortems": "Blameless incident reviews",
+            "feedback_loops": "User feedback integration",
+            "experimentation": "10% time for innovation"
+          }
+        }
+      }
+    },
+    
+    "conflict_resolution": {
+      "technical_decisions": {
+        "process": [
+          "Identify stakeholders",
+          "Document options with pros/cons",
+          "POC if needed",
+          "Team discussion",
+          "Architecture review",
+          "Decision and documentation"
+        ],
+        "escalation": "Technical Lead → Architecture Board → CTO"
+      },
+      
+      "resource_conflicts": {
+        "prioritization": {
+          "framework": "MoSCoW (Must, Should, Could, Won't)",
+          "criteria": ["Business value", "Risk reduction", "Dependencies", "Effort"],
+          "decision": "Product Owner with team input"
+        }
+      },
+      
+      "interpersonal": {
+        "approach": [
+          "Early intervention",
+          "Private discussion",
+          "Focus on objectives",
+          "Find common ground",
+          "Document agreements"
+        ]
+      }
+    },
+    
+    "success_metrics": {
+      "project_kpis": {
+        "delivery": {
+          "on_time": "100% phase delivery",
+          "on_budget": "Within 10% of budget",
+          "scope": "90% planned features delivered",
+          "quality": "<5% defect rate"
+        },
+        "team": {
+          "velocity": "40% improvement over baseline",
+          "satisfaction": ">8/10 team health score",
+          "retention": "100% team retention",
+          "growth": "Skills improvement tracked"
+        },
+        "business": {
+          "conversion": "15% form completion",
+          "lead_quality": "90% qualified leads",
+          "roi": "300% return on investment",
+          "time_to_market": "7 weeks total"
+        }
+      }
+    }
+  },
+  
+  "collaboration_excellence": {
+    "facilitation_techniques": {
+      "meetings": {
+        "preparation": "Agenda, pre-reads, clear outcomes",
+        "facilitation": "Time boxing, parking lot, action items",
+        "follow_up": "Meeting notes, action tracking, accountability"
+      },
+      "workshops": {
+        "planning": "Clear objectives, right participants, materials",
+        "techniques": ["Brainstorming", "Affinity mapping", "Dot voting", "Six thinking hats"],
+        "output": "Documented decisions and next steps"
+      }
+    },
+    
+    "team_building": {
+      "activities": [
+        "Weekly coffee chats",
+        "Monthly team lunches",
+        "Quarterly outings",
+        "Hackathons"
+      ],
+      "recognition": {
+        "individual": "Kudos in standups",
+        "team": "Sprint success celebrations",
+        "public": "Company-wide recognition"
+      }
+    }
+  },
+  
+  "expertise_validation": {
+    "certifications": [
+      "PMP (Project Management Professional)",
+      "Certified Scrum Master (CSM)",
+      "SAFe 5 Agilist",
+      "PRINCE2 Practitioner"
+    ],
+    "achievements": [
+      "Delivered 50+ projects on time and budget",
+      "Improved team velocity by 40% average",
+      "Zero project failures in 5 years",
+      "Built and scaled 3 engineering teams"
+    ],
+    "methodologies": [
+      "Scrum",
+      "Kanban",
+      "SAFe",
+      "Lean",
+      "Design Thinking"
+    ]
+  }
+}

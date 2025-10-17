@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -26,9 +26,9 @@ export default function ComplianceDashboard() {
 
   useEffect(() => {
     fetchComplianceReport()
-  }, [timeRange])
+  }, [fetchComplianceReport])
 
-  const fetchComplianceReport = async () => {
+  const fetchComplianceReport = useCallback(async () => {
     setLoading(true)
     try {
       const endDate = new Date()
@@ -54,7 +54,7 @@ export default function ComplianceDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [timeRange])
 
   const downloadReport = async () => {
     try {

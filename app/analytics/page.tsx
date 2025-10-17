@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -62,13 +62,7 @@ export default function AnalyticsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchAnalytics();
-    const interval = setInterval(fetchAnalytics, 30000); // Refresh every 30 seconds
-    return () => clearInterval(interval);
-  }, [timeRange]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/analytics/conversion-dashboard?timeRange=${timeRange}`);
@@ -82,7 +76,13 @@ export default function AnalyticsDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [timeRange]);
+
+  useEffect(() => {
+    fetchAnalytics();
+    const interval = setInterval(fetchAnalytics, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, [fetchAnalytics]);
 
   if (loading && !data) {
     return (

@@ -13,24 +13,8 @@ import type { LoanType } from '@/components/forms/SimpleLoanTypeSelector'
 import { useLoanApplicationContext } from '@/lib/hooks/useLoanApplicationContext'
 
 // Using ProgressiveFormWithController for production (has working Chatwoot integration)
-const ProgressiveFormWithController = dynamic(
-  () => import('@/components/forms/ProgressiveFormWithController').then(mod => ({
-    default: mod.ProgressiveFormWithController
-  })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse">
-          <div className="text-center">
-            <div className="inline-flex h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-gold motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-            <p className="mt-4 text-silver">Loading application form...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-)
+// TEMPORARY FIX: Use static import bypassing dynamic loading issue 
+import { ProgressiveFormWithController } from '@/components/forms/ProgressiveFormWithController'
 
 // Dynamic import for commercial direct-to-broker form
 const CommercialQuickForm = dynamic(

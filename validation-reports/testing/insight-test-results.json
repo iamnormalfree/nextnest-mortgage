@@ -1,0 +1,994 @@
+{
+  "testRunDate": "2025-08-31T05:58:05.748Z",
+  "totalScenarios": 9,
+  "results": [
+    {
+      "scenario": "NP1_HighValue",
+      "name": "High-Value Property Purchase",
+      "gate2Data": {
+        "loanType": "new_purchase",
+        "name": "John Tan",
+        "email": "john@example.com",
+        "phone": "91234567",
+        "propertyType": "Private",
+        "priceRange": 2000000,
+        "purchaseTimeline": "next_3_months"
+      },
+      "gate3Data": {
+        "monthlyIncome": 25000,
+        "existingCommitments": 2000
+      },
+      "gate2Insights": [
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "🏠 Purchase Cost Breakdown",
+          "message": "For S$2,000,000 property with 75% loan",
+          "calculations": {
+            "maxLoan": 1500000,
+            "monthlyPayment": 7510,
+            "downpayment": 500000,
+            "stampDuty": 88000
+          },
+          "details": [
+            "Loan amount: S$1,500,000",
+            "25% downpayment: S$500,000",
+            "Estimated stamp duty: S$88,000",
+            "Total upfront: S$588,000"
+          ],
+          "actionable": true,
+          "nextStep": "Add income to check affordability"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$2,226,000 in loans",
+          "calculations": {
+            "maxLoan": 2226000,
+            "tdsr": 0.08,
+            "monthlyPayment": 11750.000000000002
+          },
+          "details": [
+            "TDSR Ratio: 8.0% (limit: 55%)",
+            "Available for housing: S$11,750/month",
+            "Maximum property value: S$2,968,000"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$91,500",
+          "calculations": {
+            "stampDuty": 88000,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$88,000",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        },
+        {
+          "type": "opportunity",
+          "urgency": "medium",
+          "title": "💡 Optimization Opportunities",
+          "message": "We found ways to improve your mortgage terms",
+          "details": [
+            "Consider consolidating existing loans to improve TDSR",
+            "Structure as joint application to increase borrowing capacity"
+          ],
+          "actionable": true,
+          "nextStep": "Schedule a call with our mortgage specialist"
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 1,
+        "gate3InsightCount": 4,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "high"
+        ]
+      }
+    },
+    {
+      "scenario": "NP2_HDB",
+      "name": "HDB Purchase - Moderate Income",
+      "gate2Data": {
+        "loanType": "new_purchase",
+        "name": "Sarah Lim",
+        "email": "sarah@example.com",
+        "phone": "98765432",
+        "propertyType": "HDB",
+        "priceRange": 600000,
+        "purchaseTimeline": "this_month"
+      },
+      "gate3Data": {
+        "monthlyIncome": 8000,
+        "existingCommitments": 500
+      },
+      "gate2Insights": [
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "🏠 Purchase Cost Breakdown",
+          "message": "For S$600,000 property with 75% loan",
+          "calculations": {
+            "maxLoan": 450000,
+            "monthlyPayment": 2253,
+            "downpayment": 150000,
+            "stampDuty": 26400
+          },
+          "details": [
+            "Loan amount: S$450,000",
+            "25% downpayment: S$150,000",
+            "Estimated stamp duty: S$26,400",
+            "Total upfront: S$176,400"
+          ],
+          "actionable": true,
+          "nextStep": "Add income to check affordability"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$738,000 in loans",
+          "calculations": {
+            "maxLoan": 738000,
+            "tdsr": 0.0625,
+            "monthlyPayment": 3900
+          },
+          "details": [
+            "TDSR Ratio: 6.3% (limit: 55%)",
+            "Available for housing: S$3,900/month",
+            "Maximum property value: S$984,000"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$29,900",
+          "calculations": {
+            "stampDuty": 26400,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$26,400",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        },
+        {
+          "type": "opportunity",
+          "urgency": "medium",
+          "title": "💡 Optimization Opportunities",
+          "message": "We found ways to improve your mortgage terms",
+          "details": [
+            "Structure as joint application to increase borrowing capacity",
+            "Check eligibility for Enhanced CPF Housing Grant (up to $80,000)"
+          ],
+          "actionable": true,
+          "nextStep": "Schedule a call with our mortgage specialist"
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 1,
+        "gate3InsightCount": 4,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "high"
+        ]
+      }
+    },
+    {
+      "scenario": "NP3_Commercial",
+      "name": "Commercial Property Investment",
+      "gate2Data": {
+        "loanType": "new_purchase",
+        "name": "Peter Wong",
+        "email": "peter@example.com",
+        "phone": "97778888",
+        "propertyType": "Commercial",
+        "priceRange": 3000000,
+        "purchaseTimeline": "3_6_months"
+      },
+      "gate3Data": {
+        "monthlyIncome": 40000,
+        "existingCommitments": 5000
+      },
+      "gate2Insights": [
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "🏠 Purchase Cost Breakdown",
+          "message": "For S$3,000,000 property with 75% loan",
+          "calculations": {
+            "maxLoan": 2250000,
+            "monthlyPayment": 11265,
+            "downpayment": 750000,
+            "stampDuty": 132000
+          },
+          "details": [
+            "Loan amount: S$2,250,000",
+            "25% downpayment: S$750,000",
+            "Estimated stamp duty: S$132,000",
+            "Total upfront: S$882,000"
+          ],
+          "actionable": true,
+          "nextStep": "Add income to check affordability"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$3,220,000 in loans",
+          "calculations": {
+            "maxLoan": 3220000,
+            "tdsr": 0.125,
+            "monthlyPayment": 17000
+          },
+          "details": [
+            "TDSR Ratio: 12.5% (limit: 55%)",
+            "Available for housing: S$17,000/month",
+            "Maximum property value: S$4,293,333.333"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$135,500",
+          "calculations": {
+            "stampDuty": 132000,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$132,000",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        },
+        {
+          "type": "opportunity",
+          "urgency": "medium",
+          "title": "💡 Optimization Opportunities",
+          "message": "We found ways to improve your mortgage terms",
+          "details": [
+            "Consider consolidating existing loans to improve TDSR",
+            "Structure as joint application to increase borrowing capacity"
+          ],
+          "actionable": true,
+          "nextStep": "Schedule a call with our mortgage specialist"
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 1,
+        "gate3InsightCount": 4,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "high"
+        ]
+      }
+    },
+    {
+      "scenario": "RF1_NoLockHighSavings",
+      "name": "Refinance - No Lock-in, High Savings",
+      "gate2Data": {
+        "loanType": "refinance",
+        "name": "David Chen",
+        "email": "david@example.com",
+        "phone": "91112222",
+        "currentRate": 4.5,
+        "outstandingLoan": 800000,
+        "lockInStatus": "no_lockin",
+        "propertyValue": 1200000
+      },
+      "gate3Data": {
+        "monthlyIncome": 15000,
+        "existingCommitments": 1000
+      },
+      "gate2Insights": [
+        {
+          "type": "opportunity",
+          "urgency": "high",
+          "title": "💰 Significant Savings Opportunity",
+          "message": "Save S$644.411/month by refinancing from 4.5% to 2.95%",
+          "calculations": {
+            "monthlyPayment": 4416.7836526098745,
+            "maxLoan": 800000
+          },
+          "details": [
+            "Current payment: S$5,061.195/month",
+            "New payment: S$4,416.784/month",
+            "Annual savings: S$7,732.936",
+            "Break-even period: 5 months"
+          ],
+          "value": "S$7,732.936 yearly",
+          "actionable": true,
+          "nextStep": "Complete profile to lock in these savings"
+        },
+        {
+          "type": "opportunity",
+          "urgency": "high",
+          "title": "✅ Perfect Timing - No Lock-in Period",
+          "message": "You can refinance immediately without any penalties",
+          "details": [
+            "Zero penalty fees",
+            "Free to switch to better rates",
+            "Banks competing aggressively for no-penalty switches"
+          ],
+          "actionable": true,
+          "nextStep": "Lock in a better rate before markets change"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$1,373,000 in loans",
+          "calculations": {
+            "maxLoan": 1373000,
+            "tdsr": 0.06666666666666667,
+            "monthlyPayment": 7250
+          },
+          "details": [
+            "TDSR Ratio: 6.7% (limit: 55%)",
+            "Available for housing: S$7,250/month",
+            "Maximum property value: S$1,830,666.667"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$56,300",
+          "calculations": {
+            "stampDuty": 52800,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$52,800",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 2,
+        "gate3InsightCount": 3,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "high",
+          "medium"
+        ]
+      }
+    },
+    {
+      "scenario": "RF2_LockedMarginal",
+      "name": "Refinance - Locked In, Marginal Savings",
+      "gate2Data": {
+        "loanType": "refinance",
+        "name": "Michelle Ng",
+        "email": "michelle@example.com",
+        "phone": "93334444",
+        "currentRate": 3.2,
+        "outstandingLoan": 500000,
+        "lockInStatus": "locked_in",
+        "propertyValue": 800000
+      },
+      "gate3Data": {
+        "monthlyIncome": 10000,
+        "existingCommitments": 800
+      },
+      "gate2Insights": [
+        {
+          "type": "opportunity",
+          "urgency": "medium",
+          "title": "💰 Significant Savings Opportunity",
+          "message": "Save S$62.824/month by refinancing from 3.2% to 2.95%",
+          "calculations": {
+            "monthlyPayment": 2760.4897828811713,
+            "maxLoan": 500000
+          },
+          "details": [
+            "Current payment: S$2,823.314/month",
+            "New payment: S$2,760.49/month",
+            "Annual savings: S$753.892",
+            "Break-even period: 48 months"
+          ],
+          "value": "S$753.892 yearly",
+          "actionable": true,
+          "nextStep": "Complete profile to lock in these savings"
+        },
+        {
+          "type": "advice",
+          "urgency": "low",
+          "title": "🔒 Currently in Lock-in Period",
+          "message": "Calculate if penalty cost is worth the savings from refinancing",
+          "details": [
+            "Typical penalty: 1.5% of outstanding loan",
+            "May still save if rate difference > 1%",
+            "Plan ahead for lock-in expiry date"
+          ],
+          "actionable": true,
+          "nextStep": "Calculate break-even analysis"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$890,000 in loans",
+          "calculations": {
+            "maxLoan": 890000,
+            "tdsr": 0.08,
+            "monthlyPayment": 4700
+          },
+          "details": [
+            "TDSR Ratio: 8.0% (limit: 55%)",
+            "Available for housing: S$4,700/month",
+            "Maximum property value: S$1,186,666.667"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$38,700",
+          "calculations": {
+            "stampDuty": 35200,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$35,200",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 2,
+        "gate3InsightCount": 3,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "low",
+          "high"
+        ]
+      }
+    },
+    {
+      "scenario": "RF3_ExpiringSoon",
+      "name": "Refinance - Lock-in Expiring Soon",
+      "gate2Data": {
+        "loanType": "refinance",
+        "name": "Karen Teo",
+        "email": "karen@example.com",
+        "phone": "95559999",
+        "currentRate": 3.8,
+        "outstandingLoan": 650000,
+        "lockInStatus": "expiring_soon",
+        "propertyValue": 1000000
+      },
+      "gate3Data": {
+        "monthlyIncome": 12000,
+        "existingCommitments": 600
+      },
+      "gate2Insights": [
+        {
+          "type": "opportunity",
+          "urgency": "medium",
+          "title": "💰 Significant Savings Opportunity",
+          "message": "Save S$282.072/month by refinancing from 3.8% to 2.95%",
+          "calculations": {
+            "monthlyPayment": 3588.6367177455236,
+            "maxLoan": 650000
+          },
+          "details": [
+            "Current payment: S$3,870.709/month",
+            "New payment: S$3,588.637/month",
+            "Annual savings: S$3,384.867",
+            "Break-even period: 11 months"
+          ],
+          "value": "S$3,384.867 yearly",
+          "actionable": true,
+          "nextStep": "Complete profile to lock in these savings"
+        },
+        {
+          "type": "warning",
+          "urgency": "critical",
+          "title": "⚡ Lock-in Expiring Soon",
+          "message": "Your lock-in period is ending - prime time to refinance",
+          "details": [
+            "Start application 3 months before expiry",
+            "Multiple banks to compare",
+            "Avoid auto-renewal at higher rates"
+          ],
+          "value": "Act within 30 days",
+          "actionable": true,
+          "nextStep": "Get pre-approved offers from multiple banks"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$1,136,000 in loans",
+          "calculations": {
+            "maxLoan": 1136000,
+            "tdsr": 0.05,
+            "monthlyPayment": 6000.000000000001
+          },
+          "details": [
+            "TDSR Ratio: 5.0% (limit: 55%)",
+            "Available for housing: S$6,000/month",
+            "Maximum property value: S$1,514,666.667"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$47,500",
+          "calculations": {
+            "stampDuty": 44000,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$44,000",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 2,
+        "gate3InsightCount": 3,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "critical",
+          "high"
+        ]
+      }
+    },
+    {
+      "scenario": "EQ1_Investment",
+      "name": "Equity Loan - Investment Purpose",
+      "gate2Data": {
+        "loanType": "equity_loan",
+        "name": "Robert Tan",
+        "email": "robert@example.com",
+        "phone": "95556666",
+        "propertyValue": 2500000,
+        "outstandingLoan": 600000,
+        "purpose": "investment"
+      },
+      "gate3Data": {
+        "monthlyIncome": 30000,
+        "existingCommitments": 3000
+      },
+      "gate2Insights": [
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "💎 Available Equity",
+          "message": "Unlock up to S$1,275,000 from your property",
+          "calculations": {
+            "maxLoan": 1275000
+          },
+          "details": [
+            "Property value: S$2,500,000",
+            "Max LTV (75%): S$1,875,000",
+            "Outstanding loan: S$600,000",
+            "Available equity: S$1,275,000"
+          ],
+          "actionable": true,
+          "nextStep": "Complete assessment for equity release options"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$2,557,000 in loans",
+          "calculations": {
+            "maxLoan": 2557000,
+            "tdsr": 0.1,
+            "monthlyPayment": 13500
+          },
+          "details": [
+            "TDSR Ratio: 10.0% (limit: 55%)",
+            "Available for housing: S$13,500/month",
+            "Maximum property value: S$3,409,333.333"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$113,500",
+          "calculations": {
+            "stampDuty": 110000,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$110,000",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        },
+        {
+          "type": "opportunity",
+          "urgency": "medium",
+          "title": "💡 Optimization Opportunities",
+          "message": "We found ways to improve your mortgage terms",
+          "details": [
+            "Consider consolidating existing loans to improve TDSR"
+          ],
+          "actionable": true,
+          "nextStep": "Schedule a call with our mortgage specialist"
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 1,
+        "gate3InsightCount": 4,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "high"
+        ]
+      }
+    },
+    {
+      "scenario": "EQ2_Business",
+      "name": "Equity Loan - Business Capital",
+      "gate2Data": {
+        "loanType": "equity_loan",
+        "name": "Jennifer Lee",
+        "email": "jennifer@example.com",
+        "phone": "91110000",
+        "propertyValue": 1800000,
+        "outstandingLoan": 400000,
+        "purpose": "business"
+      },
+      "gate3Data": {
+        "monthlyIncome": 20000,
+        "existingCommitments": 2500
+      },
+      "gate2Insights": [
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "💎 Available Equity",
+          "message": "Unlock up to S$950,000 from your property",
+          "calculations": {
+            "maxLoan": 950000
+          },
+          "details": [
+            "Property value: S$1,800,000",
+            "Max LTV (75%): S$1,350,000",
+            "Outstanding loan: S$400,000",
+            "Available equity: S$950,000"
+          ],
+          "actionable": true,
+          "nextStep": "Complete assessment for equity release options"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$1,610,000 in loans",
+          "calculations": {
+            "maxLoan": 1610000,
+            "tdsr": 0.125,
+            "monthlyPayment": 8500
+          },
+          "details": [
+            "TDSR Ratio: 12.5% (limit: 55%)",
+            "Available for housing: S$8,500/month",
+            "Maximum property value: S$2,146,666.667"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$82,700",
+          "calculations": {
+            "stampDuty": 79200,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$79,200",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        },
+        {
+          "type": "opportunity",
+          "urgency": "medium",
+          "title": "💡 Optimization Opportunities",
+          "message": "We found ways to improve your mortgage terms",
+          "details": [
+            "Consider consolidating existing loans to improve TDSR"
+          ],
+          "actionable": true,
+          "nextStep": "Schedule a call with our mortgage specialist"
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 1,
+        "gate3InsightCount": 4,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "high"
+        ]
+      }
+    },
+    {
+      "scenario": "EQ3_Personal",
+      "name": "Equity Loan - Personal Use",
+      "gate2Data": {
+        "loanType": "equity_loan",
+        "name": "Andrew Lim",
+        "email": "andrew@example.com",
+        "phone": "92223333",
+        "propertyValue": 1000000,
+        "outstandingLoan": 300000,
+        "purpose": "personal"
+      },
+      "gate3Data": {
+        "monthlyIncome": 8000,
+        "existingCommitments": 400
+      },
+      "gate2Insights": [
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "💎 Available Equity",
+          "message": "Unlock up to S$450,000 from your property",
+          "calculations": {
+            "maxLoan": 450000
+          },
+          "details": [
+            "Property value: S$1,000,000",
+            "Max LTV (75%): S$750,000",
+            "Outstanding loan: S$300,000",
+            "Available equity: S$450,000"
+          ],
+          "actionable": true,
+          "nextStep": "Complete assessment for equity release options"
+        }
+      ],
+      "gate3Insights": [
+        {
+          "type": "analysis",
+          "urgency": "high",
+          "title": "📊 Your Personalized Affordability Analysis",
+          "message": "Based on MAS TDSR framework, you can afford up to S$757,000 in loans",
+          "calculations": {
+            "maxLoan": 757000,
+            "tdsr": 0.05,
+            "monthlyPayment": 4000
+          },
+          "details": [
+            "TDSR Ratio: 5.0% (limit: 55%)",
+            "Available for housing: S$4,000/month",
+            "Maximum property value: S$1,009,333.333"
+          ],
+          "actionable": true,
+          "nextStep": "Download your personalized mortgage report"
+        },
+        {
+          "type": "advice",
+          "urgency": "medium",
+          "title": "🏦 Top 3 Banks for Your Profile",
+          "message": "Based on your profile, these banks offer the best terms",
+          "details": [
+            "DBS - Lowest rates for stable income profiles",
+            "OCBC - Best for self-employed with 2-year track record",
+            "UOB - Flexible on TDSR calculations"
+          ],
+          "actionable": true,
+          "nextStep": "We'll negotiate with these banks on your behalf"
+        },
+        {
+          "type": "calculation",
+          "urgency": "medium",
+          "title": "📋 Total Upfront Costs Breakdown",
+          "message": "Total stamp duties and fees: S$47,500",
+          "calculations": {
+            "stampDuty": 44000,
+            "absd": 0
+          },
+          "details": [
+            "Buyer's Stamp Duty: S$44,000",
+            "ABSD: S$0 (First property - Citizen)",
+            "Legal fees (est.): S$3,000",
+            "Valuation fee: S$500"
+          ],
+          "actionable": false
+        }
+      ],
+      "metrics": {
+        "gate2InsightCount": 1,
+        "gate3InsightCount": 3,
+        "hasCalculations": true,
+        "hasActionableInsights": true,
+        "urgencyLevels": [
+          "medium",
+          "high"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "averageGate2Insights": 1.3333333333333333,
+    "averageGate3Insights": 3.5555555555555554,
+    "scenariosWithCalculations": 9,
+    "scenariosWithActionableInsights": 9
+  }
+}

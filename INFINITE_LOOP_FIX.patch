@@ -1,0 +1,130 @@
+# INFINITE LOOP FIX
+# File: hooks/useProgressiveFormController.ts
+# Lines to change:
+
+## Line 9: Add useRef import
+- import { useState, useEffect, useCallback } from 'react'
++ import { useState, useEffect, useCallback, useRef } from 'react'
+
+## After line 96 (after hasCalculated state): Add refs for tracking previous values
++ // Use ref to track previous values to prevent infinite loops
++ const prevFieldValuesRef = useRef<string>('')
++ const prevScoreFieldsRef = useRef<string>('')
+
+## Lines 197-206: REPLACE fieldValues tracking effect
+REMOVE:
+  // Track field values - use ref to avoid infinite loops
+  useEffect(() => {
+    // Only update fieldValues if we actually need them for display
+    // Using JSON.stringify comparison to check if values actually changed
+    const currentValues = JSON.stringify(watchedFields)
+    const prevValues = JSON.stringify(fieldValues)
+    if (currentValues !== prevValues) {
+      setFieldValues(watchedFields)
+    }
+  }, [JSON.stringify(watchedFields)])
+
+REPLACE WITH:
+  // Track field values - FIXED: use ref to avoid infinite loops
+  useEffect(() => {
+    const currentValues = JSON.stringify(watchedFields)
+    
+    // Only update if values actually changed
+    if (currentValues !== prevFieldValuesRef.current) {
+      prevFieldValuesRef.current = currentValues
+      setFieldValues(watchedFields)
+    }
+  }, [watchedFields])
+
+## Lines 127-195: REPLACE lead scoring effect
+REMOVE entire useEffect from line 127-195
+
+REPLACE WITH:
+  // Lead scoring logic - FIXED: use ref to avoid infinite loops
+  useEffect(() => {
+    const fields = watchedFields
+    
+    // Create serialized snapshot of fields that affect scoring
+    const scoreFields = JSON.stringify({
+      name: fields.name,
+      email: fields.email,
+      phone: fields.phone,
+      propertyCategory: fields.propertyCategory,
+      propertyType: fields.propertyType,
+      propertyPrice: fields.propertyPrice,
+      priceRange: fields.priceRange,
+      monthlyIncome: fields.monthlyIncome,
+      actualIncomes: fields.actualIncomes,
+      employmentType: fields.employmentType,
+      purchaseTimeline: fields.purchaseTimeline,
+      lockInStatus: fields.lockInStatus,
+      currentRate: fields.currentRate
+    })
+
+    // Only recalculate if scoring fields actually changed
+    if (scoreFields === prevScoreFieldsRef.current) {
+      return
+    }
+    
+    prevScoreFieldsRef.current = scoreFields
+
+    let score = 0
+
+    // Basic information scoring
+    if (fields.name?.length > 2) score += 10
+    if (fields.email?.includes('@')) score += 10
+    if (fields.phone?.length >= 8) score += 10
+
+    // Property details scoring (Step 2)
+    if (fields.propertyCategory) score += 15
+    if (fields.propertyType) score += 15
+    if (fields.propertyPrice || fields.priceRange) score += 20
+
+    // Financial details scoring (Step 3)
+    if (fields.monthlyIncome > 0 || fields.actualIncomes?.[0] > 0) score += 15
+    if (fields.employmentType === 'employed') score += 10
+    if (fields.employmentType === 'self-employed') score += 8
+
+    // Timeline urgency scoring
+    if (fields.purchaseTimeline === 'immediate') score += 25
+    if (fields.purchaseTimeline === 'next_3_months') score += 20
+    if (fields.purchaseTimeline === 'next_6_months') score += 10
+
+    // Refinancing specific scoring
+    if (mappedLoanType === 'refinance') {
+      if (fields.lockInStatus === 'ending_soon') score += 20
+      if (fields.currentRate > 3.5) score += 15
+    }
+
+    const finalScore = Math.min(score, 100)
+    setLeadScore(finalScore)
+
+    if (onScoreUpdate) {
+      onScoreUpdate({
+        total: finalScore,
+        urgency: finalScore * 0.4,
+        value: finalScore * 0.4,
+        qualification: finalScore * 0.2,
+        breakdown: {
+          urgencyFactors: {},
+          valueFactors: {},
+          qualificationFactors: {}
+        },
+        routing: finalScore >= 75 ? 'immediate' :
+                 finalScore >= 50 ? 'priority' :
+                 finalScore >= 25 ? 'standard' : 'nurture',
+        confidence: 0.8,
+        timestamp: new Date()
+      })
+    }
+  }, [watchedFields, mappedLoanType, onScoreUpdate])
+
+## Lines 230-261: Update calculateInstant callback
+Change line 233:
+- const formData = watch()
++ const formData = watchedFields
+
+## Lines 264-309: REPLACE instant calculation effect
+Change dependency to use watchedFields instead of multiple watch() calls:
+  }, [currentStep, mappedLoanType, hasCalculated, watchedFields, calculateInstant])
+

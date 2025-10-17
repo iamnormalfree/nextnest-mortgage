@@ -1,0 +1,1930 @@
+
+> modernmortgage-simple@0.1.0 test
+> jest --runInBand
+
+PASS components/forms/__tests__/ProgressiveFormAnalytics.test.tsx (18.368 s)
+PASS components/forms/__tests__/ProgressiveFormWithController.test.tsx (8.103 s)
+  ● Console
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'refinance' },
+        loanType: 'refinance'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'refinance' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'refinance',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'refinance' },
+        loanType: 'refinance'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'refinance' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'refinance',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Test Borrower',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'test@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '91234567',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Test Borrower',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'test@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '91234567',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Test Borrower',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'test@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '91234567',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Test Borrower',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'test@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '91234567',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Test Borrower',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'test@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '91234567',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Test Borrower',
+        email: 'test@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Test Borrower',
+          email: 'test@example.com',
+          phone: '91234567'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Test Borrower',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'test@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '91234567',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+PASS components/forms/__tests__/Step3NewPurchase.test.tsx (5.003 s)
+PASS components/forms/__tests__/Step3Refinance.test.tsx
+  ● Console
+
+    console.error
+      Warning: A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+          at input
+          at className (C:\Users\HomePC\Desktop\Code\NextNest\components\ui\input.tsx:6:6)
+          at div
+          at indexB (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\react-hook-form\src\utils\swap.ts:2:23)
+          at div
+          at div
+          at div
+          at onFieldChange (C:\Users\HomePC\Desktop\Code\NextNest\components\forms\sections\Step3Refinance.tsx:25:3)
+          at encType (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\react-hook-form\src\form.tsx:142:16)
+          at children (C:\Users\HomePC\Desktop\Code\NextNest\components\forms\__tests__\Step3Refinance.test.tsx:61:87)
+
+    [0m [90m 522 |[39m
+     [90m 523 |[39m       [36mconst[39m jointIncomeInput [33m=[39m screen[33m.[39mgetByLabelText([32m'Monthly Income'[39m)
+    [31m[1m>[22m[39m[90m 524 |[39m       fireEvent[33m.[39mchange(jointIncomeInput[33m,[39m { target[33m:[39m { value[33m:[39m [32m'7000'[39m } })
+     [90m     |[39m                 [31m[1m^[22m[39m
+     [90m 525 |[39m
+     [90m 526 |[39m       expect(mockOnFieldChange)[33m.[39mtoHaveBeenCalledWith([32m'actualIncomes.1'[39m[33m,[39m [35m7000[39m)
+     [90m 527 |[39m     })[0m
+
+      at printWarning (node_modules/react-dom/cjs/react-dom.development.js:86:30)
+      at error (node_modules/react-dom/cjs/react-dom.development.js:60:7)
+      at updateWrapper (node_modules/react-dom/cjs/react-dom.development.js:1813:7)
+      at updateProperties (node_modules/react-dom/cjs/react-dom.development.js:10151:7)
+      at commitUpdate (node_modules/react-dom/cjs/react-dom.development.js:11047:3)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24428:19)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24332:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24385:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24332:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24385:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24385:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24385:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24332:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24615:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24332:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24332:9)
+      at recursivelyTraverseMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24312:7)
+      at commitMutationEffectsOnFiber (node_modules/react-dom/cjs/react-dom.development.js:24471:9)
+      at commitMutationEffects (node_modules/react-dom/cjs/react-dom.development.js:24282:3)
+      at commitRootImpl (node_modules/react-dom/cjs/react-dom.development.js:26849:5)
+      at commitRoot (node_modules/react-dom/cjs/react-dom.development.js:26721:5)
+      at performSyncWorkOnRoot (node_modules/react-dom/cjs/react-dom.development.js:26156:3)
+      at flushSyncCallbacks (node_modules/react-dom/cjs/react-dom.development.js:12042:22)
+      at flushSync (node_modules/react-dom/cjs/react-dom.development.js:26240:7)
+      at finishEventHandler (node_modules/react-dom/cjs/react-dom.development.js:3976:5)
+      at batchedUpdates (node_modules/react-dom/cjs/react-dom.development.js:3994:5)
+      at dispatchEventForPluginEventSystem (node_modules/react-dom/cjs/react-dom.development.js:9287:3)
+      at dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay (node_modules/react-dom/cjs/react-dom.development.js:6465:5)
+      at dispatchEvent (node_modules/react-dom/cjs/react-dom.development.js:6457:5)
+      at dispatchDiscreteEvent (node_modules/react-dom/cjs/react-dom.development.js:6430:5)
+      at HTMLDivElement.callTheUserObjectsOperation (node_modules/jsdom/lib/jsdom/living/generated/EventListener.js:26:30)
+      at innerInvokeEventListeners (node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25)
+      at invokeEventListeners (node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+      at HTMLInputElementImpl._dispatch (node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+      at HTMLInputElementImpl.dispatchEvent (node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+      at HTMLInputElement.dispatchEvent (node_modules/jsdom/lib/jsdom/living/generated/EventTarget.js:241:34)
+      at node_modules/@testing-library/dom/dist/events.js:19:20
+      at node_modules/@testing-library/react/dist/pure.js:108:16
+      at node_modules/@testing-library/react/dist/act-compat.js:48:24
+      at act (node_modules/react/cjs/react.development.js:2512:16)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at Object.eventWrapper (node_modules/@testing-library/react/dist/pure.js:107:28)
+      at fireEvent (node_modules/@testing-library/dom/dist/events.js:12:35)
+      at Function.fireEvent.<computed> [as change] (node_modules/@testing-library/dom/dist/events.js:110:36)
+      at Function.fireEvent.<computed> [as change] (node_modules/@testing-library/react/dist/fire-event.js:15:52)
+      at Object.change (components/forms/__tests__/Step3Refinance.test.tsx:524:17)
+
+PASS components/forms/__tests__/test_progressive-form-implementation.test.tsx
+  ● Console
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Jamie Lee',
+          email: 'jamie@example.com',
+          phone: '98765432'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Jamie Lee',
+        email: 'jamie@example.com',
+        phone: '98765432'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Jamie Lee',
+        email: 'jamie@example.com',
+        phone: '98765432'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Jamie Lee',
+          email: 'jamie@example.com',
+          phone: '98765432'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Jamie Lee',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'jamie@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '98765432',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+PASS components/forms/__tests__/ProgressiveFormManualProgression.test.tsx
+  ● Console
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 1,
+        currentStep: 0,
+        formDataSize: 1,
+        formDataEntries: { loanType: 'new_purchase' },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 0,
+        requirements: {
+          requiredFields: [ 'loanType' ],
+          requiresEmail: false,
+          requiresPhone: false
+        },
+        formData: { loanType: 'new_purchase' },
+        formDataSize: 1,
+        hasRequiredFields: [
+          {
+            field: 'loanType',
+            hasField: true,
+            value: 'new_purchase',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+    console.log
+      🎯 LeadForm.progressToStep called! {
+        targetStep: 2,
+        currentStep: 1,
+        formDataSize: 4,
+        formDataEntries: {
+          loanType: 'new_purchase',
+          name: 'Alex Tan',
+          email: 'alex@example.com',
+          phone: '91234567'
+        },
+        loanType: 'new_purchase'
+      }
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:103:13)
+
+    console.log
+      🔎 About to validate step requirements...
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:121:13)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Alex Tan',
+        email: 'alex@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔧 getStep2Fields for new_purchase - checking form data: {
+        loanType: 'new_purchase',
+        name: 'Alex Tan',
+        email: 'alex@example.com',
+        phone: '91234567'
+      }
+
+      at LeadForm.log [as getStep2Fields] (lib/domains/forms/entities/LeadForm.ts:265:17)
+
+    console.log
+      🔍 LeadForm validation debug: {
+        step: 1,
+        requirements: {
+          requiredFields: [ 'name', 'email', 'phone' ],
+          requiresEmail: true,
+          requiresPhone: false
+        },
+        formData: {
+          loanType: 'new_purchase',
+          name: 'Alex Tan',
+          email: 'alex@example.com',
+          phone: '91234567'
+        },
+        formDataSize: 4,
+        hasRequiredFields: [
+          {
+            field: 'name',
+            hasField: true,
+            value: 'Alex Tan',
+            valueType: 'string'
+          },
+          {
+            field: 'email',
+            hasField: true,
+            value: 'alex@example.com',
+            valueType: 'string'
+          },
+          {
+            field: 'phone',
+            hasField: true,
+            value: '91234567',
+            valueType: 'string'
+          }
+        ]
+      }
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:162:13)
+
+    console.log
+      ✅ LeadForm validation passed!
+
+      at LeadForm.log [as validateStepRequirements] (lib/domains/forms/entities/LeadForm.ts:211:13)
+
+    console.log
+      📊 Validation result: true
+
+      at LeadForm.log [as progressToStep] (lib/domains/forms/entities/LeadForm.ts:125:13)
+
+PASS lib/validation/__tests__/mortgage-schemas.test.ts
+PASS tests/calculations/instant-profile.test.ts
+FAIL tests/calculations/compliance-snapshot.test.ts
+  ● Compliance Snapshot Calculator - Dr Elena v2 Alignment › TDSR Compliance Calculations › should calculate TDSR limit correctly for employed income
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 0.04
+    Received: undefined
+
+    [0m [90m 20 |[39m       expect(result[33m.[39mrecognizedIncome)[33m.[39mtoBe([35m10000[39m)[33m;[39m [90m// 100% for employed[39m
+     [90m 21 |[39m       expect(result[33m.[39mtdsrLimit)[33m.[39mtoBe([35m3500[39m)[33m;[39m [90m// (10000 * 0.55) - 2000[39m
+    [31m[1m>[22m[39m[90m 22 |[39m       expect(result[33m.[39mstressRateApplied)[33m.[39mtoBe([35m0.04[39m)[33m;[39m
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 23 |[39m       expect(result[33m.[39mtdsrRatio)[33m.[39mtoBe([35m32[39m)[33m;[39m
+     [90m 24 |[39m       expect(result[33m.[39misTDSRCompliant)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 25 |[39m       expect(result[33m.[39mpolicyRefs)[33m.[39mtoContain([32m'MAS Notice 645'[39m)[33m;[39m[0m
+
+      at Object.toBe (tests/calculations/compliance-snapshot.test.ts:22:40)
+
+PASS tests/calculations/refinance-outlook.test.ts
+PASS tests/dr-elena-v2-regulation.test.ts
+PASS tests/calculations/dr-elena-constants.test.ts
+PASS components/forms/__tests__/Step3NewPurchaseUnit.test.tsx
+PASS lib/forms/__tests__/form-config.test.ts
+PASS tests/jest-smoke.test.ts
+
+Test Suites: 1 failed, 14 passed, 15 total
+Tests:       1 failed, 203 passed, 204 total
+Snapshots:   0 total
+Time:        45.195 s, estimated 61 s
+Ran all test suites.

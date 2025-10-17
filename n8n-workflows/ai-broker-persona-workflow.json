@@ -1,0 +1,630 @@
+{
+  "name": "AI Broker Persona System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwoot-ai-broker",
+        "responseMode": "onReceived",
+        "responseData": "={\"received\": true, \"timestamp\": \"{{$now.toISO()}}\"}"
+      },
+      "id": "webhook_receiver",
+      "name": "Chatwoot Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "chatwoot-ai-broker"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"event\"]}}",
+              "value2": "message_created"
+            },
+            {
+              "value1": "={{$json[\"message\"][\"message_type\"]}}",
+              "value2": "incoming"
+            },
+            {
+              "value1": "={{$json[\"message\"][\"sender\"][\"type\"]}}",
+              "operation": "notEqual",
+              "value2": "agent"
+            }
+          ]
+        }
+      },
+      "id": "filter_messages",
+      "name": "Filter Customer Messages",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract customer profile from conversation\nconst conversation = $input.first().json.conversation;\nconst message = $input.first().json.message;\nconst attributes = conversation.custom_attributes || {};\n\n// Build customer profile\nconst customerProfile = {\n  // Identifiers\n  conversationId: conversation.id,\n  contactId: conversation.contact_id,\n  messageId: message.id,\n  \n  // Customer Data\n  name: attributes.name || conversation.contact?.name || 'Customer',\n  email: attributes.email || conversation.contact?.email,\n  phone: attributes.phone || conversation.contact?.phone_number,\n  \n  // Lead Qualification\n  leadScore: parseInt(attributes.lead_score) || 50,\n  loanType: attributes.loan_type || 'new_purchase',\n  propertyType: attributes.property_category || 'hdb',\n  monthlyIncome: parseFloat(attributes.monthly_income) || 5000,\n  loanAmount: parseFloat(attributes.loan_amount) || 0,\n  timeline: attributes.purchase_timeline || 'flexible',\n  employmentType: attributes.employment_type || 'employed',\n  \n  // Message Context\n  currentMessage: message.content,\n  messageCount: parseInt(attributes.message_count) || 0,\n  \n  // Previous Assignment\n  previousBrokerId: attributes.assigned_broker_id,\n  previousBrokerName: attributes.assigned_broker_name\n};\n\nreturn customerProfile;"
+      },
+      "id": "extract_profile",
+      "name": "Extract Customer Profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 280]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Check if conversation already has a broker\nSELECT \n  bc.*,\n  b.name as broker_name,\n  b.slug as broker_slug,\n  b.photo_url,\n  b.personality_type,\n  b.voice_description,\n  b.communication_style,\n  b.approach_style,\n  b.favorite_phrases,\n  b.speaking_speed,\n  b.voice_model\nFROM broker_conversations bc\nJOIN ai_brokers b ON bc.broker_id = b.id\nWHERE bc.conversation_id = {{$json[\"conversationId\"]}}\nAND bc.status = 'active'\nLIMIT 1;",
+        "additionalFields": {}
+      },
+      "id": "check_existing",
+      "name": "Check Existing Assignment",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 280],
+      "credentials": {
+        "postgres": {
+          "id": "supabase_postgres",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"broker_id\"]}}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "id": "needs_assignment",
+      "name": "Needs Assignment?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 280]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Assign best broker using the function\nSELECT \n  b.*,\n  assign_best_broker(\n    {{$json[\"leadScore\"]}},\n    '{{$json[\"loanType\"]}}',\n    '{{$json[\"propertyType\"]}}',\n    {{$json[\"monthlyIncome\"]}},\n    '{{$json[\"timeline\"]}}'\n  ) as assigned_broker_id\nFROM ai_brokers b\nWHERE b.id = assign_best_broker(\n  {{$json[\"leadScore\"]}},\n  '{{$json[\"loanType\"]}}',\n  '{{$json[\"propertyType\"]}}',\n  {{$json[\"monthlyIncome\"]}},\n  '{{$json[\"timeline\"]}}'\n);",
+        "additionalFields": {}
+      },
+      "id": "assign_broker",
+      "name": "Assign Best Broker",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "postgres": {
+          "id": "supabase_postgres",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "broker_conversations",
+        "columns": "conversation_id,broker_id,contact_id,customer_name,customer_email,customer_phone,lead_score,loan_type,property_type,monthly_income,loan_amount,timeline,assignment_method,assignment_reason",
+        "additionalFields": {}
+      },
+      "id": "create_assignment",
+      "name": "Create Assignment Record",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1450, 200],
+      "credentials": {
+        "postgres": {
+          "id": "supabase_postgres",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge broker data from either path\nconst brokerData = $input.all()[0].json;\nconst customerProfile = $input.all()[1].json;\n\n// Prepare broker context\nreturn {\n  broker: {\n    id: brokerData.id || brokerData.broker_id,\n    name: brokerData.name || brokerData.broker_name,\n    slug: brokerData.slug || brokerData.broker_slug,\n    photoUrl: brokerData.photo_url,\n    personalityType: brokerData.personality_type,\n    voiceDescription: brokerData.voice_description,\n    communicationStyle: brokerData.communication_style,\n    approachStyle: brokerData.approach_style,\n    favoritePhrases: brokerData.favorite_phrases || [],\n    speakingSpeed: brokerData.speaking_speed,\n    voiceModel: brokerData.voice_model\n  },\n  customer: customerProfile,\n  conversationId: customerProfile.conversationId,\n  messageCount: customerProfile.messageCount\n};"
+      },
+      "id": "merge_context",
+      "name": "Merge Broker Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1650, 280]
+    },
+    {
+      "parameters": {
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{$json[\"conversationId\"]}}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "={{$credentials.chatwootApiToken}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get_history",
+      "name": "Get Conversation History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1850, 280],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "chatwoot_api",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build conversation history for OpenAI\nconst messages = $json.payload || [];\nconst brokerContext = $input.all()[1].json;\n\n// Get last 10 messages for context\nconst conversationHistory = messages\n  .slice(-10)\n  .filter(msg => !msg.private)\n  .map(msg => ({\n    role: msg.message_type === 0 ? 'user' : 'assistant',\n    content: msg.content\n  }));\n\n// Identify topics discussed\nconst topicsDiscussed = [];\nconst messageTexts = messages.map(m => m.content.toLowerCase()).join(' ');\n\nif (messageTexts.includes('rate')) topicsDiscussed.push('interest rates');\nif (messageTexts.includes('afford')) topicsDiscussed.push('affordability');\nif (messageTexts.includes('cpf')) topicsDiscussed.push('CPF usage');\nif (messageTexts.includes('loan')) topicsDiscussed.push('loan details');\nif (messageTexts.includes('property')) topicsDiscussed.push('property type');\n\nreturn {\n  ...brokerContext,\n  conversationHistory,\n  topicsDiscussed,\n  totalMessages: messages.length\n};"
+      },
+      "id": "process_history",
+      "name": "Process History",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [2050, 280]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-3.5-turbo",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are {{$json[\"broker\"][\"name\"]}}, a mortgage broker specialist at NextNest Singapore.\n\n## YOUR IDENTITY\nName: {{$json[\"broker\"][\"name\"]}}\nPersonality: {{$json[\"broker\"][\"personalityType\"]}}\nVoice: {{$json[\"broker\"][\"voiceDescription\"]}}\nStyle: {{$json[\"broker\"][\"communicationStyle\"]}}\nApproach: {{$json[\"broker\"][\"approachStyle\"]}}\n\n## CUSTOMER PROFILE\nName: {{$json[\"customer\"][\"name\"]}}\nLead Score: {{$json[\"customer\"][\"leadScore\"]}}/100\nLoan Type: {{$json[\"customer\"][\"loanType\"]}}\nProperty: {{$json[\"customer\"][\"propertyType\"]}}\nMonthly Income: S${{$json[\"customer\"][\"monthlyIncome\"]}}\nTimeline: {{$json[\"customer\"][\"timeline\"]}}\n\n## CONVERSATION STATUS\nMessage #{{$json[\"messageCount\"] + 1}} in our conversation\nTopics discussed: {{$json[\"topicsDiscussed\"].join(\", \")}}\n\n## CURRENT SINGAPORE MORTGAGE RATES\n- 2-year fixed: 3.70% - 3.80%\n- 3-year fixed: 3.60% - 3.70%\n- 5-year fixed: 3.65% - 3.75%\n- Floating (SORA + spread): 3.67% + 0.65%\n\n## YOUR OBJECTIVES\n1. Stay consistently in character as {{$json[\"broker\"][\"name\"]}}\n2. Use your unique communication style and approach\n3. Reference previous discussion naturally (don't repeat covered topics)\n4. Build toward handoff after 6-10 messages for high-value leads\n5. If customer shows high intent (ready to apply, urgent need), suggest direct consultation\n\n## FAVORITE PHRASES TO USE\n{{$json[\"broker\"][\"favoritePhrases\"].join(\"\\n\")}}\n\n## IMPORTANT GUIDELINES\n- Be specific with numbers using their actual data\n- Show calculations when discussing affordability\n- Reference Singapore regulations (TDSR, LTV, CPF) when relevant\n- Maintain your personality consistently\n- If this is message 8+ and lead score > 75, subtly guide toward human handoff\n- Never break character or mention you're an AI"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 400,
+          "topP": 0.9
+        }
+      },
+      "id": "generate_response",
+      "name": "Generate AI Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [2250, 280],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_api",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Analyze for handoff triggers\nconst response = $json.choices[0].message.content;\nconst customer = $input.all()[1].json.customer;\nconst broker = $input.all()[1].json.broker;\nconst messageCount = $input.all()[1].json.messageCount;\nconst userMessage = customer.currentMessage.toLowerCase();\n\nlet shouldHandoff = false;\nlet handoffReason = '';\nlet urgencyLevel = 'normal';\n\n// Check handoff triggers\nconst handoffKeywords = [\n  'speak to human', 'real person', 'human agent',\n  'ready to apply', 'apply now', 'let\\'s proceed',\n  'sign up', 'start application', 'move forward'\n];\n\n// Direct request for human\nif (handoffKeywords.some(keyword => userMessage.includes(keyword))) {\n  shouldHandoff = true;\n  handoffReason = `Customer explicitly requested to proceed or speak with human`;\n  urgencyLevel = 'high';\n}\n// High-value lead at optimal handoff point\nelse if (messageCount >= 7 && customer.leadScore >= 80) {\n  shouldHandoff = true;\n  handoffReason = `High-value lead (score: ${customer.leadScore}) ready for conversion after ${messageCount} messages`;\n  urgencyLevel = 'medium';\n}\n// Urgent timeline\nelse if (customer.timeline === 'immediate' && messageCount >= 5) {\n  shouldHandoff = true;\n  handoffReason = `Urgent timeline customer engaged for ${messageCount} messages`;\n  urgencyLevel = 'high';\n}\n// Complex situation\nelse if (userMessage.includes('divorce') || userMessage.includes('bankruptcy') || \n         userMessage.includes('foreigner') || userMessage.includes('overseas')) {\n  shouldHandoff = true;\n  handoffReason = 'Complex situation requiring specialist attention';\n  urgencyLevel = 'medium';\n}\n// Frustration detected\nelse if (userMessage.includes('frustrated') || userMessage.includes('not helpful') ||\n         userMessage.includes('speak to someone else')) {\n  shouldHandoff = true;\n  handoffReason = 'Customer showing frustration - immediate attention needed';\n  urgencyLevel = 'urgent';\n}\n\n// Prepare handoff message if needed\nlet finalResponse = response;\nif (shouldHandoff) {\n  const handoffMessage = `\\n\\n---\\n🤝 I can see you're ready to take the next step! Let me connect you with our senior mortgage specialist who can process your application immediately and secure these rates for you. They'll be with you in just a moment.`;\n  finalResponse = response + handoffMessage;\n}\n\nreturn {\n  aiResponse: finalResponse,\n  shouldHandoff,\n  handoffReason,\n  urgencyLevel,\n  conversationId: customer.conversationId,\n  brokerId: broker.id,\n  brokerName: broker.name,\n  messageCount: messageCount + 1\n};"
+      },
+      "id": "check_handoff",
+      "name": "Check Handoff Triggers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [2450, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{$json[\"conversationId\"]}}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "={{$credentials.chatwootApiToken}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{$json[\"aiResponse\"]}}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "={{false}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send_response",
+      "name": "Send to Chatwoot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [2650, 280],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "chatwoot_api",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"shouldHandoff\"]}}",
+              "value2": "={{true}}"
+            }
+          ]
+        }
+      },
+      "id": "check_if_handoff",
+      "name": "Should Handoff?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [2850, 280]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{$json[\"conversationId\"]}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "={{$credentials.chatwootApiToken}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "open"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "change_status",
+      "name": "Change to Open",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [3050, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "chatwoot_api",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{$json[\"conversationId\"]}}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "={{$credentials.chatwootApiToken}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "=🤖➡️👨‍💼 **AI Broker Handoff**\\n\\n**From:** {{$json[\"brokerName\"]}}\\n**Reason:** {{$json[\"handoffReason\"]}}\\n**Urgency:** {{$json[\"urgencyLevel\"]}}\\n**Messages Exchanged:** {{$json[\"messageCount\"]}}\\n\\n**Quick Summary:**\\n- Lead Score: {{$node[\"Extract Customer Profile\"].json[\"leadScore\"]}}/100\\n- Loan Type: {{$node[\"Extract Customer Profile\"].json[\"loanType\"]}}\\n- Property: {{$node[\"Extract Customer Profile\"].json[\"propertyType\"]}}\\n- Income: S${{$node[\"Extract Customer Profile\"].json[\"monthlyIncome\"]}}\\n- Timeline: {{$node[\"Extract Customer Profile\"].json[\"timeline\"]}}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": "={{true}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "add_note",
+      "name": "Add Internal Note",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [3250, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "chatwoot_api",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{$json[\"conversationId\"]}}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "={{$credentials.chatwootApiToken}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "custom_attributes",
+              "value": "={\\n  \"message_count\": {{$json[\"messageCount\"]}},\\n  \"assigned_broker_id\": \"{{$json[\"brokerId\"]}}\",\\n  \"assigned_broker_name\": \"{{$json[\"brokerName\"]}}\",\\n  \"last_ai_response\": \"{{$now.toISO()}}\",\\n  \"handoff_triggered\": {{$json[\"shouldHandoff\"]}},\\n  \"handoff_reason\": \"{{$json[\"handoffReason\"]}}\"\\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "update_attributes",
+      "name": "Update Attributes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [3050, 360],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "chatwoot_api",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Update conversation metrics\nUPDATE broker_conversations\nSET \n  messages_exchanged = {{$json[\"messageCount\"]}},\n  broker_messages = broker_messages + 1,\n  last_message_at = NOW(),\n  handoff_triggered = {{$json[\"shouldHandoff\"]}},\n  handoff_reason = '{{$json[\"handoffReason\"]}}',\n  handoff_at = CASE WHEN {{$json[\"shouldHandoff\"]}} THEN NOW() ELSE NULL END,\n  status = CASE WHEN {{$json[\"shouldHandoff\"]}} THEN 'handoff_requested' ELSE 'active' END\nWHERE conversation_id = {{$json[\"conversationId\"]}};\n\n-- Update broker metrics\nUPDATE ai_brokers\nSET \n  total_messages_sent = total_messages_sent + 1,\n  last_active_at = NOW()\nWHERE id = '{{$json[\"brokerId\"]}}';\n\n-- Track successful phrases if applicable\nINSERT INTO broker_learning (\n  broker_id,\n  conversation_id,\n  learning_type,\n  successful_phrases,\n  customer_segment,\n  lead_score_range,\n  created_at\n) VALUES (\n  '{{$json[\"brokerId\"]}}',\n  {{$json[\"conversationId\"]}},\n  'response_sent',\n  ARRAY['{{$json[\"aiResponse\"].substring(0, 100)}}'],\n  '{{$node[\"Extract Customer Profile\"].json[\"propertyType\"]}}',\n  '{{$node[\"Extract Customer Profile\"].json[\"leadScore\"]}}',\n  NOW()\n);",
+        "additionalFields": {}
+      },
+      "id": "update_metrics",
+      "name": "Update Metrics",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [3250, 360],
+      "credentials": {
+        "postgres": {
+          "id": "supabase_postgres",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chatwoot Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter Customer Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Customer Messages": {
+      "main": [
+        [
+          {
+            "node": "Extract Customer Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Customer Profile": {
+      "main": [
+        [
+          {
+            "node": "Check Existing Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing Assignment": {
+      "main": [
+        [
+          {
+            "node": "Needs Assignment?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Assignment?": {
+      "main": [
+        [
+          {
+            "node": "Assign Best Broker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Broker Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Best Broker": {
+      "main": [
+        [
+          {
+            "node": "Create Assignment Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Assignment Record": {
+      "main": [
+        [
+          {
+            "node": "Merge Broker Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Broker Context": {
+      "main": [
+        [
+          {
+            "node": "Get Conversation History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Conversation History": {
+      "main": [
+        [
+          {
+            "node": "Process History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process History": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI Response": {
+      "main": [
+        [
+          {
+            "node": "Check Handoff Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Handoff Triggers": {
+      "main": [
+        [
+          {
+            "node": "Send to Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Should Handoff?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Handoff?": {
+      "main": [
+        [
+          {
+            "node": "Change to Open",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Attributes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change to Open": {
+      "main": [
+        [
+          {
+            "node": "Add Internal Note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Internal Note": {
+      "main": [
+        [
+          {
+            "node": "Update Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Attributes": {
+      "main": [
+        [
+          {
+            "node": "Update Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "ai-broker-v1",
+  "id": "ai-broker-persona-system",
+  "meta": {
+    "instanceId": "nextnest-ai-brokers"
+  },
+  "tags": []
+}

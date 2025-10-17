@@ -214,10 +214,10 @@ export function ProgressiveForm({
     if (significantFields.includes(fieldName)) {
       requestAIInsight(fieldName, value)
     }
-  }, [currentGate, leadForm, publishEvent, createEvent])
+  }, [currentGate, leadForm, publishEvent, createEvent]) // eslint-disable-line react-hooks/exhaustive-deps
   
   // Request AI insight
-  const requestAIInsight = async (fieldName: string, value: any) => {
+  const requestAIInsight = useCallback(async (fieldName: string, value: any) => {
     setIsAnalyzing(true)
     
     await publishEvent(createEvent(
@@ -268,7 +268,7 @@ export function ProgressiveForm({
     } finally {
       setIsAnalyzing(false)
     }
-  }
+  }, [publishEvent, createEvent, sessionId, currentGate, completedGates, loanType, leadForm, onAIInsight])
   
   // Progress to next gate
   const progressToNextGate = async (data: any) => {

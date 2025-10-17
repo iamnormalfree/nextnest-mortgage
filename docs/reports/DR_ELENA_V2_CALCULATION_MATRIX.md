@@ -137,3 +137,36 @@
 The Dr Elena v2 persona provides comprehensive calculation rules that align well with the Step 2/3 implementation plan. Key gaps identified around refinance monthly savings calculations and early repayment penalties. The persona's emphasis on rounding rules, income recognition, and age/tenure triggers must be faithfully implemented in the calculator modules.
 
 **Next Steps**: Annotate implementation plan with specific persona section references, create test fixtures from test scenarios, and implement calculator module with persona-aligned constants.
+
+## Workstream 3 Resolved Gaps (2025-10-16)
+
+### Commercial Property LTV
+- **Resolved**: Commercial LTV set to 60% per persona bank policy
+- **Implementation**: `dr-elena-constants.ts` exports commercial LTV constant
+- **Test Coverage**: `scenario_6` validates commercial property with CPF disallowance
+
+### CPF Valuation & Withdrawal Logic
+- **Resolved**: CPF withdrawal limit = 120% of lower(valuation, purchase_price)
+- **Implementation**: Calculator applies valuation limit correctly
+- **Test Coverage**: All scenarios validate `cpf_withdrawal_limit` field
+
+### Negative Test Scenarios
+- **Resolved**: Comprehensive negative scenarios added to fixtures
+- **Coverage**:
+  - TDSR breach: `scenario_negative_tdsr_breach`
+  - MSR breach: `scenario_negative_msr_breach`
+  - Commercial CPF disallowance: `scenario_negative_commercial_cpf`
+- **Test Files**: 
+  - `tests/calculations/compliance-snapshot.test.ts` - 385+ lines of negative scenarios
+  - `tests/calculations/instant-profile.test.ts` - Negative scenario test suite
+
+### Reason Codes & Policy References
+- **Resolved**: All calculators return structured reason codes and policy references
+- **Mapping**:
+  - TDSR calculations → `MAS Notice 645`
+  - MSR calculations → `MAS Notice 632` + `MAS Notice 645`
+  - CPF restrictions → Appropriate policy refs per property type
+- **Test Coverage**: All scenarios validate `reasonCodes` and `policyRefs` arrays
+
+### Outstanding Items
+None identified - all core calculation requirements from persona v2 are now implemented and tested.

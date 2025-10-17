@@ -1,0 +1,34 @@
+{
+  "event": "message_created",
+  "id": 999,
+  "content": "hi",
+  "message_type": 0,
+  "private": false,
+  "sender": {
+    "type": "contact"
+  },
+  "conversation": {
+    "id": 280,
+    "status": "bot",
+    "contact_id": 123,
+    "custom_attributes": {
+      "lead_score": 65,
+      "loan_type": "new_purchase",
+      "conversation_status": "bot"
+    },
+    "meta": {
+      "sender": {
+        "name": "Test User",
+        "email": "test@example.com",
+        "phone_number": "+6591234567"
+      }
+    }
+  },
+  "message": {
+    "message_type": 0,
+    "content": "hi",
+    "sender": {
+      "type": "contact"
+    }
+  }
+}

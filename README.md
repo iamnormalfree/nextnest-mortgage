@@ -1,6 +1,6 @@
-# ModernMortgage-Simple
+# NextNest - Singapore's Smartest Mortgage Platform
 
-A simplified, working version of the NextNest mortgage website that focuses on core functionality without feature bloat.
+An AI-powered mortgage platform with sophisticated UI design and intelligent broker matching.
 
 ## What's Included
 
@@ -64,6 +64,46 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 - Real-time payment calculations
 - Quick scenario buttons (HDB, Private Condo)
 - Payment breakdown and totals
+
+## 🎨 Design System
+
+**Single Source of Truth:** `/app/redesign/sophisticated-flow/page.tsx`
+
+### Quick Setup
+```bash
+# Enable the new design system
+echo "NEXT_PUBLIC_USE_SOPHISTICATED_FLOW=true" >> .env.local
+npm run dev
+```
+
+### Design Principles
+- **90% Monochrome + 10% Yellow** (#FCD34D)
+- **NO Purple** - Yellow accent only
+- **Sharp Rectangles** - NO rounded corners
+- **Font Weights:** 300/400/600 ONLY
+- **"Rule of One":** ONE yellow element per viewport
+
+### Key Files
+- **Design Tokens:** `/lib/design/tokens.ts`
+- **Documentation:** `/docs/design/SINGLE_SOURCE_OF_TRUTH.md`
+- **Setup Guide:** `/SOPHISTICATED_FLOW_SETUP.md`
+
+### Component Patterns
+```typescript
+import { COLORS, COMPONENT_PATTERNS } from '@/lib/design/tokens'
+
+// Primary CTA (yellow)
+<button className={COMPONENT_PATTERNS.primaryButton.className}>
+  Get Started
+</button>
+
+// Card with sharp corners
+<div className={COMPONENT_PATTERNS.card.className}>
+  {/* content */}
+</div>
+```
+
+---
 
 ## Next Steps
 

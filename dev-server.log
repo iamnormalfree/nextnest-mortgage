@@ -1,0 +1,150 @@
+
+> modernmortgage-simple@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+  ▲ Next.js 14.2.32
+  - Local:        http://localhost:3001
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 4.6s
+ ○ Compiling /redesign/sophisticated-flow ...
+ ✓ Compiled /redesign/sophisticated-flow in 7.8s (550 modules)
+ GET /redesign/sophisticated-flow 200 in 9579ms
+ ✓ Compiled in 1722ms (259 modules)
+ ○ Compiling /apply ...
+ ✓ Compiled /apply in 2s (747 modules)
+ ✓ Compiled in 2.2s (761 modules)
+ ✓ Compiled in 1499ms (761 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\HomePC\Desktop\Code\NextNest\.next\cache\webpack\client-development\9.pack.gz_' -> 'C:\Users\HomePC\Desktop\Code\NextNest\.next\cache\webpack\client-development\9.pack.gz'
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 4.2s (778 modules)
+ ⨯ app\apply\page.tsx (96:14) @ ProgressiveForm
+ ⨯ ReferenceError: ProgressiveForm is not defined
+    at ApplyPageContent (./app/apply/page.tsx:139:104)
+digest: "2447369201"
+[0m [90m 94 |[39m             [33m<[39m[33mCommercialQuickForm[39m sessionId[33m=[39m{sessionId} className[33m=[39m[32m"w-full"[39m [33m/[39m[33m>[39m[0m
+[0m [90m 95 |[39m           ) [33m:[39m ([0m
+[0m[31m[1m>[22m[39m[90m 96 |[39m             [33m<[39m[33mProgressiveForm[39m[0m
+[0m [90m    |[39m              [31m[1m^[22m[39m[0m
+[0m [90m 97 |[39m               loanType[33m=[39m{validLoanType}[0m
+[0m [90m 98 |[39m               sessionId[33m=[39m{sessionId}[0m
+[0m [90m 99 |[39m               onGateCompletion[33m=[39m{handleGateCompletion}[0m
+ GET /apply?loanType=new_purchase 200 in 1807ms
+ ✓ Compiled in 1871ms (778 modules)
+ ✓ Compiled in 1140ms (371 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /apply?loanType=new_purchase 200 in 498ms
+ ✓ Compiled in 839ms (371 modules)
+ ✓ Compiled in 1526ms (371 modules)
+ ✓ Compiled in 1322ms (371 modules)
+ ✓ Compiled in 1225ms (371 modules)
+ ✓ Compiled in 814ms (371 modules)
+ ✓ Compiled in 1929ms (778 modules)
+ ✓ Compiled in 610ms (764 modules)
+ ✓ Compiled in 921ms (764 modules)
+ ✓ Compiled in 717ms (778 modules)
+ ✓ Compiled in 705ms (371 modules)
+ ✓ Compiled in 438ms (371 modules)
+ ✓ Compiled in 411ms (371 modules)
+ ✓ Compiled in 2.7s (946 modules)
+ ⨯ ./hooks/useProgressiveFormController.ts
+Error: 
+  [31mx[0m the name `fields` is defined multiple times
+     ,-[[36;1;4mC:\Users\HomePC\Desktop\Code\NextNest\hooks\useProgressiveFormController.ts[0m:129:1]
+ [2m129[0m | 
+ [2m130[0m |   // Lead scoring logic - FIXED: use ref to avoid infinite loops
+ [2m131[0m |   useEffect(() => {
+ [2m132[0m |     const fields = watchedFields
+     : [31;1m          ^^^|^^[0m
+     :              [31;1m`-- [31;1mprevious definition of `fields` here[0m[0m
+ [2m133[0m |     
+ [2m134[0m |     // Create serialized snapshot of fields that affect scoring
+ [2m135[0m |     const scoreFields = JSON.stringify({
+ [2m136[0m |       name: fields.name,
+ [2m137[0m |       email: fields.email,
+ [2m138[0m |       phone: fields.phone,
+ [2m139[0m |       propertyCategory: fields.propertyCategory,
+ [2m140[0m |       propertyType: fields.propertyType,
+ [2m141[0m |       propertyPrice: fields.propertyPrice,
+ [2m142[0m |       priceRange: fields.priceRange,
+ [2m143[0m |       monthlyIncome: fields.monthlyIncome,
+ [2m144[0m |       actualIncomes: fields.actualIncomes,
+ [2m145[0m |       employmentType: fields.employmentType,
+ [2m146[0m |       purchaseTimeline: fields.purchaseTimeline,
+ [2m147[0m |       lockInStatus: fields.lockInStatus,
+ [2m148[0m |       currentRate: fields.currentRate
+ [2m149[0m |     })
+ [2m150[0m | 
+ [2m151[0m |     // Only recalculate if scoring fields actually changed
+ [2m152[0m |     if (scoreFields === prevScoreFieldsRef.current) {
+ [2m153[0m |       return
+ [2m154[0m |     }
+ [2m155[0m |     
+ [2m156[0m |     prevScoreFieldsRef.current = scoreFields
+ [2m157[0m | 
+ [2m158[0m |     let score = 0
+ [2m159[0m |     const fields = watch()
+     : [33;1m          ^^^|^^[0m
+     :              [33;1m`-- [33;1m`fields` redefined here[0m[0m
+ [2m160[0m | 
+ [2m161[0m |     // Basic information scoring
+ [2m161[0m |     if (fields.name?.length > 2) score += 10
+     `----
+
+Import trace for requested module:
+./hooks/useProgressiveFormController.ts
+./components/forms/ProgressiveFormWithController.tsx
+./app/apply/page.tsx
+ ⨯ ./hooks/useProgressiveFormController.ts
+Error: 
+  [31mx[0m the name `fields` is defined multiple times
+     ,-[[36;1;4mC:\Users\HomePC\Desktop\Code\NextNest\hooks\useProgressiveFormController.ts[0m:129:1]
+ [2m129[0m | 
+ [2m130[0m |   // Lead scoring logic - FIXED: use ref to avoid infinite loops
+ [2m131[0m |   useEffect(() => {
+ [2m132[0m |     const fields = watchedFields
+     : [31;1m          ^^^|^^[0m
+     :              [31;1m`-- [31;1mprevious definition of `fields` here[0m[0m
+ [2m133[0m |     
+ [2m134[0m |     // Create serialized snapshot of fields that affect scoring
+ [2m135[0m |     const scoreFields = JSON.stringify({
+ [2m136[0m |       name: fields.name,
+ [2m137[0m |       email: fields.email,
+ [2m138[0m |       phone: fields.phone,
+ [2m139[0m |       propertyCategory: fields.propertyCategory,
+ [2m140[0m |       propertyType: fields.propertyType,
+ [2m141[0m |       propertyPrice: fields.propertyPrice,
+ [2m142[0m |       priceRange: fields.priceRange,
+ [2m143[0m |       monthlyIncome: fields.monthlyIncome,
+ [2m144[0m |       actualIncomes: fields.actualIncomes,
+ [2m145[0m |       employmentType: fields.employmentType,
+ [2m146[0m |       purchaseTimeline: fields.purchaseTimeline,
+ [2m147[0m |       lockInStatus: fields.lockInStatus,
+ [2m148[0m |       currentRate: fields.currentRate
+ [2m149[0m |     })
+ [2m150[0m | 
+ [2m151[0m |     // Only recalculate if scoring fields actually changed
+ [2m152[0m |     if (scoreFields === prevScoreFieldsRef.current) {
+ [2m153[0m |       return
+ [2m154[0m |     }
+ [2m155[0m |     
+ [2m156[0m |     prevScoreFieldsRef.current = scoreFields
+ [2m157[0m | 
+ [2m158[0m |     let score = 0
+ [2m159[0m |     const fields = watch()
+     : [33;1m          ^^^|^^[0m
+     :              [33;1m`-- [33;1m`fields` redefined here[0m[0m
+ [2m160[0m | 
+ [2m161[0m |     // Basic information scoring
+ [2m161[0m |     if (fields.name?.length > 2) score += 10
+     `----
+
+Import trace for requested module:
+./hooks/useProgressiveFormController.ts
+./components/forms/ProgressiveFormWithController.tsx
+./app/apply/page.tsx
+ ✓ Compiled in 806ms (932 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\HomePC\Desktop\Code\NextNest\.next\cache\webpack\server-development\9.pack.gz_' -> 'C:\Users\HomePC\Desktop\Code\NextNest\.next\cache\webpack\server-development\9.pack.gz'

@@ -105,19 +105,38 @@ export function Step3Refinance({
     // Get property type from form context
     const propertyType = watch('propertyType') || 'Private'
 
-    // Calculate total commitments (defaults to 0 if not entered)
-    const totalCommitments = (existingCommitments || 0) + (creditCardCount || 0) * 50
+    // Calculate total existing commitments (defaults to 0 if not entered)
+    const totalExistingCommitments = (existingCommitments || 0) + (creditCardCount || 0) * 50
 
-    // Calculate TDSR and MSR ratios directly
-    // TDSR = (commitments / income) * 100
-    const tdsrRatio = monthlyIncome > 0 ? (totalCommitments / monthlyIncome) * 100 : 0
+    // Calculate monthly mortgage payment for the REFINANCED loan
+    // Formula: M = P * [r(1+r)^n] / [(1+r)^n - 1]
+    // Using MAS stress test rate (4% for residential properties)
+    const stressTestRate = 4.0 // MAS stress test rate
+    const monthlyRate = stressTestRate / 100 / 12
+    const tenureYears = 25 // Standard assumption for refinance
+    const numberOfPayments = tenureYears * 12
+
+    let monthlyMortgagePayment = 0
+    if (outstandingLoanNumeric > 0 && monthlyRate > 0) {
+      const numerator = monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)
+      const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1
+      monthlyMortgagePayment = Math.ceil(outstandingLoanNumeric * (numerator / denominator))
+    }
+
+    // Calculate TDSR: (New Mortgage Payment + Existing Commitments) / Income × 100%
+    // TDSR limit is 55% of income (MAS regulation)
+    const tdsrRatio = monthlyIncome > 0
+      ? ((monthlyMortgagePayment + totalExistingCommitments) / monthlyIncome) * 100
+      : 0
     const tdsrLimitPercent = 55
 
-    // MSR = (commitments / income) * 100 (only for HDB/EC)
+    // Calculate MSR: (New Mortgage Payment ONLY) / Income × 100%
+    // MSR limit is 30% of income (applies to HDB/EC properties only)
+    // Note: MSR does NOT include existing debts, only the new mortgage payment
     const msrLimitPercent = 30
     const isHDBOrEC = propertyType === 'HDB' || propertyType === 'EC'
     const msrRatio = isHDBOrEC && monthlyIncome > 0
-      ? (totalCommitments / monthlyIncome) * 100
+      ? (monthlyMortgagePayment / monthlyIncome) * 100
       : 0
 
     // Check compliance

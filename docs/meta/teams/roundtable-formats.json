@@ -1,0 +1,894 @@
+{
+  "roundtableFormats": {
+    "version": "1.0.0",
+    "purpose": "Structured formats to prevent the 10 critical problems that kill code quality & execution",
+    "formats": [
+      {
+        "id": "architecture-review",
+        "name": "Architecture Review Roundtable",
+        "frequency": "Weekly",
+        "duration": "90 minutes",
+        "prevents": ["Architectural Inconsistency", "Component Coupling", "Database Schema Evolution Chaos"],
+        "format": {
+          "participants": {
+            "required": ["lead-architect", "backend-engineer", "frontend-engineer"],
+            "optional": ["data-engineer", "devops-engineer"],
+            "facilitator": "rotating"
+          },
+          "agenda": {
+            "warmup": {
+              "duration": "10 min",
+              "activity": "Review last week's architectural decisions",
+              "output": "Decision log update"
+            },
+            "reviewSegment": {
+              "duration": "30 min",
+              "activity": "Review proposed architectural changes",
+              "checklist": [
+                "Does this maintain clear bounded contexts?",
+                "Are interfaces properly defined?",
+                "Will this cause breaking changes?",
+                "Is the coupling loose enough?",
+                "Can this scale horizontally?"
+              ],
+              "output": "Architecture Decision Records (ADRs)"
+            },
+            "designSegment": {
+              "duration": "30 min",
+              "activity": "Design new components/features",
+              "method": "Contract-first with TypeScript interfaces",
+              "tools": ["Miro board", "OpenAPI spec editor"],
+              "output": "Interface definitions and contracts"
+            },
+            "validationSegment": {
+              "duration": "15 min",
+              "activity": "Validate against non-functional requirements",
+              "criteria": ["Performance", "Security", "Scalability", "Maintainability"],
+              "output": "Risk assessment matrix"
+            },
+            "actionItems": {
+              "duration": "5 min",
+              "activity": "Assign implementation tasks",
+              "output": "JIRA tickets with clear acceptance criteria"
+            }
+          },
+          "deliverables": [
+            "Updated architecture diagrams",
+            "New/modified TypeScript interfaces",
+            "ADR documents",
+            "Risk mitigation plans"
+          ],
+          "successMetrics": {
+            "immediateSuccess": "All proposed changes have clear interfaces",
+            "weeklySuccess": "Zero breaking changes in production",
+            "monthlySuccess": "Architecture complexity score remains stable"
+          }
+        }
+      },
+      {
+        "id": "pre-implementation-planning",
+        "name": "Pre-Implementation Planning Roundtable",
+        "frequency": "Per feature",
+        "duration": "2 hours",
+        "prevents": ["Missing Learning Loops", "Integration Hell", "Scope Creep"],
+        "format": {
+          "participants": {
+            "required": ["product-owner", "lead-architect", "project-coordinator"],
+            "optional": ["all-specialists"],
+            "facilitator": "project-coordinator"
+          },
+          "agenda": {
+            "requirementsReview": {
+              "duration": "20 min",
+              "activity": "Deep dive into business requirements",
+              "questions": [
+                "What problem are we solving?",
+                "Who is the user?",
+                "What is the success metric?",
+                "What are the edge cases?",
+                "What can we defer to v2?"
+              ],
+              "output": "Refined user stories with acceptance criteria"
+            },
+            "technicalBreakdown": {
+              "duration": "40 min",
+              "activity": "Break down into technical tasks",
+              "method": "Event Storming or Story Mapping",
+              "components": [
+                "Frontend components needed",
+                "Backend endpoints required",
+                "Database schema changes",
+                "AI/ML integration points",
+                "Third-party dependencies"
+              ],
+              "output": "Technical task breakdown with dependencies"
+            },
+            "riskAssessment": {
+              "duration": "20 min",
+              "activity": "Identify and mitigate risks",
+              "categories": [
+                "Technical risks",
+                "Integration risks",
+                "Performance risks",
+                "Security risks",
+                "Timeline risks"
+              ],
+              "output": "Risk register with mitigation strategies"
+            },
+            "learningLoopDesign": {
+              "duration": "20 min",
+              "activity": "Design feedback and optimization mechanisms",
+              "elements": [
+                "User feedback collection points",
+                "A/B test opportunities",
+                "Performance metrics to track",
+                "AI prompt optimization hooks",
+                "Conversion funnel tracking"
+              ],
+              "output": "Learning loop implementation plan"
+            },
+            "estimationAndPrioritization": {
+              "duration": "15 min",
+              "activity": "Estimate effort and prioritize tasks",
+              "method": "Planning Poker + MoSCoW",
+              "output": "Prioritized backlog with story points"
+            },
+            "integrationPlanning": {
+              "duration": "5 min",
+              "activity": "Plan integration points and handoffs",
+              "output": "Integration checklist and timeline"
+            }
+          },
+          "deliverables": [
+            "Technical specification document",
+            "Risk mitigation plan",
+            "Learning loop design",
+            "Integration test scenarios",
+            "Sprint backlog"
+          ],
+          "antiPatterns": [
+            "Starting coding without clear interfaces",
+            "Ignoring edge cases until QA",
+            "Not defining success metrics upfront",
+            "Assuming 'we'll figure it out as we go'"
+          ]
+        }
+      },
+      {
+        "id": "security-compliance-review",
+        "name": "Security & Compliance First Roundtable",
+        "frequency": "Bi-weekly + Pre-release",
+        "duration": "60 minutes",
+        "prevents": ["Security & Compliance as Afterthought"],
+        "format": {
+          "participants": {
+            "required": ["security-engineer", "backend-engineer", "data-engineer"],
+            "optional": ["devops-engineer", "frontend-engineer"],
+            "facilitator": "security-engineer"
+          },
+          "agenda": {
+            "threatModeling": {
+              "duration": "20 min",
+              "activity": "STRIDE threat modeling for new features",
+              "categories": [
+                "Spoofing",
+                "Tampering",
+                "Repudiation",
+                "Information Disclosure",
+                "Denial of Service",
+                "Elevation of Privilege"
+              ],
+              "output": "Threat model diagram with countermeasures"
+            },
+            "complianceCheck": {
+              "duration": "15 min",
+              "activity": "Review against compliance requirements",
+              "standards": ["PDPA", "MAS Guidelines", "ISO 27001", "OWASP Top 10"],
+              "output": "Compliance checklist with gaps identified"
+            },
+            "codeSecurityReview": {
+              "duration": "15 min",
+              "activity": "Review security-critical code changes",
+              "focus": [
+                "Authentication/Authorization",
+                "Data encryption",
+                "Input validation",
+                "API security",
+                "Dependency vulnerabilities"
+              ],
+              "output": "Security review comments and required fixes"
+            },
+            "incidentResponsePrep": {
+              "duration": "10 min",
+              "activity": "Update incident response procedures",
+              "elements": [
+                "Detection mechanisms",
+                "Response playbooks",
+                "Communication plans",
+                "Recovery procedures"
+              ],
+              "output": "Updated incident response documentation"
+            }
+          },
+          "gates": {
+            "preCommit": ["No secrets in code", "Dependencies scanned"],
+            "preMerge": ["Security review approved", "SAST/DAST passed"],
+            "preRelease": ["Penetration test passed", "Compliance verified"]
+          }
+        }
+      },
+      {
+        "id": "ai-optimization-lab",
+        "name": "AI Integration & Optimization Lab",
+        "frequency": "Weekly",
+        "duration": "2 hours",
+        "prevents": ["AI Integration Brittleness", "Missing Learning Loops"],
+        "format": {
+          "participants": {
+            "required": ["ai-engineer", "data-engineer", "backend-engineer"],
+            "optional": ["frontend-engineer", "product-owner"],
+            "facilitator": "ai-engineer"
+          },
+          "agenda": {
+            "performanceReview": {
+              "duration": "30 min",
+              "activity": "Review AI system performance metrics",
+              "metrics": [
+                "Response time percentiles",
+                "Accuracy/relevance scores",
+                "Cost per request",
+                "Fallback frequency",
+                "User satisfaction scores"
+              ],
+              "output": "Performance report with trends"
+            },
+            "promptEngineering": {
+              "duration": "40 min",
+              "activity": "A/B test results and prompt optimization",
+              "process": [
+                "Review A/B test results",
+                "Analyze user feedback on AI responses",
+                "Refine prompts based on data",
+                "Design new experiments"
+              ],
+              "output": "Updated prompt library and new experiments"
+            },
+            "fallbackSystemReview": {
+              "duration": "20 min",
+              "activity": "Test and improve fallback mechanisms",
+              "scenarios": [
+                "API timeout",
+                "Rate limiting",
+                "Invalid responses",
+                "Cost threshold exceeded"
+              ],
+              "output": "Fallback system test results and improvements"
+            },
+            "learningLoopImplementation": {
+              "duration": "25 min",
+              "activity": "Implement feedback loops",
+              "components": [
+                "User feedback collection",
+                "Automatic retraining triggers",
+                "Performance degradation detection",
+                "Competitive benchmarking"
+              ],
+              "output": "Learning loop code and monitoring dashboards"
+            },
+            "costOptimization": {
+              "duration": "5 min",
+              "activity": "Review and optimize AI costs",
+              "strategies": [
+                "Caching frequently asked questions",
+                "Batching requests",
+                "Using cheaper models for simple tasks",
+                "Implementing smart routing"
+              ],
+              "output": "Cost optimization recommendations"
+            }
+          },
+          "experiments": {
+            "alwaysRunning": "At least 2 A/B tests active",
+            "minimumSampleSize": 1000,
+            "statisticalSignificance": 0.95
+          }
+        }
+      },
+      {
+        "id": "ux-consistency-workshop",
+        "name": "UX Consistency & Experience Workshop",
+        "frequency": "Bi-weekly",
+        "duration": "90 minutes",
+        "prevents": ["User Experience Fragmentation"],
+        "format": {
+          "participants": {
+            "required": ["ux-engineer", "frontend-engineer", "product-owner"],
+            "optional": ["ai-engineer", "data-engineer"],
+            "facilitator": "ux-engineer"
+          },
+          "agenda": {
+            "designSystemReview": {
+              "duration": "20 min",
+              "activity": "Review and update design system",
+              "components": [
+                "Color palette consistency",
+                "Typography hierarchy",
+                "Component library",
+                "Interaction patterns",
+                "Accessibility standards"
+              ],
+              "output": "Updated design system documentation"
+            },
+            "userJourneyMapping": {
+              "duration": "30 min",
+              "activity": "Map and optimize user journeys",
+              "paths": [
+                "First-time visitor",
+                "Returning user",
+                "Mobile user",
+                "Power user",
+                "Error recovery"
+              ],
+              "output": "Journey maps with pain points identified"
+            },
+            "accessibilityAudit": {
+              "duration": "20 min",
+              "activity": "Accessibility testing and fixes",
+              "standards": ["WCAG 2.1 AA", "Screen reader compatibility", "Keyboard navigation"],
+              "tools": ["axe DevTools", "WAVE", "NVDA/JAWS testing"],
+              "output": "Accessibility report with fix priorities"
+            },
+            "conversionOptimization": {
+              "duration": "15 min",
+              "activity": "Review conversion metrics and optimize",
+              "metrics": [
+                "Form completion rate",
+                "Drop-off points",
+                "Time to complete",
+                "Error frequency",
+                "Help usage"
+              ],
+              "output": "Conversion optimization recommendations"
+            },
+            "prototypeAndTest": {
+              "duration": "5 min",
+              "activity": "Plan user testing sessions",
+              "output": "User testing schedule and scenarios"
+            }
+          },
+          "principles": [
+            "Mobile-first design",
+            "Progressive enhancement",
+            "Consistent mental models",
+            "Clear error states",
+            "Delightful micro-interactions"
+          ]
+        }
+      },
+      {
+        "id": "data-pipeline-reliability",
+        "name": "Data Pipeline & Quality Roundtable",
+        "frequency": "Weekly",
+        "duration": "60 minutes",
+        "prevents": ["Data Pipeline Brittleness", "Database Schema Evolution Chaos"],
+        "format": {
+          "participants": {
+            "required": ["data-engineer", "backend-engineer", "devops-engineer"],
+            "optional": ["ai-engineer", "security-engineer"],
+            "facilitator": "data-engineer"
+          },
+          "agenda": {
+            "pipelineHealthCheck": {
+              "duration": "15 min",
+              "activity": "Review pipeline performance and failures",
+              "metrics": [
+                "Pipeline success rate",
+                "Data freshness",
+                "Processing latency",
+                "Data quality scores",
+                "Storage costs"
+              ],
+              "output": "Pipeline health dashboard"
+            },
+            "schemaEvolution": {
+              "duration": "15 min",
+              "activity": "Plan and review schema changes",
+              "process": [
+                "Review proposed changes",
+                "Assess backward compatibility",
+                "Plan migration strategy",
+                "Update documentation"
+              ],
+              "output": "Schema migration plan with rollback strategy"
+            },
+            "dataQualityGates": {
+              "duration": "15 min",
+              "activity": "Implement data quality checks",
+              "validations": [
+                "Completeness",
+                "Uniqueness",
+                "Consistency",
+                "Accuracy",
+                "Timeliness"
+              ],
+              "output": "Data quality rules and monitoring"
+            },
+            "monitoringAndAlerting": {
+              "duration": "10 min",
+              "activity": "Update monitoring and alerts",
+              "coverage": [
+                "Pipeline failures",
+                "Data anomalies",
+                "SLA breaches",
+                "Resource usage"
+              ],
+              "output": "Updated alert configurations"
+            },
+            "disasterRecovery": {
+              "duration": "5 min",
+              "activity": "Test backup and recovery procedures",
+              "output": "DR test results and improvements"
+            }
+          },
+          "standards": {
+            "dataRetention": "Define retention policies",
+            "dataLineage": "Track data flow and transformations",
+            "dataPrivacy": "Implement PII handling"
+          }
+        }
+      },
+      {
+        "id": "devops-deployment-readiness",
+        "name": "DevOps & Deployment Readiness",
+        "frequency": "Pre-deployment + Weekly",
+        "duration": "75 minutes",
+        "prevents": ["Configuration Drift & Deployment Complexity", "Integration Hell"],
+        "format": {
+          "participants": {
+            "required": ["devops-engineer", "lead-architect", "security-engineer"],
+            "optional": ["backend-engineer", "frontend-engineer"],
+            "facilitator": "devops-engineer"
+          },
+          "agenda": {
+            "environmentConsistency": {
+              "duration": "15 min",
+              "activity": "Verify environment parity",
+              "checks": [
+                "Configuration alignment",
+                "Dependency versions",
+                "Resource allocations",
+                "Feature flags",
+                "Secrets management"
+              ],
+              "output": "Environment drift report"
+            },
+            "deploymentDryRun": {
+              "duration": "20 min",
+              "activity": "Execute deployment simulation",
+              "steps": [
+                "Blue-green deployment test",
+                "Rollback procedure test",
+                "Health check validation",
+                "Smoke test execution"
+              ],
+              "output": "Deployment readiness checklist"
+            },
+            "performanceTesting": {
+              "duration": "15 min",
+              "activity": "Load testing and optimization",
+              "scenarios": [
+                "Normal load",
+                "Peak load",
+                "Sustained load",
+                "Spike testing"
+              ],
+              "output": "Performance test results and bottlenecks"
+            },
+            "monitoringSetup": {
+              "duration": "15 min",
+              "activity": "Configure monitoring and observability",
+              "components": [
+                "Application metrics",
+                "Infrastructure metrics",
+                "Log aggregation",
+                "Distributed tracing",
+                "Error tracking"
+              ],
+              "output": "Monitoring dashboard and alert rules"
+            },
+            "runbookUpdate": {
+              "duration": "10 min",
+              "activity": "Update operational runbooks",
+              "sections": [
+                "Common issues and fixes",
+                "Escalation procedures",
+                "Recovery procedures",
+                "Contact information"
+              ],
+              "output": "Updated runbook documentation"
+            }
+          },
+          "gates": {
+            "preProduction": [
+              "All tests passing",
+              "Security scan clean",
+              "Performance within budget",
+              "Rollback tested"
+            ],
+            "postDeployment": [
+              "Health checks passing",
+              "No error rate increase",
+              "Performance stable",
+              "All features working"
+            ]
+          }
+        }
+      },
+      {
+        "id": "daily-standup-plus",
+        "name": "Daily Standup Plus",
+        "frequency": "Daily",
+        "duration": "15 minutes",
+        "prevents": ["Integration Hell", "Scope Creep"],
+        "format": {
+          "participants": {
+            "required": ["all-active-team-members"],
+            "optional": ["project-coordinator"],
+            "facilitator": "rotating"
+          },
+          "agenda": {
+            "updates": {
+              "duration": "8 min",
+              "activity": "Progress updates",
+              "structure": [
+                "What I completed yesterday",
+                "What I'm working on today",
+                "Any blockers or dependencies"
+              ],
+              "timeboxed": "1 minute per person"
+            },
+            "integrationCheck": {
+              "duration": "3 min",
+              "activity": "Identify integration points for the day",
+              "questions": [
+                "Who needs to sync on interfaces?",
+                "Any API changes being made?",
+                "Any database schema updates?"
+              ],
+              "output": "Integration sync meetings scheduled"
+            },
+            "riskRadar": {
+              "duration": "2 min",
+              "activity": "Quick risk identification",
+              "categories": [
+                "Technical risks emerged",
+                "Timeline concerns",
+                "Scope creep attempts"
+              ],
+              "output": "Risks logged for escalation"
+            },
+            "focusAlignment": {
+              "duration": "2 min",
+              "activity": "Confirm sprint goal alignment",
+              "reminder": "Current sprint goal and priorities",
+              "output": "Team aligned on daily priorities"
+            }
+          },
+          "rules": [
+            "No problem-solving during standup",
+            "Park detailed discussions for after",
+            "Keep updates relevant to team",
+            "Focus on dependencies and blockers"
+          ]
+        }
+      },
+      {
+        "id": "post-incident-learning",
+        "name": "Post-Incident Learning Review",
+        "frequency": "After incidents + Monthly",
+        "duration": "90 minutes",
+        "prevents": ["All 10 problems through continuous learning"],
+        "format": {
+          "participants": {
+            "required": ["incident-responders", "lead-architect", "devops-engineer"],
+            "optional": ["all-stakeholders"],
+            "facilitator": "neutral-party"
+          },
+          "agenda": {
+            "timelineReconstruction": {
+              "duration": "20 min",
+              "activity": "Build incident timeline",
+              "elements": [
+                "First detection",
+                "Escalation points",
+                "Actions taken",
+                "Resolution time",
+                "Recovery completion"
+              ],
+              "output": "Detailed incident timeline"
+            },
+            "rootCauseAnalysis": {
+              "duration": "30 min",
+              "activity": "5 Whys or Fishbone analysis",
+              "categories": [
+                "Technical causes",
+                "Process failures",
+                "Human factors",
+                "External factors"
+              ],
+              "output": "Root cause identification"
+            },
+            "blamelessReview": {
+              "duration": "20 min",
+              "activity": "Learning-focused discussion",
+              "questions": [
+                "What went well?",
+                "What could be improved?",
+                "What surprised us?",
+                "What should we have known?"
+              ],
+              "principles": "No blame, focus on systems not people",
+              "output": "Learning points document"
+            },
+            "actionPlanning": {
+              "duration": "15 min",
+              "activity": "Define preventive actions",
+              "types": [
+                "Immediate fixes",
+                "Short-term improvements",
+                "Long-term prevention",
+                "Process changes"
+              ],
+              "output": "Action items with owners and deadlines"
+            },
+            "knowledgeSharing": {
+              "duration": "5 min",
+              "activity": "Plan knowledge dissemination",
+              "methods": [
+                "Team presentation",
+                "Documentation updates",
+                "Runbook improvements",
+                "Training needs"
+              ],
+              "output": "Knowledge sharing plan"
+            }
+          },
+          "outputs": [
+            "Incident report",
+            "Action items tracked",
+            "Process improvements",
+            "Updated monitoring",
+            "Team learning"
+          ]
+        }
+      },
+      {
+        "id": "technical-debt-tribunal",
+        "name": "Technical Debt Tribunal",
+        "frequency": "Monthly",
+        "duration": "2 hours",
+        "prevents": ["Architectural Inconsistency", "Component Coupling", "Scope Creep"],
+        "format": {
+          "participants": {
+            "required": ["lead-architect", "engineering-leads", "product-owner"],
+            "optional": ["senior-engineers"],
+            "facilitator": "lead-architect"
+          },
+          "agenda": {
+            "debtInventory": {
+              "duration": "30 min",
+              "activity": "Review and categorize technical debt",
+              "categories": [
+                "Critical - Security/Performance impact",
+                "High - Blocking new features",
+                "Medium - Slowing development",
+                "Low - Nice to have"
+              ],
+              "output": "Prioritized debt backlog"
+            },
+            "impactAnalysis": {
+              "duration": "30 min",
+              "activity": "Quantify debt impact",
+              "metrics": [
+                "Development velocity impact",
+                "Bug frequency correlation",
+                "Maintenance time increase",
+                "Risk exposure"
+              ],
+              "output": "Debt impact scorecard"
+            },
+            "paydownPlanning": {
+              "duration": "30 min",
+              "activity": "Plan debt reduction",
+              "strategies": [
+                "Dedicated debt sprints",
+                "20% time allocation",
+                "Boy Scout rule",
+                "Refactoring during feature work"
+              ],
+              "output": "Debt reduction roadmap"
+            },
+            "preventionStrategies": {
+              "duration": "20 min",
+              "activity": "Identify debt prevention measures",
+              "tactics": [
+                "Better upfront design",
+                "Code review improvements",
+                "Automated quality checks",
+                "Documentation standards"
+              ],
+              "output": "Prevention guidelines"
+            },
+            "commitmentAndTracking": {
+              "duration": "10 min",
+              "activity": "Get stakeholder commitment",
+              "agreements": [
+                "Time allocation for debt",
+                "Quality standards",
+                "Debt ceiling limits",
+                "Regular review schedule"
+              ],
+              "output": "Signed commitment to debt reduction"
+            }
+          },
+          "metrics": {
+            "debtRatio": "Technical debt / Feature development",
+            "debtVelocity": "Rate of debt accumulation",
+            "paydownRate": "Debt resolved per sprint"
+          }
+        }
+      }
+    ],
+    "metaFormats": {
+      "formatSelection": {
+        "description": "How to choose which format to use",
+        "decision_tree": {
+          "newFeature": ["pre-implementation-planning", "architecture-review"],
+          "incident": ["post-incident-learning"],
+          "deployment": ["devops-deployment-readiness", "security-compliance-review"],
+          "qualityIssues": ["technical-debt-tribunal", "ux-consistency-workshop"],
+          "aiProblems": ["ai-optimization-lab"],
+          "dataIssues": ["data-pipeline-reliability"],
+          "daily": ["daily-standup-plus"],
+          "recurring": {
+            "weekly": ["architecture-review", "ai-optimization-lab", "data-pipeline-reliability"],
+            "biWeekly": ["security-compliance-review", "ux-consistency-workshop"],
+            "monthly": ["technical-debt-tribunal", "post-incident-learning"]
+          }
+        }
+      },
+      "combinationStrategies": {
+        "description": "How to combine formats for maximum effectiveness",
+        "patterns": [
+          {
+            "name": "Feature Development Cycle",
+            "sequence": [
+              "pre-implementation-planning",
+              "architecture-review",
+              "daily-standup-plus (throughout)",
+              "security-compliance-review",
+              "devops-deployment-readiness"
+            ]
+          },
+          {
+            "name": "Quality Improvement Sprint",
+            "combination": [
+              "technical-debt-tribunal",
+              "ux-consistency-workshop",
+              "data-pipeline-reliability",
+              "ai-optimization-lab"
+            ]
+          },
+          {
+            "name": "Incident Response Flow",
+            "sequence": [
+              "immediate: war room",
+              "post-incident-learning",
+              "architecture-review (if architectural issue)",
+              "security-compliance-review (if security issue)"
+            ]
+          }
+        ]
+      },
+      "effectiveness_metrics": {
+        "description": "How to measure if these formats are working",
+        "kpis": [
+          {
+            "metric": "Production incidents",
+            "target": "< 2 per month",
+            "format": "post-incident-learning"
+          },
+          {
+            "metric": "Breaking changes",
+            "target": "0 unplanned",
+            "format": "architecture-review"
+          },
+          {
+            "metric": "Security vulnerabilities",
+            "target": "0 critical, < 3 high",
+            "format": "security-compliance-review"
+          },
+          {
+            "metric": "AI response quality",
+            "target": "> 85% satisfaction",
+            "format": "ai-optimization-lab"
+          },
+          {
+            "metric": "Deployment success rate",
+            "target": "> 95%",
+            "format": "devops-deployment-readiness"
+          },
+          {
+            "metric": "Technical debt ratio",
+            "target": "< 20%",
+            "format": "technical-debt-tribunal"
+          },
+          {
+            "metric": "User conversion rate",
+            "target": "> 15%",
+            "format": "ux-consistency-workshop"
+          },
+          {
+            "metric": "Data pipeline uptime",
+            "target": "> 99.5%",
+            "format": "data-pipeline-reliability"
+          }
+        ]
+      },
+      "antiPatterns": {
+        "description": "What NOT to do in roundtables",
+        "avoid": [
+          "Meeting without clear agenda",
+          "No assigned action items",
+          "Same person always facilitating",
+          "Skipping due to 'too busy'",
+          "Not tracking decisions made",
+          "Allowing scope creep in meetings",
+          "Problem-solving in standups",
+          "Blame-focused incident reviews",
+          "Ignoring technical debt",
+          "Not measuring effectiveness"
+        ]
+      }
+    },
+    "implementation_guide": {
+      "getting_started": {
+        "week1": [
+          "Implement daily-standup-plus immediately",
+          "Schedule first architecture-review",
+          "Set up security-compliance-review"
+        ],
+        "week2": [
+          "Run first pre-implementation-planning for next feature",
+          "Start ai-optimization-lab if using AI",
+          "Begin data-pipeline-reliability sessions"
+        ],
+        "week3": [
+          "Add ux-consistency-workshop",
+          "Prepare devops-deployment-readiness"
+        ],
+        "week4": [
+          "Hold first technical-debt-tribunal",
+          "Review effectiveness of all formats"
+        ]
+      },
+      "tools_needed": [
+        "Video conferencing with screen share",
+        "Collaborative whiteboard (Miro/Figma)",
+        "Issue tracking (JIRA/Linear)",
+        "Documentation wiki (Confluence/Notion)",
+        "Architecture diagrams (draw.io/Lucidchart)",
+        "Monitoring dashboards (Grafana/DataDog)",
+        "Code review tools (GitHub/GitLab)"
+      ],
+      "success_factors": [
+        "Executive buy-in for time allocation",
+        "Clear ownership and facilitation",
+        "Consistent scheduling and attendance",
+        "Action items tracked to completion",
+        "Regular effectiveness reviews",
+        "Continuous format improvement"
+      ]
+    }
+  }
+}

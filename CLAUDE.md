@@ -123,3 +123,175 @@ npm run lint         # Code quality check
 - Mark todos completed immediately after finishing (don't batch)
 - Never discard tasks without Brent's approval
 - Use journal for unrelated issues found during work
+
+---
+
+## Planning & Documentation Workflow
+
+**CRITICAL: One plan per feature. No proliferation.**
+
+### Planning Rules
+
+**File format:** `docs/plans/active/{date}-{feature-slug}.md`
+
+**Maximum length: 200 lines**
+- If longer, split into multiple plans OR extract to runbook
+- Plans contain DECISIONS (what to build, why, testing)
+- Plans do NOT contain INSTRUCTIONS (code examples, tutorials)
+
+**Required sections:**
+```yaml
+---
+status: draft | active | completed
+complexity: light | medium | heavy
+estimated_hours: X
+---
+
+# Feature Name
+
+## Problem (2-3 sentences)
+What are we solving?
+
+## Success Criteria (3-5 measurable outcomes)
+- Outcome 1
+- Outcome 2
+
+## Tasks (5-15 tasks, each <2h)
+- [ ] Task 1 (test file, doc link if needed)
+- [ ] Task 2
+
+## Testing Strategy
+Unit/Integration/E2E: which files
+
+## Rollback Plan
+How to undo if it fails
+```
+
+**Red flags your plan is too long:**
+- Contains code examples >20 lines
+- Contains "read this first" prerequisites
+- Contains troubleshooting sections
+- Contains copy-paste tutorials
+- Over 200 lines
+
+**When plan grows too large:**
+1. Extract code examples → delete or move to `docs/runbooks/`
+2. Extract tutorials → link to existing runbook
+3. Split into Phase 1, Phase 2 plans if still >200 lines
+
+**Before creating a new plan:**
+1. Check `docs/plans/active/` - does a plan for this feature already exist?
+2. If yes, update existing plan instead of creating new one
+3. If creating new plan, set old related plans to `status: archived` and move them
+
+### Execution Rules
+
+**During implementation, use ONLY:**
+- `TodoWrite` tool for task tracking
+- `docs/codex-journal.md` for daily notes
+- Git commits as execution log
+- Nothing else
+
+**DO NOT create during execution:**
+- New plans
+- Investigation reports (use journal)
+- Status updates (use journal)
+- Fix summaries (git log is your summary)
+
+**Update codex-journal.md structure:**
+```markdown
+## {YYYY-MM-DD} - {Feature Name}
+
+**Branch:** {branch-name}
+**Plan:** docs/plans/active/{date}-{feature-slug}.md
+**Status:** in-progress | blocked | completed
+
+### Progress Today
+- [x] Completed task 1
+- [ ] Blocked on task 2
+
+### Key Decisions
+- Decision: {what we chose and why}
+
+### Issues Found
+- Issue: {description} - fixed in commit abc1234
+
+### Next Session
+- Start with task X
+```
+
+### Completion Rules
+
+**Create ONE completion report when fully done:**
+
+**File format:** `docs/plans/active/{date}-{feature-slug}-COMPLETION.md`
+
+**Required sections:**
+```markdown
+---
+plan: {date}-{feature-slug}.md
+completed: YYYY-MM-DD
+outcome: success | partial | failed
+---
+
+# Completion: Feature Name
+
+## What We Built
+- Feature 1: {1 sentence}
+
+## Metrics
+- Baseline: X → Current: Y
+
+## What Worked / Didn't Work
+...
+
+## Next Actions
+- [ ] Monitor X
+- [ ] Archive plan
+```
+
+**When to create completion report:**
+- All tasks in plan are completed OR explicitly deferred
+- All tests are passing
+- Code is merged to main branch
+- Never create partial/interim reports
+
+### Archive Rules
+
+**Archive immediately after completion report:**
+```bash
+git mv docs/plans/active/{plan}.md docs/plans/archive/2025/10/
+git mv docs/plans/active/{plan}-COMPLETION.md docs/plans/archive/2025/10/
+```
+
+**Archive structure:** `docs/plans/archive/{year}/{month}/`
+
+### Forbidden: Root-Level Documentation
+
+**NEVER create these at repository root:**
+- `*_SUMMARY.md`
+- `*_REPORT.md`
+- `*_FIX.md`
+- `*_STATUS.md`
+- `*_IMPLEMENTATION.md`
+- `*.txt` status files
+
+**Exception:** README.md, CLAUDE.md, AGENTS.md, SKILL.md, standard configs
+
+**If you find root-level docs:**
+1. Is it a plan? → move to `docs/plans/archive/{year}/{month}/`
+2. Investigation notes? → move to `docs/reports/investigations/`
+3. Fix summary? → delete (git log has it)
+4. Status update? → delete (stale)
+
+### Quick Reference: Where Things Go
+
+| Document Type | Location |
+|---------------|----------|
+| Active plan | `docs/plans/active/` |
+| Implementation todos | TodoWrite tool |
+| Daily notes | `docs/codex-journal.md` |
+| Completion report | `docs/plans/active/` then archive |
+| Archived plans | `docs/plans/archive/{year}/{month}/` |
+| Implementation guides | `docs/runbooks/{domain}/` |
+| Investigation findings | `docs/codex-journal.md` |

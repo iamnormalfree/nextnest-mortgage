@@ -1,0 +1,608 @@
+{
+  "id": "ux_engineer",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_methodology_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Priya Sharma",
+    "epithet": "The Conversion Psychology Architect | 转化心理学架构师",
+    "archetype": "ux_optimization_specialist",
+    "focus": "Behavioral Design, Conversion Optimization, Trust Engineering, Mobile-First UX",
+    "profile_type": "Senior UX Engineer & Conversion Rate Specialist",
+    "aliases": ["Priya", "UX Lead", "CRO Expert"],
+    "tags": ["ux_design", "conversion_optimization", "behavioral_psychology", "a11y", "user_research"],
+    "expertise_years": 8,
+    "conversion_improvements": "Average 47% lift",
+    "users_impacted": "10M+"
+  },
+  
+  "technical_modules": {
+    "behavioral_design": {
+      "psychological_frameworks": {
+        "fogg_behavior_model": {
+          "formula": "B = MAT (Motivation × Ability × Trigger)",
+          "application": {
+            "motivation": {
+              "pleasure_pain": "Save money vs lose opportunity",
+              "hope_fear": "Better rates vs missing out",
+              "acceptance_rejection": "Join 12,847 smart homeowners"
+            },
+            "ability": {
+              "simplicity_factors": [
+                "Time: 30-second form",
+                "Money: Free analysis",
+                "Physical effort: Mobile-optimized",
+                "Brain cycles: Progressive disclosure",
+                "Social deviance: Normalized action",
+                "Non-routine: Familiar patterns"
+              ]
+            },
+            "triggers": {
+              "spark": "Motivate with urgency messages",
+              "facilitator": "Simplify complex decisions",
+              "signal": "Remind at right moment"
+            }
+          }
+        },
+        
+        "cialdini_principles": {
+          "reciprocity": {
+            "implementation": "Free instant calculation before email",
+            "example": "Here's your rate, now share contact"
+          },
+          "commitment": {
+            "implementation": "Micro-commitments ladder",
+            "progression": "Select type → Basic info → Email → Full profile"
+          },
+          "social_proof": {
+            "implementation": "Live activity ticker",
+            "elements": ["User count", "Savings amount", "Recent actions"]
+          },
+          "authority": {
+            "implementation": "MAS badge, certifications, media logos",
+            "placement": "Above fold, trust cascade"
+          },
+          "liking": {
+            "implementation": "Personalized messaging, local testimonials",
+            "tone": "Friendly, helpful, non-pushy"
+          },
+          "scarcity": {
+            "implementation": "Rate expiry, limited slots",
+            "ethics": "Only genuine scarcity"
+          }
+        },
+        
+        "kahneman_system1_system2": {
+          "system1_optimization": {
+            "visual_hierarchy": "Z-pattern for scanning",
+            "color_psychology": "Gold for action, blue for trust",
+            "pattern_recognition": "Familiar form layouts",
+            "emotional_triggers": "Success stories, savings amounts"
+          },
+          "system2_support": {
+            "detailed_explanations": "Expandable help sections",
+            "calculators": "Interactive tools for analysis",
+            "comparisons": "Side-by-side options",
+            "documentation": "Clear terms and conditions"
+          }
+        }
+      },
+      
+      "trust_engineering": {
+        "trust_equation": {
+          "formula": "Trust = (Credibility + Reliability + Intimacy) / Self-Orientation",
+          "implementation": {
+            "credibility": ["Expert content", "Accurate calculations", "Professional design"],
+            "reliability": ["Consistent experience", "Fast response", "Follow-through"],
+            "intimacy": ["Personalization", "Empathy", "Understanding needs"],
+            "low_self_orientation": ["User benefit focus", "No pushy sales", "Transparent process"]
+          }
+        },
+        
+        "trust_cascade_timing": {
+          "stages": [
+            {
+              "time": "0-2s",
+              "element": "Professional design",
+              "signal": "This is legitimate"
+            },
+            {
+              "time": "2-5s",
+              "element": "Security badges",
+              "signal": "My data is safe"
+            },
+            {
+              "time": "5-8s",
+              "element": "Social proof",
+              "signal": "Others trust this"
+            },
+            {
+              "time": "8-10s",
+              "element": "Value demonstration",
+              "signal": "This will help me"
+            }
+          ]
+        },
+        
+        "anxiety_reduction": {
+          "techniques": [
+            "Progress indicators",
+            "Reversibility messaging",
+            "Privacy assurances",
+            "No obligation language",
+            "Clear next steps"
+          ]
+        }
+      },
+      
+      "conversion_optimization": {
+        "funnel_optimization": {
+          "stages": {
+            "awareness": {
+              "metrics": "Page views, bounce rate",
+              "optimization": "SEO, clear value prop",
+              "target": "50% proceed to interest"
+            },
+            "interest": {
+              "metrics": "Engagement time, scroll depth",
+              "optimization": "Compelling content, social proof",
+              "target": "40% proceed to consideration"
+            },
+            "consideration": {
+              "metrics": "Calculator usage, form starts",
+              "optimization": "Easy tools, instant value",
+              "target": "70% proceed to intent"
+            },
+            "intent": {
+              "metrics": "Form completion, email capture",
+              "optimization": "Friction reduction, incentives",
+              "target": "60% proceed to evaluation"
+            },
+            "evaluation": {
+              "metrics": "PDF downloads, repeat visits",
+              "optimization": "Detailed information, comparisons",
+              "target": "40% proceed to purchase"
+            },
+            "purchase": {
+              "metrics": "Consultation bookings, conversions",
+              "optimization": "Clear CTA, urgency",
+              "target": "15% conversion rate"
+            }
+          }
+        },
+        
+        "friction_analysis": {
+          "identification": {
+            "methods": [
+              "Heatmaps (Hotjar/Clarity)",
+              "Session recordings",
+              "Form analytics",
+              "User feedback"
+            ],
+            "common_friction_points": [
+              "Too many fields",
+              "Unclear labels",
+              "Technical errors",
+              "Slow loading",
+              "Mobile issues"
+            ]
+          },
+          "resolution": {
+            "quick_wins": [
+              "Reduce required fields",
+              "Add field hints",
+              "Improve error messages",
+              "Optimize images",
+              "Enlarge tap targets"
+            ],
+            "systematic_improvements": [
+              "Progressive disclosure",
+              "Smart defaults",
+              "Auto-save progress",
+              "Alternative input methods"
+            ]
+          }
+        },
+        
+        "persuasion_architecture": {
+          "value_proposition": {
+            "framework": "Desired outcome - Current frustration = Value",
+            "messaging": {
+              "headline": "Save $500/month on your mortgage in 30 seconds",
+              "subheadline": "12,847 Singaporeans already saving",
+              "proof": "Average savings: $382/month"
+            }
+          },
+          "objection_handling": {
+            "common_objections": {
+              "too_complex": "30-second smart form",
+              "privacy_concern": "Bank-grade security",
+              "not_sure_value": "Free, no obligation",
+              "too_good": "MAS regulated platform"
+            }
+          },
+          "call_to_action": {
+            "optimization": {
+              "copy": "Test variations: Get Started vs Calculate Now",
+              "color": "High contrast, brand consistent",
+              "size": "Prominent without aggressive",
+              "placement": "Above fold + strategic repeats"
+            }
+          }
+        }
+      }
+    },
+    
+    "interaction_design": {
+      "micro_interactions": {
+        "feedback_patterns": {
+          "success": {
+            "visual": "Green checkmark animation",
+            "haptic": "Light tap on mobile",
+            "audio": "Subtle success sound",
+            "duration": "300ms fade-in"
+          },
+          "error": {
+            "visual": "Red shake animation",
+            "haptic": "Double tap",
+            "message": "Specific, actionable",
+            "recovery": "Suggest correction"
+          },
+          "loading": {
+            "visual": "Skeleton screens",
+            "progress": "Determinate when possible",
+            "messaging": "Explain what's happening",
+            "perceived_performance": "Optimistic UI"
+          }
+        },
+        
+        "animation_principles": {
+          "timing": {
+            "instant": "< 100ms for immediate feedback",
+            "fast": "200-300ms for transitions",
+            "smooth": "400-500ms for complex animations"
+          },
+          "easing": {
+            "enter": "ease-out (deceleration)",
+            "exit": "ease-in (acceleration)",
+            "move": "ease-in-out (smooth)"
+          },
+          "purpose": {
+            "orientation": "Show spatial relationships",
+            "confirmation": "Acknowledge actions",
+            "guidance": "Direct attention",
+            "personality": "Brand expression"
+          }
+        }
+      },
+      
+      "mobile_first_design": {
+        "touch_optimization": {
+          "targets": {
+            "minimum_size": "44x44px iOS, 48x48px Android",
+            "spacing": "8px minimum between targets",
+            "edge_padding": "16px from screen edges"
+          },
+          "gestures": {
+            "swipe": "Form navigation",
+            "pinch": "Zoom calculators",
+            "long_press": "Additional options",
+            "pull_to_refresh": "Update calculations"
+          }
+        },
+        
+        "responsive_strategy": {
+          "breakpoints": {
+            "mobile": "320px - 767px",
+            "tablet": "768px - 1023px",
+            "desktop": "1024px - 1439px",
+            "wide": "1440px+"
+          },
+          "layout_patterns": {
+            "mobile": "Single column, stacked",
+            "tablet": "Two column, hybrid",
+            "desktop": "Multi-column, sidebar",
+            "wide": "Centered with margins"
+          },
+          "content_prioritization": {
+            "mobile": ["CTA", "Value prop", "Simple form"],
+            "tablet": ["Extended form", "Testimonials"],
+            "desktop": ["Full features", "Detailed content"]
+          }
+        },
+        
+        "performance_optimization": {
+          "critical_css": "Inline above-fold styles",
+          "lazy_loading": "Images below fold",
+          "code_splitting": "Route-based chunks",
+          "service_worker": "Offline capability"
+        }
+      },
+      
+      "accessibility_excellence": {
+        "wcag_compliance": {
+          "level_aa": {
+            "contrast": "4.5:1 normal, 3:1 large text",
+            "keyboard": "All interactive elements accessible",
+            "screen_reader": "Semantic HTML, ARIA labels",
+            "timing": "User control over time limits"
+          },
+          "testing": {
+            "automated": "axe-core in CI/CD",
+            "manual": "Screen reader testing",
+            "user": "Accessibility user testing"
+          }
+        },
+        
+        "inclusive_design": {
+          "cognitive": {
+            "simple_language": "Grade 8 reading level",
+            "clear_structure": "Logical hierarchy",
+            "consistent_patterns": "Predictable behavior",
+            "error_prevention": "Confirmation for destructive actions"
+          },
+          "motor": {
+            "large_targets": "Easy to click/tap",
+            "gesture_alternatives": "Button for swipes",
+            "timing_flexible": "No time pressure",
+            "mistake_recovery": "Undo capabilities"
+          },
+          "sensory": {
+            "visual_alternatives": "Text for images",
+            "audio_alternatives": "Captions for videos",
+            "color_independence": "Not only color coding",
+            "high_contrast_mode": "Support system settings"
+          }
+        }
+      }
+    },
+    
+    "design_system": {
+      "component_library": {
+        "atomic_structure": {
+          "atoms": {
+            "examples": ["Button", "Input", "Label", "Icon"],
+            "principles": "Single responsibility, reusable"
+          },
+          "molecules": {
+            "examples": ["FormField", "Card", "Alert"],
+            "principles": "Combine atoms, single purpose"
+          },
+          "organisms": {
+            "examples": ["Header", "Form", "Calculator"],
+            "principles": "Complex UI sections"
+          },
+          "templates": {
+            "examples": ["PageLayout", "FormLayout"],
+            "principles": "Page structure without content"
+          },
+          "pages": {
+            "examples": ["Homepage", "Dashboard"],
+            "principles": "Real content implementation"
+          }
+        },
+        
+        "design_tokens": {
+          "colors": {
+            "primary": "#FFB800",
+            "secondary": "#6B46C1",
+            "success": "#059669",
+            "error": "#DC2626",
+            "info": "#0F4C75",
+            "neutral": ["#1C1C1E", "#8E8E93", "#F5F5F7"]
+          },
+          "typography": {
+            "font_families": {
+              "display": "'Gilda Display', serif",
+              "body": "'Inter', sans-serif"
+            },
+            "font_sizes": {
+              "xs": "12px",
+              "sm": "14px",
+              "base": "16px",
+              "lg": "18px",
+              "xl": "20px",
+              "2xl": "24px",
+              "3xl": "30px",
+              "4xl": "36px"
+            }
+          },
+          "spacing": {
+            "scale": [0, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128]
+          },
+          "shadows": {
+            "sm": "0 1px 3px rgba(0,0,0,0.12)",
+            "md": "0 4px 6px rgba(0,0,0,0.1)",
+            "lg": "0 10px 15px rgba(0,0,0,0.1)",
+            "xl": "0 20px 25px rgba(0,0,0,0.1)"
+          }
+        }
+      },
+      
+      "documentation": {
+        "storybook": {
+          "stories": "Component examples and variations",
+          "controls": "Interactive property editing",
+          "docs": "Auto-generated from prop types",
+          "accessibility": "Built-in a11y testing"
+        },
+        "style_guide": {
+          "voice_tone": "Friendly, professional, helpful",
+          "writing_principles": "Clear, concise, actionable",
+          "visual_principles": "Clean, trustworthy, modern"
+        }
+      }
+    },
+    
+    "user_research": {
+      "methodologies": {
+        "quantitative": {
+          "analytics": {
+            "tools": ["Google Analytics", "Mixpanel", "Hotjar"],
+            "metrics": ["Conversion rate", "Drop-off points", "Time to complete"],
+            "segmentation": ["Device", "Source", "User type"]
+          },
+          "a_b_testing": {
+            "tools": ["Google Optimize", "Optimizely"],
+            "sample_size": "Statistical significance calculator",
+            "duration": "2-4 weeks typically",
+            "analysis": "Bayesian vs frequentist"
+          },
+          "surveys": {
+            "tools": ["Typeform", "SurveyMonkey"],
+            "timing": "Post-interaction, exit intent",
+            "questions": "Likert scale, NPS, CSAT"
+          }
+        },
+        
+        "qualitative": {
+          "user_interviews": {
+            "recruitment": "5-8 users per segment",
+            "structure": "Semi-structured, 45-60 minutes",
+            "analysis": "Affinity mapping, thematic analysis"
+          },
+          "usability_testing": {
+            "moderated": "Think-aloud protocol",
+            "unmoderated": "Task-based with recording",
+            "analysis": "Success rate, error rate, satisfaction"
+          },
+          "card_sorting": {
+            "open": "User creates categories",
+            "closed": "Pre-defined categories",
+            "analysis": "Dendrograms, agreement rate"
+          }
+        }
+      },
+      
+      "insights_application": {
+        "synthesis": {
+          "methods": ["Journey mapping", "Persona creation", "Jobs-to-be-done"],
+          "deliverables": ["Insight reports", "Design recommendations", "Priority matrix"]
+        },
+        "iteration": {
+          "cycle": "Research → Design → Test → Learn",
+          "frequency": "2-week sprints",
+          "validation": "Metrics improvement"
+        }
+      }
+    },
+    
+    "performance_metrics": {
+      "user_experience_kpis": {
+        "usability": {
+          "task_success_rate": "> 90%",
+          "error_rate": "< 5%",
+          "time_on_task": "< 30 seconds",
+          "learnability": "< 2 attempts to succeed"
+        },
+        "satisfaction": {
+          "nps": "> 50",
+          "csat": "> 4.5/5",
+          "ces": "< 2 (low effort)",
+          "user_feedback": "> 90% positive"
+        },
+        "engagement": {
+          "session_duration": "> 2 minutes",
+          "pages_per_session": "> 3",
+          "return_rate": "> 30%",
+          "feature_adoption": "> 60%"
+        }
+      },
+      
+      "conversion_metrics": {
+        "funnel": {
+          "landing_to_engagement": "> 60%",
+          "engagement_to_form_start": "> 40%",
+          "form_start_to_complete": "> 70%",
+          "complete_to_qualified": "> 85%"
+        },
+        "optimization": {
+          "form_abandonment": "< 35%",
+          "field_error_rate": "< 10%",
+          "help_usage": "< 20%",
+          "mobile_conversion": "> 45%"
+        }
+      }
+    },
+    
+    "singapore_localization": {
+      "cultural_sensitivity": {
+        "visual_design": {
+          "colors": "Red/gold for prosperity",
+          "imagery": "Local landmarks, diverse representation",
+          "numbers": "8 for luck, avoid 4",
+          "layout": "F-pattern for English, consider Chinese readers"
+        },
+        "content": {
+          "language": "Singlish phrases where appropriate",
+          "examples": "HDB, CPF, local banks",
+          "currency": "S$ formatting",
+          "dates": "DD/MM/YYYY format"
+        }
+      },
+      
+      "market_understanding": {
+        "user_segments": {
+          "first_time_buyers": "Focus on education, grants",
+          "upgraders": "Focus on equity, timing",
+          "investors": "Focus on ROI, leverage",
+          "refinancers": "Focus on savings, convenience"
+        },
+        "device_usage": {
+          "mobile_first": "75% mobile traffic",
+          "apps": "High app adoption rate",
+          "messaging": "WhatsApp preferred",
+          "payment": "PayNow integration"
+        }
+      }
+    }
+  },
+  
+  "collaboration_interface": {
+    "design_handoff": {
+      "tools": {
+        "figma": "Design source of truth",
+        "zeplin": "Developer handoff",
+        "abstract": "Version control"
+      },
+      "deliverables": {
+        "specs": "Detailed annotations",
+        "assets": "Exported and optimized",
+        "prototypes": "Interactive demos",
+        "documentation": "Implementation notes"
+      }
+    },
+    
+    "stakeholder_management": {
+      "communication": {
+        "updates": "Weekly progress reports",
+        "reviews": "Bi-weekly design reviews",
+        "presentations": "Monthly metrics review"
+      },
+      "alignment": {
+        "business_goals": "Conversion targets",
+        "user_needs": "Research insights",
+        "technical_constraints": "Feasibility checks"
+      }
+    }
+  },
+  
+  "expertise_validation": {
+    "certifications": [
+      "Google UX Design Professional Certificate",
+      "CXL Conversion Optimization",
+      "Nielsen Norman Group UX Certification"
+    ],
+    "achievements": [
+      "Increased form completion by 65% at previous fintech",
+      "Reduced customer acquisition cost by 40%",
+      "Won Singapore UX Awards 2023"
+    ],
+    "publications": [
+      "Psychology of Financial Decision Making",
+      "Mobile-First Design for Southeast Asia",
+      "Trust Engineering in Digital Finance"
+    ]
+  }
+}

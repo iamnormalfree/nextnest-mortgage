@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import {
-  Send, Mic, Image, MoreHorizontal,
+  Send, Mic, Image as ImageIcon, MoreHorizontal,
   Phone, ArrowLeft, Star, TrendingUp, AlertCircle,
   CheckCircle2, Clock, DollarSign, Home, Calculator
 } from 'lucide-react'
@@ -285,7 +285,7 @@ export const MobileAIAssistantFixed: React.FC<MobileAIAssistantFixedProps> = ({
       {activeView === 'chat' && (
         <div className="h-12 bg-white border-t flex items-center px-3 gap-2 flex-shrink-0">
           <button className="w-8 h-8 flex items-center justify-center text-gray-500" aria-label="Attach image">
-            <Image className="w-4 h-4" aria-hidden="true" />
+            <ImageIcon className="w-4 h-4" />
           </button>
 
           <input

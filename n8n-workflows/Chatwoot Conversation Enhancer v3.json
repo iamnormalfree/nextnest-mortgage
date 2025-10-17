@@ -1,0 +1,559 @@
+{
+  "name": "Chatwoot Conversation Enhancer",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "8b57d249-6434-4aab-bf6f-ab6ea059ffa9",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1904,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://chat.nextnest.sg/api/v1/accounts/1/conversations",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "pending"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "ML1DyhzJyDKFFvsZLvEYfHnC"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3ac8202d-12b6-424f-a30b-42cb97a62489",
+      "name": "Get Pending Conversations",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1696,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.data.payload.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "id": "20697110-b61c-40e8-8860-e36a61db5dad"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "37338c8a-64e6-4173-aba9-ed3a7885fbbd",
+      "name": "Check if Conversations Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1472,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "ML1DyhzJyDKFFvsZLvEYfHnC"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"assignee_id\": 1\n}",
+        "options": {}
+      },
+      "id": "8fc97b5f-33a0-4943-b2b2-3e079d652900",
+      "name": "Assign to User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1024,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{ $json.id }}/toggle_status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "ML1DyhzJyDKFFvsZLvEYfHnC"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"status\": \"open\"\n}",
+        "options": {}
+      },
+      "id": "8e804b5b-e47c-4b7f-b870-dab4f599763b",
+      "name": "Set Status to Open",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -816,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Broker configurations\nconst AI_BROKERS = {\n  'Marcus Chen': { label: 'AI-Broker-Marcus', color: '#FF6B6B' },\n  'Sarah Wong': { label: 'AI-Broker-Sarah', color: '#4ECDC4' },\n  'Jasmine Lee': { label: 'AI-Broker-Jasmine', color: '#45B7D1' }\n};\n\nconst PROPERTY_LABELS = {\n  'HDB': { label: 'Property-HDB', color: '#96CEB4' },\n  'EC': { label: 'Property-EC', color: '#FFEAA7' },\n  'Private': { label: 'Property-Private', color: '#DDA0DD' }\n};\n\n  const conversation = $('Split Out').item.json;\n  const brokerName =\n  conversation.custom_attributes?.ai_broker_name;\n  const propertyType =\n  conversation.custom_attributes?.property_type;\n\nconst labels = [];\n\n// Add broker label\nif (brokerName && AI_BROKERS[brokerName]) {\n  labels.push(AI_BROKERS[brokerName].label);\n}\n\n// Add property label\nif (propertyType && PROPERTY_LABELS[propertyType]) {\n  labels.push(PROPERTY_LABELS[propertyType].label);\n}\n\nreturn [{\n  json: {\n    conversation_id: conversation.id,\n    labels: labels,\n    broker_name: brokerName,\n    property_type: propertyType,\n    conversation: conversation\n  }\n}];"
+      },
+      "id": "5c77a143-121a-47cd-86d1-d40f087b0ad3",
+      "name": "Determine Labels",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{ $json.conversation_id }}/labels",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "ML1DyhzJyDKFFvsZLvEYfHnC"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": {{ JSON.stringify($json.labels) }}\n}",
+        "options": {}
+      },
+      "id": "42e6cd05-e09d-4f6a-b3c6-4832179aeb94",
+      "name": "Add Labels",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -144,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "  const conversation = $('Determine Labels').first().json.conversation;\n  const formData = conversation.custom_attributes || {};\n\n  // Skip generating user-facing form submission message - process internally only\n  return [{\n    json: {\n      conversation_id: conversation.id,\n      // No user_message - prevents form submission display in chat\n      conversation: conversation,\n      skip_user_message: true\n    }\n  }];"
+      },
+      "id": "aaa2fd40-ffdc-4e61-9db6-edc9fa4bcf14",
+      "name": "Generate User Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{ $json.conversation_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "ML1DyhzJyDKFFvsZLvEYfHnC"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "= {\n    \"content\": {{ JSON.stringify($json.conversation.messages[0].content) }},\n    \"message_type\": \"incoming\",\n    \"private\": false\n  }",
+        "options": {}
+      },
+      "id": "2d8a8afb-1891-46de-aaf5-ae86950b6755",
+      "name": "Add User Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        304,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate AI broker introduction message\n  const conversation = $('Determine Labels').first().json.conversation;\n  const formData = conversation.custom_attributes || {};\n  const brokerName = formData.ai_broker_name;\n  const userName = conversation.meta?.sender?.name || 'there';\n  const leadScore = formData.lead_score || 75;\n  const monthlyIncome = formData.monthly_income || 5000;\n  const propertyType = formData.property_type || 'property';\n\n  const brokerIntros = {\n    'Marcus Chen': `Hi ${userName}! 🎯\n\n  I'm Marcus Chen, your dedicated mortgage specialist. I've analyzed your ${formData.loan_type || 'mortgage'} application and have excellent news!\n\n  ✅ **Pre-qualification Status**: Highly Likely Approved\n  💰 **Your Profile Score**: ${leadScore}/100 (${leadScore > 85 ? 'Premium' : leadScore > 70 ? 'Strong' : 'Good'} tier)\n  🏆 **Monthly Income**: S$${monthlyIncome} puts you in a strong position\n\n  Based on your ${propertyType} choice, I've identified 3 strategies that could maximize your savings.\n\n  The market is moving fast right now, and with your ${leadScore > 80 ? 'excellent' : 'strong'} profile, we should secure your rate ASAP.\n\n  **Ready to lock in these rates today?** I can have your pre-approval letter ready within 2 hours. 🚀`,\n\n    'Sarah Wong': `Hello ${userName}! 👋\n\n  I'm Sarah Wong, and I'm excited to help you with your ${formData.loan_type || 'mortgage'} journey.\n\n  I've reviewed your application and here's what I found:\n\n  📊 **Your Profile Assessment**: ${leadScore}/100\n  ✅ ${leadScore > 80 ? 'Excellent' : leadScore > 70 ? 'Strong' : 'Good'} approval likelihood\n  💡 Your S$${monthlyIncome} income puts you in a ${leadScore > 80 ? 'excellent' : 'good'} position\n\n  **What this means for you:**\n  • ${propertyType} properties offer several financing options\n  • Current market conditions are favorable for your timeline\n\n  I'm here to answer any questions and guide you through each step. What would you like to explore first?`,\n\n    'Jasmine Lee': `Hi ${userName},\n\n  Thank you for taking the time to complete your ${formData.loan_type || 'mortgage'} application. I'm Jasmine Lee, and I'm here to help you understand your options without any pressure.\n\n  I know mortgage decisions can feel overwhelming, so let's take this step by step:\n\n  🏠 **What I understand about your situation:**\n  • You're exploring ${formData.loan_type || 'mortgage'} options\n  • Looking at ${propertyType} properties\n  • Want to make sure you're getting the best value\n\n  **My approach:**\n  • No pressure - we'll move at your pace\n  • Clear explanations of all options\n  • Honest advice about what makes sense for your situation\n\n  Feel free to ask me anything - even questions you think might be \"basic.\" That's what I'm here for! 😊`\n  };\n\n  const introMessage = brokerIntros[brokerName] || brokerIntros['Sarah Wong'];\n\n  return [{\n    json: {\n      conversation_id: conversation.id,\n      broker_message: introMessage,\n      broker_name: brokerName\n    }\n  }];"
+      },
+      "id": "22275fd0-ec4a-4aba-b256-02fde0851a7b",
+      "name": "Generate Broker Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        -128
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{ $json.conversation_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "ML1DyhzJyDKFFvsZLvEYfHnC"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": {{ JSON.stringify($json.broker_message) }},\n  \"message_type\": \"outgoing\",\n  \"private\": false\n}",
+        "options": {}
+      },
+      "id": "86271722-06b1-438f-ba23-fe0c610e9998",
+      "name": "Add Broker Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        736,
+        -128
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.data.payload.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equal"
+              },
+              "id": "88165f2f-5750-4c69-9ee7-0acf0f570b79"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2df074c0-838e-4348-b8f9-b7e544107e2f",
+      "name": "No Conversations",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        592
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "c26a6d77-5bef-4b2d-b5e9-8c5c787e9589",
+      "name": "No Action Needed",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.payload",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        144
+      ],
+      "id": "82c03595-2b5a-4e2d-bcec-3c3966502c13",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a8c9590f-0e99-4781-88c6-3fb0eab5c910",
+              "leftValue": "={{ $('Assign to User').item.json.custom_attributes.ai_broker_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -624,
+        -32
+      ],
+      "id": "dc121b28-f5a9-400e-9d8d-c799cd19d8d8",
+      "name": "Check Broker Name Status"
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-09-19T11:13:25.004+08:00",
+          "Readable date": "September 19th 2025, 11:13:25 am",
+          "Readable time": "11:13:25 am",
+          "Day of week": "Friday",
+          "Year": "2025",
+          "Month": "September",
+          "Day of month": "19",
+          "Hour": "11",
+          "Minute": "13",
+          "Second": "25",
+          "Timezone": "Asia/Singapore (UTC+08:00)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Conversations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Conversations": {
+      "main": [
+        [
+          {
+            "node": "Check if Conversations Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Conversations Exist": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Conversations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign to User": {
+      "main": [
+        [
+          {
+            "node": "Set Status to Open",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Status to Open": {
+      "main": [
+        [
+          {
+            "node": "Check Broker Name Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Labels": {
+      "main": [
+        [
+          {
+            "node": "Add Labels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Labels": {
+      "main": [
+        [
+          {
+            "node": "Generate User Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate User Message": {
+      "main": [
+        [
+          {
+            "node": "Add User Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add User Message": {
+      "main": [
+        []
+      ]
+    },
+    "Generate Broker Message": {
+      "main": [
+        [
+          {
+            "node": "Add Broker Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Conversations": {
+      "main": [
+        [
+          {
+            "node": "No Action Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Assign to User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Broker Name Status": {
+      "main": [
+        [
+          {
+            "node": "Determine Labels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Singapore",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "e34a1f49-35ee-4d74-b302-aae5191e7655",
+  "meta": {
+    "instanceId": "6964f6cc593d151740b2cfaf9853d942d8baa05ae80134871d80f052f81f912b"
+  },
+  "id": "AxVHQbpEP87T87De",
+  "tags": []
+}

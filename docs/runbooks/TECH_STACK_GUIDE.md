@@ -82,6 +82,126 @@ scripts/, validation-reports/
 - Any feature touching `app/` routes must update its corresponding plan/runbook plus component README, per the docs roadmap.
 - Monthly docs + tech stack review recommended: owners sweep their sections, demote stale runbooks to archive, and update `last-reviewed` stamps.
 
+---
+
+## Engineering Decision Frameworks
+
+### GEO-First Philosophy
+
+**Core Principles:**
+- **Stay Lean**: Keep Next.js but evaluate all dependencies before adding
+- **GEO-First**: Optimize for AI citation and Generative Engine Optimization
+- **Performance Priority**: Maintain fast site speed (~140KB gzipped target)
+- **Progressive Enhancement**: Build core functionality without JavaScript, enhance with JS
+- **SSR Strategy**: Server-render marketing/SEO pages, use client islands for interactivity
+
+**Decision Framework:**
+Before adding any dependency or feature, ask:
+1. **Does this improve GEO/SEO?**
+2. **Is this essential for user functionality?**
+3. **Can we build this with existing tools?**
+4. **What's the bundle size impact?**
+
+**Architecture Strategy:**
+- **Marketing Pages**: SSR for AI crawlers and search engines
+- **Dashboard**: Hybrid SSR shell + interactive islands
+- **Calculators**: Server-rendered initial state + client interactivity
+- **Programmatic Content**: Generate location/loan-type combinations for SEO
+- **External APIs**: Add only when user dashboards are ready
+
+### Dependency Decision Framework
+
+#### When to Use Progressive Enhancement
+
+**✅ USE FOR:**
+1. Calculators (work without JS for SEO)
+2. Forms (accessibility requirement)
+3. Search (basic GET params work everywhere)
+4. File uploads (fallback for all devices)
+
+**❌ DON'T USE FOR:**
+1. Real-time chat (requires JS)
+2. Complex animations (JS-only features)
+3. Client-only features (like drawing tools)
+
+#### When to Use Micro-Frameworks
+
+**✅ USE WHEN:**
+1. You have repetitive code patterns
+2. Need focused functionality (validation, dates, HTTP)
+3. Want to avoid reinventing the wheel
+4. Bundle size is still small
+
+**❌ AVOID WHEN:**
+1. You can write it in 5-10 lines yourself
+2. Only using 1-2 functions from large library
+3. Adds complexity without clear benefit
+
+#### For NextNest Mortgage Platform - Recommended
+
+**✅ Approved Dependencies:**
+- Zod (form validation)
+- clsx (conditional CSS)
+- date-fns (mortgage date calculations)
+
+**❌ Skip These:**
+- React Query (overkill for simple data needs)
+- Zustand/Redux (no complex state management needed)
+- Framer Motion (animations aren't priority)
+- Heavy component libraries (Tailwind is enough)
+- lodash, ramda, moment.js (too heavy)
+
+### Design System Specifications
+
+**Color Palette:**
+```css
+Primary Blue: #4A90E2 (primary-500)
+Dark Blue: #3A80D2 (primary-600)
+Dark Navy: #0D1B2A (dark-900)
+Light Background: #FAF9F8 (light-50)
+```
+
+**Typography:**
+- **Headings**: Gilda Display (serif)
+- **Body Text**: Inter (sans-serif)
+- **Responsive sizing**: Tailwind's text-* classes
+
+**Layout Patterns:**
+- **Container**: `container mx-auto px-4 sm:px-6 lg:px-8`
+- **Cards**: `bg-white rounded-xl shadow-lg border`
+- **Buttons**: `bg-[#4A90E2] hover:bg-[#3A80D2] text-white`
+
+### Progressive Enhancement Pattern
+
+1. **Level 1**: Works without JavaScript (form submissions via GET params)
+2. **Level 2**: JavaScript enhancement for real-time calculations
+3. **Level 3**: Advanced features (charts, comparisons)
+
+### Bundle Size Management
+
+- **Target**: Maintain <140KB gzipped for marketing pages
+- **Strategy**: Code splitting between marketing and dashboard routes
+- **Monitoring**: Use `@next/bundle-analyzer` for tracking
+
+### Troubleshooting & Development Tips
+
+**Common Issues:**
+1. **Build Errors**: Check TypeScript types and imports
+2. **Styling Issues**: Verify Tailwind class names and configuration
+3. **API Errors**: Check route.ts file structure and exports
+4. **Form Issues**: Verify React Hook Form setup and validation
+
+**Development Tips:**
+- Use browser dev tools for debugging
+- Check console for errors and warnings
+- Use TypeScript for better error catching
+- Test responsive design on multiple screen sizes
+- Validate forms thoroughly before submission
+
+---
+
+**Last reviewed:** 2025-10-17
+
 ## Roadmap / Outstanding Tasks
 1. Finalise docs reorg (move root markdown into `docs/` buckets, add `_templates/`).
 2. Finish broker assignment + human-like LLM cues for Chatwoot at `chat.nextnest.sg`.

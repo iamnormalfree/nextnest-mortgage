@@ -1,0 +1,724 @@
+{
+  "name": "NN AI Broker",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwoot-ai-broker",
+        "options": {}
+      },
+      "id": "fe628289-fe6d-4a18-89c2-87af0d0821ad",
+      "name": "Chatwoot Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        112
+      ],
+      "webhookId": "chatwoot-ai-broker"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge broker data from either path\n  const inputs = $input.all();\n\n  // Get customer profile from the Extract Customer Profile node\n  const customerProfile = $('Extract Customer Profile').first().json;\n\n  // Initialize broker data\n  let brokerData = null;\n\n  // Check which path we came from\n  // Path 1: Existing broker (hasbroker = true)\n  // Look for the full broker details from \"Execute a SQL query3\" node\n  try {\n    const existingBroker = $('Execute a SQL query3').first().json;\n    if (existingBroker && existingBroker.id) {\n      brokerData = {\n        id: existingBroker.id,\n        name: existingBroker.name,\n        slug: existingBroker.slug,\n        photoUrl: existingBroker.photo_url,\n        personalityType: existingBroker.personality_type,\n        voiceDescription: existingBroker.voice_description,\n        communicationStyle: existingBroker.communication_style,\n        approachStyle: existingBroker.approach_style,\n        favoritePhrases: existingBroker.favorite_phrases || [],\n        speakingSpeed: existingBroker.speaking_speed,\n        voiceModel: existingBroker.voice_model\n      };\n    }\n  } catch (e) {\n    // Node doesn't exist or wasn't executed - try the other path\n  }\n\n  // Path 2: New broker assignment (hasbroker = false)\n  if (!brokerData) {\n    try {\n      const newBroker = $('Assign Best Broker 2').first().json;\n      if (newBroker) {\n        brokerData = {\n          id: newBroker.assigned_broker_id || newBroker.id,\n          name: newBroker.name,\n          slug: newBroker.slug,\n          photoUrl: newBroker.photo_url,\n          personalityType: newBroker.personality_type,\n          voiceDescription: newBroker.voice_description,\n          communicationStyle: newBroker.communication_style,\n          approachStyle: newBroker.approach_style,\n          favoritePhrases: newBroker.favorite_phrases || [],\n          speakingSpeed: newBroker.speaking_speed,\n          voiceModel: newBroker.voice_model\n        };\n      }\n    } catch (e) {\n      // This path wasn't executed either\n    }\n  }\n\n  // If still no broker data, check the inputs directly\n  if (!brokerData) {\n    // Look through all inputs for broker data\n    for (const input of inputs) {\n      const data = input.json;\n      // Check if this looks like broker data\n      if (data.id && data.name && (data.personality_type || data.voice_model)) {\n        brokerData = {\n          id: data.id,\n          name: data.name,\n          slug: data.slug,\n          photoUrl: data.photo_url,\n          personalityType: data.personality_type,\n          voiceDescription: data.voice_description,\n          communicationStyle: data.communication_style,\n          approachStyle: data.approach_style,\n          favoritePhrases: data.favorite_phrases || [],\n          speakingSpeed: data.speaking_speed,\n          voiceModel: data.voice_model\n        };\n        break;\n      }\n    }\n  }\n\n  // Return merged context\n  return {\n    broker: brokerData,\n    customer: customerProfile,\n    conversationId: customerProfile?.conversationId,\n    messageCount: customerProfile?.messageCount || 0\n  };"
+      },
+      "id": "aaff502c-bde3-4af7-97fb-fac37eab8189",
+      "name": "Merge Broker Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        400,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://chat.nextnest.sg/api/v1/accounts/1/conversations/{{$json[\"conversationId\"]}}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Api-Access-Token",
+              "value": "=={{$env.CHATWOOT_API_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bf0b1d6b-e8f1-43f6-a0e3-eb745ab75aee",
+      "name": "Get Conversation History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        576,
+        192
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "bBZC1i0chtCiwWOm",
+          "name": "Chatwoot API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n    const conversationData = $input.first().json;\n    const brokerContext = $('Merge Broker Context').first().json;\n\n    const messages = conversationData.messages || [];\n\n    // Build conversation history\n    const conversationHistory = [];\n    for (let i = 0; i < Math.min(10, messages.length); i++) {\n      const msg = messages[messages.length - 1 - i];\n      if (!msg.private) {\n        let role = 'system';\n        if (msg.message_type === 0) {\n          role = 'user';\n        } else if (msg.message_type === 1) {\n          role = 'assistant';\n        }\n        conversationHistory.unshift({\n          role: role,\n          content: msg.content\n        });\n      }\n    }\n\n    // Identify topics\n    const topicsDiscussed = [];\n    const messageTexts = messages.map(m => String(m.content || '').toLowerCase()).join(' ');\n\n    if (messageTexts.indexOf('rate') !== -1) topicsDiscussed.push('interest rates');\n    if (messageTexts.indexOf('afford') !== -1) topicsDiscussed.push('affordability');\n    if (messageTexts.indexOf('cpf') !== -1) topicsDiscussed.push('CPF usage');\n    if (messageTexts.indexOf('loan') !== -1) topicsDiscussed.push('loan details');\n    if (messageTexts.indexOf('refinanc') !== -1) topicsDiscussed.push('refinancing');\n\n    // Use the actual current message from customer\n    const currentMsg = brokerContext.customer?.currentMessage || 'I need help with my mortgage';\n\n    return {\n      broker: brokerContext.broker || null,\n      customer: brokerContext.customer || null,\n      conversationHistory: conversationHistory,\n      topicsDiscussed: topicsDiscussed,\n      totalMessages: messages.length,\n      currentMessage: currentMsg\n    };\n\n  } catch (error) {\n    return {\n      error: error.message,\n      stack: error.stack\n    };\n  }"
+      },
+      "id": "c7d572ef-13e2-4dec-b7dc-c3cdf623a34b",
+      "name": "Process History",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        800,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get inputs\n  const aiData = $input.first().json;\n  const processHistory = $('Process History').first().json;\n\n  // Extract data\n  const response = aiData.message.content;\n  const customer = processHistory.customer;\n  const broker = processHistory.broker;\n  const messageCount = processHistory.totalMessages;\n  const userMessage = customer.currentMessage.toLowerCase();\n\n  // Initialize\n  let shouldHandoff = false;\n  let handoffReason = 'none';\n  let urgencyLevel = 'normal';\n\n  // Check for handoff keywords\n  const handoffKeywords = [\n    'ready to apply', 'apply now', 'lets proceed',\n    'speak to human', 'real person', 'human agent',\n    'sign up', 'start application', 'move forward'\n  ];\n\n  for (const keyword of handoffKeywords) {\n    if (userMessage.includes(keyword)) {\n      shouldHandoff = true;\n      handoffReason = 'Customer explicitly requested to proceed or speak with human';\n      urgencyLevel = 'high';\n      break;\n    }\n  }\n\n  // Check high-value lead at optimal handoff point\n  if (!shouldHandoff && messageCount >= 7 && customer.leadScore >= 80) {\n    shouldHandoff = true;\n    handoffReason = 'High-value lead (score: ' + customer.leadScore + ') ready for conversion after ' + messageCount + ' messages';\n    urgencyLevel = 'medium';\n  }\n\n  // Check urgent timeline\n  if (!shouldHandoff && customer.timeline === 'urgent' && messageCount >= 5) {\n    shouldHandoff = true;\n    handoffReason = 'Urgent timeline customer engaged for ' + messageCount + ' messages';\n    urgencyLevel = 'high';\n  }\n\n  // Check complex situations\n  const complexKeywords = ['divorce', 'bankruptcy', 'foreigner', 'overseas', 'complicated'];\n  for (const keyword of complexKeywords) {\n    if (userMessage.includes(keyword)) {\n      shouldHandoff = true;\n      handoffReason = 'Complex situation requiring specialist attention';\n      urgencyLevel = 'medium';\n      break;\n    }\n  }\n\n  // Check frustration\n  const frustrationKeywords = ['frustrated', 'not helpful', 'speak to someone else', 'waste time'];\n  for (const keyword of frustrationKeywords) {\n    if (userMessage.includes(keyword)) {\n      shouldHandoff = true;\n      handoffReason = 'Customer showing frustration - immediate attention needed';\n      urgencyLevel = 'urgent';\n      break;\n    }\n  }\n\n  // Add handoff message if needed\n  let finalResponse = response;\n  if (shouldHandoff) {\n    const handoffMessage = ' I can see you are ready to take the next step! Let me connect you with our senior mortgage specialist who can process your application immediately and secure these rates for you.';\n    finalResponse = response + '\\n\\n---\\n' + handoffMessage;\n  }\n\n  // Return result\n  return {\n    aiResponse: finalResponse,\n    shouldHandoff: shouldHandoff,\n    handoffReason: handoffReason,\n    urgencyLevel: urgencyLevel,\n    conversationId: customer.conversationId,\n    brokerId: broker.id,\n    brokerName: broker.name,\n    messageCount: messageCount + 1\n  };"
+      },
+      "id": "258eb3ac-db52-472f-8f8f-5eb727d892de",
+      "name": "Check Handoff Triggers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0473c621-b1ab-4e0a-83f2-8ab4978bbfbc",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "created",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "0c890c6f-663c-4ab0-b549-d171471efdf0",
+              "leftValue": "={{ $json.body.conversation.status }}",
+              "rightValue": "bot",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "588a209b-dbed-4978-b036-f3c93f5d0929",
+              "leftValue": "={{ $json.body.message.message_type }}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "bc6210fc-7494-41a4-8772-3473797836d8",
+              "leftValue": "={{ $json.body.message.sender.type }}",
+              "rightValue": "contact",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -832,
+        128
+      ],
+      "id": "5290cbb7-74eb-48a9-895c-098c39fa0184",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "  SELECT\n    CASE\n      WHEN bc.broker_id IS NOT NULL THEN true\n      ELSE false\n    END as hasbroker,\n    COALESCE({{$json[\"conversationId\"] || 'NULL'}}, 0)::integer as conversation_id,\n    bc.broker_id,\n    bc.status,\n    b.name as broker_name,\n    b.personality_type\n  FROM (SELECT COALESCE({{$json[\"conversationId\"] || 'NULL'}}, 0)::integer as conversation_id) as input\n  LEFT JOIN broker_conversations bc\n    ON bc.conversation_id = input.conversation_id\n    AND bc.status = 'active'\n  LEFT JOIN ai_brokers b\n    ON bc.broker_id = b.id\n  LIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -336,
+        48
+      ],
+      "id": "ed7b9040-c1a0-4042-821f-798632f84cc8",
+      "name": "Execute a SQL query2",
+      "credentials": {
+        "postgres": {
+          "id": "wWlJYuvG9LtfFgyl",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "32d5e761-4aeb-494c-8151-f3201edec567",
+              "leftValue": "={{ $json.hasbroker }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        144
+      ],
+      "id": "65c894b3-8d97-4d12-8da7-63aaa90ceb52",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  b.*,\n  assign_best_broker(\n    {{ $('Extract Customer Profile').item.json.leadScore }},\n    '{{ $('Extract Customer Profile').item.json.loanType }}',\n    '{{ $('Extract Customer Profile').item.json.propertyType }}',\n    {{ $('Extract Customer Profile').item.json.monthlyIncome }},\n    '{{ $('Extract Customer Profile').item.json.timeline }}'\n  ) as assigned_broker_id\nFROM ai_brokers b\nWHERE b.id = assign_best_broker(\n  {{ $('Extract Customer Profile').item.json.leadScore }},\n  '{{ $('Extract Customer Profile').item.json.loanType }}',\n  '{{ $('Extract Customer Profile').item.json.propertyType }}',\n  {{ $('Extract Customer Profile').item.json.monthlyIncome }},\n  '{{ $('Extract Customer Profile').item.json.timeline }}'\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        -32
+      ],
+      "id": "6dfeefd6-1ccd-4b74-8075-af1bbff252ce",
+      "name": "Assign Best Broker 2",
+      "credentials": {
+        "postgres": {
+          "id": "wWlJYuvG9LtfFgyl",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "  INSERT INTO broker_conversations (\n    id,\n    conversation_id,\n    broker_id,\n    contact_id,\n    customer_name,\n    customer_email,\n    customer_phone,\n    lead_score,\n    loan_type,\n    property_type,\n    monthly_income,\n    loan_amount,\n    timeline,\n    assignment_method,\n    assignment_reason,\n    status,\n    assigned_at\n  ) VALUES (\n    gen_random_uuid(),\n    {{ $('Extract Customer Profile').item.json.conversationId }},\n    '{{ $('Assign Best Broker 2').item.json.assigned_broker_id }}',\n    {{ $('Extract Customer Profile').item.json.contactId }},\n    '{{ $('Extract Customer Profile').item.json.name }}',\n    '{{ $('Extract Customer Profile').item.json.email || NULL }}',\n    '{{ $('Extract Customer Profile').item.json.phone || NULL }}',\n    {{ $('Extract Customer Profile').item.json.leadScore }},\n    '{{ $('Extract Customer Profile').item.json.loanType }}',\n    '{{ $('Extract Customer Profile').item.json.propertyType }}',\n    {{ $('Extract Customer Profile').item.json.monthlyIncome }},\n    {{ $('Extract Customer Profile').item.json.loanAmount || 0 }},\n    '{{ $('Extract Customer Profile').item.json.timeline }}',\n    'auto',\n    'Best match based on lead score and profile',\n    'active',\n    NOW()\n  )\n  RETURNING *;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        192,
+        -32
+      ],
+      "id": "43805d02-26c6-4694-a6d2-d76038635d57",
+      "name": "Create Assignment Records",
+      "credentials": {
+        "postgres": {
+          "id": "wWlJYuvG9LtfFgyl",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "  // Extract customer profile from conversation\n  const body = $input.first().json.body || $input.first().json;\n  const conversation = body.conversation;\n  const message = body.message;\n  const sender = message.sender; // FIX: sender is inside message object\n\n  // Get custom attributes from BOTH conversation and contact\n  const convAttributes = conversation.custom_attributes || {};\n  const contactAttributes = conversation.contact?.custom_attributes || {};\n\n  // Merge attributes - conversation attributes take priority\n  const attributes = { ...contactAttributes, ...convAttributes };\n\n  // Build customer profile\n  const customerProfile = {\n    // Identifiers\n    conversationId: conversation.id,\n    contactId: conversation.contact_id || conversation.contact?.id,\n    messageId: message.id,\n\n    // Customer Data - check multiple sources\n    name: attributes.name || conversation.contact?.name || sender?.name || 'Customer',\n    email: attributes.email || conversation.contact?.email || sender?.email,\n    phone: attributes.phone || conversation.contact?.phone_number || sender?.phone_number,\n\n    // Lead Qualification - FROM CONVERSATION ATTRIBUTES\n    leadScore: parseInt(convAttributes.lead_score || attributes.lead_score) || 50,\n    loanType: convAttributes.loan_type || attributes.loan_type || 'new_purchase',\n    propertyType: convAttributes.property_category || attributes.property_category || 'hdb',\n    monthlyIncome: parseFloat(convAttributes.monthly_income || attributes.monthly_income) || 5000,\n    propertyPrice: parseFloat(convAttributes.property_price || attributes.property_price) || 0,\n    loanAmount: parseFloat(convAttributes.loan_amount || attributes.loan_amount) || 0,\n    timeline: convAttributes.purchase_timeline || attributes.purchase_timeline || 'flexible',\n    employmentType: convAttributes.employment_type || attributes.employment_type || 'employed',\n\n    // Additional context\n    existingCommitments: parseFloat(convAttributes.existing_commitments) || 0,\n    applicantAges: convAttributes.applicant_ages || [],\n\n    // Message Context\n    currentMessage: message.content,\n    messageCount: parseInt(convAttributes.message_count || attributes.message_count) || 0,\n\n    // Broker Assignment\n    assignedBrokerName: convAttributes.ai_broker_name || attributes.ai_broker_name,\n    brokerPersona: convAttributes.broker_persona || attributes.broker_persona,\n\n    // Session tracking\n    sessionId: convAttributes.session_id || attributes.session_id\n  };\n\n  return customerProfile;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        80
+      ],
+      "id": "35db76c2-2fe0-458a-a5d7-705d1e50c1cc",
+      "name": "Extract Customer Profile"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code node - Get Conversation History\n  const input = $input.first().json;\n  // Dynamic conversation ID from webhook payload\n  const conversationId = input.conversationId || input.customer?.conversationId || input.conversation?.id || 24;\n\n  try {\n    const response = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `https://chat.nextnest.sg/api/v1/accounts/1/conversations/${conversationId}/messages`,\n      headers: {\n        'api-access-token': '={{$env.CHATWOOT_API_TOKEN}}'\n      },\n      json: true\n    });\n\n    // Chatwoot returns messages in response.payload\n    const messages = response.payload || [];\n\n    return {\n      conversationId: conversationId,\n      messages: messages,\n      messageCount: messages.length,\n      success: true\n    };\n  } catch (error) {\n    return {\n      conversationId: conversationId,\n      messages: [],\n      messageCount: 0,\n      success: false,\n      error: error.message\n    };\n  }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -128
+      ],
+      "id": "c0432669-ccf5-4a25-80e0-10c1296455d3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "  SELECT\n    b.*\n  FROM ai_brokers b\n  WHERE b.id = '{{$json[\"broker_id\"]}}'\n  LIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        48,
+        240
+      ],
+      "id": "06cd666e-fc41-417b-9235-e0a0be24ce1c",
+      "name": "Execute a SQL query3",
+      "credentials": {
+        "postgres": {
+          "id": "wWlJYuvG9LtfFgyl",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "= You are {{ $json.broker.name }}, a mortgage specialist in Singapore with this personality:\n  {{ $json.broker.voiceDescription }}\n\n  Your communication style: {{ $json.broker.communicationStyle }}\n  Your approach: {{ $json.broker.approachStyle }}\n\n  Use these phrases naturally: {{ $json.broker.favoritePhrases.join(', ') }}\n\n  Customer Profile:\n  - Name: {{ $json.customer.name }}\n  - Lead Score: {{ $json.customer.leadScore }}\n  - Loan Type: {{ $json.customer.loanType }}\n  - Property: {{ $json.customer.propertyType }}\n  - Monthly Income: ${{ $json.customer.monthlyIncome }}\n  - Loan Amount: ${{ $json.customer.loanAmount }}\n\n  Stay in character. Be helpful but push for conversion. If they show interest, suggest scheduling a call or getting\n  pre-approval.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.currentMessage }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 500,
+          "temperature": 0.8
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        976,
+        224
+      ],
+      "id": "518ea5f6-369a-4b60-a9b1-2c4f971ad37c",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "6gSuABAxZiiW9ItB",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "  // Send Response to Chatwoot\n  const data = $input.first().json;\n  const conversationId = data.conversationId;\n  const aiResponse = data.aiResponse;\n  const shouldHandoff = data.shouldHandoff;\n\n  // For testing with fake conversation ID, just return the response\n  if (conversationId === 12346 || conversationId === 12347) {\n    console.log('Test mode - not sending to Chatwoot');\n    return {\n      status: 'test_mode',\n      message: 'Response generated but not sent (test conversation)',\n      conversationId: conversationId,\n      response: aiResponse,\n      shouldHandoff: shouldHandoff,\n      brokerName: data.brokerName\n    };\n  }\n\n  // For production - send to Chatwoot\n  try {\n    const response = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `https://chat.nextnest.sg/api/v1/accounts/1/conversations/${conversationId}/messages`,\n      headers: {\n        'api-access-token': '={{$env.CHATWOOT_API_TOKEN}}',\n        'Content-Type': 'application/json'\n      },\n      body: {\n        content: aiResponse,\n        message_type: 'outgoing',\n        private: false\n      },\n      json: true\n    });\n\n    // If handoff needed, update conversation status\n    if (shouldHandoff) {\n      await this.helpers.httpRequest({\n        method: 'PATCH',\n        url: `https://chat.nextnest.sg/api/v1/accounts/1/conversations/${conversationId}`,\n        headers: {\n          'api-access-token': '={{$env.CHATWOOT_API_TOKEN}}',\n          'Content-Type': 'application/json'\n        },\n        body: {\n          status: 'pending'\n        },\n        json: true\n      });\n    }\n\n    return {\n      status: 'success',\n      messageId: response.id,\n      conversationId: conversationId,\n      response: aiResponse,\n      shouldHandoff: shouldHandoff,\n      handoffStatus: shouldHandoff ? 'pending' : 'bot',\n      brokerName: data.brokerName\n    };\n\n  } catch (error) {\n    return {\n      status: 'error',\n      error: error.message,\n      conversationId: conversationId,\n      response: aiResponse,\n      shouldHandoff: shouldHandoff\n    };\n  }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        240
+      ],
+      "id": "ca148e05-8387-4aff-9ae2-5e10a0f871a1",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle Handoff to Human Agent\n  let data = $input.first().json;\n\n  // If data is incomplete (coming through IF node), get from Check Handoff Triggers\n  if (!data.handoffReason || data.messageCount === undefined) {\n    try {\n      // Get the full data from Check Handoff Triggers node\n      const checkHandoffData = $('Check Handoff Triggers').first().json;\n      data = checkHandoffData;\n      console.log('Got complete data from Check Handoff Triggers');\n    } catch (e) {\n      console.log('Could not get data from Check Handoff Triggers:', e.message);\n    }\n  }\n\n  // Now extract all values\n  const conversationId = data.conversationId;\n  const brokerName = data.brokerName;\n  const handoffReason = data.handoffReason || 'Customer ready to proceed';\n  const urgencyLevel = data.urgencyLevel || 'normal';\n  const messageCount = data.messageCount || 0;\n  const brokerId = data.brokerId;\n\n  // Debug: Log extracted values\n  console.log('Final extracted values:', {\n    conversationId,\n    brokerName,\n    handoffReason,\n    urgencyLevel,\n    messageCount,\n    brokerId\n  });\n\n  // Get customer data from the input chain\n  let customerProfile = {};\n  try {\n    // Try to get from previous nodes in the chain\n    const inputs = $input.all();\n    for (const input of inputs) {\n      if (input.json.leadScore !== undefined) {\n        customerProfile = input.json;\n        break;\n      }\n    }\n  } catch (e) {\n    // Use defaults if not found\n    customerProfile = {\n      leadScore: 0,\n      loanType: 'unknown',\n      propertyType: 'unknown',\n      monthlyIncome: 0,\n      timeline: 'unknown',\n      currentMessage: ''\n    };\n  }\n\n  // For test mode, just return what would be done\n  if (conversationId === 12346 || conversationId === 12347) {\n    return {\n      status: 'test_mode',\n      message: 'Handoff simulated (test conversation)',\n      conversationId: conversationId,\n      actions: ['Would change status to open', 'Would add internal note'],\n      handoffDetails: {\n        broker: brokerName,\n        reason: handoffReason,\n        urgency: urgencyLevel,\n        messages: messageCount\n      }\n    };\n  }\n\n  try {\n    // Step 1: Change conversation status to \"open\" for human agents\n    const statusUpdate = await this.helpers.httpRequest({\n      method: 'PATCH',\n      url: `https://chat.nextnest.sg/api/v1/accounts/1/conversations/${conversationId}`,\n      headers: {\n        'api-access-token': '={{$env.CHATWOOT_API_TOKEN}}',\n        'Content-Type': 'application/json'\n      },\n      body: {\n        status: 'open'\n      },\n      json: true\n    });\n\n    // Step 2: Add internal note with handoff details\n    const noteContent = '🤖➡️👨‍💼 **AI Broker Handoff**\\n\\n' +\n      '**From:** ' + brokerName + '\\n' +\n      '**Reason:** ' + handoffReason + '\\n' +\n      '**Urgency:** ' + urgencyLevel + '\\n' +\n      '**Messages Exchanged:** ' + messageCount + '\\n\\n' +\n      '**Quick Summary:**\\n' +\n      '- Lead Score: ' + (customerProfile.leadScore || 'N/A') + '/100\\n' +\n      '- Loan Type: ' + (customerProfile.loanType || 'N/A') + '\\n' +\n      '- Property: ' + (customerProfile.propertyType || 'N/A') + '\\n' +\n      '- Income: S$' + (customerProfile.monthlyIncome || 'N/A') + '\\n' +  // Fixed: Added $\n      '- Timeline: ' + (customerProfile.timeline || 'N/A');\n\n    const internalNote = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `https://chat.nextnest.sg/api/v1/accounts/1/conversations/${conversationId}/messages`,\n      headers: {\n        'api-access-token': '={{$env.CHATWOOT_API_TOKEN}}',\n        'Content-Type': 'application/json'\n      },\n      body: {\n        content: noteContent,\n        message_type: 'outgoing',\n        private: true\n      },\n      json: true\n    });\n\n    return {\n      status: 'success',\n      message: 'Handoff completed',\n      conversationId: conversationId,\n      conversationStatus: 'open',\n      handoffDetails: {\n        broker: brokerName,\n        reason: handoffReason,\n        urgency: urgencyLevel,\n        messages: messageCount\n      }\n    };\n\n  } catch (error) {\n    return {\n      status: 'error',\n      error: error.message,\n      conversationId: conversationId\n    };\n  }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        80
+      ],
+      "id": "66ef81c3-320b-4242-a7c7-6b320f175816",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Update Conversation Attributes (No Handoff)\n  const handoffData = $input.first().json;\n  const checkHandoff = $('Check Handoff Triggers').first().json;\n\n  // Get all the data we need\n  const conversationId = handoffData.conversationId || checkHandoff.conversationId;\n  const messageCount = handoffData.messageCount || checkHandoff.messageCount || 0;\n  const brokerId = handoffData.brokerId || checkHandoff.brokerId || '';\n  const brokerName = handoffData.brokerName || checkHandoff.brokerName || '';\n  const handoffReason = handoffData.handoffReason || checkHandoff.handoffReason || 'none';\n\n  // For test mode, just return what would be updated\n  if (conversationId === 12346 || conversationId === 12347) {\n    return {\n      status: 'test_mode',\n      message: 'Attributes update simulated (test conversation)',\n      conversationId: conversationId,\n      updatedAttributes: {\n        message_count: messageCount,\n        assigned_broker_id: brokerId,\n        assigned_broker_name: brokerName,\n        last_ai_response: new Date().toISOString(),\n        handoff_triggered: false,\n        handoff_reason: handoffReason\n      }\n    };\n  }\n\n  try {\n    // Update conversation custom attributes\n    const response = await this.helpers.httpRequest({\n      method: 'PATCH',\n      url: `https://chat.nextnest.sg/api/v1/accounts/1/conversations/${conversationId}`,\n      headers: {\n        'api-access-token': '={{$env.CHATWOOT_API_TOKEN}}',\n        'Content-Type': 'application/json'\n      },\n      body: {\n        custom_attributes: {\n          message_count: messageCount,\n          assigned_broker_id: brokerId,\n          assigned_broker_name: brokerName,\n          last_ai_response: new Date().toISOString(),\n          handoff_triggered: false,\n          handoff_reason: handoffReason,\n          broker_status: 'active'\n        }\n      },\n      json: true\n    });\n\n    // Also update broker_conversations table in database\n    try {\n      await this.helpers.httpRequest({\n        method: 'POST',\n        url: 'https://primary-production-1af6.up.railway.app/rest/execute',\n        headers: {\n          'Content-Type': 'application/json'\n        },\n        body: {\n          query: `UPDATE broker_conversations\n                  SET messages_exchanged = $1,\n                      broker_messages = broker_messages + 1,\n                      last_message_at = NOW(),\n                      status = 'active'\n                  WHERE conversation_id = $2`,\n          params: [messageCount, conversationId]\n        },\n        json: true\n      });\n    } catch (dbError) {\n      console.log('Database update failed:', dbError.message);\n    }\n\n    return {\n      status: 'success',\n      message: 'Conversation attributes updated',\n      conversationId: conversationId,\n      updatedAttributes: {\n        message_count: messageCount,\n        assigned_broker_id: brokerId,\n        assigned_broker_name: brokerName,\n        last_ai_response: new Date().toISOString(),\n        handoff_triggered: false,\n        handoff_reason: handoffReason\n      }\n    };\n\n  } catch (error) {\n    return {\n      status: 'error',\n      error: error.message,\n      conversationId: conversationId\n    };\n  }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        304
+      ],
+      "id": "ecc48d7d-9d6a-47e6-901e-66d6ca42621d",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "832ebe33-808c-4522-a0f0-635911b90cc4",
+              "leftValue": "={{ $json.shouldHandoff }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1632,
+        192
+      ],
+      "id": "9e568f35-82ae-4739-afbd-556828376fcf",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Update conversation metrics\n  UPDATE broker_conversations\n  SET\n    messages_exchanged = {{$('Check Handoff Triggers').first().json.messageCount}},\n    broker_messages = broker_messages + 1,\n    last_message_at = NOW(),\n    handoff_triggered = {{$('Check Handoff Triggers').first().json.shouldHandoff}},\n    handoff_reason = '{{$('Check Handoff Triggers').first().json.handoffReason}}',\n    handoff_at = CASE WHEN {{$('Check Handoff Triggers').first().json.shouldHandoff}} THEN NOW() ELSE handoff_at END,\n    status = CASE WHEN {{$('Check Handoff Triggers').first().json.shouldHandoff}} THEN 'handoff_requested' ELSE 'active'\n  END\n  WHERE conversation_id = {{$('Check Handoff Triggers').first().json.conversationId}};\n\n  -- Update broker metrics\n  UPDATE ai_brokers\n  SET\n    total_messages_sent = total_messages_sent + 1,\n    last_active_at = NOW()\n  WHERE id = '{{$('Check Handoff Triggers').first().json.brokerId}}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2160,
+        224
+      ],
+      "id": "ab4fb36f-ad03-4181-aa9e-85c55de6e133",
+      "name": "Update metrics",
+      "credentials": {
+        "postgres": {
+          "id": "wWlJYuvG9LtfFgyl",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Chatwoot Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "primary-production-1af6.up.railway.app",
+            "user-agent": "curl/8.12.1",
+            "content-length": "1230",
+            "accept": "*/*",
+            "content-type": "application/json",
+            "x-forwarded-for": "38.255.69.142",
+            "x-forwarded-host": "primary-production-1af6.up.railway.app",
+            "x-forwarded-proto": "https",
+            "x-railway-edge": "railway/asia-southeast1-eqsg3a",
+            "x-railway-request-id": "NH63yzWjSnS4vlSgV7rehQ",
+            "x-real-ip": "38.255.69.142",
+            "x-request-start": "1757576689819",
+            "accept-encoding": "gzip"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "message_created",
+            "id": "test-webhook-1757576691",
+            "conversation": {
+              "id": 12346,
+              "contact_id": 5679,
+              "status": "bot",
+              "custom_attributes": {
+                "name": "Sarah Lim",
+                "email": "sarah.lim@example.com",
+                "phone": "+6598765432",
+                "lead_score": 85,
+                "loan_type": "refinancing",
+                "property_category": "private_condo",
+                "monthly_income": 12000,
+                "loan_amount": 1200000,
+                "purchase_timeline": "urgent",
+                "employment_type": "self_employed",
+                "message_count": 1,
+                "status": "bot"
+              },
+              "contact": {
+                "name": "Sarah Lim",
+                "email": "sarah.lim@example.com",
+                "phone_number": "+6598765432"
+              }
+            },
+            "message": {
+              "id": 98766,
+              "content": "I want to refinance my condo loan. Current rates are too high and I heard there are better options now.",
+              "message_type": "incoming",
+              "created_at": "2025-09-11T07:44:51.000Z",
+              "sender": {
+                "id": 5679,
+                "type": "contact",
+                "name": "Sarah Lim"
+              }
+            },
+            "account": {
+              "id": 1,
+              "name": "NextNest"
+            },
+            "inbox": {
+              "id": 2,
+              "name": "Website"
+            }
+          },
+          "webhookUrl": "https://primary-production-1af6.up.railway.app/webhook-test/chatwoot-ai-broker",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Chatwoot Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Broker Context": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Conversation History": {
+      "main": [
+        []
+      ]
+    },
+    "Process History": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Handoff Triggers": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Extract Customer Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Assign Best Broker 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a SQL query3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Best Broker 2": {
+      "main": [
+        [
+          {
+            "node": "Create Assignment Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Assignment Records": {
+      "main": [
+        [
+          {
+            "node": "Merge Broker Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Customer Profile": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query3": {
+      "main": [
+        [
+          {
+            "node": "Merge Broker Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Process History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Check Handoff Triggers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Update metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Update metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d05ea9eb-e540-4878-a058-f76a6d913b1a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6964f6cc593d151740b2cfaf9853d942d8baa05ae80134871d80f052f81f912b"
+  },
+  "id": "I6fx7kySryKCu4zi",
+  "tags": []
+}

@@ -5,7 +5,7 @@
  * Central configuration for progressive form steps and default values
  */
 
-import { FormStep, LoanType } from '@/lib/contracts/form-contracts'
+import { FormStep, LoanType, PropertyCategory, PropertyType } from '@/lib/contracts/form-contracts'
 
 /**
  * Progressive form step definitions
@@ -34,8 +34,8 @@ export const formSteps: FormStep[] = [
     stepNumber: 2,
     label: 'What You Need',
     description: 'Tell us about your property goals',
-    fieldsRequired: ['propertyCategory'],
-    minimumFields: 1,
+    fieldsRequired: ['propertyCategory', 'propertyType', 'priceRange', 'combinedAge'],
+    minimumFields: 4,
     trustLevel: 50,
     ctaText: 'Get instant loan estimate'
   },
@@ -62,12 +62,6 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     phone: '',
     // Singapore reality: Joint applications are the norm
     applicantType: 'joint',
-    // Combined age for instant calculations
-    combinedAge: 35,
-    // Step 3 fields (Your Finances)
-    monthlyIncome: undefined,
-    existingCommitments: undefined,
-    employmentType: 'employed', // Set a default value
     // Initialize actualAges and actualIncomes to prevent controlled/uncontrolled input warnings
     actualAges: {
       0: 30, // Set reasonable defaults
@@ -77,10 +71,47 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
       0: 5000, // Set reasonable defaults
       1: undefined
     },
+    actualVariableIncomes: {
+      0: 0,
+      1: undefined
+    },
+    // Step 3 fields (Your Finances)
+    existingCommitments: undefined,
+    employmentType: 'employed', // Set a default value
+    creditCardCount: 0,
+    hasJointApplicant: false,
+    employmentDetails: {
+      'self-employed': {
+        businessAgeYears: '',
+        noaSubmitted: false,
+        averageReportedIncome: ''
+      },
+      variable: {
+        averagePastTwelveMonths: '',
+        lowestObservedIncome: ''
+      }
+    },
+    liabilities: {
+      propertyLoans: { enabled: false, outstandingBalance: '', monthlyPayment: '' },
+      carLoans: { enabled: false, outstandingBalance: '', monthlyPayment: '' },
+      creditCards: { enabled: false, outstandingBalance: '', monthlyPayment: '' },
+      personalLines: { enabled: false, outstandingBalance: '', monthlyPayment: '' },
+      otherCommitments: ''
+    },
     // Initialize co-applicant fields to avoid validation errors for single applicants
-    coApplicantCommitments: undefined,
-    coApplicantCreditCards: '',
-    coApplicantEmployment: ''
+    applicant2Commitments: undefined,
+    // Refinance objectives and cash-out
+    refinancingGoals: [],
+    cashOutAmount: undefined,
+    cashOutReason: undefined,
+    // Property and timing details for Step 3 refinance
+    ownerOccupied: true, // Default to owner-occupied
+    monthsRemaining: undefined,
+    // MAS readiness compliance metrics
+    tdsrRatio: undefined,
+    tdsrLimit: 55,
+    msrRatio: undefined,
+    msrLimit: 30,
   }
 
   // Add loan-type specific defaults
@@ -89,8 +120,8 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     defaults.propertyType = 'HDB' // Default property type
     defaults.priceRange = 500000 // Default price range
     defaults.combinedAge = 35 // Default combined age
-    defaults.purchaseTimeline = 'next_3_months'
-    defaults.firstTimeBuyer = false
+    defaults.developmentName = undefined // Optional field
+    defaults.paymentScheme = undefined // Optional field
   } else if (loanType === 'refinance') {
     defaults.propertyType = 'HDB' // Required by step 2 schema
     defaults.currentRate = 3.0 // Default reasonable rate
@@ -99,11 +130,17 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     defaults.propertyValue = undefined
     defaults.outstandingLoan = 400000 // Default reasonable outstanding loan
     defaults.remainingTenure = undefined
+    defaults.ownerOccupied = true // Default to owner-occupied
+    defaults.monthsRemaining = undefined
+    defaults.refinancingGoals = ['lower_monthly_payment'] // Default to most common objective
+    // MAS readiness compliance metrics
+    defaults.tdsrRatio = undefined
+    defaults.tdsrLimit = 55
+    defaults.msrRatio = undefined
+    defaults.msrLimit = 30
     // Per-applicant income/job changes flow defaults
     defaults.mainApplicantChanges = undefined
     defaults.coApplicantChanges = undefined
-    // New refined refinancing fields
-    defaults.refinancingGoals = []
     defaults.yearsInProperty = undefined
   } else if (loanType === 'commercial') {
     defaults.commercialPropertyType = ''
@@ -150,6 +187,68 @@ export const propertyCategoryOptions = [
   }
 ]
 
+export type PropertyTypeOption = {
+  value: PropertyType
+  label: string
+}
+
+export const propertyTypeOptionsByCategory: Record<
+  'default' | 'resale' | 'new_launch' | 'bto' | 'commercial' | 'refinance',
+  PropertyTypeOption[]
+> = {
+  default: [
+    { value: 'HDB', label: 'HDB Flat' },
+    { value: 'EC', label: 'Executive Condo' },
+    { value: 'Private', label: 'Private Condo' },
+    { value: 'Landed', label: 'Landed Property' }
+  ],
+  resale: [
+    { value: 'HDB', label: 'HDB Flat (Resale)' },
+    { value: 'Private', label: 'Private Condo (Resale)' },
+    { value: 'Landed', label: 'Landed Property (Resale)' }
+  ],
+  new_launch: [
+    { value: 'EC', label: 'Executive Condo (New Launch)' },
+    { value: 'Private', label: 'Private Condo (New Launch)' },
+    { value: 'Landed', label: 'Landed Property (New Launch)' }
+  ],
+  bto: [
+    { value: 'HDB', label: 'HDB Flat (BTO)' }
+  ],
+  commercial: [
+    { value: 'Commercial', label: 'Commercial Property' }
+  ],
+  refinance: [
+    { value: 'HDB', label: 'HDB Flat' },
+    { value: 'EC', label: 'Executive Condo' },
+    { value: 'Private', label: 'Private Condo' },
+    { value: 'Landed', label: 'Landed Property' }
+  ]
+}
+
+export function getPropertyTypeOptions(
+  loanType: LoanType,
+  category?: PropertyCategory | null
+): PropertyTypeOption[] {
+  if (loanType === 'refinance') {
+    return propertyTypeOptionsByCategory.refinance
+  }
+
+  if (loanType === 'new_purchase') {
+    if (category === 'resale') return propertyTypeOptionsByCategory.resale
+    if (category === 'new_launch') return propertyTypeOptionsByCategory.new_launch
+    if (category === 'bto') return propertyTypeOptionsByCategory.bto
+    if (category === 'commercial') return propertyTypeOptionsByCategory.commercial
+    return propertyTypeOptionsByCategory.default
+  }
+
+  if (loanType === 'commercial') {
+    return propertyTypeOptionsByCategory.commercial
+  }
+
+  return propertyTypeOptionsByCategory.default
+}
+
 /**
  * Field visibility rules
  * Determines which fields to show based on form state
@@ -167,17 +266,20 @@ export function getVisibleFields(
   } else if (step === 2) {
     // Step 2: Property details
     if (loanType === 'new_purchase') {
-      visibleFields.push('propertyCategory')
+      // Always show the 4 required inputs per restoration plan
+      visibleFields.push('propertyCategory', 'propertyType', 'priceRange', 'combinedAge')
 
       if (propertyCategory === 'resale') {
-        visibleFields.push('propertyType', 'priceRange', 'purchaseTimeline', 'firstTimeBuyer')
+        visibleFields.push('purchaseTimeline', 'firstTimeBuyer')
       } else if (propertyCategory === 'new_launch') {
         visibleFields.push('developmentName', 'unitType', 'topDate', 'paymentScheme')
       } else if (propertyCategory === 'bto') {
         visibleFields.push('btoProject', 'flatType', 'grantAmount', 'firstTimer')
       }
     } else if (loanType === 'refinance') {
-      visibleFields.push('propertyType', 'currentRate', 'lockInStatus', 'currentBank', 'outstandingLoan')
+      // Always show the 4 required inputs for restoration plan
+      visibleFields.push('propertyType', 'priceRange', 'combinedAge')
+      visibleFields.push('currentRate', 'lockInStatus', 'currentBank', 'outstandingLoan')
     } else if (loanType === 'commercial') {
       visibleFields.push('commercialPropertyType', 'purchaseStructure')
     }
@@ -188,6 +290,12 @@ export function getVisibleFields(
     // Add co-applicant fields if joint application
     if (propertyCategory !== 'commercial') {
       visibleFields.push('actualAges.1', 'actualIncomes.1')
+    }
+
+    // Add refinance-specific Step 3 fields
+    if (loanType === 'refinance') {
+      visibleFields.push('ownerOccupied', 'monthsRemaining')
+      visibleFields.push('refinancingGoals')
     }
   }
 

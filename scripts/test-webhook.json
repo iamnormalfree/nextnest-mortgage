@@ -1,0 +1,83 @@
+{
+  "event": "message_created",
+  "id": "message_created_webhook",
+  "account": {
+    "id": 1,
+    "name": "NextNest"
+  },
+  "conversation": {
+    "id": 24,
+    "account_id": 1,
+    "inbox_id": 1,
+    "contact_id": 11,
+    "assignee_id": null,
+    "team_id": null,
+    "status": "bot",
+    "snoozed_until": null,
+    "custom_attributes": {
+      "lead_score": 100,
+      "loan_type": "new_purchase",
+      "property_category": "resale",
+      "monthly_income": 8000,
+      "purchase_timeline": "soon",
+      "broker_persona": "aggressive",
+      "ai_broker_name": "Michelle Chen",
+      "session_id": "session_1757472662372_ogpjvv2qr",
+      "employment_type": "employed",
+      "property_price": 1500000,
+      "existing_commitments": 0,
+      "applicant_ages": [35],
+      "status": "bot",
+      "form_completed_at": "2025-01-11T02:51:59Z",
+      "source": "progressive_form",
+      "integration_version": "2.0"
+    },
+    "additional_attributes": {
+      "browser": "Chrome",
+      "browser_version": "120.0",
+      "referer": "http://localhost:3004/",
+      "initiated_at": {
+        "timestamp": "2025-01-11T02:51:59Z"
+      }
+    },
+    "created_at": 1757472722,
+    "contact": {
+      "id": 11,
+      "name": "Brent",
+      "email": "brent@example.com",
+      "phone_number": "+6591234567",
+      "account_id": 1,
+      "created_at": 1757471534,
+      "updated_at": 1757472722,
+      "custom_attributes": {
+        "lead_score": 100,
+        "loan_type": "new_purchase",
+        "employment_type": "employed",
+        "property_category": "resale",
+        "session_id": "session_1757472662372_ogpjvv2qr"
+      }
+    },
+    "messages": []
+  },
+  "message": {
+    "id": 48,
+    "content": "Hi, I need help with getting a mortgage for a $1.5M property",
+    "message_type": "incoming",
+    "created_at": 1757472900,
+    "private": false,
+    "conversation_id": 24,
+    "sender": {
+      "id": 11,
+      "name": "Brent",
+      "email": "brent@example.com",
+      "type": "contact"
+    }
+  },
+  "sender": {
+    "id": 11,
+    "name": "Brent",
+    "email": "brent@example.com",
+    "phone_number": "+6591234567",
+    "type": "contact"
+  }
+}

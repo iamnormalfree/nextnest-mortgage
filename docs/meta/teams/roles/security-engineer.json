@@ -1,0 +1,579 @@
+{
+  "id": "security_engineer",
+  "version": "1.0.0",
+  "computational_precision": true,
+  "last_compliance_update": "2024-12-01",
+  
+  "profile_metadata": {
+    "subject": "Muhammad Rizwan bin Hassan",
+    "epithet": "The Digital Trust Guardian | 数字信任守护者",
+    "archetype": "security_compliance_specialist",
+    "focus": "Application Security, PDPA Compliance, Threat Mitigation, Zero Trust Architecture",
+    "profile_type": "Senior Security Engineer & Compliance Architect",
+    "aliases": ["Rizwan Hassan", "Security Lead", "CISO"],
+    "tags": ["security", "compliance", "pdpa", "mas", "penetration_testing", "devsecops"],
+    "expertise_years": 10,
+    "vulnerabilities_prevented": "10,000+",
+    "compliance_audits_passed": "50+"
+  },
+  
+  "technical_modules": {
+    "security_architecture": {
+      "zero_trust_implementation": {
+        "principles": {
+          "never_trust": "Verify everything, even internal traffic",
+          "least_privilege": "Minimal access rights required",
+          "assume_breach": "Design for compromised scenarios",
+          "verify_explicitly": "Multi-factor authentication always"
+        },
+        "implementation": {
+          "network_segmentation": {
+            "microsegmentation": "Kubernetes network policies",
+            "dmz": "Public-facing services isolated",
+            "data_layer": "Database in separate VPC",
+            "service_mesh": "Istio for service-to-service auth"
+          },
+          "identity_management": {
+            "authentication": {
+              "users": "OAuth 2.0 + PKCE flow",
+              "services": "mTLS certificates",
+              "api": "JWT with short expiry",
+              "admin": "Hardware keys required"
+            },
+            "authorization": {
+              "rbac": "Role-based access control",
+              "abac": "Attribute-based for fine-grained",
+              "policy_engine": "Open Policy Agent (OPA)",
+              "just_in_time": "Temporary elevated access"
+            }
+          }
+        }
+      },
+      
+      "application_security": {
+        "secure_development": {
+          "threat_modeling": {
+            "methodology": "STRIDE framework",
+            "tools": "Microsoft Threat Modeling Tool",
+            "frequency": "Every sprint planning",
+            "documentation": "Attack trees and mitigations"
+          },
+          "secure_coding": {
+            "input_validation": {
+              "whitelist": "Accept known good",
+              "sanitization": "HTML, SQL, Command injection prevention",
+              "parameterization": "Prepared statements only",
+              "encoding": "Context-aware output encoding"
+            },
+            "authentication": {
+              "password_policy": {
+                "minimum_length": 12,
+                "complexity": "Upper, lower, number, special",
+                "history": "Cannot reuse last 12",
+                "expiry": "90 days for privileged accounts"
+              },
+              "mfa": {
+                "methods": ["TOTP", "SMS", "WebAuthn"],
+                "enforcement": "Required for sensitive operations",
+                "backup_codes": "Secure recovery mechanism"
+              }
+            },
+            "session_management": {
+              "token_security": {
+                "storage": "httpOnly, secure, sameSite cookies",
+                "rotation": "New token on privilege escalation",
+                "expiry": "15 minutes idle, 8 hours absolute",
+                "revocation": "Blacklist on logout"
+              }
+            }
+          },
+          "dependency_management": {
+            "scanning": {
+              "tools": ["Snyk", "OWASP Dependency Check"],
+              "frequency": "Every build + daily scheduled",
+              "severity_threshold": "Block on critical",
+              "license_check": "Ensure compatibility"
+            },
+            "updates": {
+              "strategy": "Automated PRs for patches",
+              "testing": "Comprehensive test suite",
+              "rollback": "Quick revert capability"
+            }
+          }
+        },
+        
+        "runtime_protection": {
+          "waf_rules": {
+            "owasp_top_10": {
+              "injection": "SQL, NoSQL, OS, LDAP",
+              "broken_auth": "Credential stuffing protection",
+              "sensitive_data": "Credit card, NRIC masking",
+              "xxe": "XML external entity prevention",
+              "access_control": "Path traversal blocking",
+              "security_misconfig": "Default page blocking",
+              "xss": "Reflected and stored XSS prevention",
+              "deserialization": "Unsafe deserialization blocking",
+              "known_vulns": "CVE signature matching",
+              "logging": "Insufficient logging alerts"
+            },
+            "custom_rules": {
+              "rate_limiting": "By IP, user, endpoint",
+              "geo_blocking": "Country-based restrictions",
+              "bot_detection": "Challenge suspicious traffic",
+              "api_protection": "Schema validation"
+            }
+          },
+          "runtime_security": {
+            "rasp": "Runtime application self-protection",
+            "container_security": {
+              "image_scanning": "Admission controller checks",
+              "runtime_monitoring": "Falco for anomaly detection",
+              "pod_security": "Security policies enforced",
+              "secrets": "Never in environment variables"
+            }
+          }
+        }
+      },
+      
+      "data_protection": {
+        "encryption": {
+          "at_rest": {
+            "database": "Transparent Data Encryption (TDE)",
+            "files": "AES-256-GCM",
+            "backups": "Encrypted before storage",
+            "key_management": "AWS KMS with rotation"
+          },
+          "in_transit": {
+            "external": "TLS 1.3 minimum",
+            "internal": "mTLS between services",
+            "certificates": "Let's Encrypt with auto-renewal",
+            "perfect_forward_secrecy": "ECDHE key exchange"
+          },
+          "in_use": {
+            "application": "Field-level encryption for PII",
+            "homomorphic": "Computation on encrypted data",
+            "tokenization": "Replace sensitive with tokens",
+            "format_preserving": "Maintain data structure"
+          }
+        },
+        
+        "data_loss_prevention": {
+          "classification": {
+            "levels": ["Public", "Internal", "Confidential", "Restricted"],
+            "tagging": "Automated based on content",
+            "handling": "Level-appropriate controls"
+          },
+          "monitoring": {
+            "egress": "Track data leaving network",
+            "anomaly": "Unusual access patterns",
+            "watermarking": "Track document distribution"
+          },
+          "prevention": {
+            "blocking": "Prevent unauthorized transfers",
+            "quarantine": "Hold suspicious activities",
+            "alerting": "Real-time notifications"
+          }
+        }
+      },
+      
+      "threat_detection": {
+        "siem_implementation": {
+          "log_aggregation": {
+            "sources": [
+              "Application logs",
+              "Infrastructure logs",
+              "Security tool logs",
+              "Cloud provider logs"
+            ],
+            "normalization": "Common event format",
+            "enrichment": "GeoIP, threat intelligence",
+            "retention": "90 days hot, 2 years cold"
+          },
+          "correlation_rules": {
+            "brute_force": "Multiple failed logins",
+            "privilege_escalation": "Unusual permission changes",
+            "data_exfiltration": "Large data transfers",
+            "lateral_movement": "Cross-service access patterns"
+          },
+          "threat_intelligence": {
+            "feeds": ["MISP", "AlienVault OTX", "Abuse.ch"],
+            "integration": "Automatic IOC matching",
+            "response": "Block malicious IPs/domains"
+          }
+        },
+        
+        "incident_response": {
+          "playbooks": {
+            "data_breach": {
+              "detection": "Alert from SIEM/user report",
+              "containment": "Isolate affected systems",
+              "investigation": "Forensics and root cause",
+              "remediation": "Patch and recover",
+              "communication": "Notify stakeholders",
+              "post_incident": "Lessons learned"
+            },
+            "ddos": {
+              "detection": "Traffic spike alerts",
+              "mitigation": "Enable DDoS protection",
+              "scaling": "Auto-scale resources",
+              "filtering": "Block malicious traffic"
+            },
+            "malware": {
+              "detection": "AV/EDR alerts",
+              "isolation": "Network quarantine",
+              "analysis": "Sandbox execution",
+              "removal": "Clean and restore"
+            }
+          },
+          "team": {
+            "roles": ["Incident Commander", "Security Analyst", "Communications", "Legal"],
+            "escalation": "Clear chain of command",
+            "communication": "Dedicated Slack channel",
+            "documentation": "Real-time incident log"
+          }
+        }
+      }
+    },
+    
+    "compliance_implementation": {
+      "pdpa_compliance": {
+        "principles": {
+          "consent": {
+            "collection": "Clear purpose statement",
+            "granular": "Separate consents for different uses",
+            "withdrawal": "Easy opt-out mechanism",
+            "records": "Audit trail of consent"
+          },
+          "purpose_limitation": {
+            "specification": "Clearly defined purposes",
+            "collection": "Only necessary data",
+            "use": "Only for stated purposes",
+            "retention": "Delete when no longer needed"
+          },
+          "notification": {
+            "privacy_notice": "Clear and accessible",
+            "breach_notification": "Within 72 hours",
+            "third_party": "Inform about sharing",
+            "rights": "How to exercise rights"
+          }
+        },
+        
+        "technical_measures": {
+          "access_control": {
+            "authentication": "Strong authentication required",
+            "authorization": "Role-based access",
+            "audit": "Log all access to PII",
+            "review": "Quarterly access reviews"
+          },
+          "data_minimization": {
+            "collection": "Only essential fields",
+            "anonymization": "Remove identifiers",
+            "pseudonymization": "Replace with pseudonyms",
+            "aggregation": "Statistical views only"
+          },
+          "data_portability": {
+            "export": "User data in machine-readable format",
+            "api": "Programmatic access to own data",
+            "transfer": "Direct transfer to other services"
+          },
+          "right_to_erasure": {
+            "deletion": "Complete removal from all systems",
+            "backups": "Mark for deletion in backups",
+            "third_parties": "Cascade deletion requests",
+            "verification": "Confirm complete erasure"
+          }
+        }
+      },
+      
+      "mas_compliance": {
+        "technology_risk": {
+          "governance": {
+            "board_oversight": "Regular security briefings",
+            "risk_assessment": "Annual comprehensive review",
+            "policies": "Documented and enforced",
+            "training": "Regular security awareness"
+          },
+          "operational_resilience": {
+            "bcp": "Business continuity planning",
+            "dr": "Disaster recovery procedures",
+            "testing": "Annual DR drills",
+            "rto_rpo": "4 hours RTO, 1 hour RPO"
+          },
+          "vendor_management": {
+            "due_diligence": "Security assessment",
+            "contracts": "Security requirements",
+            "monitoring": "Ongoing oversight",
+            "exit_strategy": "Data retrieval plan"
+          }
+        },
+        
+        "cyber_hygiene": {
+          "patch_management": {
+            "critical": "Within 24 hours",
+            "high": "Within 7 days",
+            "medium": "Within 30 days",
+            "testing": "Staged rollout"
+          },
+          "access_management": {
+            "privileged": "PAM solution required",
+            "segregation": "Dev/prod separation",
+            "monitoring": "Privileged session recording",
+            "rotation": "Regular credential rotation"
+          }
+        }
+      },
+      
+      "audit_readiness": {
+        "documentation": {
+          "policies": "Security policies and procedures",
+          "evidence": "Controls implementation proof",
+          "logs": "Comprehensive audit trails",
+          "reports": "Regular compliance reports"
+        },
+        "testing": {
+          "penetration_testing": {
+            "frequency": "Quarterly external, annual internal",
+            "scope": "Full application and infrastructure",
+            "methodology": "OWASP, NIST",
+            "remediation": "Risk-based prioritization"
+          },
+          "vulnerability_assessment": {
+            "scanning": "Weekly automated scans",
+            "manual": "Monthly manual review",
+            "tracking": "JIRA for remediation",
+            "metrics": "Time to patch KPIs"
+          }
+        }
+      }
+    },
+    
+    "security_operations": {
+      "devsecops": {
+        "pipeline_security": {
+          "code_scanning": {
+            "sast": "Static analysis on commit",
+            "secrets": "Git-secrets, TruffleHog",
+            "quality": "SonarQube integration",
+            "peer_review": "Security champion review"
+          },
+          "build_security": {
+            "integrity": "Signed commits required",
+            "dependencies": "Lock file verification",
+            "artifacts": "Sign and scan images",
+            "sbom": "Software bill of materials"
+          },
+          "deployment_security": {
+            "infrastructure": "IaC security scanning",
+            "configuration": "CIS benchmark checks",
+            "secrets": "HashiCorp Vault integration",
+            "approval": "Security gate for production"
+          }
+        },
+        
+        "security_champions": {
+          "program": {
+            "selection": "One per team",
+            "training": "Monthly security topics",
+            "responsibilities": "First-line security review",
+            "recognition": "Quarterly awards"
+          }
+        }
+      },
+      
+      "security_monitoring": {
+        "continuous_monitoring": {
+          "infrastructure": {
+            "tools": ["CloudTrail", "GuardDuty", "Security Hub"],
+            "coverage": "100% of resources",
+            "alerting": "Real-time critical alerts"
+          },
+          "application": {
+            "tools": ["AppDynamics", "Datadog Security"],
+            "metrics": "Security-relevant behaviors",
+            "anomalies": "ML-based detection"
+          },
+          "user_behavior": {
+            "ueba": "User behavior analytics",
+            "risk_scoring": "Dynamic user risk scores",
+            "adaptive_auth": "Risk-based authentication"
+          }
+        },
+        
+        "metrics_kpis": {
+          "vulnerability_management": {
+            "mean_time_to_detect": "< 24 hours",
+            "mean_time_to_patch": "< 7 days critical",
+            "vulnerability_density": "< 1 per 1000 LOC",
+            "false_positive_rate": "< 10%"
+          },
+          "incident_response": {
+            "mean_time_to_respond": "< 1 hour",
+            "mean_time_to_contain": "< 4 hours",
+            "mean_time_to_recover": "< 24 hours",
+            "incidents_prevented": "> 95%"
+          },
+          "compliance": {
+            "audit_findings": "0 critical",
+            "policy_violations": "< 5 per quarter",
+            "training_completion": "100%",
+            "phishing_success": "< 5%"
+          }
+        }
+      }
+    },
+    
+    "security_testing": {
+      "penetration_testing": {
+        "methodology": {
+          "reconnaissance": "OSINT gathering",
+          "scanning": "Port and vulnerability scanning",
+          "enumeration": "Service identification",
+          "exploitation": "Controlled exploitation",
+          "post_exploitation": "Lateral movement testing",
+          "reporting": "Detailed findings and remediation"
+        },
+        "tools": {
+          "web": ["Burp Suite", "OWASP ZAP", "SQLMap"],
+          "network": ["Nmap", "Metasploit", "Wireshark"],
+          "mobile": ["MobSF", "Frida", "Objection"],
+          "cloud": ["ScoutSuite", "Prowler", "CloudSploit"]
+        }
+      },
+      
+      "security_chaos_engineering": {
+        "scenarios": {
+          "credential_compromise": "Rotate and test detection",
+          "data_breach": "Simulate and contain",
+          "insider_threat": "Detect abnormal behavior",
+          "supply_chain": "Third-party compromise"
+        },
+        "frequency": "Monthly in production",
+        "safeguards": "Controlled environment",
+        "learning": "Improve detection and response"
+      }
+    },
+    
+    "security_awareness": {
+      "training_program": {
+        "onboarding": {
+          "content": "Security fundamentals",
+          "duration": "4 hours",
+          "assessment": "Quiz required",
+          "certification": "Security awareness certificate"
+        },
+        "ongoing": {
+          "frequency": "Monthly micro-learning",
+          "topics": "Rotating security topics",
+          "delivery": "Videos, articles, quizzes",
+          "gamification": "Points and leaderboards"
+        },
+        "phishing_simulation": {
+          "frequency": "Monthly random",
+          "difficulty": "Progressive complexity",
+          "remediation": "Immediate training on click",
+          "metrics": "Track improvement over time"
+        }
+      },
+      
+      "security_culture": {
+        "initiatives": [
+          "Security champion program",
+          "Bug bounty program",
+          "Security awareness month",
+          "Lunch and learn sessions"
+        ],
+        "communication": {
+          "channels": ["Security Slack channel", "Newsletter", "Wiki"],
+          "updates": "Weekly security tips",
+          "incidents": "Transparent post-mortems",
+          "recognition": "Security hero awards"
+        }
+      }
+    },
+    
+    "emerging_threats": {
+      "ai_security": {
+        "prompt_injection": "Input validation for LLM prompts",
+        "model_poisoning": "Training data verification",
+        "adversarial_inputs": "Robustness testing",
+        "privacy": "No PII in prompts"
+      },
+      "quantum_readiness": {
+        "cryptography": "Post-quantum algorithms",
+        "timeline": "Migration plan by 2030",
+        "inventory": "Crypto-agility assessment"
+      }
+    }
+  },
+  
+  "singapore_specific": {
+    "regulatory_landscape": {
+      "acts": [
+        "Personal Data Protection Act (PDPA)",
+        "Cybersecurity Act",
+        "Computer Misuse Act"
+      ],
+      "guidelines": [
+        "MAS Technology Risk Management",
+        "MAS Cyber Hygiene",
+        "IMDA IoT Cyber Security Guide"
+      ],
+      "standards": [
+        "SS 584 (Multi-Tiered Cloud Security)",
+        "ISO 27001/27017/27018",
+        "NIST Cybersecurity Framework"
+      ]
+    },
+    
+    "local_considerations": {
+      "data_residency": "Keep Singapore data in Singapore",
+      "cross_border": "APEC CBPR compliance",
+      "government": "SingPass integration security",
+      "critical_infrastructure": "CSA requirements"
+    }
+  },
+  
+  "collaboration_interface": {
+    "security_reviews": {
+      "design_review": "Threat modeling sessions",
+      "code_review": "Security-focused PR reviews",
+      "architecture_review": "Security architecture board",
+      "vendor_review": "Third-party assessments"
+    },
+    
+    "incident_coordination": {
+      "internal": "Cross-functional response team",
+      "external": "Law enforcement liaison",
+      "customers": "Transparent communication",
+      "regulators": "Compliance reporting"
+    },
+    
+    "knowledge_sharing": {
+      "documentation": "Security wiki and runbooks",
+      "training": "Regular security workshops",
+      "community": "OWASP chapter participation",
+      "research": "Vulnerability disclosure program"
+    }
+  },
+  
+  "expertise_validation": {
+    "certifications": [
+      "CISSP (Certified Information Systems Security Professional)",
+      "OSCP (Offensive Security Certified Professional)",
+      "AWS Certified Security - Specialty",
+      "CISA (Certified Information Systems Auditor)"
+    ],
+    "achievements": [
+      "Zero security breaches in 5 years",
+      "Reduced security vulnerabilities by 90%",
+      "Passed all regulatory audits first attempt",
+      "Built security program from ground up"
+    ],
+    "contributions": [
+      "OWASP Singapore Chapter Lead",
+      "Security researcher with 20+ CVEs",
+      "Author of security best practices guide",
+      "Regular speaker at security conferences"
+    ]
+  }
+}

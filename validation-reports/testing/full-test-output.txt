@@ -1,0 +1,534 @@
+🚀 Starting Mortgage Insights Test Suite...
+
+
+============================================================
+Testing: High-Value Property Purchase
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: calculation
+  Title: 🏠 Purchase Cost Breakdown
+  Message: For S$2,000,000 property with 75% loan
+  Calculations: {
+  maxLoan: 1500000,
+  monthlyPayment: 7510,
+  downpayment: 500000,
+  stampDuty: 88000
+}
+  Details:
+    - Loan amount: S$1,500,000
+    - 25% downpayment: S$500,000
+    - Estimated stamp duty: S$88,000
+    - Total upfront: S$588,000
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$2,226,000 in loans
+  Calculations: { maxLoan: 2226000, tdsr: 0.08, monthlyPayment: 11750.000000000002 }
+  Details:
+    - TDSR Ratio: 8.0% (limit: 55%)
+    - Available for housing: S$11,750/month
+    - Maximum property value: S$2,968,000
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$91,500
+  Calculations: { stampDuty: 88000, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$88,000
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+Insight 4:
+  Type: opportunity
+  Title: 💡 Optimization Opportunities
+  Message: We found ways to improve your mortgage terms
+  Details:
+    - Consider consolidating existing loans to improve TDSR
+    - Structure as joint application to increase borrowing capacity
+
+============================================================
+Testing: HDB Purchase - Moderate Income
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: calculation
+  Title: 🏠 Purchase Cost Breakdown
+  Message: For S$600,000 property with 75% loan
+  Calculations: {
+  maxLoan: 450000,
+  monthlyPayment: 2253,
+  downpayment: 150000,
+  stampDuty: 26400
+}
+  Details:
+    - Loan amount: S$450,000
+    - 25% downpayment: S$150,000
+    - Estimated stamp duty: S$26,400
+    - Total upfront: S$176,400
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$738,000 in loans
+  Calculations: { maxLoan: 738000, tdsr: 0.0625, monthlyPayment: 3900 }
+  Details:
+    - TDSR Ratio: 6.3% (limit: 55%)
+    - Available for housing: S$3,900/month
+    - Maximum property value: S$984,000
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$29,900
+  Calculations: { stampDuty: 26400, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$26,400
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+Insight 4:
+  Type: opportunity
+  Title: 💡 Optimization Opportunities
+  Message: We found ways to improve your mortgage terms
+  Details:
+    - Structure as joint application to increase borrowing capacity
+    - Check eligibility for Enhanced CPF Housing Grant (up to $80,000)
+
+============================================================
+Testing: Commercial Property Investment
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: calculation
+  Title: 🏠 Purchase Cost Breakdown
+  Message: For S$3,000,000 property with 75% loan
+  Calculations: {
+  maxLoan: 2250000,
+  monthlyPayment: 11265,
+  downpayment: 750000,
+  stampDuty: 132000
+}
+  Details:
+    - Loan amount: S$2,250,000
+    - 25% downpayment: S$750,000
+    - Estimated stamp duty: S$132,000
+    - Total upfront: S$882,000
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$3,220,000 in loans
+  Calculations: { maxLoan: 3220000, tdsr: 0.125, monthlyPayment: 17000 }
+  Details:
+    - TDSR Ratio: 12.5% (limit: 55%)
+    - Available for housing: S$17,000/month
+    - Maximum property value: S$4,293,333.333
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$135,500
+  Calculations: { stampDuty: 132000, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$132,000
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+Insight 4:
+  Type: opportunity
+  Title: 💡 Optimization Opportunities
+  Message: We found ways to improve your mortgage terms
+  Details:
+    - Consider consolidating existing loans to improve TDSR
+    - Structure as joint application to increase borrowing capacity
+
+============================================================
+Testing: Refinance - No Lock-in, High Savings
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: opportunity
+  Title: 💰 Significant Savings Opportunity
+  Message: Save S$644.411/month by refinancing from 4.5% to 2.95%
+  Calculations: { monthlyPayment: 4416.7836526098745, maxLoan: 800000 }
+  Details:
+    - Current payment: S$5,061.195/month
+    - New payment: S$4,416.784/month
+    - Annual savings: S$7,732.936
+    - Break-even period: 5 months
+
+Insight 2:
+  Type: opportunity
+  Title: ✅ Perfect Timing - No Lock-in Period
+  Message: You can refinance immediately without any penalties
+  Details:
+    - Zero penalty fees
+    - Free to switch to better rates
+    - Banks competing aggressively for no-penalty switches
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$1,373,000 in loans
+  Calculations: { maxLoan: 1373000, tdsr: 0.06666666666666667, monthlyPayment: 7250 }
+  Details:
+    - TDSR Ratio: 6.7% (limit: 55%)
+    - Available for housing: S$7,250/month
+    - Maximum property value: S$1,830,666.667
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$56,300
+  Calculations: { stampDuty: 52800, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$52,800
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+============================================================
+Testing: Refinance - Locked In, Marginal Savings
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: opportunity
+  Title: 💰 Significant Savings Opportunity
+  Message: Save S$62.824/month by refinancing from 3.2% to 2.95%
+  Calculations: { monthlyPayment: 2760.4897828811713, maxLoan: 500000 }
+  Details:
+    - Current payment: S$2,823.314/month
+    - New payment: S$2,760.49/month
+    - Annual savings: S$753.892
+    - Break-even period: 48 months
+
+Insight 2:
+  Type: advice
+  Title: 🔒 Currently in Lock-in Period
+  Message: Calculate if penalty cost is worth the savings from refinancing
+  Details:
+    - Typical penalty: 1.5% of outstanding loan
+    - May still save if rate difference > 1%
+    - Plan ahead for lock-in expiry date
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$890,000 in loans
+  Calculations: { maxLoan: 890000, tdsr: 0.08, monthlyPayment: 4700 }
+  Details:
+    - TDSR Ratio: 8.0% (limit: 55%)
+    - Available for housing: S$4,700/month
+    - Maximum property value: S$1,186,666.667
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$38,700
+  Calculations: { stampDuty: 35200, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$35,200
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+============================================================
+Testing: Refinance - Lock-in Expiring Soon
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: opportunity
+  Title: 💰 Significant Savings Opportunity
+  Message: Save S$282.072/month by refinancing from 3.8% to 2.95%
+  Calculations: { monthlyPayment: 3588.6367177455236, maxLoan: 650000 }
+  Details:
+    - Current payment: S$3,870.709/month
+    - New payment: S$3,588.637/month
+    - Annual savings: S$3,384.867
+    - Break-even period: 11 months
+
+Insight 2:
+  Type: warning
+  Title: ⚡ Lock-in Expiring Soon
+  Message: Your lock-in period is ending - prime time to refinance
+  Details:
+    - Start application 3 months before expiry
+    - Multiple banks to compare
+    - Avoid auto-renewal at higher rates
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$1,136,000 in loans
+  Calculations: { maxLoan: 1136000, tdsr: 0.05, monthlyPayment: 6000.000000000001 }
+  Details:
+    - TDSR Ratio: 5.0% (limit: 55%)
+    - Available for housing: S$6,000/month
+    - Maximum property value: S$1,514,666.667
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$47,500
+  Calculations: { stampDuty: 44000, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$44,000
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+============================================================
+Testing: Equity Loan - Investment Purpose
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: calculation
+  Title: 💎 Available Equity
+  Message: Unlock up to S$1,275,000 from your property
+  Calculations: { maxLoan: 1275000 }
+  Details:
+    - Property value: S$2,500,000
+    - Max LTV (75%): S$1,875,000
+    - Outstanding loan: S$600,000
+    - Available equity: S$1,275,000
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$2,557,000 in loans
+  Calculations: { maxLoan: 2557000, tdsr: 0.1, monthlyPayment: 13500 }
+  Details:
+    - TDSR Ratio: 10.0% (limit: 55%)
+    - Available for housing: S$13,500/month
+    - Maximum property value: S$3,409,333.333
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$113,500
+  Calculations: { stampDuty: 110000, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$110,000
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+Insight 4:
+  Type: opportunity
+  Title: 💡 Optimization Opportunities
+  Message: We found ways to improve your mortgage terms
+  Details:
+    - Consider consolidating existing loans to improve TDSR
+
+============================================================
+Testing: Equity Loan - Business Capital
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: calculation
+  Title: 💎 Available Equity
+  Message: Unlock up to S$950,000 from your property
+  Calculations: { maxLoan: 950000 }
+  Details:
+    - Property value: S$1,800,000
+    - Max LTV (75%): S$1,350,000
+    - Outstanding loan: S$400,000
+    - Available equity: S$950,000
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$1,610,000 in loans
+  Calculations: { maxLoan: 1610000, tdsr: 0.125, monthlyPayment: 8500 }
+  Details:
+    - TDSR Ratio: 12.5% (limit: 55%)
+    - Available for housing: S$8,500/month
+    - Maximum property value: S$2,146,666.667
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$82,700
+  Calculations: { stampDuty: 79200, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$79,200
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+Insight 4:
+  Type: opportunity
+  Title: 💡 Optimization Opportunities
+  Message: We found ways to improve your mortgage terms
+  Details:
+    - Consider consolidating existing loans to improve TDSR
+
+============================================================
+Testing: Equity Loan - Personal Use
+============================================================
+
+📊 GATE 2 INSIGHTS:
+
+Insight 1:
+  Type: calculation
+  Title: 💎 Available Equity
+  Message: Unlock up to S$450,000 from your property
+  Calculations: { maxLoan: 450000 }
+  Details:
+    - Property value: S$1,000,000
+    - Max LTV (75%): S$750,000
+    - Outstanding loan: S$300,000
+    - Available equity: S$450,000
+
+📊 GATE 3 INSIGHTS:
+
+Insight 1:
+  Type: analysis
+  Title: 📊 Your Personalized Affordability Analysis
+  Message: Based on MAS TDSR framework, you can afford up to S$757,000 in loans
+  Calculations: { maxLoan: 757000, tdsr: 0.05, monthlyPayment: 4000 }
+  Details:
+    - TDSR Ratio: 5.0% (limit: 55%)
+    - Available for housing: S$4,000/month
+    - Maximum property value: S$1,009,333.333
+
+Insight 2:
+  Type: advice
+  Title: 🏦 Top 3 Banks for Your Profile
+  Message: Based on your profile, these banks offer the best terms
+  Details:
+    - DBS - Lowest rates for stable income profiles
+    - OCBC - Best for self-employed with 2-year track record
+    - UOB - Flexible on TDSR calculations
+
+Insight 3:
+  Type: calculation
+  Title: 📋 Total Upfront Costs Breakdown
+  Message: Total stamp duties and fees: S$47,500
+  Calculations: { stampDuty: 44000, absd: 0 }
+  Details:
+    - Buyer's Stamp Duty: S$44,000
+    - ABSD: S$0 (First property - Citizen)
+    - Legal fees (est.): S$3,000
+    - Valuation fee: S$500
+
+============================================================
+TEST SUMMARY
+============================================================
+Total scenarios tested: 9
+Average Gate 2 insights: 1.3
+Average Gate 3 insights: 3.6
+Scenarios with calculations: 9/9
+Scenarios with actionable insights: 9/9
+
+✅ Test results saved to: Testing/insight-test-results.json
