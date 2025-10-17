@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import { calculateMortgage, calculateLeadScore, calculateSingaporeMetrics } from '@/lib/calculations/mortgage'
 import { calculateUrgencyProfile } from '@/lib/calculations/urgency-calculator'
-import { generateMortgageInsights } from '@/lib/insights/mortgage-insights-generator'
+// ARCHIVED: mortgage-insights-generator removed (see components/forms/archive/2025-10/)
+// import { generateMortgageInsights } from '@/lib/insights/mortgage-insights-generator'
 
 /**
  * Context Validation Dashboard
@@ -473,13 +474,16 @@ export default function ContextValidationDashboard() {
       }
       
       // Test insights generation
-      const insights = generateMortgageInsights(data, 2)
-      response.insights = insights
-      if (insights.length > 0) {
-        details.push(`Generated ${insights.length} insights`)
-      } else {
-        gaps.push('No insights generated from calculation layer')
-      }
+      // ARCHIVED: generateMortgageInsights removed (legacy form pattern)
+      // const insights = generateMortgageInsights(data, 2)
+      // response.insights = insights
+      // if (insights.length > 0) {
+      //   details.push(`Generated ${insights.length} insights`)
+      // } else {
+      //   gaps.push('No insights generated from calculation layer')
+      // }
+      response.insights = []
+      details.push('Insights generation: Legacy pattern archived')
       
     } catch (error) {
       throw error
