@@ -130,6 +130,44 @@ npm run lint         # Code quality check
 
 **CRITICAL: One plan per feature. No proliferation.**
 
+### 3-Tier Documentation System
+
+**Before creating ANY documentation, understand the 3-tier hierarchy:**
+
+**Tier 1: Code (Canonical Truth)**
+- Location: Production code files listed in `CANONICAL_REFERENCES.md`
+- Purpose: THE source of truth - actual implementation
+- Examples: `instant-profile.ts`, `ProgressiveFormWithController.tsx`, `form-contracts.ts`
+- Rule: **Check CANONICAL_REFERENCES.md before modifying ANY Tier 1 file**
+- Change Process: Tests first → Update code → Update dependent files → Verify build
+
+**Tier 2: Runbooks (Implementation Guides)**
+- Location: `docs/runbooks/{domain}/`
+- Purpose: HOW to implement features, linking to Tier 1 code
+- Examples: `FORMS_ARCHITECTURE_GUIDE.md`, `AI_BROKER_COMPLETE_GUIDE.md`
+- Rule: **NEVER duplicate code from Tier 1** - link to it with file:line references
+- Update: When Tier 1 code changes significantly
+
+**Tier 3: Plans (Temporary Decision Documents)**
+- Location: `docs/plans/active/` (then archived)
+- Purpose: WHAT to build and WHY, temporary task tracking
+- Max Length: 200 lines
+- Rule: **Reference runbooks, never duplicate them** - link to runbooks for "how"
+- Lifecycle: Created → Executed → Completed → Archived
+
+**Critical Rules:**
+1. **Never duplicate Tier 1 code** in runbooks or plans - link to it instead
+2. **Check CANONICAL_REFERENCES.md** before modifying core files
+3. **Runbooks never expire** - plans do (archive after completion)
+4. **Plans reference runbooks** - don't contain full implementation guides
+5. **Never create new tiers** - everything fits into these 3 levels
+
+**Examples:**
+- ✅ Plan says: "Update instant-profile.ts calculation (see CANONICAL_REFERENCES.md for rules)"
+- ✅ Runbook says: "See instant-profile.ts:245 for TDSR calculation implementation"
+- ❌ Plan contains full code examples from instant-profile.ts
+- ❌ Runbook duplicates calculation logic from instant-profile.ts
+
 ### Planning Rules
 
 **File format:** `docs/plans/active/{date}-{feature-slug}.md`
