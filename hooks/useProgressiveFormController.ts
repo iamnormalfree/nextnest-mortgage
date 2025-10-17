@@ -528,6 +528,23 @@ export function useProgressiveFormController({
         setCurrentStep(nextStep)
         leadForm.progressToStep(nextStep)
 
+        // Pre-fill age in Step 4 from Step 2 combinedAge
+        if (nextStep === 3) { // Moving to Step 4 (Your Finances)
+          const combinedAge = leadForm.formData.combinedAge
+
+          if (combinedAge && !leadForm.formData.actualAges?.[0]) {
+            // Pre-fill primary applicant age from Step 2 combinedAge
+            // For single applicants, use full combinedAge
+            // For joint applicants, divide by 2 as reasonable estimate
+            const hasJointApplicant = leadForm.formData.hasJointApplicant
+            const estimatedAge = hasJointApplicant
+              ? Math.round(combinedAge / 2)
+              : combinedAge
+
+            setValue('actualAges.0', estimatedAge, { shouldValidate: false })
+          }
+        }
+
       }
 
       // Notify parent (synchronous callback)
