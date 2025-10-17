@@ -227,10 +227,13 @@
 ## Technical Debt & Maintenance
 
 **Known Issues (to address before Phase 2):**
-- [ ] Windows file lock issues (campaign pages not archived)
-- [ ] ESLint warnings in test files (display names)
-- [ ] Broker assignment logic needs refinement
-- [ ] Conversation state synchronization issues
+- [ ] Audit logs stored locally (need Railway volume or logging service)
+- [ ] Compliance report returns mock data (need real log parsing)
+- [ ] No alerting configured for security events
+- [ ] Windows file lock issues (3 directories)
+- [ ] ESLint warnings in test files
+- [ ] Broker assignment logic refinement
+- [ ] Conversation state synchronization
 
 **Architectural Improvements:**
 - [ ] Remove adapter pattern in dr-elena-integration-service.ts (migrate fully to instant-profile.ts)

@@ -181,7 +181,7 @@ export default function MinimalSophisticatedForm() {
                   Contact details
                 </h2>
                 <p className="text-sm text-stone">
-                  We'll keep this confidential
+                  We&apos;ll keep this confidential
                 </p>
               </div>
 

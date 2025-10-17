@@ -15,7 +15,7 @@ import type {
 
 // Dynamic imports for code splitting
 const SophisticatedAIBrokerUI = dynamic(
-  () => import('@/redesign/SophisticatedAIBrokerUI'),
+  () => import('@/components/archive/2025-10/redesign-experiments/redesign/SophisticatedAIBrokerUI'),
   {
     ssr: false,
     loading: () => <LoadingSkeleton />

@@ -1,5 +1,28 @@
 # Forms Architecture Guide
 
+**Last Updated:** 2025-10-18
+
+## Production Forms Status
+
+### Active Production Form
+**File:** `components/forms/ProgressiveFormWithController.tsx`
+**Route:** `/app/apply/page.tsx`
+**Status:** ✅ PRODUCTION (Tier 1)
+**Features:** 3-step progressive, Chatwoot integration, Step3 components, analytics
+**Size:** 1,517 lines
+
+### Landing Page
+**File:** `app/page.tsx`
+**Purpose:** Homepage with loan type selection → routes to `/apply`
+**Previously:** Was in `app/redesign/sophisticated-flow/page.tsx` (archived 2025-10-18)
+
+### Archived Experimental Forms
+**Location:** `components/archive/2025-10/redesign-experiments/`
+**Contents:** SophisticatedProgressiveForm and related prototypes
+**Status:** Reference only, not for production use
+
+---
+
 ## Overview
 NextNest uses a hybrid form architecture optimized for performance, SEO, and user experience. This guide documents our form patterns, bundle optimization strategies, and best practices.
 

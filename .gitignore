@@ -52,3 +52,7 @@ nul
 .swc/
 
 # Keep .codex and .factory per user request (alternative Claude configs)
+
+# Audit logs (environment-specific storage for PDPA compliance)
+/logs/
+*.jsonl
