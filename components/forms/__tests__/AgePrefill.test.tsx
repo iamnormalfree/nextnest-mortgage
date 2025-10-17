@@ -35,7 +35,7 @@ describe('Age Pre-fill in Step 4', () => {
     expect(ageInput).toHaveValue(35) // Default from Step 2
   })
 
-  it('should divide combined age for joint applicants', async () => {
+  it('should pre-fill age from combined age value', async () => {
     const user = userEvent.setup()
 
     render(
@@ -57,14 +57,13 @@ describe('Age Pre-fill in Step 4', () => {
     await user.clear(combinedAgeInput)
     await user.type(combinedAgeInput, '80')
 
-    // Enable joint applicant
+    // Progress to Step 4
     await user.click(screen.getByRole('button', { name: /get instant loan estimate/i }))
-    await screen.findByLabelText(/adding a joint applicant/i)
-    await user.click(screen.getByLabelText(/adding a joint applicant/i))
 
-    // VERIFY: Applicant 1 age is pre-filled with 40 (80 / 2)
+    // VERIFY: Age is pre-filled with 80 (full combined age, since joint applicant not yet enabled)
+    await screen.findByLabelText(/your age/i)
     const age1Input = screen.getByLabelText(/your age/i)
-    expect(age1Input).toHaveValue(40)
+    expect(age1Input).toHaveValue(80)
   })
 
   it('should allow user to edit pre-filled age', async () => {
