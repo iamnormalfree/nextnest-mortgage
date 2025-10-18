@@ -1,104 +1,234 @@
-# Agent Skills - Quick Reference
+# Skills Directory
 
-## 📚 What's Here
+**Purpose:** Contains Claude Code skills (reusable procedural knowledge)
 
-This directory contains Agent Skills - reusable domain expertise that Claude loads automatically when relevant.
-
----
-
-## 🎯 Response-Awareness Framework Skills
-
-### Structure
-```
-response-awareness-light/      → LIGHT tier (single-file, fast)
-response-awareness-medium/     → MEDIUM tier (multi-file, moderate)
-response-awareness-heavy/      → HEAVY tier (complex single-domain)
-response-awareness-full/       → FULL tier (multi-domain architecture)
-  └── phases/                  → Phase-specific resources
-```
-
-### How to Use
-
-**Automatic activation**:
-Skills activate when Claude detects matching task complexity.
-
-**Manual invocation**:
-```
-User: /response-awareness "your task description"
-```
-
-Router scores complexity → Invokes appropriate Skill → Workflow loads
+**Last Updated:** 2025-10-19
 
 ---
 
-## 📖 Skills Index
+## Architecture Overview
 
-| Skill | Purpose | When to Use |
-|-------|---------|-------------|
-| **Response Awareness Light** | Single-file changes | Score 0-1, bug fixes, cosmetic |
-| **Response Awareness Medium** | Multi-file features | Score 2-4, moderate complexity |
-| **Response Awareness Heavy** | Complex single-domain | Score 5-7, architectural decisions |
-| **Response Awareness Full** | Multi-domain architecture | Score 8+, system-wide changes |
+Skills are stored in the git subtree at `.claude/frameworks/shared/frameworks/` and **linked** to this directory via Windows junctions (symlinks).
+
+### Why Junctions?
+
+- ✅ Skills live in git subtree (synced across projects)
+- ✅ Claude Code expects skills in `.claude/skills/`
+- ✅ Junctions bridge the gap without file duplication
+- ✅ Each developer creates their own local junctions
+- ✅ Junctions are NOT committed (in .gitignore)
 
 ---
 
-## 🔧 Adding New Skills
+## Active Skills (Linked from Subtree)
 
-To create a new Skill:
+### Response-Awareness Framework Tiers
 
-1. **Create directory**: `.claude/skills/your-skill-name/`
-2. **Create SKILL.md** with YAML frontmatter:
+**Location:** `.claude/frameworks/shared/frameworks/response-awareness/`
 
-```yaml
+- ✅ `response-awareness-light/` → Single-file changes, bug fixes (Complexity 0-1)
+- ✅ `response-awareness-medium/` → Multi-file features (Complexity 2-4)
+- ✅ `response-awareness-heavy/` → Complex single-domain features (Complexity 5-7)
+- ✅ `response-awareness-full/` → Multi-domain architecture changes (Complexity 8+)
+
+**Router:** `/response-awareness` slash command scores complexity and routes to appropriate tier
+
+### Superpowers Skills
+
+**Location:** `.claude/frameworks/shared/frameworks/superpowers/`
+
+- ✅ `brainstorming/` → Transform rough ideas into designs (brainstorming.md, systematic-debugging.md)
+
+**Note:** Brainstorming junction points to entire superpowers folder. Access via:
+- `brainstorming/brainstorming.md`
+- `brainstorming/systematic-debugging.md`
+
 ---
-name: Your Skill Name
-description: Brief description (max 1024 chars) of what this Skill does and when to use it
+
+## Local Skills (Not in Subtree)
+
+**Location:** Directly in `.claude/skills/` (committed to NextNest repo)
+
+- ✅ `executing-plans/` → Execute detailed implementation plans
+
 ---
 
-# Your Skill Name
+## Setup Instructions
 
-## Instructions
-[Step-by-step guidance for Claude]
+### First Time Setup (Fresh Clone)
 
-## Examples
-[Concrete usage examples]
+```powershell
+# Run setup script to create junctions
+.\scripts\setup-skill-junctions.ps1
 ```
 
-3. **Optional**: Add resource files (scripts, templates, references)
+**What it does:**
+1. Creates junction: `response-awareness-light` → subtree location
+2. Creates junction: `response-awareness-medium` → subtree location
+3. Creates junction: `response-awareness-heavy` → subtree location
+4. Creates junction: `response-awareness-full` → subtree location
+5. Creates junction: `brainstorming` → subtree/superpowers
 
-4. **Test**: Skill should activate when description matches task
+### Manual Setup (If Script Fails)
+
+```powershell
+cd .claude\skills
+
+# Response-Awareness tiers
+New-Item -ItemType Junction -Path "response-awareness-light" -Target "..\frameworks\shared\frameworks\response-awareness\response-awareness-light"
+New-Item -ItemType Junction -Path "response-awareness-medium" -Target "..\frameworks\shared\frameworks\response-awareness\response-awareness-medium"
+New-Item -ItemType Junction -Path "response-awareness-heavy" -Target "..\frameworks\shared\frameworks\response-awareness\response-awareness-heavy"
+New-Item -ItemType Junction -Path "response-awareness-full" -Target "..\frameworks\shared\frameworks\response-awareness\response-awareness-full"
+
+# Superpowers
+New-Item -ItemType Junction -Path "brainstorming" -Target "..\frameworks\shared\frameworks\superpowers"
+```
+
+### Verify Setup
+
+```powershell
+# Check junctions exist
+ls .claude\skills
+
+# Should show:
+# - response-awareness-light (junction)
+# - response-awareness-medium (junction)
+# - response-awareness-heavy (junction)
+# - response-awareness-full (junction)
+# - brainstorming (junction)
+# - executing-plans (real folder)
+```
 
 ---
 
-## 📋 Skill Metadata Limits
+## After Subtree Updates
 
-- `name`: 64 characters maximum
-- `description`: 1024 characters maximum
+**When you run:**
+```bash
+git subtree pull --prefix .claude/frameworks/shared https://github.com/iamnormalfree/claude-shared.git master --squash
+```
 
----
+**Junctions automatically see new content** (they're just pointers)
 
-## 🎓 Skills vs Other Features
-
-| Feature | Purpose | When Loaded |
-|---------|---------|-------------|
-| **Skills** | Domain expertise | Auto-detected or invoked |
-| **Slash Commands** | User workflows | Manual invocation |
-| **Hooks** | Behavioral enforcement | Event-triggered |
-| **Subagents** | Task execution | Explicit via Task() |
-| **CLAUDE.md** | Project context | Always loaded |
-
-**Skills are for**: Reusable procedural knowledge that follows you across conversations.
+**No need to recreate junctions** unless you deleted `.claude/skills/` folder
 
 ---
 
-## 📚 Documentation
+## Troubleshooting
 
-- **Migration Summary**: `SKILLS_MIGRATION_SUMMARY.md`
-- **Individual Skills**: Each Skill's `SKILL.md` file
-- **Official Docs**: https://docs.claude.com/en/docs/agents-and-tools/agent-skills
+### Error: "Unknown skill: response-awareness-heavy"
+
+**Cause:** Junctions not created
+
+**Fix:**
+```powershell
+.\scripts\setup-skill-junctions.ps1
+```
+
+### Error: Junction already exists
+
+**Cause:** Running setup script multiple times
+
+**Fix:** Script skips existing junctions automatically (safe to run anytime)
+
+### Want to delete junctions?
+
+```powershell
+# Remove junctions (not the target files)
+cd .claude\skills
+Remove-Item response-awareness-light
+Remove-Item response-awareness-medium
+Remove-Item response-awareness-heavy
+Remove-Item response-awareness-full
+Remove-Item brainstorming
+
+# Recreate
+cd ..\..
+.\scripts\setup-skill-junctions.ps1
+```
+
+**IMPORTANT:** Use `Remove-Item` NOT `rm -rf` (removes junction, not target)
 
 ---
 
-**Created**: 2025-10-16
-**Skills Count**: 4 (Response-Awareness tiers)
-**Status**: ✅ Active
+## File Structure
+
+```
+.claude/
+├── skills/                                    # This directory
+│   ├── response-awareness-light/             # Junction → subtree
+│   ├── response-awareness-medium/            # Junction → subtree
+│   ├── response-awareness-heavy/             # Junction → subtree
+│   ├── response-awareness-full/              # Junction → subtree
+│   ├── brainstorming/                        # Junction → subtree/superpowers
+│   ├── executing-plans/                      # Real folder (local skill)
+│   ├── archive/                              # Archived old skills
+│   └── README.md (this file)
+│
+└── frameworks/
+    └── shared/                               # Git subtree
+        └── frameworks/
+            ├── response-awareness/
+            │   ├── response-awareness-light/
+            │   ├── response-awareness-medium/
+            │   ├── response-awareness-heavy/
+            │   └── response-awareness-full/
+            └── superpowers/
+                ├── brainstorming.md
+                └── systematic-debugging.md
+```
+
+---
+
+## Adding New Skills
+
+### From Subtree (Shared Across Projects)
+
+1. **Add to shared repository:**
+   ```bash
+   cd C:\Users\HomePC\.config\claude-shared
+   # Add skill to frameworks/
+   git add .
+   git commit -m "Add new skill"
+   git push
+   ```
+
+2. **Pull to NextNest:**
+   ```bash
+   cd C:\Users\HomePC\Desktop\Code\NextNest
+   git subtree pull --prefix .claude/frameworks/shared https://github.com/iamnormalfree/claude-shared.git master --squash
+   ```
+
+3. **Create junction:**
+   ```powershell
+   cd .claude\skills
+   New-Item -ItemType Junction -Path "new-skill-name" -Target "..\frameworks\shared\frameworks\new-skill-name"
+   ```
+
+4. **Add to .gitignore:**
+   ```gitignore
+   .claude/skills/new-skill-name
+   ```
+
+### Local Only (NextNest-Specific)
+
+1. **Create directly in `.claude/skills/`:**
+   ```bash
+   mkdir .claude/skills/nextnest-specific-skill
+   # Add SKILL.md with YAML frontmatter
+   ```
+
+2. **Commit normally:**
+   ```bash
+   git add .claude/skills/nextnest-specific-skill
+   git commit -m "Add NextNest-specific skill"
+   ```
+
+---
+
+## See Also
+
+- `UPDATE_GUIDE.md` - Git subtree sync workflow
+- `scripts/setup-skill-junctions.ps1` - Junction setup script
+- `.claude/frameworks/shared/README.md` - Subtree documentation
+- `.claude/commands/response-awareness.md` - Skill router
