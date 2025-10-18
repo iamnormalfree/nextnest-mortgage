@@ -55,10 +55,14 @@ estimated_hours: 40
   - Includes affordability validation (prevent suggesting $1.2M to $3k/mo income)
   - See: `docs/runbooks/mobile-form-optimization/reference/singapore-mortgage-context.md`
 - [ ] Integrate existing session storage (1h)
-  - **CRITICAL:** Use `useLoanApplicationStorage` (already exists, 7-day persistence)
-  - **DO NOT** create new storage hooks
-  - See: `docs/runbooks/mobile-form-optimization/reference/amendment-existing-storage.md`
-  - Update: `hooks/useProgressiveFormController.ts`
+  - **CRITICAL:** Use `useLoanApplicationStorage` (already exists at `lib/hooks/useLoanApplicationStorage.ts`, 113 lines, 7-day persistence)
+  - **DO NOT** create new storage hooks - we already have battle-tested solutions:
+    * `useLoanApplicationStorage` - Form data persistence with auto-cleanup
+    * `useChatSessionStorage` - Chat message persistence (95 lines)
+    * `sessionManager` - Unified sessionStorage API (116 lines at `lib/utils/session-manager.ts`)
+  - **Total existing storage:** 969 lines of proven code
+  - **Implementation:** Update `hooks/useProgressiveFormController.ts` to restore persisted data on mount using `retrieveLoanApplicationData(sessionId)`
+  - **Error handling:** Form data auto-saves to localStorage, so on submission failure users can reload and retry (no complex offline queue needed)
 
 ### Phase 4: A/B Testing Framework
 - [ ] Create experiment configuration (2h)

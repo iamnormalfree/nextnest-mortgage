@@ -16,8 +16,34 @@
 - [ ] Workstream 1 Task 4 – refinance outlook recalibration.
 - [ ] Workstream 1 Task 5 – controller wiring audit.
 
+## Misc Tasks Checklist (Progressive Form Polish)
+
+Extracted from `FORM_COMPACT_MODE_AND_APPLY_PAGE_TASKLIST.md` (2025-09-17) - verify if still needed before implementing:
+
+### Part B: Compact Desktop Mode (Incomplete)
+- [ ] Add responsive `md:` classes to `ProgressiveFormWithController.tsx` (2-3h)
+  - Current status: CommercialQuickForm has some `md:h-10`, but ProgressiveFormWithController has ZERO responsive classes
+  - Target: Inputs/selects `md:h-10 md:text-sm md:px-3 md:py-2`, buttons `md:h-10 md:text-sm`, stepper circles `md:w-8 md:h-8`
+  - Reduce vertical spacing: `space-y-6` → `md:space-y-3`
+  - Evidence: ProgressiveFormWithController:1-1517 uses fixed sizing everywhere
+
+### Part C: Brand-Lint Compliance (Incomplete)
+- [ ] Replace hex colors with brand tokens, run `npm run lint:brand` (30-60 min)
+  - Current status: Forms use hex colors like `#666666`, `#E5E5E5`, `#000000`
+  - Target: Use only brand tokens (`bg-gold`, `text-ink`, `text-graphite`, `text-emerald`, `bg-mist`, `border-fog`)
+  - Files: All Step3 sections, ProgressiveFormWithController
+
+### Part D: ESLint Chat Dependency Fix (Unknown Status)
+- [ ] Fix ESLint dependency warning in `CustomChatInterface.tsx` (15-30 min)
+  - Check init effect for missing dependencies (`fetchMessages`, `pollNewMessages`, `clearTyping`)
+  - Options: Wrap in `useCallback` OR add targeted disable with comment
+
+**Note:** Parts A (routing) and E (CTA updates) are COMPLETE. Only Parts B, C, D remain.
+
+---
+
 ## Deferred Opportunities (Logged 2025-10-18)
-Reference: `docs/plans/active/2025-10-18-function-usage-audit-plan.md`
+Reference: `docs/plans/archive/2025/10/2025-10-18-function-usage-audit-plan.md`
 
 ### MEDIUM Priority (Address During Next Feature Work)
 1. **Enhance AI insights with full `calculateRefinancingSavings()`** (15 min)
