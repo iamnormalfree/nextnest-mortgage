@@ -18,27 +18,34 @@
 
 ## Misc Tasks Checklist (Progressive Form Polish)
 
-Extracted from `FORM_COMPACT_MODE_AND_APPLY_PAGE_TASKLIST.md` (2025-09-17) - verify if still needed before implementing:
+Extracted from `FORM_COMPACT_MODE_AND_APPLY_PAGE_TASKLIST.md` (2025-09-17).
 
-### Part B: Compact Desktop Mode (Incomplete)
+**Status Review (2025-10-18):**
+- ✅ **Part D (ESLint):** No CustomChatInterface warnings found in current lint output - appears resolved
+- ⚠️ **Part C (Brand-Lint):** 49 violations found, but ALL in `app/analytics/` and `app/archive/` directories (not production forms)
+- 🔄 **Part B (Compact Mode):** Still relevant - consider during Path 1 (desktop UX) or Path 2 (mobile-first) implementation
+
+**Recommendation:** Close Parts C & D (non-issues). Defer Part B to Path 1 or Path 2 execution.
+
+### Part B: Compact Desktop Mode (DEFER to Path 1/Path 2)
 - [ ] Add responsive `md:` classes to `ProgressiveFormWithController.tsx` (2-3h)
-  - Current status: CommercialQuickForm has some `md:h-10`, but ProgressiveFormWithController has ZERO responsive classes
+  - Current status: ProgressiveFormWithController has ZERO responsive classes
   - Target: Inputs/selects `md:h-10 md:text-sm md:px-3 md:py-2`, buttons `md:h-10 md:text-sm`, stepper circles `md:w-8 md:h-8`
   - Reduce vertical spacing: `space-y-6` → `md:space-y-3`
-  - Evidence: ProgressiveFormWithController:1-1517 uses fixed sizing everywhere
+  - **Action:** Consider during Path 1 (desktop UX quick wins) OR Path 2 (mobile-first rebuild)
+  - **Decision needed:** Does "compact desktop mode" align with Path 1's "reduce visual weight" objective?
 
-### Part C: Brand-Lint Compliance (Incomplete)
-- [ ] Replace hex colors with brand tokens, run `npm run lint:brand` (30-60 min)
-  - Current status: Forms use hex colors like `#666666`, `#E5E5E5`, `#000000`
-  - Target: Use only brand tokens (`bg-gold`, `text-ink`, `text-graphite`, `text-emerald`, `bg-mist`, `border-fog`)
-  - Files: All Step3 sections, ProgressiveFormWithController
+### ~~Part C: Brand-Lint Compliance~~ ✅ CLOSED (Non-Issue)
+- **Status:** Brand-lint violations exist, but ONLY in:
+  - `app/analytics/page.tsx` (49 violations - dev/admin page)
+  - `app/archive/2025-10/development-tests/` (archived test pages)
+- **Production forms are clean** - no violations in `components/forms/`
+- **Action:** None needed. Analytics page can use gray tokens when refactored.
 
-### Part D: ESLint Chat Dependency Fix (Unknown Status)
-- [ ] Fix ESLint dependency warning in `CustomChatInterface.tsx` (15-30 min)
-  - Check init effect for missing dependencies (`fetchMessages`, `pollNewMessages`, `clearTyping`)
-  - Options: Wrap in `useCallback` OR add targeted disable with comment
-
-**Note:** Parts A (routing) and E (CTA updates) are COMPLETE. Only Parts B, C, D remain.
+### ~~Part D: ESLint Chat Dependency Fix~~ ✅ CLOSED (Already Fixed)
+- **Status:** No ESLint warnings found for CustomChatInterface in current lint output
+- **Verification:** `npm run lint` shows 4 warnings total, none related to CustomChatInterface
+- **Action:** None needed. Issue appears already resolved.
 
 ---
 
