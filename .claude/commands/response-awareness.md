@@ -531,6 +531,65 @@ Return: Clean code + report
 
 ---
 
+## Optional Logging Flags
+
+**Default behavior**: No logging (fastest, minimal overhead)
+
+**Available flags**:
+
+### --light-logging
+**Purpose**: Understand workflow and review decisions
+**Logs**: Phase transitions, final metrics, LCL summary, PATH_DECISION points
+**Overhead**: ~10 seconds per session, ~500 tokens
+**When to use**: Learning how framework works, reviewing architectural decisions
+
+**Output location**:
+```
+docs/completion_drive_logs/DD-MM-YYYY_task-name/
+  phase_transitions.log
+  final_metrics.md
+```
+
+### --verbose-logging
+**Purpose**: Deep learning, debugging, complete audit trail
+**Logs**: Everything - every tag insert/resolve, every LCL operation, detailed tracking
+**Overhead**: ~60 seconds per session, ~2,500 tokens
+**When to use**: Debugging issues, studying tag lifecycle, understanding LCL mechanics
+
+**Output location**:
+```
+docs/completion_drive_logs/DD-MM-YYYY_task-name/
+  phase_transitions.log
+  tag_operations.log
+  lcl_exports.log
+  final_metrics.md
+  detailed_report.md
+```
+
+## Usage Examples
+
+```bash
+# No logging (default - fastest)
+/response-awareness "add feature X"
+
+# Light logging (workflow understanding)
+/response-awareness "add feature X" --light-logging
+
+# Verbose logging (deep learning/debugging)
+/response-awareness "add feature X" --verbose-logging
+```
+
+## Flag Parsing
+
+Extract logging flag from command arguments:
+- If `--light-logging` present: Set LOGGING_LEVEL=light
+- If `--verbose-logging` present: Set LOGGING_LEVEL=verbose
+- If neither: Set LOGGING_LEVEL=none
+
+**Pass LOGGING_LEVEL to all Skills** in their invocation context or via prompt.
+
+---
+
 **Router Version**: 2.0 (Skills-based routing)
 **Last Updated**: 2025-10-16
 **Architecture**: Universal router + Tier Skills

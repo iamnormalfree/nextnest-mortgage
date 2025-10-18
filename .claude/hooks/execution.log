@@ -1,39 +1,3 @@
-[2025-10-17 14:51:53] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:53] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:55] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:55] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:55] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:56] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:56] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:56] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:58] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:58] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:51:58] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:52:00] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:52:00] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:52:00] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:53:05] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:53:05] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:53:05] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 15:09:15] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 15:09:15] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 15:09:15] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 15:12:21] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 15:12:21] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 15:12:21] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:01:23] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:01:23] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:40:50] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:51:01] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:51:01] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:52:33] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:52:33] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 16:52:33] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 17:04:16] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 17:04:16] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 17:11:35] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 17:11:35] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 17:19:23] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-17 17:19:23] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-17 17:19:23] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-17 17:19:33] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
@@ -498,3 +462,39 @@
 [2025-10-18 17:25:39] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-18 17:25:39] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-18 17:25:39] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:29:48] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:29:48] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:29:48] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:30:04] [question-suppression     ] [FULL  ] [ALLOW  ] [Unknown        ] No ambiguities detected
+[2025-10-18 17:30:04] [question-suppression     ] [AUTO  ] [ALLOW  ] [Unknown        ] No ambiguities detected
+[2025-10-18 17:30:04] [assumption-detector      ] [FULL  ] [ALLOW  ] [Unknown        ] No unverified assumptions detected
+[2025-10-18 17:30:04] [assumption-detector      ] [AUTO  ] [ALLOW  ] [Unknown        ] No unverified assumptions detected
+[2025-10-18 17:30:12] [assumption-detector      ] [MEDIUM] [BLOCK  ] [Unknown        ] Orchestrator has 0 unverified assumptions
+[2025-10-18 17:30:12] [assumption-detector      ] [HEAVY ] [BLOCK  ] [Unknown        ] Orchestrator has 0 unverified assumptions
+[2025-10-18 17:30:39] [question-suppression     ] [AUTO  ] [ALLOW  ] [Unknown        ] No ambiguities detected
+[2025-10-18 17:30:39] [orchestrator-firewall    ] [AUTO  ] [ALLOW  ] [Unknown        ] Agent implementation or direct work allowed
+[2025-10-18 17:30:39] [assumption-detector      ] [AUTO  ] [ALLOW  ] [Unknown        ] No unverified assumptions detected
+[2025-10-18 17:30:56] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:30:56] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:30:56] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:09] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:09] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:09] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:11] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:11] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:11] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:31] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:31] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:31] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:43] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:43] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:43] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:45] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:45] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:45] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:47] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:47] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:31:47] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:32:10] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:32:10] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 17:32:10] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode

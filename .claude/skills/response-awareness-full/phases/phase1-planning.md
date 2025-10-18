@@ -445,3 +445,54 @@ Before proceeding to Phase 2, confirm:
 - Select optimal approach combinations
 - Create unified implementation blueprint
 - Resolve any planning conflicts
+
+<!-- LEGACY FEATURE RESTORED (2025-10-06)
+     FULL tier uses progressive context loading, so plans from Phase 1 are especially
+     important for Phase 2 synthesis to review without holding everything in context.
+-->
+
+## MANDATORY: Write Domain Plans to Disk
+
+Each domain planning agent must write output to:
+
+```
+docs/completion_drive_plans/DD-MM-YYYY_task-name/plan_[domain]_HHMMSS.md
+```
+
+**Why this matters in FULL tier**:
+- Phase 2 (Synthesis) can read plans from disk instead of holding in context
+- Enables progressive context loading (read plan → synthesize → unload)
+- Creates permanent record of multi-domain exploration
+- Allows user to review domain plans before synthesis
+
+**Plan file format**:
+```markdown
+# Domain Plan: [Domain Name]
+## Task: [task description]
+## Date: DD-MM-YYYY HH:MM:SS
+## Phase: 1 (Planning)
+
+## Explored Approaches
+[Approach A, B, C with PATH_DECISION marks]
+
+## Recommended Approach
+[Selected approach with reasoning]
+
+## Integration Contracts
+[All contracts this domain exposes/requires]
+
+## Dependencies
+[What this domain needs from others]
+[What other domains need from this one]
+
+## Risk Mitigation
+[Strategies for high-risk areas]
+
+## Uncertainties
+[#PLAN_UNCERTAINTY marks - need validation]
+
+## LCL Exports for Phase 2
+#LCL_EXPORT_CRITICAL: contract::[domain]::[summary]
+#LCL_EXPORT_FIRM: technical_decision::[domain]::[summary]
+#LCL_EXPORT_CASUAL: implementation_preference::[domain]::[summary]
+```

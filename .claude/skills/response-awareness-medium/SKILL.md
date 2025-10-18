@@ -13,6 +13,106 @@ Handles multi-file features and moderate complexity with optional planning and b
 
 ## 🎯 Model & Agent Guidance (MEDIUM Tier)
 
+<!-- CONDITIONAL LOGGING (Added 2025-10-06)
+     Only execute if LOGGING_LEVEL != none
+     This does NOT affect default framework operation
+
+     MEDIUM tier has simpler phases than HEAVY, so logging is adapted accordingly.
+-->
+
+## Logging Instructions (IF ENABLED)
+
+**Check LOGGING_LEVEL from parent orchestrator:**
+- If LOGGING_LEVEL=none: Skip all logging (default behavior)
+- If LOGGING_LEVEL=light: Execute light logging instructions
+- If LOGGING_LEVEL=verbose: Execute verbose logging instructions
+
+### Light Logging Instructions
+
+**Phase transitions:**
+When entering new phase, append to `docs/completion_drive_logs/DD-MM-YYYY_task-name/phase_transitions.log`:
+```
+[HH:MM:SS] ENTER Phase [name]: [Planning/Implementation/Verification]
+```
+
+**PATH_DECISION logging:**
+When creating PATH_DECISION tag, append to `phase_transitions.log`:
+```
+[HH:MM:SS] PATH_DECISION: [brief summary]
+```
+
+**LCL export summary:**
+When LCL exports created, append to `phase_transitions.log`:
+```
+[HH:MM:SS] LCL Exports: [count] (Critical: X, Firm: X, Casual: X)
+```
+
+### Verbose Logging Instructions
+
+**Everything in light logging PLUS:**
+
+**Tag insertion:**
+When creating any tag in code, append to `docs/completion_drive_logs/DD-MM-YYYY_task-name/tag_operations.log`:
+```
+[HH:MM:SS] INSERT #TAG_NAME at file.py:line - "Brief context/reason"
+```
+
+**Tag resolution:**
+When resolving/removing tag, append to `tag_operations.log`:
+```
+[HH:MM:SS] RESOLVE #TAG_NAME at file.py:line - Action: [what was done]
+```
+
+**LCL operations:**
+When exporting LCL, append to `docs/completion_drive_logs/DD-MM-YYYY_task-name/lcl_exports.log`:
+```
+[HH:MM:SS] EXPORT LCL_[LEVEL]: key::value
+```
+
+### Final Metrics (Both Levels)
+
+At end of session, write `docs/completion_drive_logs/DD-MM-YYYY_task-name/final_metrics.md`:
+
+```markdown
+# Response-Awareness Session Metrics
+## Task: [task description]
+## Date: [DD-MM-YYYY]
+## Tier: MEDIUM
+## Logging Level: [light/verbose]
+
+### Phase Summary
+- Planning (if used): [HH:MM:SS - HH:MM:SS] (Duration: Xm Ys)
+- Implementation: [HH:MM:SS - HH:MM:SS] (Duration: Xm Ys)
+- Verification: [HH:MM:SS - HH:MM:SS] (Duration: Xm Ys)
+
+### Tag Operations
+- Total tags created: X
+- Tags resolved: X
+- Tags remaining: X (should be 0 except PATH tags)
+- Most common tag: #TAG_NAME (X occurrences)
+
+### LCL Exports (if used)
+- Critical exports: X
+- Firm exports: X
+- Total context passed: X items
+
+### Assumptions & Decisions
+- COMPLETION_DRIVE assumptions: X (Verified: X, Incorrect: X)
+- Assumption accuracy: X%
+- PATH_DECISION points: X
+
+### Suggestions Generated
+- ERROR_HANDLING: X locations
+- EDGE_CASE: X locations
+
+### Final Status
+All critical tags resolved
+Clean code delivered
+Framework effectiveness: [brief assessment]
+```
+
+**IMPORTANT**: All logging is OPTIONAL. If LOGGING_LEVEL=none, skip ALL of the above.
+
 ### Model Selection: Hybrid Approach
 **MEDIUM tier uses hybrid model strategy:**
 - **Planning (if needed)**: Sonnet orchestrator does lightweight planning
@@ -309,6 +409,14 @@ Watch for:
 
 Return: Brief plan with marked decisions
 ```
+
+**If Planning Phase Executed: Write Plan to Disk**
+
+```
+docs/completion_drive_plans/DD-MM-YYYY_task-name/plan_MEDIUM_HHMMSS.md
+```
+
+Include: Scope, approaches explored, selected path, implementation steps
 
 **Example**:
 ```python
