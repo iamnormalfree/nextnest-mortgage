@@ -676,6 +676,47 @@
 **Component Tests:**
 - Colocated with components: `components/[domain]/__tests__/`
 
+### Git Worktree Location Standard
+
+**Canonical Location:** `.worktrees/[branch-name]/`
+
+**Purpose:** Parallel development workspaces sharing same .git directory
+
+**Examples:**
+- ✅ `.worktrees/fix-calculator-bug/` - Bug fix worktree
+- ✅ `.worktrees/feature-email-validation/` - Feature worktree
+- ✅ `.worktrees/test-production-issue/` - Testing worktree
+- ❌ `worktrees/` - Missing dot prefix
+- ❌ `.git/worktrees/` - Git internal directory (not for code)
+
+**Naming Convention:**
+- Use branch name as folder name (consistency)
+- Lowercase with hyphens (no spaces, underscores)
+- Descriptive: `fix-[bug]`, `feature-[name]`, `test-[scenario]`
+
+**Git Configuration:**
+- Entry in `.gitignore`: `.worktrees/`
+- Managed via `git worktree` command (not manual file operations)
+- Documented in: `docs/runbooks/devops/GIT_WORKTREE_WORKFLOW.md`
+
+**Allowed Changes:**
+- Create worktrees via `git worktree add .worktrees/[name] -b [branch]`
+- Work on code inside worktree folders
+- Remove worktrees via `git worktree remove .worktrees/[name]`
+
+**Forbidden Changes:**
+- Do NOT commit `.worktrees/` directory (in .gitignore)
+- Do NOT manually create worktree folders (use git worktree command)
+- Do NOT share worktrees between developers (each creates their own)
+- Do NOT use other locations (`.worktrees/` is canonical)
+
+**Related:**
+- Tier 2: `docs/runbooks/devops/GIT_WORKTREE_WORKFLOW.md` - Complete workflow guide
+- Agent: `.claude/agents/worktree-helper.md` - Automated worktree creation
+- Config: `.claude/config/response-awareness-config.json` - Worktree integration settings
+
+---
+
 ### Archive Folder Naming
 
 **Canonical Format:** `YYYY-MM` (e.g., `2025-10`, `2025-11`)

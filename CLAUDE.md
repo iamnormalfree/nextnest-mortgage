@@ -43,6 +43,12 @@ We're colleagues ("Brent" and "Claude") working together with honest, direct com
 - Stop and ask about uncommitted changes before starting new work
 - Create WIP branch if no clear branch exists for the task
 
+**Session Continuation Protocol:**
+- When resuming work from previous session, ALWAYS check `git status` and `git branch` first
+- If uncommitted changes exist AND new task is unrelated to current branch → offer worktree
+- If unclear whether new task relates to current branch → ask before proceeding
+- Use `/response-awareness "[task]"` for new work to trigger automatic safeguards (Phase 0 checks)
+
 **Code Changes:**
 - Make the SMALLEST reasonable changes to achieve the outcome
 - NEVER throw away or rewrite implementations without explicit permission - STOP and ask first
