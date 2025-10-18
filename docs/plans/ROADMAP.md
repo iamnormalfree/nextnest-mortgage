@@ -204,6 +204,68 @@
 - ⏳ Time to first broker response: <24 hours
 - ⏳ Mobile usability score: >80/100
 
+### Phase 1 Production Readiness Checklist
+
+**Pre-Launch Requirements** (extracted from archived production readiness plans):
+
+**Session & Storage:**
+- [ ] SessionId persisted to sessionStorage before LoanApplicationProvider mounts
+- [ ] Resume session guard: hydrate context from cached data on refresh
+- [ ] Explicit "Reset application" action clears all storage keys
+- [ ] Data retention policy: wipe cached loan data after N days (PDPA compliance)
+- [ ] Browser fingerprinting for cross-session journey tracking (no cookies)
+
+**Error Handling & Resilience:**
+- [ ] ChatTransitionScreen surfaces API errors with retry CTA
+- [ ] `/api/forms/analyze` failures show friendly message while retaining form data
+- [ ] Feature flags (e.g., `ENABLE_CHAT_TRANSITION`) for quick incident response
+- [ ] Network failure scenarios tested (503 responses, localStorage disabled)
+- [ ] No double-creation of Chatwoot conversations (guard against multiple clicks)
+
+**Broker Integration:**
+- [ ] Assigned broker name matches greeting message and chat header
+- [ ] System messages appear in correct order: queue → reviewing → joined → greeting
+- [ ] `conversation.custom_attributes.ai_broker_name` matches greeting author
+- [ ] No duplicate queue messages in chat UI
+- [ ] Legacy enhanced webhook disabled or respects Supabase assignments
+
+**Performance Benchmarks:**
+- [ ] Bundle size <140KB gzipped
+- [ ] Time to interactive <3s on 3G
+- [ ] First contentful paint <1.5s
+- [ ] Lighthouse performance score >90
+
+**Security & Compliance:**
+- [ ] Journey data retained for 2 years max (refinancing cycle)
+- [ ] Personal data anonymization after 90 days inactivity
+- [ ] Explicit consent captured for reminder communications
+- [ ] Professional users excluded from marketing communications
+- [ ] All API routes have proper error handling and input validation
+
+**Mobile Parity:**
+- [ ] Step navigation works on mobile + desktop
+- [ ] CTA states consistent across viewports
+- [ ] Validation messages readable on small screens
+- [ ] Touch targets meet accessibility minimums (44x44px)
+
+**Testing Coverage:**
+- [ ] Unit tests: form validation, calculation logic, schema compliance
+- [ ] Integration tests: form-to-chat handoff, broker assignment flow
+- [ ] E2E tests: complete application journey (form → analysis → chat)
+- [ ] Manual QA: network failures, API errors, localStorage edge cases
+- [ ] Test output pristine (no uncaught errors, clean console)
+
+**Documentation:**
+- [ ] Runbooks updated with production flows
+- [ ] Rollback procedures documented
+- [ ] Known issues logged in `docs/KNOWN_ISSUES.md`
+- [ ] Deployment checklist verified (see `docs/runbooks/devops/production-deployment-guide.md`)
+
+**References:**
+- Session hardening: `docs/plans/archive/2025/09/2025-09-26-apply-production-readiness-plan.md`
+- Broker alignment: `docs/plans/archive/2025/09/2025-09-26-broker-chat-alignment-plan.md`
+- Form restoration: `docs/plans/archive/2025/10/2025-10-28-progressive-form-restoration-implementation-plan.md`
+
 ### Phase 1.5 Success Criteria
 - [ ] 15 core content pieces published
 - [ ] SEO audit score >80/100

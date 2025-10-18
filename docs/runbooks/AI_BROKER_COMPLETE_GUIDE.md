@@ -862,7 +862,176 @@ User sees in chat:
 3. Human agent receives notification
 4. Conversation continues with human
 
-### 3.3 Integration Points
+### 3.3 Message Role Contract
+
+**Status**: ✅ Implemented as of 2025-10-18 (commits: 5b75526, 28b1fe7, 6e7b4de)
+
+The `/api/chat/messages` endpoint returns normalized message objects with a `role` field that simplifies UI rendering and eliminates ambiguity between user, agent, and system messages.
+
+#### Response Format
+
+```typescript
+{
+  id: string
+  content: string
+  role: 'user' | 'agent' | 'system'  // NEW FIELD
+  message_type: number               // Preserved for backward compatibility
+  created_at: string
+  private: boolean
+  sender: {
+    name: string
+    avatar_url: string | null
+    type: 'contact' | 'agent' | 'bot' | 'system'
+  } | null
+  original: object                   // Raw Chatwoot payload for debugging
+}
+```
+
+#### Role Derivation Logic
+
+**Implementation**: `app/api/chat/messages/route.ts:122-144`
+
+The server derives the `role` field using a priority-based algorithm:
+
+1. **Check `message_type` first** (primary indicator):
+   - `message_type === 2` → `role: 'system'` (activity messages)
+   - `message_type === 1` → `role: 'agent'` (outgoing messages)
+   - `message_type === 0` → `role: 'user'` (incoming messages)
+
+2. **Fall back to `sender.type`** (secondary indicator):
+   - `sender.type === 'system'` → `role: 'system'`
+   - `sender.type === 'agent'` OR `'bot'` → `role: 'agent'`
+   - `sender.type === 'contact'` → `role: 'user'`
+
+3. **Special case for private messages**:
+   - If `private: true`, force `role: 'agent'` (internal notes)
+
+```typescript
+// Simplified example from route.ts:122-144
+let role: 'user' | 'agent' | 'system' = 'agent'
+
+if (msg.message_type === 2) {
+  role = 'system'
+} else if (msg.message_type === 1) {
+  role = 'agent'
+} else if (msg.message_type === 0) {
+  role = 'user'
+} else if (msg.sender?.type === 'system') {
+  role = 'system'
+}
+
+if (msg.private) {
+  role = 'agent'  // Override for private messages
+}
+```
+
+#### System Message Rendering
+
+**Implementation**: `components/chat/EnhancedChatInterface.tsx:366-372`
+
+System messages render as centered status chips without avatars:
+
+```tsx
+// Example system message rendering
+if (messageRole === 'system') {
+  return (
+    <div className="flex justify-center my-2">
+      <div className="px-3 py-1 bg-mist/70 text-graphite text-xs text-center rounded-md border border-fog/70">
+        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+      </div>
+    </div>
+  )
+}
+```
+
+**Visual Design**:
+- Centered alignment (no left/right bias)
+- Subtle background (`bg-mist/70`)
+- Small text (`text-xs`)
+- No avatar or sender name
+- Border for visual separation
+
+#### Boilerplate Filtering
+
+**Implementation**: `components/chat/CustomChatInterface.tsx:51-54`
+
+Noisy Chatwoot automation events are hidden from the UI:
+
+```typescript
+const hiddenActivityPatterns = [
+  /conversation was reopened/i,
+  /added property/i
+]
+
+// Applied during system message rendering:
+const shouldHide = hiddenActivityPatterns.some(pattern => 
+  pattern.test(message.content || '')
+)
+```
+
+**Rationale**: 
+- Reduces clutter in chat UI
+- Preserves messages in database for audit trail
+- User sees only meaningful status updates ("Sarah is joining the conversation")
+
+#### Activity Message Creation
+
+**Implementation**: `lib/integrations/chatwoot-client.ts:651-723`
+
+When creating system messages (e.g., broker join notifications):
+
+```typescript
+// Primary: Use Chatwoot activity endpoint
+POST /api/v1/accounts/:accountId/conversations/:conversationId/activities
+{
+  action: 'conversation_activity',
+  content: 'Sarah Wong is joining the conversation'
+}
+
+// Response: 204 No Content (success)
+
+// Fallback: Use messages endpoint with message_type: 2
+POST /api/v1/accounts/:accountId/conversations/:conversationId/messages
+{
+  content: 'Sarah Wong is joining the conversation',
+  message_type: 2  // Forces system classification
+}
+```
+
+**Graceful Degradation**:
+- Tries `/activities` endpoint first (Chatwoot's official API)
+- Handles 204 No Content correctly
+- Falls back to `/messages` with `message_type: 2` if activities endpoint fails
+- Logs errors but doesn't expose implementation details to caller
+
+#### Testing the Contract
+
+**Verify role normalization**:
+```bash
+# Fetch messages for a conversation
+curl http://localhost:3000/api/chat/messages?conversationId=123
+
+# Expected: All messages have 'role' field
+# System messages: role === 'system'
+# Agent messages: role === 'agent'
+# User messages: role === 'user'
+```
+
+**Verify UI rendering**:
+1. Send test message → Should appear as customer bubble (right-aligned)
+2. Agent responds → Should appear as agent bubble with avatar (left-aligned)
+3. Broker joins → Should appear as centered system chip (no avatar)
+4. Automation events → Should be hidden from view
+
+**Common Issues**:
+- Missing `role` field → Check API response format
+- System messages showing as agent → Check `message_type === 2` handling
+- Boilerplate visible → Update `hiddenActivityPatterns` regex
+- Avatar showing for system → Check UI conditional rendering
+
+---
+
+### 3.4 Integration Points
 
 Key API routes in NextNest:
 - `C:\Users\HomePC\Desktop\Code\NextNest\app\api\chatwoot-conversation\route.ts` - Conversation creation
@@ -871,7 +1040,7 @@ Key API routes in NextNest:
 
 **Port Reference**: All local development uses `http://localhost:3000`
 
-### 3.4 Visual Elements in Chat UI
+### 3.5 Visual Elements in Chat UI
 
 #### Broker Profile Display
 ```javascript
@@ -915,7 +1084,7 @@ const HandoffTransition = ({ fromBroker, toHuman }) => (
 );
 ```
 
-### 3.5 Testing Scenarios
+### 3.6 Testing Scenarios
 
 #### Test Case 1: High-Value Lead
 **Input**:
