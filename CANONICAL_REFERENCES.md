@@ -393,3 +393,165 @@
 1. Update this file if you added new Tier 1 files
 2. Update relevant runbooks if implementation changed
 3. Archive old plans if feature is complete
+
+---
+
+## Folder Structure Standards (Tier 1)
+
+**This section defines the canonical folder organization rules. Check here before creating new folders or files.**
+
+### app/ Directory Structure
+
+**Production Routes** (public-facing):
+- `app/page.tsx` - Homepage landing
+- `app/layout.tsx` - Root layout with metadata
+- `app/globals.css` - Global styles
+- `app/sitemap.ts` - SEO sitemap generation
+
+**Feature Routes:**
+- `app/apply/` - Main mortgage application flow (ProgressiveFormWithController)
+- `app/apply/insights/` - Post-submission AI insights & chat
+- `app/calculator/` - Mortgage calculator pages
+- `app/calculators/` - Calculator variants (TDSR, affordability)
+- `app/chat/` - Broker chat interface
+- `app/analytics/` - Analytics dashboard
+- `app/compliance/` - Compliance reporting
+- `app/dashboard/` - User dashboard
+- `app/campaigns/` - Marketing campaign landing pages
+- `app/pdpa/` - Privacy policy
+- `app/system-status/` - System health monitoring
+
+**API Routes:**
+- `app/api/forms/` - Form processing endpoints
+- `app/api/ai-insights/` - AI insights generation
+- `app/api/analytics/` - Analytics tracking
+- `app/api/chat/` - Chat message handling
+- `app/api/chatwoot-*/` - Chatwoot integration webhooks
+- `app/api/compliance/` - Compliance report generation
+- `app/api/health/` - Health check endpoints
+
+**Development Routes** (excluded from production builds):
+- `app/_dev/test-mobile/` - Mobile testing harness
+- `app/_dev/[feature]/` - Any experimental/testing pages
+- **Rule:** Underscore prefix (`_dev`) excludes from production builds
+
+**Archives** (NOT built):
+- `app/archive/YYYY-MM/[feature]/` - Archived production pages
+- Example: `app/archive/2025-10/validation-dashboard/`
+
+**Forbidden:**
+- ❌ `app/test-*` - Use `app/_dev/` instead
+- ❌ `app/temp-*` - Use `app/_dev/` or delete
+- ❌ `app/*.backup.tsx` - Use git history
+
+### components/ Directory Structure
+
+**Design System Primitives:**
+- `components/ui/` - Shadcn/ui components (button, input, card, select, etc.)
+
+**Layout Components:**
+- `components/layout/Footer.tsx` - Site footer
+- `components/layout/ConditionalNav.tsx` - Conditional navigation
+- `components/layout/Header.tsx` - Site header (if exists)
+
+**Landing Page Sections:**
+- `components/landing/HeroSection.tsx` - Homepage hero
+- `components/landing/ServicesSection.tsx` - Services overview
+- `components/landing/ContactSection.tsx` - Contact form section
+- `components/landing/CTASection.tsx` - Call-to-action sections
+- `components/landing/LoanTypeSection.tsx` - Loan type selection
+- `components/landing/FeatureCards.tsx` - Feature highlights
+- `components/landing/StatsSection.tsx` - Statistics showcase
+
+**Shared Utilities:**
+- `components/shared/AnimatedCounter.tsx` - Number animation component
+- `components/shared/ErrorBoundary.tsx` - Error boundary wrapper
+- `components/shared/icons.tsx` - Icon library
+- `components/shared/ChatwootWidget.tsx` - Chatwoot widget loader
+
+**Feature Domains:**
+- `components/forms/` - Form components (Tier 1: ProgressiveFormWithController.tsx)
+  - `components/forms/sections/` - Form step components (Step3NewPurchase.tsx, Step3Refinance.tsx)
+  - `components/forms/mobile/` - Mobile-specific form components
+  - `components/forms/__tests__/` - Form component tests
+  - `components/forms/archive/` - Archived form experiments
+
+- `components/ai-broker/` - AI broker components (Tier 1: MobileAIAssistantCompact.tsx)
+- `components/chat/` - Chat UI components
+- `components/analytics/` - Analytics visualization components
+- `components/calculators/` - Calculator widget components
+  - `components/calculators/archive/` - Archived calculators
+
+**Archives:**
+- `components/archive/YYYY-MM/[category]/` - Archived components
+- Example: `components/archive/2025-10/examples/bloomberg-example.tsx`
+
+**Component Organization Rules:**
+1. **3+ related files** → Create subfolder
+2. **Single utility** → Place in `shared/`
+3. **Domain-specific** → Create domain folder
+4. **UI primitive** → Use `ui/` (Shadcn components only)
+
+### lib/ Directory Structure
+
+**Tier 1 Files:**
+- `lib/calculations/instant-profile.ts` - Dr Elena v2 calculator
+- `lib/calculations/dr-elena-constants.ts` - MAS regulatory constants
+- `lib/contracts/form-contracts.ts` - Form-first domain contracts
+- `lib/forms/form-config.ts` - Form step definitions
+- `lib/events/event-bus.ts` - Event publishing system
+
+**Archives:**
+- `lib/calculations/archive/2025-10/` - Archived calculators
+- `lib/hooks/archive/` - Archived hooks
+
+### hooks/ Directory Structure
+
+**Tier 1 Hooks:**
+- `hooks/useProgressiveFormController.ts` - Form state management
+
+**Archives:**
+- `hooks/archive/` - Archived hooks
+
+### types/ Directory Structure
+
+**Production Types:**
+- `types/mortgage.ts` - Legacy mortgage types (use form-contracts.ts for new code)
+- `types/forms.ts` - Form-specific types
+- `types/api.ts` - API request/response types
+
+### tests/ Directory Structure
+
+**Test Organization:**
+- `tests/calculations/` - Calculation engine tests
+- `tests/dr-elena-v2-regulation.test.ts` - Dr Elena v2 regulatory compliance
+- `tests/fixtures/` - Test data fixtures
+- `tests/e2e/` - End-to-end tests (if exists)
+
+**Component Tests:**
+- Colocated with components: `components/[domain]/__tests__/`
+
+### Archive Folder Naming
+
+**Canonical Format:** `YYYY-MM` (e.g., `2025-10`, `2025-11`)
+
+**Examples:**
+- ✅ `app/archive/2025-10/validation-dashboard/`
+- ✅ `components/archive/2025-10/examples/`
+- ✅ `lib/calculations/archive/2025-10/`
+- ❌ `archive-oct-2025/` - Wrong format
+- ❌ `old-stuff/` - Not date-based
+
+### Enforcement Rules
+
+**Before Creating ANY File:**
+1. Check this section for folder structure rules
+2. Use Component Placement Decision Tree (see CLAUDE.md)
+3. Ask: "Is there an existing folder for this domain?"
+4. Never create backup files (use git history)
+
+**Before Creating ANY Folder:**
+1. Do you have 3+ related files? (Yes → create folder)
+2. Is this a new feature domain? (Yes → create domain folder)
+3. Is this temporary/experimental? (Yes → use `archive/YYYY-MM/`)
+4. Otherwise → use existing shared/ or layout/ folders

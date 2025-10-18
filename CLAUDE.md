@@ -117,6 +117,62 @@ npm run lint         # Code quality check
 
 ---
 
+## Component Placement Decision Tree
+
+**Before creating ANY file in app/ or components/, answer these questions:**
+
+### Question 1: Is this a test/development page?
+- **YES** → Create in `app/_dev/[feature-name]/page.tsx`
+  - Underscore prefix excludes from production builds
+  - Examples: `app/_dev/test-mobile/`, `app/_dev/test-broker/`
+- **NO** → Continue to Question 2
+
+### Question 2: Is this experimental/in-progress code?
+- **YES** → Create in `components/archive/YYYY-MM/[experiment-name]/`
+  - Use date format: `2025-10`, `2025-11`
+  - Add README explaining the experiment
+- **NO** → Continue to Question 3
+
+### Question 3: Is this a production page route?
+- **YES** → Create in `app/[route-name]/page.tsx`
+  - ✅ Allowed: `app/apply/`, `app/calculator/`, `app/chat/`
+  - ❌ Forbidden: `app/test-*`, `app/temp-*`, `app/*.backup.tsx`
+- **NO** → Continue to Question 4
+
+### Question 4: Is this a reusable component?
+- **YES** → Determine folder based on purpose:
+  - **UI primitives** → `components/ui/[component-name].tsx` (Shadcn/ui components)
+  - **Layout components** → `components/layout/[component-name].tsx` (Footer, Header, Nav)
+  - **Landing page sections** → `components/landing/[SectionName].tsx` (Hero, Services, CTA)
+  - **Shared utilities** → `components/shared/[component-name].tsx` (ErrorBoundary, icons, AnimatedCounter)
+  - **Forms** → `components/forms/[component-name].tsx`
+  - **Form sections** → `components/forms/sections/[section-name].tsx`
+  - **Mobile forms** → `components/forms/mobile/[component-name].tsx`
+  - **AI Broker** → `components/ai-broker/[component-name].tsx`
+  - **Chat** → `components/chat/[component-name].tsx`
+  - **Analytics** → `components/analytics/[component-name].tsx`
+  - **Calculators** → `components/calculators/[component-name].tsx`
+- **NO** → STOP - Reconsider if you need this file
+
+### Question 5: Where do tests go?
+- **Component tests** → `components/[folder]/__tests__/[ComponentName].test.tsx`
+- **Integration tests** → `tests/[domain]/[feature].test.ts`
+- **E2E tests** → `tests/e2e/[flow].test.ts`
+- **Test fixtures** → `tests/fixtures/[data-set].ts`
+
+### Question 6: What about backup files?
+- **NEVER commit .backup.tsx files** - Use git history instead (`git show HEAD~1:path/to/file.tsx`)
+- **Alternative implementation?** → Archive to `components/archive/YYYY-MM/[descriptive-name].tsx`
+
+### Forbidden Patterns
+- ❌ `app/test-*` pages (use `app/_dev/` instead)
+- ❌ `app/temp-*` pages (use `app/_dev/` or delete)
+- ❌ `*.backup.tsx` files (use git history)
+- ❌ Top-level components without clear domain (organize into subfolders)
+- ❌ Random subfolders without 3+ related files
+
+---
+
 ## Root Directory Requirements
 
 **Allowed at repository root:**
@@ -271,6 +327,26 @@ How to undo if it fails
 1. Check `docs/plans/active/` - does a plan for this feature already exist?
 2. If yes, update existing plan instead of creating new one
 3. If creating new plan, set old related plans to `status: archived` and move them
+
+**Pre-implementation checklist (add to every plan):**
+```markdown
+## Pre-Implementation Checklist
+
+**Before starting implementation:**
+- [ ] Check CANONICAL_REFERENCES.md for folder structure standards
+- [ ] Verify no Tier 1 files will be modified (if yes, review change rules)
+- [ ] Confirm file placement using Component Placement Decision Tree (CLAUDE.md)
+- [ ] Check for existing similar components/features to avoid duplication
+- [ ] Identify which tests need to be written first (TDD)
+- [ ] Review related runbooks for implementation patterns
+
+**File placement decisions:**
+- [ ] New app/ routes → Production route or app/_dev/?
+- [ ] New components → Which domain folder? (ui, layout, landing, shared, forms, etc.)
+- [ ] New tests → Colocated __tests__/ or tests/ directory?
+- [ ] New utilities → lib/ or hooks/?
+- [ ] Archive format → YYYY-MM if archiving anything
+```
 
 ### Execution Rules
 
