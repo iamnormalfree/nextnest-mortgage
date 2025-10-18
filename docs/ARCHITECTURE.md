@@ -12,10 +12,20 @@
 ## Core Architecture Components
 
 ### App Router Structure (`app/` directory)
+
+**Pages:**
 - `page.tsx` - Landing page with hero, services, and lead capture
 - `layout.tsx` - Root layout with fixed navigation and global metadata
+- `apply/page.tsx` - Progressive mortgage application form
 - `dashboard/page.tsx` - Interactive mortgage calculator with React hooks
-- `api/contact/route.ts` - Form submission API endpoint
+
+**API Routes:**
+- `api/contact/route.ts` - Contact form submission
+- `api/chatwoot-conversation/route.ts` - Lead form to Chatwoot integration
+- `api/chatwoot-webhook/route.ts` - Chatwoot webhook event handler
+- `api/forms/analyze/route.ts` - Form data analysis
+- `api/ai-insights/route.ts` - AI-generated insights
+- `api/compliance/report/route.ts` - MAS compliance reporting
 
 ### Business Logic Layer (`lib/` directory)
 - `lib/calculations/mortgage.ts` - Mortgage calculation engine with Zod validation
@@ -133,6 +143,136 @@ When making changes:
 - Static generation enabled for marketing pages
 - Bundle analysis available via environment variable
 - Ready for Vercel/Netlify deployment
+
+## AI Broker Integration Architecture
+
+### System Overview
+
+NextNest implements an AI-powered broker chat system that provides personalized mortgage advisory through:
+- **5 AI Broker Personas** with distinct communication styles (aggressive, balanced, conservative)
+- **Lead Scoring & Routing** (0-100 score) matching customers to appropriate broker personas
+- **Chatwoot Integration** (self-hosted at chat.nextnest.sg) for chat interface
+- **Conversation Management** with deduplication and human handoff capabilities
+
+### System Flow
+
+```
+Lead Form Submission (/apply)
+  ↓
+Chatwoot Conversation Creation
+  ↓
+AI Broker Assignment (based on lead score)
+  ↓
+Personalized Greeting & Chat
+  ↓
+Human Handoff (when needed)
+```
+
+### Database Schema
+
+**AI Brokers Table:**
+```sql
+ai_brokers (
+  id UUID,
+  name TEXT,
+  personality_type TEXT,        -- 'aggressive' | 'balanced' | 'conservative'
+  is_available BOOLEAN,
+  current_workload INTEGER,     -- Max 3 concurrent conversations
+  active_conversations JSONB
+)
+```
+
+**Broker Conversations Table:**
+```sql
+broker_conversations (
+  id UUID,
+  broker_id UUID,
+  chatwoot_conversation_id INTEGER,
+  lead_score DECIMAL,
+  loan_type TEXT,
+  status TEXT,                  -- 'active' | 'completed' | 'handed_off'
+  assigned_at TIMESTAMPTZ
+)
+```
+
+### Key API Routes
+
+**`app/api/chatwoot-conversation/route.ts`**
+- Creates Chatwoot conversations from form submissions
+- Implements conversation deduplication (returning customers reuse conversations)
+- Triggers broker assignment based on lead score
+- Handles contact creation and metadata
+
+**`app/api/chatwoot-webhook/route.ts`**
+- Receives webhook events from Chatwoot
+- Implements echo detection (prevents bot message loops)
+- Routes incoming messages to AI processing
+- Detects human handoff scenarios
+
+### Integration Patterns
+
+**Conversation Deduplication:**
+- Matches existing conversations by contact + loan type
+- Reuses conversations within 30-day window
+- Prevents duplicate greetings to returning customers
+
+**Echo Detection:**
+- Tracks bot message IDs to prevent processing own messages
+- In-memory deduplication set for webhook events
+- Prevents infinite loops in bot-to-bot scenarios
+
+**Human Handoff:**
+- Detects complex questions requiring human intervention
+- Updates conversation status from 'bot' to 'open'
+- Releases AI broker capacity for reassignment
+- Maintains conversation history for seamless transition
+
+**Broker Capacity Management:**
+- Each AI broker handles max 3 concurrent conversations
+- Workload tracking with automatic availability updates
+- Round-robin assignment within personality type tiers
+
+### Environment Configuration
+
+Required environment variables:
+
+```bash
+# Chatwoot Integration
+CHATWOOT_BASE_URL=https://chat.nextnest.sg
+CHATWOOT_ACCOUNT_ID=1
+CHATWOOT_INBOX_ID=1
+CHATWOOT_API_KEY=your_api_key_here
+CHATWOOT_BOT_USER_ID=1
+
+# Database (Supabase)
+DATABASE_URL=postgresql://...
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxx...
+SUPABASE_SERVICE_ROLE_KEY=eyJxxx...
+
+# AI Integration
+OPENAI_API_KEY=sk-...
+
+# Rate Limiting (Upstash Redis)
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+```
+
+### Performance Characteristics
+
+| Metric | Target | Notes |
+|--------|--------|-------|
+| Greeting message delay | 2s | Human-like timing |
+| Activity message delay | 500ms | System notifications |
+| Response timing | 1-6s | Based on message urgency |
+| Broker capacity | 3 concurrent | Per AI broker persona |
+| Conversation deduplication | <30 days | Returning customer window |
+
+### Migration Notes
+
+Current implementation uses n8n for AI orchestration (external webhook). Future migration to Vercel AI SDK in-process is planned. See `docs/reports/investigations/ai-broker-system-pre-bullmq-migration-baseline.md` for detailed migration planning.
+
+---
 
 ## AI Intelligent Lead Form Architecture
 
