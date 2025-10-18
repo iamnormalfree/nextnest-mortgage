@@ -56,14 +56,23 @@ Task complexity analysis:
 - Change Type: X/3
 - Total Score: X/12
 
-→ Routing to: [TIER NAME] (Score X matches Y-Z range)
+→ Routing to: [TIER NAME] tier (Score X matches Y-Z range)
 
-The [TIER] tier Skill will now handle this task.
+I'm now using the "Response Awareness [Tier Name]" skill for this task.
 ```
 
-**After this announcement: STOP. The tier Skill loads automatically and takes over.**
+**CRITICAL: Immediately after announcing, you MUST explicitly state the skill loading:**
 
-**VIOLATION:** If you continue working after announcing routing, you have bypassed the orchestration system and violated the router protocol. The orchestrator firewall will block you.
+- If LIGHT tier: "I'm now using the **Response Awareness Light** skill for this task."
+- If MEDIUM tier: "I'm now using the **Response Awareness Medium** skill for this task."
+- If HEAVY tier: "I'm now using the **Response Awareness Heavy** skill for this task."
+- If FULL tier: "I'm now using the **Response Awareness Full** skill for this task."
+
+**This statement triggers the skill loading. Without it, the tier workflow will not activate.**
+
+**After this statement: The tier Skill loads and takes over. Router is done.**
+
+**VIOLATION:** If you continue working after the skill loading statement, you have bypassed the orchestration system and violated the router protocol. The orchestrator firewall will block you.
 
 ---
 
