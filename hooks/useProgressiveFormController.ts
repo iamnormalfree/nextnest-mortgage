@@ -15,11 +15,13 @@ import { FormStep, LeadScore, AIInsightResponse, LoanType } from '@/lib/contract
 import { conversionTracker } from '@/lib/analytics/conversion-tracking'
 import { eventBus, FormEvents, useEventPublisher, useCreateEvent } from '@/lib/events/event-bus'
 import {
+  calculateInstantProfile,
+  roundMonthlyPayment,
+  calculateRefinanceOutlook,
   calculateRefinancingSavings,
   calculateIWAA,
   getPlaceholderRate
-} from '@/lib/calculations/mortgage'
-import { calculateInstantProfile, roundMonthlyPayment, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
+} from '@/lib/calculations/instant-profile'
 import { formSteps, getDefaultValues } from '@/lib/forms/form-config'
 
 // Interface for the controller's return value

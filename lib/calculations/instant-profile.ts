@@ -821,19 +821,96 @@ export function getEmploymentRecognitionRate(employmentType: string): number {
 export function calculateTotalLiabilities(creditCardCount: number, existingCommitments: number, employmentType: string, monthlyIncome?: number) {
   // Credit card minimum payments: 3% of credit limit or S$50 minimum, whichever is higher
   const creditCardPayments = Math.max(creditCardCount * 50, creditCardCount * 3000 * 0.03)
-  
+
   // Total monthly commitments
   const totalCommitments = creditCardPayments + existingCommitments
-  
+
   // Apply income recognition based on employment type with safeguard for negative income
   const recognitionRate = getEmploymentRecognitionRate(employmentType)
   const recognizedIncome = monthlyIncome && monthlyIncome > 0 ? monthlyIncome * recognitionRate : 0
-  
+
   return {
     creditCardPayments,
     existingCommitments,
     totalCommitments,
     recognizedIncome,
     recognitionRate
+  }
+}
+
+/**
+ * Calculate IWAA (Income-Weighted Average Age)
+ * Used for determining maximum loan tenure based on borrower ages
+ * Source: Migrated from legacy mortgage.ts
+ */
+export function calculateIWAA(ages: number[], incomes: number[]): number {
+  if (ages.length === 0 || incomes.length === 0) return 0
+  if (ages.length !== incomes.length) return ages[0] || 0
+
+  const totalIncome = incomes.reduce((sum, income) => sum + income, 0)
+  if (totalIncome === 0) return ages[0] || 0
+
+  const weightedSum = ages.reduce((sum, age, i) => sum + age * (incomes[i] / totalIncome), 0)
+  return Math.round(weightedSum)
+}
+
+/**
+ * Get placeholder interest rate based on property type and loan type
+ * Used for initial calculations when user hasn't specified a rate
+ * Source: Migrated from legacy mortgage.ts
+ */
+export function getPlaceholderRate(propertyType: string, loanType: string = 'new_purchase'): number {
+  const rates: Record<string, Record<string, number>> = {
+    HDB: { new_purchase: 2.3, refinance: 2.1 },
+    Private: { new_purchase: 2.8, refinance: 2.6 },
+    Commercial: { new_purchase: 3.2, refinance: 3.0 },
+  }
+
+  return rates[propertyType]?.[loanType] || 2.8
+}
+
+/**
+ * Calculate refinancing savings (simplified version)
+ * Compares current loan payments vs refinanced payments
+ * Source: Migrated from legacy mortgage.ts
+ * Note: For full refinance analysis, use calculateRefinanceOutlook() instead
+ */
+export function calculateRefinancingSavings(
+  currentRate: number,
+  outstandingLoan: number,
+  remainingTenure: number = 20,
+  propertyValue?: number
+) {
+  const newRate = 2.5 // Competitive market rate
+  const tenure = remainingTenure
+
+  // Calculate current monthly payment
+  const currentMonthly =
+    (outstandingLoan * (currentRate / 100 / 12) * Math.pow(1 + currentRate / 100 / 12, tenure * 12)) /
+    (Math.pow(1 + currentRate / 100 / 12, tenure * 12) - 1)
+
+  // Calculate new monthly payment
+  const newMonthly =
+    (outstandingLoan * (newRate / 100 / 12) * Math.pow(1 + newRate / 100 / 12, tenure * 12)) /
+    (Math.pow(1 + newRate / 100 / 12, tenure * 12) - 1)
+
+  const monthlySavings = currentMonthly - newMonthly
+  const annualSavings = monthlySavings * 12
+  const lifetimeSavings = monthlySavings * tenure * 12
+
+  // Calculate break-even period (assuming $3000 refinancing costs)
+  const refinancingCost = 3000
+  const breakEvenMonths = monthlySavings > 0 ? Math.ceil(refinancingCost / monthlySavings) : 0
+
+  return {
+    currentRate,
+    newRate,
+    currentMonthlyPayment: Math.round(currentMonthly),
+    newMonthlyPayment: Math.round(newMonthly),
+    monthlySavings: Math.round(monthlySavings),
+    annualSavings: Math.round(annualSavings),
+    lifetimeSavings: Math.round(lifetimeSavings),
+    breakEvenMonths,
+    worthRefinancing: monthlySavings > 150 && breakEvenMonths < 24, // At least $150/month and break-even within 2 years
   }
 }

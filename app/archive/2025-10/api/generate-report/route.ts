@@ -17,7 +17,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { mortgageFormSchema } from '@/lib/validation/mortgage-schemas'
-import { calculateMortgage } from '@/lib/calculations/mortgage'
+import { calculateMortgage } from '@/lib/calculations/archive/2025-10/mortgage'
 import { LeadScorer } from '@/lib/processing/lead-scorer'
 import { z } from 'zod'
 

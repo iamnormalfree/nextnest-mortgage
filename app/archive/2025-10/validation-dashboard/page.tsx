@@ -19,7 +19,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { calculateMortgage, calculateLeadScore, calculateSingaporeMetrics } from '@/lib/calculations/mortgage'
+import { calculateMortgage, calculateLeadScore, calculateSingaporeMetrics } from '@/lib/calculations/archive/2025-10/mortgage'
 import { calculateUrgencyProfile } from '@/lib/calculations/urgency-calculator'
 // ARCHIVED: mortgage-insights-generator removed (see components/forms/archive/2025-10/)
 // import { generateMortgageInsights } from '@/lib/insights/mortgage-insights-generator'

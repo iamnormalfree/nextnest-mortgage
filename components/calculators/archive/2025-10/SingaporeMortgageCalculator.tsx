@@ -23,7 +23,7 @@
 
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { calculateMortgageWithMetrics, MORTGAGE_SCENARIOS, calculateLeadScore } from '@/lib/calculations/mortgage'
+import { calculateMortgageWithMetrics, MORTGAGE_SCENARIOS, calculateLeadScore } from '@/lib/calculations/archive/2025-10/mortgage'
 import type { MortgageInput, LeadCaptureData } from '@/types/mortgage'
 
 // Configuration interface for platform-specific customization

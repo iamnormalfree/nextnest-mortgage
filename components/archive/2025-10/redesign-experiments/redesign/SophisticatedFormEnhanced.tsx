@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 
 // Import calculation functions
-import { getPlaceholderRate } from '@/lib/calculations/mortgage'
+import { getPlaceholderRate } from '@/lib/calculations/archive/2025-10/mortgage'
 
 // Simple helper for credit card debt calculation (3.5% of card limit per MAS)
 const getCreditCardCommitment = (creditCards: string): number => {
