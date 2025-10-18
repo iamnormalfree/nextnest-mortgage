@@ -1,0 +1,13 @@
+# Project List for update-all-projects.ps1
+# Add one project path per line
+# Lines starting with # are ignored
+
+# Example:
+# C:\Users\HomePC\Desktop\Code\NextNest
+# C:\Users\HomePC\Desktop\Code\AnotherProject
+# C:\Projects\ThirdProject
+
+# To use:
+# 1. Copy this file to project-list.txt
+# 2. Add your project paths (one per line)
+# 3. Run: .\update-all-projects.ps1
