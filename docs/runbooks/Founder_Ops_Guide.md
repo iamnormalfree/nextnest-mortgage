@@ -91,15 +91,18 @@ Think of it as the single source of truth for a user’s form session.
 
 ## 5) Validation & calculations
 
-- __Form Contracts__: `lib/contracts/form-contracts.ts`
+- __Form Contracts__: `lib/calculations/instant-profile.ts` (THE single source of truth)
   - Define interfaces for form state, inputs, and results
   - Source of truth for field names and types
 
-- __Calculators__: `lib/calculations/instant-profile.ts` (Dr Elena v2)
+- __Calculators__: `lib/calculations/instant-profile.ts` (Dr Elena v2 - PRODUCTION)
+  - All mortgage calculations consolidated here (916 lines)
   - Power instant eligibility (new purchase) and refinancing savings
   - Uses MAS regulatory constants from `lib/calculations/dr-elena-constants.ts`
   - Triggered automatically in Step 3 when enough fields are complete
-  - Functions: `calculateInstantProfile()`, `calculateRefinanceOutlook()`, `calculateComplianceSnapshot()`
+  - Core functions: `calculateInstantProfile()`, `calculateRefinanceOutlook()`, `calculateComplianceSnapshot()`
+  - Utilities: `calculateIWAA()`, `getPlaceholderRate()`, `calculateRefinancingSavings()`
+  - **Note:** `lib/calculations/mortgage.ts` archived 2025-10-18 (replaced by instant-profile.ts)
 
 ---
 
