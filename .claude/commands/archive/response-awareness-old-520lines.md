@@ -1,61 +1,44 @@
-# /response-awareness - Universal Smart Router
+a# /response-awareness - Universal Smart Router
 
 ## Purpose
 Universal entry point that assesses task complexity and routes to the appropriate orchestration tier. Prevents over-engineering simple tasks while ensuring complex work gets full systematic treatment.
 
 **Core Innovation**: Dynamic routing based on actual complexity, not guesswork.
 
----
-
-## Your Role as Router
-
-You analyze the user's request, score its complexity, and invoke the appropriate Response Awareness tier Skill.
-
-**You do NOT execute the workflow yourself** - you route to the Skill that contains the workflow.
-
----
-
 ## Architecture Overview
 
 ### Five Tiers (Progressively Capable)
 
-**LIGHT** (~5 tags, single-pass) 🚀 *Haiku implementation*
+**LIGHT** (~5 tags, single-pass)
 - Single file changes, bug fixes, cosmetic updates
 - Minimal orchestration, fast execution
 - Catches 80% of errors in simple tasks
-- **Model**: Haiku for implementation (fast, cost-efficient)
 
-**MEDIUM** (~15 tags, optional planning) 🚀 *Haiku implementation*
+**MEDIUM** (~15 tags, optional planning)
 - Multi-file features, moderate complexity
 - Basic planning and synthesis when needed
 - Handles 90% of real-world tasks
-- **Model**: Haiku for implementation (clear instructions)
 
-**HEAVY** (~35 tags, full planning+synthesis) 🧠 *All Sonnet*
+**HEAVY** (~35 tags, full planning+synthesis)
 - Complex single-domain features
 - Full multi-path exploration
 - Advanced verification protocols
-- **Model**: Sonnet for all phases (metacognition critical)
 
-**FULL** (~50+ tags, phase-chunked) 🧠 *All Sonnet*
+**FULL** (~50+ tags, phase-chunked)
 - Multi-domain architecture changes
 - Progressive context loading (never holds all tags at once)
 - Maximum systematic coordination
-- **Model**: Sonnet for all phases (maximum metacognitive demands)
 
-**SCOUT** (Assessment only) 🚀 *Always Haiku*
+**SCOUT** (Assessment only)
 - Deploys when complexity unclear
 - Analyzes codebase and requirements
 - Returns complexity assessment
-- **Model**: Haiku (objective measurement, no metacognition needed)
 
 ### Why This Matters
 - Simple tasks get simple treatment (fast, focused)
 - Complex tasks get full rigor (systematic, verified)
 - Can escalate if complexity emerges mid-execution
 - Context efficient even for complex work
-
----
 
 ## Complexity Assessment Protocol
 
@@ -91,29 +74,29 @@ Complexity-scout analyzes:
 
 Score across 4 dimensions (0-3 each, max 12):
 
-### File Scope (0-3)
-- **0** = Single file modification
-- **1** = 2-3 related files
-- **2** = Multi-file module
-- **3** = Multi-domain (crosses system boundaries)
+**File Scope** (0-3):
+- 0 = Single file modification
+- 1 = 2-3 related files
+- 2 = Multi-file module
+- 3 = Multi-domain (crosses system boundaries)
 
-### Requirement Clarity (0-3)
-- **0** = Crystal clear, unambiguous
-- **1** = Mostly clear, minor questions
-- **2** = Ambiguous, needs interpretation
-- **3** = Vague or contradictory
+**Requirement Clarity** (0-3):
+- 0 = Crystal clear, unambiguous
+- 1 = Mostly clear, minor questions
+- 2 = Ambiguous, needs interpretation
+- 3 = Vague or contradictory
 
-### Integration Risk (0-3)
-- **0** = Isolated change, no dependencies
-- **1** = Touches existing APIs/interfaces
-- **2** = Cross-module integration
-- **3** = System-wide impact
+**Integration Risk** (0-3):
+- 0 = Isolated change, no dependencies
+- 1 = Touches existing APIs/interfaces
+- 2 = Cross-module integration
+- 3 = System-wide impact
 
-### Change Type (0-3)
-- **0** = Cosmetic, documentation, config
-- **1** = Logic changes within existing patterns
-- **2** = New features, new patterns
-- **3** = Architectural changes, paradigm shifts
+**Change Type** (0-3):
+- 0 = Cosmetic, documentation, config
+- 1 = Logic changes within existing patterns
+- 2 = New features, new patterns
+- 3 = Architectural changes, paradigm shifts
 
 **Total Score → Tier Routing:**
 - **0-1** → LIGHT
@@ -121,32 +104,28 @@ Score across 4 dimensions (0-3 each, max 12):
 - **5-7** → HEAVY
 - **8+** → FULL
 
----
+### Example Assessments
 
-## Example Assessments
-
-### "Fix login button styling"
+**"Fix login button styling"**
 - File scope: 0 (single CSS/component file)
 - Clarity: 0 (clear)
 - Integration: 0 (isolated)
 - Change type: 0 (cosmetic)
 - **Score: 0 → LIGHT**
 
-### "Add user authentication"
+**"Add user authentication"**
 - File scope: 3 (auth service, UI, backend, DB)
 - Clarity: 1 (mostly clear)
 - Integration: 2 (cross-module)
 - Change type: 2 (new feature)
 - **Score: 8 → FULL**
 
-### "Refactor data fetching to use React Query"
+**"Refactor data fetching to use React Query"**
 - File scope: 2 (multiple components)
 - Clarity: 1 (clear pattern)
 - Integration: 1 (API layer)
 - Change type: 2 (new pattern)
 - **Score: 6 → HEAVY**
-
----
 
 ## Tier Capabilities & Tag Sets
 
@@ -182,8 +161,6 @@ Score across 4 dimensions (0-3 each, max 12):
 **When to use:** Multi-system features, architecture overhauls, maximum rigor needed
 **Context management:** Loads phase files sequentially, never all at once
 
----
-
 ## Core Orchestration Principles (All Tiers)
 
 These principles apply regardless of tier:
@@ -209,8 +186,6 @@ If orchestrator implements, they lose coordination map. Orchestrator holds "whol
 - LCL for clean context passing (no repeated discussion)
 - Verification removes processing tags
 - Only PATH tags persist as documentation
-
----
 
 ## Essential Tags (Failsafe Set - All Tiers)
 
@@ -246,8 +221,6 @@ These 5 tags catch the most critical errors at any complexity level:
 **Action**: Report to user, don't fix unless asked
 **Why universal**: Useful discoveries happen at any complexity
 
----
-
 ## Strategic Context Placement (LCL Basics)
 
 **The Mechanism**: Information prefixed with "LCL:" is processed normally but NOT repeatedly discussed. Prevents context dilution.
@@ -265,8 +238,6 @@ These 5 tags catch the most critical errors at any complexity level:
 
 **Reality**: This is strategic context management, not a "parallel layer". The benefit is real; the mechanism is simple.
 
----
-
 ## Routing Execution Protocol
 
 ### When /response-awareness [task] runs:
@@ -283,41 +254,86 @@ ELSE:
     route = tier_from_score(score)
 ```
 
-**Step 2: Invoke Tier-Specific Skill**
-
-Based on routing decision, invoke the appropriate Skill:
-
+**Step 2: Deploy Tier-Specific Orchestrator**
 ```
-Task complexity analysis:
-- File Scope: X/3
-- Requirement Clarity: X/3
-- Integration Risk: X/3
-- Change Type: X/3
-- Total Score: X/12
+# CRITICAL: Use Read tool with EXPLICIT FILE PATHS (not directories!)
 
-→ Routing to: [TIER NAME] (Score X matches Y-Z range)
+IF route == "LIGHT":
+    Read file: .claude/commands/response-awareness-light.md
+ELSE IF route == "MEDIUM":
+    Read file: .claude/commands/response-awareness-medium.md
+ELSE IF route == "HEAVY":
+    Read file: .claude/commands/response-awareness-heavy.md
+ELSE IF route == "FULL":
+    Read file: .claude/commands/response-awareness-full/core.md
+    # WARNING: This is a FILE inside a folder, not the folder itself!
+    # Do NOT Read "response-awareness-full/" - causes EISDIR error on Windows
 
-I'm now using the "Response Awareness [Tier]" skill for this task.
+Deploy orchestrator with tier framework
+Orchestrator executes tier-appropriate workflow
 ```
-
-Claude will automatically load that Skill's instructions and follow its workflow.
 
 **Step 3: Monitor for Escalation**
 ```
-IF Skill reports "complexity exceeds tier":
+IF agent reports "complexity exceeds tier":
     Calculate new tier
-    Invoke higher tier Skill
+    Re-deploy with higher tier framework
     Continue from current phase
 ```
 
 **Step 4: Synthesize Results**
 ```
-Collect final outputs from Skill execution
+Collect final outputs
 Generate appropriate tier report
 Return to user
 ```
 
----
+## Escalation Protocol
+
+Routing decisions aren't permanent. Agents can signal complexity exceeded:
+
+### Escalation Triggers
+
+**LIGHT → MEDIUM**:
+- Multiple files discovered
+- Integration complexity emerges
+- Requirements more ambiguous than expected
+
+**MEDIUM → HEAVY**:
+- Architectural decisions required
+- Multi-path exploration needed
+- Complex cross-module integration
+
+**HEAVY → FULL**:
+- Multiple domains involved
+- System-wide architecture impact
+- Maximum rigor needed
+
+### Escalation Process
+
+1. Agent marks in output: `#COMPLEXITY_EXCEEDED: [reason]`
+2. Orchestrator detects escalation marker
+3. Re-assess with new information
+4. Calculate appropriate tier
+5. Load new tier framework
+6. Continue execution with enhanced protocols
+7. Preserve all work done so far (via LCL if needed)
+
+### Example Escalation
+```
+Task: "Update login form validation"
+Initial assessment: LIGHT (single component)
+
+During implementation:
+Agent discovers: Form validation affects 5 components + backend API
+Agent reports: #COMPLEXITY_EXCEEDED: Multi-component + API integration
+
+Orchestrator:
+Re-assess: File scope now 2, Integration 1 → Score 3
+Escalate: LIGHT → MEDIUM
+Reload: response-awareness-medium.md
+Continue: Implementation with medium-tier protocols
+```
 
 ## Complexity-Scout Subagent (When Needed)
 
@@ -329,7 +345,7 @@ Return to user
 
 ### How It Works:
 
-The **complexity-scout** is a specialized assessment agent that:
+The **complexity-scout** is a specialized subagent (see `.claude/subagents/complexity-scout.md`) that:
 - Uses Glob to count affected files
 - Uses Grep to identify integration points
 - Uses Read to analyze complexity indicators
@@ -339,31 +355,23 @@ The **complexity-scout** is a specialized assessment agent that:
 - Returns structured assessment
 
 ### Deployment:
-```python
-# ALWAYS use Haiku for scout (fast, cost-efficient, objective measurement)
-Task(
-    subagent_type="general-purpose",
-    model="claude-3-5-haiku-20241022",  # Haiku 3.5 for speed + cost
-    description="Analyze task complexity for response-awareness routing",
-    prompt="""
-You are analyzing task complexity for the Response-Awareness Framework.
+```
+Deploy complexity-scout subagent with task: [user request]
 
-Task: [user's request]
-
-Analyze the codebase and provide scored assessment:
-
-1. File Scope (0-3): How many files affected?
-2. Requirement Clarity (0-3): How clear are requirements?
-3. Integration Risk (0-3): What's the integration complexity?
-4. Change Type (0-3): Cosmetic vs architectural?
-
-Provide:
-- Score for each dimension with reasoning
-- Total score (0-12)
-- Recommended tier (LIGHT/MEDIUM/HEAVY/FULL)
-- Any clarifying questions if requirements unclear
-"""
-)
+Subagent will:
+1. Analyze codebase structure
+2. Score 4 dimensions (0-3 each):
+   - File scope
+   - Requirement clarity
+   - Integration risk
+   - Change type
+3. If Requirement Clarity ≥ 1:
+   - Generate clarifying questions
+   - Request clarification before tier recommendation
+4. If Requirement Clarity = 0:
+   - Calculate total (0-12)
+   - Recommend tier
+5. Return structured assessment
 ```
 
 ### Expected Output Format:
@@ -396,89 +404,7 @@ Estimated Tier Range: [range based on other dimensions]
 
 **Orchestrator Action**:
 - If scout requests clarification: Ask user questions, then re-run scout with clarified requirements
-- If scout recommends tier: Parse output, invoke recommended tier Skill
-
----
-
-## 🎯 Specialized Subagent Reference
-
-Once a tier Skill is invoked, it will guide agent deployment. Key specialists:
-
-| Agent Type | Use For |
-|------------|---------|
-| **plan-synthesis-agent** | Unifying multiple planning approaches (Phase 2) |
-| **data-architect** | Data modeling, schema design |
-| **integration-specialist** | API design, event systems |
-| **ui-state-synchronization-expert** | UI state bugs, screen transitions |
-| **test-automation-expert** | Test strategy, MCP testing |
-| **metacognitive-tag-verifier** | Tag verification (Phase 4) |
-
-**Rule**: Use specialized agents over `general-purpose` when domain matches.
-
----
-
-## 🛡️ Universal Implementation Firewall
-
-**CRITICAL RULE: Once you use Task() → you are orchestrator → NEVER implement directly**
-
-Hooks will enforce this:
-- LIGHT: Direct implementation usually OK (unless Task() used)
-- MEDIUM: Delegate if used Task()
-- HEAVY: ALWAYS delegate
-- FULL: ALWAYS delegate
-
-**The orchestrator firewall hook will block Edit/Write if you violate this rule.**
-
----
-
-## Escalation Protocol
-
-Routing decisions aren't permanent. Skills can signal complexity exceeded:
-
-### Escalation Triggers
-
-**LIGHT → MEDIUM**:
-- Multiple files discovered
-- Integration complexity emerges
-- Requirements more ambiguous than expected
-
-**MEDIUM → HEAVY**:
-- Architectural decisions required
-- Multi-path exploration needed
-- Complex cross-module integration
-
-**HEAVY → FULL**:
-- Multiple domains involved
-- System-wide architecture impact
-- Maximum rigor needed
-
-### Escalation Process
-
-1. Skill marks in output: `#COMPLEXITY_EXCEEDED: [reason]`
-2. Router detects escalation marker
-3. Re-assess with new information
-4. Calculate appropriate tier
-5. Invoke new tier Skill
-6. Continue execution with enhanced protocols
-7. Preserve all work done so far (via LCL if needed)
-
-### Example Escalation
-```
-Task: "Update login form validation"
-Initial assessment: LIGHT (single component)
-
-During implementation:
-Skill discovers: Form validation affects 5 components + backend API
-Skill reports: #COMPLEXITY_EXCEEDED: Multi-component + API integration
-
-Router:
-Re-assess: File scope now 2, Integration 1 → Score 3
-Escalate: LIGHT → MEDIUM
-Invoke: "Response Awareness Medium" Skill
-Continue: Implementation with medium-tier protocols
-```
-
----
+- If scout recommends tier: Parse output, proceed with recommended tier
 
 ## Command Execution Flow
 
@@ -491,11 +417,9 @@ Assess: Complexity score = 4
        ↓
 Route: MEDIUM tier
        ↓
-Invoke: "Response Awareness Medium" Skill
+Load: response-awareness-medium.md
        ↓
-Skill Loads: Medium tier orchestration workflow
-       ↓
-Execute: Skill guides implementation
+Execute: Medium tier orchestration
        ↓
 Monitor: Watch for escalation signals
        ↓
@@ -504,20 +428,18 @@ Complete: Synthesize results
 Return: Clean code + report
 ```
 
----
+## Next Steps for Orchestrator
 
-## Next Steps After Routing
+After routing decision made:
 
-**IF LIGHT**: "Response Awareness Light" Skill loads and executes minimal orchestration
-**IF MEDIUM**: "Response Awareness Medium" Skill loads and executes with optional planning
-**IF HEAVY**: "Response Awareness Heavy" Skill loads and executes full planning+synthesis
-**IF FULL**: "Response Awareness Full" Skill loads and executes phase-chunked orchestration
+**IF LIGHT**: Use Read on `.claude/commands/response-awareness-light.md` and execute minimal orchestration
+**IF MEDIUM**: Use Read on `.claude/commands/response-awareness-medium.md` and execute with optional planning
+**IF HEAVY**: Use Read on `.claude/commands/response-awareness-heavy.md` and execute full planning+synthesis
+**IF FULL**: Use Read on `.claude/commands/response-awareness-full/core.md` (the FILE, not folder!) and execute phase-chunked orchestration
 
 **Manual Override Available**:
-- User can specify tier: `/response-awareness-light`, `/response-awareness-medium`, etc. (deprecated)
-- Recommended: Always use `/response-awareness` router for objective assessment
-
----
+- User can specify tier: `/response-awareness-light`, `/response-awareness-medium`, etc.
+- Useful when user knows complexity in advance
 
 ## Key Benefits of Smart Routing
 
@@ -529,8 +451,70 @@ Return: Clean code + report
 ✅ **Prevents Over-Engineering**: 50-tag system not invoked for button fix
 ✅ **Ensures Rigor When Needed**: Complex work gets full systematic treatment
 
----
+<!-- OPTIONAL OBSERVABILITY FEATURE (Added 2025-10-06)
+     Purpose: Provide visibility into framework operations for learning and debugging
 
-**Router Version**: 2.0 (Skills-based routing)
-**Last Updated**: 2025-10-16
-**Architecture**: Universal router + Tier Skills
+     This is OPTIONAL and ADDITIVE - framework works normally without any flags.
+     Only use when you want to study how the framework is operating internally.
+
+     Overhead:
+     - --light-logging: ~10 seconds, ~500 tokens (phase tracking + metrics)
+     - --verbose-logging: ~60 seconds, ~2,500 tokens (complete audit trail)
+-->
+
+## Optional Logging Flags
+
+**Default behavior**: No logging (fastest, minimal overhead)
+
+**Available flags**:
+
+### --light-logging
+**Purpose**: Understand workflow and review decisions
+**Logs**: Phase transitions, final metrics, LCL summary, PATH_DECISION points
+**Overhead**: ~10 seconds per session, ~500 tokens
+**When to use**: Learning how framework works, reviewing architectural decisions
+
+**Output location**:
+```
+docs/completion_drive_logs/DD-MM-YYYY_task-name/
+  phase_transitions.log
+  final_metrics.md
+```
+
+### --verbose-logging
+**Purpose**: Deep learning, debugging, complete audit trail
+**Logs**: Everything - every tag insert/resolve, every LCL operation, detailed tracking
+**Overhead**: ~60 seconds per session, ~2,500 tokens
+**When to use**: Debugging issues, studying tag lifecycle, understanding LCL mechanics
+
+**Output location**:
+```
+docs/completion_drive_logs/DD-MM-YYYY_task-name/
+  phase_transitions.log
+  tag_operations.log
+  lcl_exports.log
+  final_metrics.md
+  detailed_report.md
+```
+
+## Usage Examples
+
+```bash
+# No logging (default - fastest)
+/response-awareness-heavy
+
+# Light logging (workflow understanding)
+/response-awareness-heavy --light-logging
+
+# Verbose logging (deep learning/debugging)
+/response-awareness-heavy --verbose-logging
+```
+
+## Flag Parsing
+
+Extract logging flag from command arguments:
+- If `--light-logging` present: Set LOGGING_LEVEL=light
+- If `--verbose-logging` present: Set LOGGING_LEVEL=verbose
+- If neither: Set LOGGING_LEVEL=none
+
+Pass LOGGING_LEVEL to all deployed agents in their prompt context.

@@ -1,3 +1,10 @@
+---
+name: contract-validator
+description: Validates integration contracts between domains to prevent integration failures using rule-based compatibility checks
+model: claude-3-5-haiku-20241022
+tools: Read, Grep, Glob
+---
+
 # Contract Validator Subagent
 
 ## Purpose

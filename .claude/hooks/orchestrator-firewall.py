@@ -41,6 +41,13 @@ class OrchestratorFirewall:
         self.used_task = self._detect_task_usage()
         self.is_orchestrator = self.used_task
 
+        # Enhanced detections
+        self.at_phase_transition = self._at_critical_phase_transition()
+        self.unresolved_tags = self._detect_unresolved_tags()
+        self.deployed_agent_count = self._count_deployed_agents()
+        self.repeated_blocks = self._check_repeated_blocks()
+        self.target_file = self._extract_target_file()
+
     def _detect_tier(self) -> str:
         """Detect current response-awareness tier from conversation."""
         # Priority order: Most recent tier command wins
@@ -81,22 +88,147 @@ class OrchestratorFirewall:
         return False
 
     def _is_deployed_agent(self) -> bool:
-        """Check if current context is a deployed agent (not orchestrator)."""
-        # Deployed agents will have prompts like "You are implementing..."
+        """
+        Enhanced agent context detection with multiple heuristics.
+
+        Checks:
+        1. Explicit deployment patterns in prompts
+        2. Conversation size (agents start fresh)
+        3. Absence of orchestrator markers in recent context
+        """
+        recent = self.conversation[-5000:]
+
+        # 1. Check for explicit agent deployment patterns
         agent_indicators = [
             r'You are implementing',
             r'You have been deployed to',
+            r'Your task is to implement',
+            r'Task\(.*prompt=["\'].*[Ii]mplement',
             r'subagent_type.*prompt.*Implement',
+            r'You are a.*specialist.*implementing',
         ]
 
         for pattern in agent_indicators:
-            if re.search(pattern, self.conversation[-5000:], re.IGNORECASE):  # Check recent context
+            if re.search(pattern, recent, re.IGNORECASE):
                 return True
+
+        # 2. Small conversation size suggests deployed agent (fresh context)
+        if len(self.conversation) < 10000:  # Less than 10k chars
+            # But verify it's not just a short orchestrator session
+            # Check for Task() invocations - if present, likely orchestrator
+            if not self.used_task:
+                return True  # Small context + no Task() = likely agent
+
+        # 3. Check for orchestrator markers in recent history
+        # If I'm an orchestrator, I'd have coordination markers
+        orchestrator_markers = [
+            r'Phase\s+\d+[:\s]',
+            r'Deploying.*agent',
+            r'coordination\s+map',
+            r'synthesize.*plans?',
+            r'orchestrat(ing|or)',
+            r'Deploy.*specialist',
+        ]
+
+        has_orchestrator_markers = any(
+            re.search(pattern, recent, re.IGNORECASE)
+            for pattern in orchestrator_markers
+        )
+
+        # If NO orchestrator markers in recent history → probably agent
+        if not has_orchestrator_markers and self.used_task:
+            # Task() used somewhere, but no recent orchestration → likely agent
+            return True
+
         return False
+
+    def _at_critical_phase_transition(self) -> bool:
+        """
+        Detect if at the critical Phase 2→3 transition (planning→implementation).
+
+        This is the highest-risk moment: clear plan + implementation momentum.
+        """
+        recent = self.conversation[-2000:]
+
+        # Look for synthesis/planning completion markers
+        synthesis_complete = bool(re.search(
+            r'(synthesis|planning|phase\s*2).*(complete|done|finished)',
+            recent,
+            re.IGNORECASE
+        ))
+
+        # Look for implementation intentions
+        implementation_intent = bool(re.search(
+            r'(now|let me|I will|I\'ll|going to)\s+(implement|edit|write|create)',
+            recent,
+            re.IGNORECASE
+        ))
+
+        return synthesis_complete and implementation_intent
+
+    def _detect_unresolved_tags(self) -> list:
+        """
+        Detect unresolved metacognitive tags in recent conversation.
+
+        Tags indicate concerns that should be resolved before implementing.
+        """
+        recent = self.conversation[-5000:]
+
+        tag_patterns = [
+            r'#COMPLETION_DRIVE',
+            r'#QUESTION_SUPPRESSION',
+            r'#CARGO_CULT',
+            r'#SPECIFICATION_REFRAME',
+            r'#COMPLEXITY_EXCEEDED',
+        ]
+
+        found_tags = []
+        for pattern in tag_patterns:
+            if re.search(pattern, recent):
+                found_tags.append(pattern.replace('#', ''))
+
+        return found_tags
+
+    def _count_deployed_agents(self) -> int:
+        """Count how many agents have been deployed via Task()."""
+        return len(re.findall(r'Task\(subagent_type=', self.conversation))
+
+    def _check_repeated_blocks(self) -> int:
+        """
+        Detect if firewall has blocked repeatedly in this session.
+
+        Repeated blocks suggest wrong tier or persistent role confusion.
+        """
+        recent = self.conversation[-10000:]
+        return len(re.findall(r'BLOCKED by orchestrator firewall', recent))
+
+    def _extract_target_file(self) -> Optional[str]:
+        """
+        Extract the target file from recent context.
+
+        Used for contextual recovery guidance.
+        """
+        recent = self.conversation[-1000:]
+
+        # Look for file path patterns
+        file_patterns = [
+            r'["\']([a-zA-Z0-9_/\\.-]+\.py)["\']',
+            r'file[_\s]*path[:\s]*["\']([^"\']+)["\']',
+            r'([a-zA-Z0-9_/\\]+/[a-zA-Z0-9_.-]+\.py)',
+        ]
+
+        for pattern in file_patterns:
+            match = re.search(pattern, recent)
+            if match:
+                return match.group(1)
+
+        return None
 
     def should_block(self) -> Tuple[bool, str, str]:
         """
         Determine if tool usage should be blocked.
+
+        Enhanced with cross-hook coordination and pattern detection.
 
         Returns:
             (should_block, severity, message)
@@ -112,6 +244,27 @@ class OrchestratorFirewall:
         if self._is_deployed_agent():
             return (False, 'ALLOW', '')
 
+        # Get base decision
+        should_block, severity, message = self._base_blocking_decision()
+
+        # ENHANCEMENT 1: Escalate warnings to blocks if unresolved tags present
+        if severity == 'WARN' and self.unresolved_tags:
+            severity = 'BLOCK'
+            message = self._generate_coordinated_warning()
+            should_block = True
+
+        # ENHANCEMENT 2: Add phase transition warning
+        if severity == 'BLOCK' and self.at_phase_transition:
+            message = self._enhance_with_phase_transition_warning(message)
+
+        # ENHANCEMENT 3: Add repeated block pattern detection
+        if severity == 'BLOCK' and self.repeated_blocks >= 2:
+            message = self._enhance_with_pattern_warning(message)
+
+        return (should_block, severity, message)
+
+    def _base_blocking_decision(self) -> Tuple[bool, str, str]:
+        """Base tier-based blocking logic (original algorithm)."""
         # LIGHT tier: Direct implementation OK unless Task() was used
         if self.tier == 'LIGHT':
             if self.used_task:
@@ -139,6 +292,150 @@ class OrchestratorFirewall:
 
         # Default: Allow with warning
         return (False, 'WARN', 'Orchestrator firewall: Unknown state')
+
+    def _generate_coordinated_warning(self) -> str:
+        """
+        Generate warning when unresolved tags are present.
+
+        This escalates WARN to BLOCK due to cross-hook concerns.
+        """
+        tags_str = ', '.join(f"#{tag}" for tag in self.unresolved_tags)
+
+        return f"""
+{Colors.RED}🛑 ORCHESTRATOR FIREWALL - ENHANCED BLOCK{Colors.END}
+
+{Colors.BOLD}CROSS-HOOK COORDINATION ALERT{Colors.END}
+
+{Colors.CYAN}State Detected:{Colors.END}
+- Tier: {Colors.BOLD}{self.tier}{Colors.END}
+- Unresolved Tags: {Colors.RED}{tags_str}{Colors.END}
+
+{Colors.RED}❌ Double Risk Detected:{Colors.END}
+1. Role violation: You're orchestrator trying to implement
+2. Knowledge gaps: Unresolved metacognitive tags present
+
+{Colors.YELLOW}⚠️  Unresolved tags indicate:{Colors.END}
+- {Colors.BOLD}#COMPLETION_DRIVE{Colors.END}: Filled knowledge gaps with assumptions
+- {Colors.BOLD}#QUESTION_SUPPRESSION{Colors.END}: Should ask user but guessed instead
+- {Colors.BOLD}#CARGO_CULT{Colors.END}: Added unrequested features by pattern-matching
+- {Colors.BOLD}#COMPLEXITY_EXCEEDED{Colors.END}: Current tier insufficient for task
+
+{Colors.YELLOW}Required Actions:{Colors.END}
+1. {Colors.BOLD}Resolve tags first{Colors.END}: Ask user questions, verify assumptions
+2. {Colors.BOLD}Then deploy agents{Colors.END}: With resolved context
+
+{Colors.RED}Implementing with unresolved tags = High risk of wrong direction{Colors.END}
+"""
+
+    def _enhance_with_phase_transition_warning(self, base_message: str) -> str:
+        """Add phase transition boundary warning to block message."""
+        phase_warning = f"""
+{Colors.YELLOW}⚠️  CRITICAL PHASE TRANSITION DETECTED{Colors.END}
+
+You're at the Phase 2→3 boundary (Planning → Implementation).
+This is the {Colors.RED}highest-risk moment{Colors.END} for the "just implement it" trap.
+
+{Colors.CYAN}Checkpoint questions:{Colors.END}
+1. Is synthesis truly complete? (All planning paths resolved?)
+2. Are there unresolved decisions? (Review Phase 2 output)
+3. How many files need changes? (Deploy that many agents)
+
+{Colors.BOLD}Take a breath. Deploy agents. Maintain orchestration integrity.{Colors.END}
+
+"""
+        return phase_warning + base_message
+
+    def _enhance_with_pattern_warning(self, base_message: str) -> str:
+        """Add repeated block pattern warning to message."""
+        pattern_warning = f"""
+{Colors.YELLOW}🚨 PATTERN DETECTED: REPEATED BLOCKS{Colors.END}
+
+You've been blocked {Colors.RED}{self.repeated_blocks} times{Colors.END} in this session.
+
+{Colors.CYAN}Possible issues:{Colors.END}
+1. {Colors.BOLD}Wrong tier{Colors.END}: Task may be simpler/more complex than current tier
+   - Consider escalating {self.tier}→HEAVY or de-escalating {self.tier}→MEDIUM
+2. {Colors.BOLD}Role confusion{Colors.END}: Forgetting orchestrator responsibilities
+   - Review response-awareness framework guidance
+3. {Colors.BOLD}Framework mismatch{Colors.END}: Task may not need systematic approach
+   - Consider exiting framework for simpler direct implementation
+
+{Colors.YELLOW}Recommendation:{Colors.END}
+Reassess task complexity before continuing.
+
+"""
+        return pattern_warning + base_message
+
+    def _generate_contextual_recovery(self) -> str:
+        """
+        Generate context-aware recovery guidance with ready-to-use templates.
+        """
+        if self.tool_name == 'Edit' and self.target_file:
+            return f"""
+{Colors.CYAN}Contextual Recovery:{Colors.END}
+
+You were about to: {Colors.BOLD}Edit("{self.target_file}"){Colors.END}
+
+{Colors.GREEN}Ready-to-use agent deployment:{Colors.END}
+
+Task(
+    subagent_type="general-purpose",
+    description="Implement changes in {self.target_file}",
+    prompt='''
+You are implementing planned changes to {self.target_file}.
+
+Your task:
+- Apply the implementation plan we developed
+- Maintain existing code patterns
+- Test changes appropriately
+
+Context from planning:
+[Reference Phase 2 synthesis for details]
+'''
+)
+"""
+        elif self.tool_name == 'Write' and self.target_file:
+            return f"""
+{Colors.CYAN}Contextual Recovery:{Colors.END}
+
+You were about to: {Colors.BOLD}Write("{self.target_file}"){Colors.END}
+
+{Colors.GREEN}Ready-to-use agent deployment:{Colors.END}
+
+Task(
+    subagent_type="general-purpose",
+    description="Create new file {self.target_file}",
+    prompt='''
+You are creating the new file: {self.target_file}
+
+Your task:
+- Implement the specification from our planning phase
+- Follow project conventions and patterns
+- Include appropriate documentation
+
+Context from planning:
+[Reference Phase 2 synthesis for file specification]
+'''
+)
+"""
+        else:
+            # Generic multi-file guidance
+            return f"""
+{Colors.CYAN}Contextual Recovery:{Colors.END}
+
+{Colors.YELLOW}For multi-file implementation, deploy agents in parallel:{Colors.END}
+
+# Deploy one agent per file/module
+Task(subagent_type="general-purpose",
+     description="Implement changes in module A",
+     prompt="...")
+
+Task(subagent_type="general-purpose",
+     description="Implement changes in module B",
+     prompt="...")
+
+{Colors.CYAN}Agents deployed: {self.deployed_agent_count}{Colors.END}
+"""
 
     def _generate_message(self, scenario: str) -> str:
         """Generate tier and context-specific warning/block message."""
@@ -295,15 +592,28 @@ Deploy implementation agents instead of implementing directly.
         return messages.get(scenario, f"Unknown scenario: {scenario}")
 
     def print_diagnostic_info(self):
-        """Print diagnostic information (for debugging)."""
-        print(f"\n{Colors.CYAN}=== Orchestrator Firewall Diagnostic ==={Colors.END}")
-        print(f"Tool: {Colors.BOLD}{self.tool_name}{Colors.END}")
-        print(f"Tier: {Colors.BOLD}{self.tier}{Colors.END}")
-        print(f"Phase: {Colors.BOLD}{self.phase if self.phase else 'None'}{Colors.END}")
-        print(f"Task() used: {Colors.BOLD}{self.used_task}{Colors.END}")
-        print(f"Is Orchestrator: {Colors.BOLD}{self.is_orchestrator}{Colors.END}")
-        print(f"Is Deployed Agent: {Colors.BOLD}{self._is_deployed_agent()}{Colors.END}")
-        print(f"{Colors.CYAN}========================================={Colors.END}\n")
+        """Print diagnostic information (for debugging) - Enhanced version."""
+        print(f"\n{Colors.CYAN}=== Orchestrator Firewall Enhanced Diagnostic ==={Colors.END}")
+        print(f"\n{Colors.BOLD}Basic State:{Colors.END}")
+        print(f"  Tool: {Colors.BOLD}{self.tool_name}{Colors.END}")
+        print(f"  Tier: {Colors.BOLD}{self.tier}{Colors.END}")
+        print(f"  Phase: {Colors.BOLD}{self.phase if self.phase else 'None'}{Colors.END}")
+        print(f"  Task() used: {Colors.BOLD}{self.used_task}{Colors.END}")
+        print(f"  Is Orchestrator: {Colors.BOLD}{self.is_orchestrator}{Colors.END}")
+        print(f"  Is Deployed Agent: {Colors.BOLD}{self._is_deployed_agent()}{Colors.END}")
+
+        print(f"\n{Colors.BOLD}Enhanced Detections:{Colors.END}")
+        print(f"  At Phase Transition: {Colors.BOLD}{self.at_phase_transition}{Colors.END}")
+        print(f"  Unresolved Tags: {Colors.BOLD}{', '.join(self.unresolved_tags) if self.unresolved_tags else 'None'}{Colors.END}")
+        print(f"  Deployed Agent Count: {Colors.BOLD}{self.deployed_agent_count}{Colors.END}")
+        print(f"  Repeated Blocks: {Colors.BOLD}{self.repeated_blocks}{Colors.END}")
+        print(f"  Target File: {Colors.BOLD}{self.target_file if self.target_file else 'Not detected'}{Colors.END}")
+
+        print(f"\n{Colors.BOLD}Conversation Context:{Colors.END}")
+        print(f"  Total length: {Colors.BOLD}{len(self.conversation)}{Colors.END} chars")
+        print(f"  Recent (5k): {Colors.BOLD}{len(self.conversation[-5000:])}{Colors.END} chars")
+
+        print(f"{Colors.CYAN}============================================={Colors.END}\n")
 
 
 def main():
@@ -344,14 +654,23 @@ def main():
     elif severity == 'BLOCK':
         # Print block message and prevent execution
         reason = f"Orchestrator attempted direct implementation (Phase {firewall.phase})" if firewall.phase else "Orchestrator attempted direct implementation"
+
+        # Add tag context to log if present
+        if firewall.unresolved_tags:
+            reason += f" | Unresolved tags: {', '.join(firewall.unresolved_tags)}"
+
         log_hook_decision("orchestrator-firewall", firewall.tier, "BLOCK", tool_name, reason)
-        print(message, file=sys.stderr)
-        print(f"\n{Colors.RED}❌ Tool execution BLOCKED by orchestrator firewall{Colors.END}", file=sys.stderr)
-        print(f"{Colors.CYAN}Recovery:{Colors.END}", file=sys.stderr)
-        print(f"1. Deploy implementation agent(s) with Task()", file=sys.stderr)
-        print(f"2. Or switch to appropriate tier for direct implementation", file=sys.stderr)
-        print(f"3. Or acknowledge deviation and override (edit hook settings)\n", file=sys.stderr)
-        sys.exit(2)  # Exit code 2 BLOCKS tool execution per Claude Code spec
+        print(message)
+        print(f"\n{Colors.RED}❌ Tool execution BLOCKED by orchestrator firewall{Colors.END}")
+
+        # Show contextual recovery guidance
+        print(firewall._generate_contextual_recovery())
+
+        print(f"\n{Colors.CYAN}Alternative recovery options:{Colors.END}")
+        print(f"1. Switch to appropriate tier for direct implementation")
+        print(f"2. Acknowledge deviation and override (edit hook settings)")
+        print(f"3. Exit response-awareness framework if task is simpler than expected\n")
+        sys.exit(1)  # Non-zero exit code blocks tool execution
 
     # Default: Allow with diagnostic
     log_hook_decision("orchestrator-firewall", firewall.tier, "ALLOW", tool_name, "Default allow")

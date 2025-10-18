@@ -1,3 +1,10 @@
+---
+name: complexity-scout
+description: Analyzes task complexity and recommends appropriate response-awareness tier using objective 0-12 scoring rubric
+model: claude-3-5-haiku-20241022
+tools: Glob, Grep, Read, WebSearch
+---
+
 # Complexity Scout Subagent
 
 ## Purpose
