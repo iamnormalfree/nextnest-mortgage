@@ -16,6 +16,30 @@
 - [ ] Workstream 1 Task 4 – refinance outlook recalibration.
 - [ ] Workstream 1 Task 5 – controller wiring audit.
 
+## Deferred Opportunities (Logged 2025-10-18)
+Reference: `docs/plans/active/2025-10-18-function-usage-audit-plan.md`
+
+### MEDIUM Priority (Address During Next Feature Work)
+1. **Enhance AI insights with full `calculateRefinancingSavings()`** (15 min)
+   - File: `app/api/ai-insights/route.ts:106-114`
+   - Add: Break-even months, lifetime savings, `worthRefinancing` flag
+   - Defer to: Next AI insights enhancement or refinance feature work
+   - See plan lines 339-345 for implementation details
+
+2. **Consolidate G3 validation with `calculateRefinancingSavings()`** (10 min)
+   - File: `lib/validation/dynamic-g3-validation.ts:122-128`
+   - Replace: Manual calculation with full function call
+   - Defer to: Next G3 validation refactoring or when adding break-even data
+   - See plan lines 347-353 for implementation details
+
+### LOW Priority (Only If Refactoring That Area)
+3. **Property-type-aware rates in form UI** (10 min)
+   - File: `components/forms/ProgressiveFormWithController.tsx:866`
+   - Replace: Hardcoded `2.8%` default with `getPlaceholderRate()`
+   - Note: Requires passing `propertyType` through multiple component layers
+   - Defer to: Only if refactoring ProgressiveFormWithController for other reasons
+   - See plan lines 355-364 for implementation details
+
 ## 2025-10-27
 
 - Re-read `AGENTS.md` to confirm collaboration rules with Brent.

@@ -1362,5 +1362,36 @@ psql "postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgre
 
 ---
 
-**Last Updated**: 2025-10-01
+## Recent Changes & Awareness Notes
+
+### Property-Type-Aware AI Insights (2025-10-18)
+**Commit:** `c55f4c3`
+**Impact:** AI refinance insights now adapt to property type
+
+**What Changed:**
+- `app/api/ai-insights/route.ts` now uses `getPlaceholderRate()` for market rate comparisons
+- Rate opportunity detection adapts to property type (HDB: 2.1%, Private: 2.6%, Commercial: 3.0%)
+- AI insights trigger only when current rate exceeds property-specific market rate
+
+**Example Impact:**
+- **Before:** HDB refinance with 2.5% rate would trigger "savings opportunity" (vs hardcoded 3.0%)
+- **After:** HDB refinance with 2.5% rate correctly shows as "above market" (vs 2.1% HDB refinance rate)
+
+**Testing Recommendations:**
+- Test AI insights for HDB refinance scenarios (should trigger at lower rates)
+- Test AI insights for Commercial refinance scenarios (should trigger at higher rates)
+- Verify urgency levels adapt correctly across property types
+
+**Related Files:**
+- Source function: `lib/calculations/instant-profile.ts:862-870` (`getPlaceholderRate`)
+- AI insights logic: `app/api/ai-insights/route.ts:106-122`
+- Function usage audit: `docs/plans/active/2025-10-18-function-usage-audit-plan.md`
+
+**Deferred Opportunities:**
+- Using full `calculateRefinancingSavings()` for break-even and lifetime savings in AI insights (MEDIUM priority)
+- See audit plan lines 339-345 for implementation details
+
+---
+
+**Last Updated**: 2025-10-18
 **Status**: Canonical - Use this guide as the single source of truth for AI broker implementation

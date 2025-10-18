@@ -288,7 +288,34 @@ const ComplexForm = dynamic(() => import('./ComplexForm'), {
 3. Ensure critical content in initial HTML
 4. Test with `curl` or Google's Rich Results Test
 
+## Recent Changes & Awareness Notes
+
+### Property-Type-Aware Rates (2025-10-18)
+**Commit:** `c55f4c3`
+**Impact:** G3 validation now uses property-specific refinance rates
+
+**What Changed:**
+- `lib/validation/dynamic-g3-validation.ts` now uses `getPlaceholderRate()` for market rate assumptions
+- Refinance savings calculations adapt to property type (HDB: 2.1%, Private: 2.6%, Commercial: 3.0%)
+
+**Testing Recommendations:**
+- Test refinance scenarios across HDB, Private, and Commercial properties
+- Verify potential savings calculations show different thresholds for different property types
+- Monitor G3 validation edge cases (low current rates, high outstanding loans)
+
+**Related Files:**
+- Source function: `lib/calculations/instant-profile.ts:862-870` (`getPlaceholderRate`)
+- Validation logic: `lib/validation/dynamic-g3-validation.ts:122-133`
+- Function usage audit: `docs/plans/active/2025-10-18-function-usage-audit-plan.md`
+
+**Deferred Opportunities:**
+- Using full `calculateRefinancingSavings()` for break-even analysis in G3 validation (MEDIUM priority)
+- Property-type-aware rates in ProgressiveFormWithController instant analysis UI (LOW priority)
+
+---
+
 ## Related Documentation
 - [Tech Stack Guide](./TECH_STACK_GUIDE.md) - Overall architecture
 - [Migration Guide](../MIGRATION_GUIDE.md) - Component migration patterns
 - [Session Context](../Session_Context/shadcn_implementation_complete.md) - Recent optimization session
+- [AI Broker Guide](./AI_BROKER_COMPLETE_GUIDE.md) - AI insights and broker system
