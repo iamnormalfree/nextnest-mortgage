@@ -1,6 +1,6 @@
 # CANONICAL_REFERENCES.md
 
-**Last Updated:** 2025-10-17
+**Last Updated:** 2025-10-18
 **Purpose:** Defines Tier 1 files (canonical source of truth) and rules for modifying them
 
 ---
@@ -256,6 +256,151 @@
 - Do NOT remove existing features (leads to feature parity issues)
 
 **Note:** See `components/ai-broker/README.md` for variant documentation
+
+---
+
+## Landing Page & Layout Components (Tier 1)
+
+### Layout Components
+
+**File:** `components/layout/ConditionalNav.tsx`
+**Purpose:** Root navigation component with conditional rendering based on route
+**Status:** ✅ PRODUCTION - CRITICAL
+**Used by:** `app/layout.tsx` (root layout)
+
+**Allowed Changes:**
+- Navigation links and menu items
+- Mobile responsiveness improvements
+- Authentication state handling
+
+**Forbidden Changes:**
+- Do NOT remove from root layout without replacement navigation
+- Do NOT change component export name (breaks root layout)
+- Do NOT add dependencies that increase bundle size significantly
+
+**File:** `components/layout/Footer.tsx`
+**Purpose:** Site footer with legal links
+**Status:** ✅ PRODUCTION
+**Used by:** `app/page.tsx`
+
+**Allowed Changes:**
+- Footer content and links
+- Social media integrations
+- Legal text updates
+
+**Forbidden Changes:**
+- Do NOT remove PDPA/compliance links without legal approval
+
+---
+
+### Landing Page Sections
+
+**Files:**
+- `components/landing/HeroSection.tsx` - Homepage hero with value proposition
+- `components/landing/ServicesSection.tsx` - Service offerings with tabs
+- `components/landing/ContactSection.tsx` - Lead capture form
+- `components/landing/CTASection.tsx` - Call-to-action section
+- `components/landing/LoanTypeSection.tsx` - Loan type selection cards
+- `components/landing/FeatureCards.tsx` - Feature highlights grid
+- `components/landing/StatsSection.tsx` - Animated statistics display
+
+**Purpose:** Homepage sections composed in `app/page.tsx`
+**Status:** ✅ PRODUCTION
+**Used by:** `app/page.tsx`
+
+**Allowed Changes:**
+- Content updates (copy, metrics, features)
+- Design improvements (colors, spacing, animations)
+- A/B testing variants
+
+**Forbidden Changes:**
+- Do NOT remove sections without updating app/page.tsx
+- Do NOT change component export names (breaks page composition)
+- Do NOT add heavy dependencies (target <140KB bundle)
+
+**Dependencies:**
+- `components/shared/AnimatedCounter.tsx` - Used by HeroSection, StatsSection
+- `components/shared/icons.tsx` - Used by HeroSection, ServicesSection
+
+---
+
+### Shared Utilities
+
+**File:** `components/shared/AnimatedCounter.tsx`
+**Purpose:** Number animation component for metrics display
+**Status:** ✅ PRODUCTION
+**Used by:** HeroSection, StatsSection, FeatureCards
+
+**Props Interface:**
+```typescript
+{
+  end: number
+  duration?: number
+  prefix?: string
+  suffix?: string
+}
+```
+
+**Allowed Changes:**
+- Animation easing functions
+- Performance optimizations
+- Additional formatting options
+
+**Forbidden Changes:**
+- Do NOT change prop interface (breaking change for 3 consumers)
+- Do NOT add dependencies (keep lightweight)
+
+---
+
+**File:** `components/shared/ErrorBoundary.tsx`
+**Purpose:** React error boundary for graceful error handling
+**Status:** ✅ PRODUCTION
+**Used by:** Root layout and critical pages
+
+**Allowed Changes:**
+- Error UI improvements
+- Error reporting integration
+- Fallback component enhancements
+
+**Forbidden Changes:**
+- Do NOT remove error catching (breaks error handling)
+- Do NOT log sensitive user data
+
+---
+
+**File:** `components/shared/icons.tsx`
+**Purpose:** Icon library for landing page components
+**Status:** ✅ PRODUCTION
+**Used by:** HeroSection, ServicesSection
+
+**Exports:**
+- `Clock`, `Users`, `Star` - Used by HeroSection
+- `CheckCircle`, `Shield`, `TrendingUp` - Used by ServicesSection
+
+**Allowed Changes:**
+- New icon additions
+- SVG optimization
+- Accessibility improvements (aria-labels)
+
+**Forbidden Changes:**
+- Do NOT remove exported icons without checking usage
+- Do NOT change icon names (breaking change)
+
+---
+
+**File:** `components/shared/ChatwootWidget.tsx`
+**Purpose:** Chatwoot chat widget loader
+**Status:** ✅ PRODUCTION
+**Used by:** Chat integration flows
+
+**Allowed Changes:**
+- Widget configuration options
+- Loading optimization
+- Position customization
+
+**Forbidden Changes:**
+- Do NOT change Chatwoot API integration without testing
+- Do NOT modify widget ID or account settings
 
 ---
 

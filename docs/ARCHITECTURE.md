@@ -27,10 +27,29 @@
 - `types/mortgage.ts` - TypeScript interfaces for mortgage data structures
 
 ### Component Strategy
-- **Feature Components** (`components/`): Self-contained UI sections (Hero, Services, Contact)
-- **Layout Pattern**: Fixed navigation + page content composition
-- **Form Handling**: React Hook Form with Zod validation
-- **Styling**: Tailwind CSS with custom color palette and typography
+
+NextNest follows a **domain-driven component organization** for scalability and maintainability:
+
+- **`components/ui/`** - Design system primitives (Shadcn/ui: button, input, card, etc.)
+- **`components/layout/`** - Layout components (ConditionalNav, Footer)
+- **`components/landing/`** - Homepage sections (Hero, Services, Contact, CTA, Stats, Features, LoanType)
+- **`components/shared/`** - Cross-feature utilities (AnimatedCounter, ErrorBoundary, icons, ChatwootWidget)
+- **`components/forms/`** - Form components (ProgressiveFormWithController + sections)
+- **`components/ai-broker/`** - AI broker chat components
+- **`components/chat/`** - Chat UI components
+- **`components/analytics/`** - Analytics visualizations
+- **`components/calculators/`** - Calculator widgets
+
+**Organization Rules:**
+- 3+ related files → create domain subfolder
+- Single utilities → place in `shared/`
+- UI primitives → use `ui/` (Shadcn only)
+- See CANONICAL_REFERENCES.md for Tier 1 component change rules
+
+**Patterns:**
+- Layout Pattern: Fixed navigation + page content composition
+- Form Handling: React Hook Form with Zod validation
+- Styling: Tailwind CSS with custom color palette and typography
 
 ## Tech Stack Specifics
 
@@ -54,10 +73,16 @@ Follow the clean code principles defined in `CLAUDE.md`:
 ## File Organization Patterns
 
 ### Component Creation
-1. Create `.tsx` files in `components/` directory
-2. Use TypeScript interfaces for props
-3. Follow existing naming conventions (PascalCase)
-4. Import and compose in page components
+1. **Determine placement** using Component Placement Decision Tree (CLAUDE.md)
+2. Create `.tsx` files in appropriate domain folder:
+   - UI primitives → `components/ui/`
+   - Layout → `components/layout/`
+   - Landing sections → `components/landing/`
+   - Shared utilities → `components/shared/`
+   - Forms → `components/forms/`
+3. Use TypeScript interfaces for props
+4. Follow existing naming conventions (PascalCase)
+5. Import and compose in page components
 
 ### API Development
 1. Create `route.ts` files in `app/api/[endpoint]/` structure
@@ -76,7 +101,10 @@ Follow the clean code principles defined in `CLAUDE.md`:
 ### Form Development
 - Use React Hook Form for performance
 - Implement Zod schemas for validation in `lib/calculations/`
-- Follow existing patterns in `components/ContactSection.tsx`
+- Follow existing patterns:
+  - Landing page forms: `components/landing/ContactSection.tsx`
+  - Application form: `components/forms/ProgressiveFormWithController.tsx`
+  - See FORMS_ARCHITECTURE_GUIDE.md for detailed patterns
 
 ## Business Logic
 
