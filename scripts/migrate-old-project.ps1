@@ -156,10 +156,14 @@ if ($totalOldFiles -gt 0) {
             }
         }
 
-        git commit -m "chore: archive old response-awareness files before migration
+        $archiveCommitMsg = @"
+chore: archive old response-awareness files before migration
 
 Archived from .claude/skills/ and .claude/commands/
-Old setup will be replaced with git subtree approach" | Out-Null
+Old setup will be replaced with git subtree approach
+"@
+
+        git commit -m $archiveCommitMsg | Out-Null
         Write-Host "  ✓ Changes committed" -ForegroundColor Green
     }
 } else {
@@ -345,12 +349,17 @@ if (-not $DryRun) {
     $hasChanges = git status --porcelain
     if ($hasChanges) {
         git add .claude/
-        git commit -m "feat: migrate to git subtree for response-awareness frameworks
+
+        $commitMsg = @"
+feat: migrate to git subtree for response-awareness frameworks
 
 - Archived old files to .claude/skills/archive/2025-10-pre-subtree/
 - Added git subtree from claude-shared repository
 - Updated response-awareness.md to use subtree paths
-- Ready for multi-project framework management"
+- Ready for multi-project framework management
+"@
+
+        git commit -m $commitMsg
 
         if ($LASTEXITCODE -eq 0) {
             Write-Host "  ✓ Changes committed" -ForegroundColor Green
