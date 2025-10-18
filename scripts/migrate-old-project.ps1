@@ -300,9 +300,47 @@ if ($missingConfigs.Count -gt 0) {
 }
 Write-Host ""
 
-# Step 8: Final commit
+# Step 8: Check for optional agents
+Write-Host "Step 8: Checking for optional agents..." -ForegroundColor Yellow
+
+if (-not (Test-Path ".claude\agents")) {
+    if ($DryRun) {
+        Write-Host "  [DRY RUN] Would create: .claude\agents\" -ForegroundColor Gray
+    } else {
+        New-Item -Path ".claude\agents" -ItemType Directory -Force | Out-Null
+        Write-Host "  Created: .claude\agents\" -ForegroundColor Green
+    }
+}
+
+$agentPath = ".claude\agents\worktree-helper.md"
+if (Test-Path ".claude\frameworks\shared\templates\agents\worktree-helper.md") {
+    if (-not (Test-Path $agentPath)) {
+        if ($DryRun) {
+            Write-Host "  [DRY RUN] Would copy: worktree-helper.md" -ForegroundColor Gray
+        } else {
+            Copy-Item -Path ".claude\frameworks\shared\templates\agents\worktree-helper.md" -Destination $agentPath -Force
+            Write-Host "  Copied: worktree-helper.md" -ForegroundColor Green
+        }
+    } else {
+        Write-Host "  ✓ Exists: worktree-helper.md (keeping your version)" -ForegroundColor Gray
+    }
+} else {
+    Write-Host "  Note: worktree-helper template not found (optional)" -ForegroundColor Gray
+}
+
+# Check for other existing agents
+$existingAgents = Get-ChildItem ".claude\agents" -File -ErrorAction SilentlyContinue
+if ($existingAgents) {
+    Write-Host "  ℹ Found existing agents (preserved):" -ForegroundColor Gray
+    foreach ($agent in $existingAgents) {
+        Write-Host "    - $($agent.Name)" -ForegroundColor DarkGray
+    }
+}
+Write-Host ""
+
+# Step 9: Final commit
 if (-not $DryRun) {
-    Write-Host "Step 8: Final commit..." -ForegroundColor Yellow
+    Write-Host "Step 9: Final commit..." -ForegroundColor Yellow
 
     $hasChanges = git status --porcelain
     if ($hasChanges) {
@@ -323,7 +361,7 @@ if (-not $DryRun) {
         Write-Host "  No changes to commit" -ForegroundColor Gray
     }
 } else {
-    Write-Host "Step 8: Skipped (dry run)" -ForegroundColor Gray
+    Write-Host "Step 9: Skipped (dry run)" -ForegroundColor Gray
 }
 Write-Host ""
 
