@@ -1,0 +1,12 @@
+{
+  "repositories": {
+    "superpowers": {
+      "path": "repos/superpowers",
+      "enabled": false,
+      "source": {
+        "type": "github",
+        "repo": "obra/superpowers"
+      }
+    }
+  }
+}

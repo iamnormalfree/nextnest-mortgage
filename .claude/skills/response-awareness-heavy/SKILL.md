@@ -11,113 +11,18 @@ Handles complex single-domain features requiring full planning, synthesis, and a
 **Complexity score**: 5-7 (out of 12)
 **Model strategy**: 🧠 **All Sonnet** (metacognition critical for planning, synthesis, and verification)
 
-<!-- CONDITIONAL LOGGING
-     Only execute if LOGGING_LEVEL != none
-     This does NOT affect default framework operation
--->
+## Load Shared Observability Module: Logging
 
-## Logging Instructions (IF ENABLED)
+**If LOGGING_LEVEL != none** (set by --light-logging or --verbose-logging flags):
 
-**Check LOGGING_LEVEL from parent orchestrator:**
-- If LOGGING_LEVEL=none: Skip all logging (default behavior)
-- If LOGGING_LEVEL=light: Execute light logging instructions
-- If LOGGING_LEVEL=verbose: Execute verbose logging instructions
+Read file `.claude/skills/response-awareness-shared/LOGGING_INSTRUCTIONS.md`
 
-### Light Logging Instructions
+This module contains complete instructions for:
+- Light logging (phase transitions, metrics)
+- Verbose logging (tag operations, LCL exports, detailed audit trail)
+- Output location: `docs/completion_drive_logs/DD-MM-YYYY_task-name/`
 
-**Phase transitions:**
-When entering new phase, append to `docs/completion_drive_logs/DD-MM-YYYY_task-name/phase_transitions.log`:
-```
-[HH:MM:SS] ENTER Phase X: [Phase name]
-```
-
-**PATH_DECISION logging:**
-When creating PATH_DECISION tag, append to `phase_transitions.log`:
-```
-[HH:MM:SS] PATH_DECISION: [brief summary]
-```
-
-**LCL export summary:**
-When Phase completes, if LCL exports created, append to `phase_transitions.log`:
-```
-[HH:MM:SS] Phase X LCL Exports: [count] (Critical: X, Firm: X, Casual: X)
-```
-
-### Verbose Logging Instructions
-
-**Everything in light logging PLUS:**
-
-**Tag insertion:**
-When creating any tag in code, append to `docs/completion_drive_logs/DD-MM-YYYY_task-name/tag_operations.log`:
-```
-[HH:MM:SS] INSERT #TAG_NAME at file.py:line - "Brief context/reason"
-```
-
-**Tag resolution:**
-When resolving/removing tag, append to `tag_operations.log`:
-```
-[HH:MM:SS] RESOLVE #TAG_NAME at file.py:line - Action: [what was done]
-```
-
-**LCL operations:**
-When exporting LCL, append to `docs/completion_drive_logs/DD-MM-YYYY_task-name/lcl_exports.log`:
-```
-[HH:MM:SS] EXPORT LCL_[LEVEL]: key::value
-[HH:MM:SS] PASS key::value -> [destination agent/phase]
-```
-
-### Final Metrics (Both Levels)
-
-At end of session, write `docs/completion_drive_logs/DD-MM-YYYY_task-name/final_metrics.md`:
-
-```markdown
-# Response-Awareness Session Metrics
-## Task: [task description]
-## Date: [DD-MM-YYYY]
-## Tier: HEAVY
-## Logging Level: [light/verbose]
-
-### Phase Summary
-- Phase 1 (Planning): [HH:MM:SS - HH:MM:SS] (Duration: Xm Ys)
-- Phase 2 (Synthesis): [HH:MM:SS - HH:MM:SS] (Duration: Xm Ys)
-- Phase 3 (Implementation): [HH:MM:SS - HH:MM:SS] (Duration: Xm Ys)
-- Phase 4 (Verification): [HH:MM:SS - HH:MM:SS] (Duration: Xm Ys)
-
-### Tag Operations
-- Total tags created: X
-- Tags resolved: X
-- Tags remaining: X (should be 0 except PATH tags)
-- Most common tag: #TAG_NAME (X occurrences)
-
-### LCL Exports
-- Critical exports: X
-- Firm exports: X
-- Casual exports: X
-- Total context passed: X items
-
-### Assumptions & Decisions
-- COMPLETION_DRIVE assumptions: X (Verified: X, Incorrect: X)
-- Assumption accuracy: X%
-- PATH_DECISION points: X
-- Non-obvious choices: X
-
-### Suggestions Generated
-- ERROR_HANDLING: X locations
-- EDGE_CASE: X locations
-- VALIDATION: X locations
-
-### Quality Metrics
-- Code lines removed (pattern cleanup): X
-- SUNK_COST patterns caught: X
-- Verification iterations: X
-
-### Final Status
-All critical tags resolved
-Clean code delivered
-Framework effectiveness: [brief assessment]
-```
-
-**IMPORTANT**: All logging is OPTIONAL. If LOGGING_LEVEL=none, skip ALL of the above.
+Skip this if LOGGING_LEVEL=none (default behavior - fastest execution).
 
 ## 🎯 Model & Agent Guidance (HEAVY Tier)
 
@@ -444,25 +349,14 @@ Cons: Won't scale if state needs grow
 #LCL_EXPORT_CRITICAL: state_scope::shared_across_user_dashboard
 ```
 
-**MANDATORY: Write Plan to Disk**
+## Load Shared Observability Module: Plan Persistence
 
-After completing planning exploration, write your plan to:
+Read file `.claude/skills/response-awareness-shared/PLAN_PERSISTENCE.md` (HEAVY Tier section)
 
-```
-docs/completion_drive_plans/DD-MM-YYYY_task-name/plan_HEAVY_HHMMSS.md
-```
-
-**Folder naming**:
-- `DD-MM-YYYY`: Current date (e.g., 18-10-2025)
-- `task-name`: Brief task description in kebab-case
-- `plan_HEAVY_HHMMSS`: Tier + timestamp (e.g., plan_HEAVY_153045.md)
-
-**Plan file must include**:
-- Scope analysis (what files/domains covered)
-- Approach exploration (2-3 alternatives with trade-offs)
-- All tags marked (#PATH_DECISION, #PLAN_UNCERTAINTY, etc.)
-- Selected approach with #PATH_RATIONALE
-- Implementation sequencing
+This module contains:
+- Phase 1: Planning agent output format
+- Phase 2: Synthesis blueprint format
+- Output location: `docs/completion_drive_plans/DD-MM-YYYY_task-name/`
 
 ### Phase 2: Synthesis & Path Selection
 
@@ -512,19 +406,7 @@ Rejected Redux because:
 #LCL_EXPORT_FIRM: optimization::useMemo_for_context_value
 ```
 
-**MANDATORY: Write Unified Blueprint to Disk**
-
-After synthesis, write to:
-
-```
-docs/completion_drive_plans/DD-MM-YYYY_task-name/FINAL_BLUEPRINT_HHMMSS.md
-```
-
-**Blueprint must include**:
-- Summary of approaches explored
-- PATH_RATIONALE for major decisions
-- Unified architecture
-- Implementation sequencing
+**Blueprint Persistence**: See shared PLAN_PERSISTENCE.md module loaded above (HEAVY Tier - Phase 2 section)
 
 ## 🚦 Phase 2 → Phase 3 Transition Checkpoint
 
