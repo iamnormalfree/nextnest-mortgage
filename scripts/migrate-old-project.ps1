@@ -50,19 +50,28 @@ Write-Host ""
 # Step 2: Detect old setup
 Write-Host "Step 2: Detecting old response-awareness setup..." -ForegroundColor Yellow
 
-$oldFiles = @()
-$oldDirs = @()
+$oldSkillFiles = @()
+$oldSkillDirs = @()
+$oldCommandDirs = @()
 
 # Check for old skill files
-if (Test-Path ".claude\skills\response-awareness-light") { $oldDirs += "response-awareness-light" }
-if (Test-Path ".claude\skills\response-awareness-medium") { $oldDirs += "response-awareness-medium" }
-if (Test-Path ".claude\skills\response-awareness-heavy") { $oldDirs += "response-awareness-heavy" }
-if (Test-Path ".claude\skills\response-awareness-full") { $oldDirs += "response-awareness-full" }
-if (Test-Path ".claude\skills\response-awareness-shared") { $oldDirs += "response-awareness-shared" }
-if (Test-Path ".claude\skills\brainstorming.md") { $oldFiles += "brainstorming.md" }
-if (Test-Path ".claude\skills\systematic-debugging.md") { $oldFiles += "systematic-debugging.md" }
+if (Test-Path ".claude\skills\response-awareness-light") { $oldSkillDirs += "response-awareness-light" }
+if (Test-Path ".claude\skills\response-awareness-medium") { $oldSkillDirs += "response-awareness-medium" }
+if (Test-Path ".claude\skills\response-awareness-heavy") { $oldSkillDirs += "response-awareness-heavy" }
+if (Test-Path ".claude\skills\response-awareness-full") { $oldSkillDirs += "response-awareness-full" }
+if (Test-Path ".claude\skills\response-awareness-shared") { $oldSkillDirs += "response-awareness-shared" }
+if (Test-Path ".claude\skills\brainstorming.md") { $oldSkillFiles += "brainstorming.md" }
+if (Test-Path ".claude\skills\systematic-debugging.md") { $oldSkillFiles += "systematic-debugging.md" }
 
-if ($oldDirs.Count -eq 0 -and $oldFiles.Count -eq 0) {
+# Check for old command files (some old setups had these)
+if (Test-Path ".claude\commands\response-awareness-full") { $oldCommandDirs += "response-awareness-full" }
+if (Test-Path ".claude\commands\response-awareness-light") { $oldCommandDirs += "response-awareness-light" }
+if (Test-Path ".claude\commands\response-awareness-medium") { $oldCommandDirs += "response-awareness-medium" }
+if (Test-Path ".claude\commands\response-awareness-heavy") { $oldCommandDirs += "response-awareness-heavy" }
+
+$totalOldFiles = $oldSkillDirs.Count + $oldSkillFiles.Count + $oldCommandDirs.Count
+
+if ($totalOldFiles -eq 0) {
     Write-Host "  ℹ No old setup detected" -ForegroundColor Gray
     Write-Host "    This project may already be migrated or never had response-awareness" -ForegroundColor Gray
     Write-Host ""
@@ -73,43 +82,84 @@ if ($oldDirs.Count -eq 0 -and $oldFiles.Count -eq 0) {
     }
 } else {
     Write-Host "  Found old files/directories:" -ForegroundColor White
-    foreach ($dir in $oldDirs) {
-        Write-Host "    - .claude\skills\$dir\" -ForegroundColor Gray
+
+    if ($oldSkillDirs.Count -gt 0) {
+        Write-Host "    In .claude\skills\:" -ForegroundColor Gray
+        foreach ($dir in $oldSkillDirs) {
+            Write-Host "      - $dir\" -ForegroundColor DarkGray
+        }
     }
-    foreach ($file in $oldFiles) {
-        Write-Host "    - .claude\skills\$file" -ForegroundColor Gray
+
+    if ($oldSkillFiles.Count -gt 0) {
+        Write-Host "    In .claude\skills\:" -ForegroundColor Gray
+        foreach ($file in $oldSkillFiles) {
+            Write-Host "      - $file" -ForegroundColor DarkGray
+        }
+    }
+
+    if ($oldCommandDirs.Count -gt 0) {
+        Write-Host "    In .claude\commands\:" -ForegroundColor Gray
+        foreach ($dir in $oldCommandDirs) {
+            Write-Host "      - $dir\" -ForegroundColor DarkGray
+        }
     }
 }
 Write-Host ""
 
 # Step 3: Archive old files
-if ($oldDirs.Count -gt 0 -or $oldFiles.Count -gt 0) {
+if ($totalOldFiles -gt 0) {
     Write-Host "Step 3: Archiving old files..." -ForegroundColor Yellow
 
-    $archivePath = ".claude\skills\archive\2025-10-pre-subtree"
+    $skillArchivePath = ".claude\skills\archive\2025-10-pre-subtree"
+    $commandArchivePath = ".claude\commands\archive\2025-10-pre-subtree"
 
     if ($DryRun) {
-        Write-Host "  [DRY RUN] Would create: $archivePath" -ForegroundColor Gray
-        Write-Host "  [DRY RUN] Would move:" -ForegroundColor Gray
-        foreach ($dir in $oldDirs) {
-            Write-Host "    - .claude\skills\$dir\ → $archivePath\$dir\" -ForegroundColor Gray
+        Write-Host "  [DRY RUN] Would create archives:" -ForegroundColor Gray
+        if ($oldSkillDirs.Count -gt 0 -or $oldSkillFiles.Count -gt 0) {
+            Write-Host "    - $skillArchivePath" -ForegroundColor Gray
         }
-        foreach ($file in $oldFiles) {
-            Write-Host "    - .claude\skills\$file → $archivePath\$file" -ForegroundColor Gray
+        if ($oldCommandDirs.Count -gt 0) {
+            Write-Host "    - $commandArchivePath" -ForegroundColor Gray
+        }
+        Write-Host "  [DRY RUN] Would move:" -ForegroundColor Gray
+        foreach ($dir in $oldSkillDirs) {
+            Write-Host "    - .claude\skills\$dir\ → $skillArchivePath\$dir\" -ForegroundColor Gray
+        }
+        foreach ($file in $oldSkillFiles) {
+            Write-Host "    - .claude\skills\$file → $skillArchivePath\$file" -ForegroundColor Gray
+        }
+        foreach ($dir in $oldCommandDirs) {
+            Write-Host "    - .claude\commands\$dir\ → $commandArchivePath\$dir\" -ForegroundColor Gray
         }
     } else {
-        New-Item -Path $archivePath -ItemType Directory -Force | Out-Null
+        # Archive skills
+        if ($oldSkillDirs.Count -gt 0 -or $oldSkillFiles.Count -gt 0) {
+            New-Item -Path $skillArchivePath -ItemType Directory -Force | Out-Null
 
-        foreach ($dir in $oldDirs) {
-            git mv ".claude\skills\$dir" "$archivePath\" | Out-Null
-            Write-Host "  Archived: $dir\" -ForegroundColor Green
-        }
-        foreach ($file in $oldFiles) {
-            git mv ".claude\skills\$file" "$archivePath\" | Out-Null
-            Write-Host "  Archived: $file" -ForegroundColor Green
+            foreach ($dir in $oldSkillDirs) {
+                git mv ".claude\skills\$dir" "$skillArchivePath\" 2>&1 | Out-Null
+                Write-Host "  Archived: skills\$dir\" -ForegroundColor Green
+            }
+            foreach ($file in $oldSkillFiles) {
+                git mv ".claude\skills\$file" "$skillArchivePath\" 2>&1 | Out-Null
+                Write-Host "  Archived: skills\$file" -ForegroundColor Green
+            }
         }
 
-        git commit -m "chore: archive old response-awareness files before migration" | Out-Null
+        # Archive commands
+        if ($oldCommandDirs.Count -gt 0) {
+            New-Item -Path $commandArchivePath -ItemType Directory -Force | Out-Null
+
+            foreach ($dir in $oldCommandDirs) {
+                git mv ".claude\commands\$dir" "$commandArchivePath\" 2>&1 | Out-Null
+                Write-Host "  Archived: commands\$dir\" -ForegroundColor Green
+            }
+        }
+
+        git commit -m "chore: archive old response-awareness files before migration
+
+Archived from .claude/skills/ and .claude/commands/
+Old setup will be replaced with git subtree approach" | Out-Null
         Write-Host "  ✓ Changes committed" -ForegroundColor Green
     }
 } else {
@@ -293,8 +343,11 @@ if ($DryRun) {
     Write-Host "✅ MIGRATION COMPLETE" -ForegroundColor Green
     Write-Host ""
     Write-Host "What was done:" -ForegroundColor White
-    if ($oldDirs.Count -gt 0 -or $oldFiles.Count -gt 0) {
-        Write-Host "  ✓ Archived old files to .claude\skills\archive\2025-10-pre-subtree\" -ForegroundColor Gray
+    if ($oldSkillDirs.Count -gt 0 -or $oldSkillFiles.Count -gt 0) {
+        Write-Host "  ✓ Archived old skills to .claude\skills\archive\2025-10-pre-subtree\" -ForegroundColor Gray
+    }
+    if ($oldCommandDirs.Count -gt 0) {
+        Write-Host "  ✓ Archived old commands to .claude\commands\archive\2025-10-pre-subtree\" -ForegroundColor Gray
     }
     if (-not $skipSubtree) {
         Write-Host "  ✓ Added git subtree at .claude\frameworks\shared\" -ForegroundColor Gray
