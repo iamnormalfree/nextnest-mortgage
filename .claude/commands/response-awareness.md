@@ -7,6 +7,22 @@ Universal entry point that assesses task complexity and routes to the appropriat
 
 ---
 
+## Load NextNest Customizations
+
+Read file `.claude/skills/response-awareness-shared/NEXTNEST_CUSTOMIZATIONS.md`
+
+**Apply Phase 0 Extensions before standard complexity assessment:**
+- Extension 0.1: Git worktree check (if uncommitted changes detected)
+- Extension 0.2: Brainstorming pre-check (if vague language detected)
+- Extension 0.3: Debug task detection (if bug keywords detected)
+
+**Load configurations:**
+- `.claude/config/response-awareness-config.json`
+- `.claude/config/logging-config.json`
+- `.claude/config/agents-config.json`
+
+---
+
 ## Your Role as Router
 
 You analyze the user's request, score its complexity, and invoke the appropriate Response Awareness tier Skill.
@@ -60,6 +76,14 @@ You analyze the user's request, score its complexity, and invoke the appropriate
 ## Complexity Assessment Protocol
 
 ### Phase 0: Intelligent Routing
+
+**FIRST: Run NextNest Extensions** (see NEXTNEST_CUSTOMIZATIONS.md loaded above)
+
+- If worktree needed → Deploy worktree-helper agent and continue in isolated workspace
+- If brainstorming needed → Invoke brainstorming skill to clarify requirements first
+- If debugging task → Route to systematic-debugging skill instead of tiers
+
+**THEN: Continue with standard complexity assessment:**
 
 **Step 1: Immediate Assessment** (no agent needed)
 

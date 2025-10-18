@@ -232,6 +232,171 @@ npm run lint         # Code quality check
 
 ---
 
+## Response-Awareness & Skills Architecture
+
+**CRITICAL: Understanding the layered AI assistance system**
+
+### Three-Layer System
+
+**Layer 1: Upstream Reference** (`.claude/upstream-reference/`)
+- Pristine copies of response-awareness framework from GitHub
+- Used for comparison when syncing updates
+- **NEVER modify** - reference only
+- Download new versions here for manual comparison
+
+**Layer 2: Configuration** (`.claude/config/`)
+- `response-awareness-config.json` - Feature flags, paths, tier settings
+- `logging-config.json` - Verbose logging, learning mode
+- `agents-config.json` - Custom agents, model preferences
+- **Modify freely** - these are your settings
+
+**Layer 3: Working Files** (`.claude/skills/`, `.claude/commands/`, `.claude/agents/`)
+- Your customized versions with NextNest integrations
+- May differ from upstream (worktree checks, CLAUDE.md compliance, etc.)
+- **Modify carefully** - preserve customizations when syncing upstream
+
+### Key Skills Available
+
+**From Response-Awareness Framework:**
+- `/response-awareness` - Universal router (complexity assessment → tier routing)
+- `response-awareness-light` - Single file, fast execution
+- `response-awareness-medium` - Multi-file, optional planning
+- `response-awareness-heavy` - Complex features, full planning
+- `response-awareness-full` - Multi-domain architecture
+
+**From Superpowers (adapted for NextNest):**
+- `brainstorming` - Refine vague ideas into designs before planning
+- `systematic-debugging` - Root cause investigation (NEVER skip this for bugs)
+
+**NextNest Custom:**
+- `worktree-helper` - Manage parallel development streams
+
+### When to Use Each Skill
+
+**For Bugs/Errors:**
+```bash
+# ALWAYS use systematic-debugging for ANY bug
+# Router will detect debug keywords and offer this automatically
+/response-awareness "Fix calculation returning NaN"
+→ Detects "fix" keyword → Offers systematic-debugging skill → Root cause investigation
+```
+
+**For Vague Ideas:**
+```bash
+# Use brainstorming to clarify before implementation
+/response-awareness "I'm thinking about adding a dashboard"
+→ Detects "thinking about" → Offers brainstorming skill → Refine requirements → Plan → Implement
+```
+
+**For Clear Requirements:**
+```bash
+# Router assesses complexity and routes to appropriate tier
+/response-awareness "Add email validation to signup form"
+→ Complexity score: 2 → MEDIUM tier → Optional planning → Implementation
+```
+
+**For Parallel Work:**
+```bash
+# Uncommitted changes + new unrelated task = worktree offer
+git status  # Shows uncommitted changes
+/response-awareness "Add new feature X"
+→ Detects uncommitted work → Offers worktree creation → Isolated workspace
+```
+
+### Configuration-Driven Behavior
+
+All paths and features come from config files, NOT hardcoded:
+
+```javascript
+// Logging location (from logging-config.json)
+const logPath = config.paths.verbose_logs;  // docs/completion_drive_logs
+
+// Feature toggles (from response-awareness-config.json)
+if (config.features.worktree_integration) {
+  // Offer worktree when appropriate
+}
+
+if (config.features.brainstorming_precheck) {
+  // Detect vague language and offer brainstorming
+}
+```
+
+### Syncing with Upstream
+
+**When response-awareness framework updates:**
+
+1. Download latest ZIP from GitHub
+2. Unzip to `.claude/upstream-reference/response-awareness-vX.X.X/`
+3. Run comparison: `node scripts/compare-upstream.js vX.X.X`
+4. Review differences (what changed upstream vs your customizations)
+5. Manually merge improvements while preserving NextNest customizations
+6. Update `.claude/config/response-awareness-config.json` upstream_version
+7. Test: `/response-awareness "test task"`
+
+**See:** [UPDATE_GUIDE.md](UPDATE_GUIDE.md) for full sync workflow
+
+### NextNest Customizations to Preserve
+
+**When syncing upstream, ALWAYS preserve:**
+
+1. **Configuration Loading**
+   - Config file paths
+   - Feature flag checks
+   - NextNest-specific settings
+
+2. **Worktree Integration**
+   - Phase 0 pre-checks
+   - worktree-helper agent deployment
+
+3. **Brainstorming Pre-Checks**
+   - Vague language detection
+   - Requirement clarification offers
+
+4. **CLAUDE.md Compliance**
+   - TDD enforcement
+   - CANONICAL_REFERENCES checks
+   - Component Placement Decision Tree
+   - YAGNI ruthlessness
+
+5. **Logging Paths**
+   - `docs/completion_drive_logs/` (not upstream default)
+   - Learning mode summaries
+   - Plan persistence to `docs/plans/`
+
+### Communication Style for Skills
+
+**For Exploratory/Vague Requests:**
+- Proactively offer brainstorming skill
+- "I notice some ambiguity. Would you like structured brainstorming or conversational exploration?"
+
+**For Bug Reports:**
+- ALWAYS offer systematic-debugging
+- "This appears to be a debugging task. Should I use systematic-debugging skill for root cause analysis?"
+
+**For Clear Implementations:**
+- Route through response-awareness automatically
+- Announce tier: "Complexity assessment: MEDIUM tier (2-5 files, moderate integration)"
+
+### Forbidden Patterns
+
+❌ **Don't bypass skills when they apply:**
+- Bug reported → Must offer systematic-debugging (don't jump to fixes)
+- Vague idea → Offer brainstorming (don't assume requirements)
+- Complex task → Use response-awareness tiers (don't implement ad-hoc)
+
+❌ **Don't modify upstream reference files:**
+- `.claude/upstream-reference/` is pristine - comparison only
+
+❌ **Don't hardcode paths:**
+- Always load from `.claude/config/*.json`
+
+✅ **Do update configs when needs change:**
+- Change logging verbosity → Edit `logging-config.json`
+- Disable worktrees → Set `features.worktree_integration: false`
+- Add custom agent → Update `agents-config.json`
+
+---
+
 ## Planning & Documentation Workflow
 
 **CRITICAL: One plan per feature. No proliferation.**

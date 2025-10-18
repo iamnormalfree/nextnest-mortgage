@@ -21,6 +21,21 @@
 - When loaded: Always for HEAVY/FULL, conditionally for MEDIUM
 - Location: `docs/completion_drive_plans/DD-MM-YYYY_task-name/`
 
+### **NEXTNEST_CUSTOMIZATIONS.md** ⭐ (NextNest-specific)
+- Purpose: NextNest project customizations for response-awareness framework
+- Used by: Router (Phase 0 extensions) and all tiers (compliance checks)
+- When loaded: Always
+- Features:
+  - Configuration loading from `.claude/config/`
+  - Git worktree integration (Phase 0.1)
+  - Brainstorming pre-checks (Phase 0.2)
+  - Debug task detection (Phase 0.3)
+  - TDD enforcement
+  - CANONICAL_REFERENCES checks
+  - Component placement validation
+  - YAGNI ruthlessness
+  - Logging/plan path overrides
+
 ---
 
 ## How Tier Skills Use These Modules
