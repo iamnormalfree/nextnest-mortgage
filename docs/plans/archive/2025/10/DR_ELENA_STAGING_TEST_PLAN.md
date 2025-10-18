@@ -458,7 +458,7 @@ If issues found in staging:
 ## 📞 Support Contacts
 
 **During Staging Tests**:
-- Technical Issues: Check `docs/DR_ELENA_QUICK_START.md` troubleshooting
+- Technical Issues: Check `docs/runbooks/ai-broker/dr-elena-quick-start.md` troubleshooting
 - MAS Compliance Questions: Review `lib/calculations/dr-elena-mortgage.ts`
 - Database Issues: Check Supabase logs
 - Performance Issues: Monitor Redis connection

@@ -171,7 +171,7 @@ Example errors (not Dr. Elena related):
    - Test results
    - Production checklist
 
-2. **`docs/DR_ELENA_QUICK_START.md`**
+2. **`docs/runbooks/ai-broker/dr-elena-quick-start.md`**
    - Team quick reference guide
    - Setup instructions
    - Troubleshooting

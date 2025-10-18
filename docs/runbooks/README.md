@@ -1,6 +1,6 @@
-﻿# Runbooks Index
+# Runbooks Index
 
-_Last updated: 2025-10-01_
+_Last updated: 2025-10-19_
 
 Each runbook includes front matter describing owner and review cadence. Use /response-awareness if a runbook needs a major rewrite.
 
@@ -8,12 +8,63 @@ Each runbook includes front matter describing owner and review cadence. Use /res
 
 | Domain | Documents | Owner |
 |--------|-----------|-------|
-| automation | - [README](runbooks/automation/phase-2-n8n-workflow/README.md)<br>- [implementation-guide](runbooks/automation/phase-2-n8n-workflow/01_Documentation/implementation-guide.md)<br>- [INTEGRATION_REQUIREMENTS](runbooks/automation/phase-2-n8n-workflow/01_Documentation/INTEGRATION_REQUIREMENTS.md)<br>- [N8N_WEBHOOK_TESTING_GUIDE](runbooks/automation/phase-2-n8n-workflow/01_Documentation/N8N_WEBHOOK_TESTING_GUIDE.md)<br>- [N8N_WORKFLOW_MODIFICATIONS](runbooks/automation/phase-2-n8n-workflow/01_Documentation/N8N_WORKFLOW_MODIFICATIONS.md)<br>- [PHASE_2_N8N_ACTUAL_WORKFLOW](runbooks/automation/phase-2-n8n-workflow/02_Workflow_Config/PHASE_2_N8N_ACTUAL_WORKFLOW.md)<br>- [PHASE_2_N8N_WORKFLOW_IDEATED](runbooks/automation/phase-2-n8n-workflow/02_Workflow_Config/PHASE_2_N8N_WORKFLOW_IDEATED.md)<br>- [PHASE_2_N8N_WORKFLOW_PROMPT_FINAL](runbooks/automation/phase-2-n8n-workflow/02_Workflow_Config/PHASE_2_N8N_WORKFLOW_PROMPT_FINAL.md)<br>- [g3-test-expected-results](runbooks/automation/phase-2-n8n-workflow/04_Testing/g3-test-expected-results.md)<br>- [EXCEL_365_N8N_SETUP](runbooks/automation/phase-2-n8n-workflow/05_Integration/EXCEL_365_N8N_SETUP.md) | Ops Lead |
-| chatops | - [CHATWOOT_COMPLETE_SETUP_GUIDE](runbooks/chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md) **[Canonical]** | AI/Chat Lead |
-| devops | - [production-deployment-guide](runbooks/devops/production-deployment-guide.md)<br>- [deployment-env-variables](runbooks/devops/deployment-env-variables.md)<br>- [production-readiness-checklist](runbooks/devops/production-readiness-checklist.md) | Ops Lead |
-| forms | - [form-refactor-guide](runbooks/forms/form-refactor-guide.md) | Frontend Lead |
-| operations | - [roundtable-execution-guide](runbooks/operations/roundtable-execution-guide.md) | Operations |
-| root | - [AI_BROKER_COMPLETE_GUIDE](runbooks/AI_BROKER_COMPLETE_GUIDE.md) **[Canonical]**<br>- [TECH_STACK_GUIDE](runbooks/TECH_STACK_GUIDE.md) **[Canonical]**<br>- [ai-brokers-profiles](runbooks/ai-brokers-profiles.md)<br>- [brand-messaging](runbooks/brand-messaging.md)<br>- [CHATWOOT_SELF_HOSTED_TROUBLESHOOTING](runbooks/CHATWOOT_SELF_HOSTED_TROUBLESHOOTING.md)<br>- [CHAT_AND_LEAD_FORM_UX_TASKLIST](runbooks/CHAT_AND_LEAD_FORM_UX_TASKLIST.md)<br>- [FORMS_ARCHITECTURE_GUIDE](runbooks/FORMS_ARCHITECTURE_GUIDE.md)<br>- [Founder_Ops_Guide](runbooks/Founder_Ops_Guide.md)<br>- [master-copywriting-guide](runbooks/master-copywriting-guide.md)<br>- [nextnest-visual-identity](runbooks/nextnest-visual-identity.md)<br>- [PROGRESSIVE_FORM_COMPACT_EXECUTION_PLAYBOOK](runbooks/PROGRESSIVE_FORM_COMPACT_EXECUTION_PLAYBOOK.md)<br>- [README](runbooks/README.md) | Shared |
+| **Canonical Guides (Root)** | - [AI_BROKER_COMPLETE_GUIDE](AI_BROKER_COMPLETE_GUIDE.md) **[Canonical]**<br>- [FORMS_ARCHITECTURE_GUIDE](FORMS_ARCHITECTURE_GUIDE.md) **[Canonical]**<br>- [TECH_STACK_GUIDE](TECH_STACK_GUIDE.md) **[Canonical]** | Shared |
+| **ai-broker** | - [patterns](ai-broker/patterns.md)<br>- [profiles](ai-broker/profiles.md)<br>- [dr-elena-quick-start](ai-broker/dr-elena-quick-start.md) | AI/Chat Lead |
+| **automation** | - [n8n-coordination](automation/n8n-coordination.md)<br>- [phase-2-n8n-workflow/*](automation/phase-2-n8n-workflow/) (11 files) | Ops Lead |
+| **brand** | - [messaging](brand/messaging.md)<br>- [copywriting-guide](brand/copywriting-guide.md)<br>- [visual-identity](brand/visual-identity.md) | Marketing/Brand |
+| **chatops** | - [CHATWOOT_COMPLETE_SETUP_GUIDE](chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md) **[Canonical]**<br>- [troubleshooting](chatops/troubleshooting.md)<br>- [webhook-disable-procedure](chatops/webhook-disable-procedure.md)<br>- [n8n-message-deduplication-fix](chatops/n8n-message-deduplication-fix.md)<br>- [n8n-message-tracking-implementation-guide](chatops/n8n-message-tracking-implementation-guide.md) | AI/Chat Lead |
+| **database** | - [migration-guide](database/migration-guide.md) | Ops Lead |
+| **devops** | - [production-deployment-guide](devops/production-deployment-guide.md)<br>- [deployment-env-variables](devops/deployment-env-variables.md)<br>- [production-readiness-checklist](devops/production-readiness-checklist.md)<br>- [worktree-workflow](devops/worktree-workflow.md) | Ops Lead |
+| **forms** | - [form-refactor-guide](forms/form-refactor-guide.md) | Frontend Lead |
+| **mobile-form-optimization** | - [00-INDEX](mobile-form-optimization/00-INDEX.md)<br>- [01-ONBOARDING](mobile-form-optimization/01-ONBOARDING.md)<br>- [02-IMPLEMENTATION-GUIDE](mobile-form-optimization/02-IMPLEMENTATION-GUIDE.md)<br>- [reference/*](mobile-form-optimization/reference/) (4 files)<br>- [tasks/*](mobile-form-optimization/tasks/) (4 files)<br>- [testing/*](mobile-form-optimization/testing/) (3 files) | Frontend Lead |
+| **operations** | - [founder-ops-guide](operations/founder-ops-guide.md)<br>- [roundtable-execution-guide](operations/roundtable-execution-guide.md) | Operations |
+| **testing** | - [test-data-factory](testing/test-data-factory.md) | QA Lead |
+
+---
+
+## Folder Structure
+
+```
+docs/runbooks/
+├── README.md (this file)
+├── AI_BROKER_COMPLETE_GUIDE.md           [Canonical]
+├── FORMS_ARCHITECTURE_GUIDE.md           [Canonical]
+├── TECH_STACK_GUIDE.md                   [Canonical]
+│
+├── ai-broker/                            (3 files)
+│   ├── patterns.md
+│   ├── profiles.md
+│   └── dr-elena-quick-start.md
+│
+├── automation/                           (12 files)
+│   ├── n8n-coordination.md
+│   └── phase-2-n8n-workflow/            (11 files)
+│
+├── brand/                                (3 files)
+│   ├── messaging.md
+│   ├── copywriting-guide.md
+│   └── visual-identity.md
+│
+├── chatops/                              (5 files)
+│   ├── CHATWOOT_COMPLETE_SETUP_GUIDE.md [Canonical]
+│   ├── troubleshooting.md
+│   ├── webhook-disable-procedure.md
+│   ├── n8n-message-deduplication-fix.md
+│   └── n8n-message-tracking-implementation-guide.md
+│
+├── database/                             (1 file)
+├── devops/                               (4 files)
+├── forms/                                (1 file)
+├── mobile-form-optimization/             (12 files)
+├── operations/                           (2 files)
+├── testing/                              (1 file)
+│
+└── archive/                              (18+ files)
+    ├── 2025/09/                          (2 files - completed tactical work)
+    ├── migration-plans/                  (2 files - pre-migration planning)
+    ├── ai-broker/                        (3 files - merged into complete guide)
+    └── chatwoot/                         (5 files - merged into complete guide)
+```
 
 ---
 
@@ -21,32 +72,61 @@ Each runbook includes front matter describing owner and review cadence. Use /res
 
 Superseded and outdated documentation is stored in `archive/` subdirectories with deprecation notices.
 
-### Deprecated Documents (Pre-Modern Stack)
-- **[DEPLOYMENT_GUIDE_LEGACY.md](runbooks/archive/DEPLOYMENT_GUIDE_LEGACY.md)** - Outdated deployment guide (pre-Chatwoot/Supabase era)
-  - Replaced by: [production-deployment-guide.md](runbooks/devops/production-deployment-guide.md)
-  - Archived: 2025-10-01
-  - Reason: References non-existent files (railway.toml, Procfile), missing modern stack
+### Recently Archived (2025-10-19)
 
-### Superseded Documents (Verbose → Concise)
-- **[tech-stack-verbose.md](runbooks/archive/tech-stack-verbose.md)** - Verbose tech stack guide
-  - Replaced by: [TECH_STACK_GUIDE.md](runbooks/TECH_STACK_GUIDE.md)
-  - Archived: 2025-10-01
-  - Reason: TECH_STACK_GUIDE.md is the canonical reference (last reviewed 2025-09-28)
+**Completed Tactical Work:**
+- **PROGRESSIVE_FORM_COMPACT_EXECUTION_PLAYBOOK.md** → `archive/2025/09/`
+  - Tactical execution playbook from Sept 2025 (completed)
+- **CHAT_AND_LEAD_FORM_UX_TASKLIST.md** → `archive/2025/09/`
+  - Junior developer task list from Sept 2025 (completed)
 
-### Merged Documents (Chatwoot)
-- **[deployment-partial.md](runbooks/archive/chatwoot/deployment-partial.md)** - Chatwoot deployment (partial)
-- **[ai-setup-partial.md](runbooks/archive/chatwoot/ai-setup-partial.md)** - Chatwoot AI setup (partial)
-- **[n8n-setup-partial.md](runbooks/archive/chatwoot/n8n-setup-partial.md)** - n8n Chatwoot setup (partial)
-- **[chatwoot-setup-guide-legacy.md](runbooks/archive/chatwoot/chatwoot-setup-guide-legacy.md)** - Operational setup guide (legacy)
-- **[n8n-chatwoot-ai-workflow-legacy.md](runbooks/archive/chatwoot/n8n-chatwoot-ai-workflow-legacy.md)** - n8n workflow details (legacy)
-  - All replaced by: [CHATWOOT_COMPLETE_SETUP_GUIDE.md](runbooks/chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md)
-  - Archived: 2025-10-01
-  - Reason: Consolidated to reduce overlap and improve maintainability
+**Pre-Migration Planning:**
+- **ENVIRONMENT_SETUP.md** → `archive/migration-plans/`
+  - BullMQ + Vercel AI SDK migration setup guide (pre-migration)
+- **INTEGRATION_MAPPING.md** → `archive/migration-plans/`
+  - Function-to-BullMQ job mapping (pre-migration reference)
 
-### Merged Documents (AI Broker)
-- **[persona-partial.md](runbooks/archive/ai-broker/persona-partial.md)** - AI Broker persona system (partial)
-- **[setup-partial.md](runbooks/archive/ai-broker/setup-partial.md)** - AI Broker setup guide (partial)
-- **[flow-partial.md](runbooks/archive/ai-broker/flow-partial.md)** - Complete AI Broker flow (partial)
-  - All replaced by: [AI_BROKER_COMPLETE_GUIDE.md](runbooks/AI_BROKER_COMPLETE_GUIDE.md)
-  - Archived: 2025-10-01
-  - Reason: Consolidated to reduce overlap and improve maintainability
+### Previously Archived (2025-10-01)
+
+**Deprecated Documents (Pre-Modern Stack):**
+- **DEPLOYMENT_GUIDE_LEGACY.md** → `archive/`
+  - Replaced by: `devops/production-deployment-guide.md`
+  - Reason: References non-existent files, missing modern stack
+
+**Superseded Documents (Verbose → Concise):**
+- **tech-stack-verbose.md** → `archive/`
+  - Replaced by: `TECH_STACK_GUIDE.md` (canonical)
+  - Reason: Concise version is more maintainable
+
+**Merged Documents (Chatwoot):**
+- 5 partial guides → `archive/chatwoot/`
+  - All replaced by: `chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md`
+  - Reason: Consolidated to reduce overlap
+
+**Merged Documents (AI Broker):**
+- 3 partial guides → `archive/ai-broker/`
+  - All replaced by: `AI_BROKER_COMPLETE_GUIDE.md`
+  - Reason: Consolidated to reduce overlap
+
+---
+
+## Canonical Guides
+
+**Keep at root for easy discovery:**
+- [AI_BROKER_COMPLETE_GUIDE.md](AI_BROKER_COMPLETE_GUIDE.md) - Comprehensive AI broker system guide
+- [FORMS_ARCHITECTURE_GUIDE.md](FORMS_ARCHITECTURE_GUIDE.md) - Forms architecture and patterns
+- [TECH_STACK_GUIDE.md](TECH_STACK_GUIDE.md) - Technology stack overview
+
+**Canonical in subfolders:**
+- [chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md](chatops/CHATWOOT_COMPLETE_SETUP_GUIDE.md) - Complete Chatwoot setup
+
+---
+
+## Organization Principles
+
+**Root Level:** Only canonical guides (3) + README
+**Subfolders:** Domain-organized (ai-broker, brand, chatops, etc.)
+**Archive:** Superseded docs with clear deprecation notices
+
+**Total Active Runbooks:** 58 files across 11 domains
+**Total Archived:** 18+ files with documented deprecation reasons

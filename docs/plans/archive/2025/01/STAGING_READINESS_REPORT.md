@@ -276,7 +276,7 @@ npx tsx scripts/test-dr-elena-integration.ts
 
 For detailed information, see:
 
-- **Quick Start**: `docs/DR_ELENA_QUICK_START.md`
+- **Quick Start**: `docs/runbooks/ai-broker/dr-elena-quick-start.md`
 - **Full Integration Docs**: `docs/DR_ELENA_INTEGRATION_COMPLETE.md`
 - **Staging Test Plan**: `docs/DR_ELENA_STAGING_TEST_PLAN.md`
 - **Deployment Steps**: `STAGING_NEXT_STEPS.md`
@@ -312,7 +312,7 @@ For detailed information, see:
 
 **For Staging Issues**:
 1. Check logs first
-2. Review troubleshooting in `docs/DR_ELENA_QUICK_START.md`
+2. Review troubleshooting in `docs/runbooks/ai-broker/dr-elena-quick-start.md`
 3. Verify environment variables
 4. Check Redis/Supabase connectivity
 

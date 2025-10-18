@@ -273,8 +273,8 @@ Chatwoot Webhook → n8n AI Response Handler
 
 - Implementation Session: `docs/reports/session-context/2025-10-02-broker-chat-alignment-implementation-session.md`
 - Broker Chat Alignment Plan: `docs/plans/active/2025-09-26-broker-chat-alignment-plan.md`
-- Webhook Disable Procedure: `docs/runbooks/chatwoot-webhook-disable-procedure.md`
-- n8n Coordination Guide: `docs/runbooks/n8n-workflow-coordination.md`
+- Webhook Disable Procedure: `docs/runbooks/chatops/webhook-disable-procedure.md`
+- n8n Coordination Guide: `docs/runbooks/automation/n8n-coordination.md`
 
 ---
 

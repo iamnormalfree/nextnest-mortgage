@@ -366,9 +366,9 @@ After staging tests, record these metrics:
 
 **Quick References**:
 - Full test plan: `docs/DR_ELENA_STAGING_TEST_PLAN.md`
-- Quick start guide: `docs/DR_ELENA_QUICK_START.md`
+- Quick start guide: `docs/runbooks/ai-broker/dr-elena-quick-start.md`
 - Technical docs: `docs/DR_ELENA_INTEGRATION_COMPLETE.md`
-- Troubleshooting: `docs/DR_ELENA_QUICK_START.md` (Troubleshooting section)
+- Troubleshooting: `docs/runbooks/ai-broker/dr-elena-quick-start.md` (Troubleshooting section)
 
 **Common Issues**:
 - Calculation errors → Review `lib/calculations/dr-elena-mortgage.ts`

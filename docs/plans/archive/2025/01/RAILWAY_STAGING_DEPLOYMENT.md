@@ -603,7 +603,7 @@ After 24 hours of successful staging:
 
 **Reference Documents:**
 - Full Integration Docs: `docs/DR_ELENA_INTEGRATION_COMPLETE.md`
-- Quick Start Guide: `docs/DR_ELENA_QUICK_START.md`
+- Quick Start Guide: `docs/runbooks/ai-broker/dr-elena-quick-start.md`
 - Test Plan: `docs/DR_ELENA_STAGING_TEST_PLAN.md`
 - Readiness Report: `STAGING_READINESS_REPORT.md`
 
