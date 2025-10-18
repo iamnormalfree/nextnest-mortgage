@@ -4,7 +4,7 @@ status: ready-for-testing
 owner: engineering
 last-reviewed: 2025-10-02
 orchestration: /response-awareness
-implementation-session: docs/sessions/2025-10-02-broker-chat-alignment-implementation-session.md
+implementation-session: docs/reports/session-context/2025-10-02-broker-chat-alignment-implementation-session.md
 ---
 
 **Implementation Status: ✅ CODE COMPLETE - Pending End-to-End Testing**

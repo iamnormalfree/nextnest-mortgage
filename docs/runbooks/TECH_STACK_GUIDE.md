@@ -50,14 +50,14 @@ public/, assets/            # Runtime/static assets
 scripts/, validation-reports/
 ```
 - Stick to server-first rendering; lift client state into hooks only when interactivity demands.
-- All new documentation for these folders should live under `docs/` (see `docs/meta/docs-reorg-roadmap.md`).
+- All new documentation for these folders should live under `docs/` (see `docs/plans/archive/` for historical reorganization plans).
 
 ## AI & ChatOps Stack
 - **Chatwoot** (self-hosted) powers conversations at `chat.nextnest.sg`; queues name brokers and orchestrate hand-offs.
 - **OpenAI / Langfuse** handle LLM responses and observability; prompts and guardrails reside in `lib/ai/` and `docs/runbooks/AI_BROKER_PERSONA_SYSTEM.md`.
 - **n8n workflows** (see `n8n-workflows/` and `docs/runbooks/N8N_CHATWOOT_AI_WORKFLOW.md`) dispatch automation tasks, broker assignment, and escalation triggers.
 - **Current gaps**: automatic broker assignment in production Chatwoot is not wired yet, so LLM replies still appear system-generated; follow the TODOs in `lib/integrations/chatwoot-client.ts` and align with the Chatwoot deployment guides before launch.
-- **Next steps**: implement the "virtual human" delay/typing indicators, confirm Chatwoot inbox mapping per broker, and record the decision trail in `docs/meta/current-state-report.md`.
+- **Next steps**: implement the "virtual human" delay/typing indicators, confirm Chatwoot inbox mapping per broker, and record the decision trail in `docs/reports/` or `docs/codex-journal.md`.
 
 ## Data, Analytics & Compliance
 - Lead submissions flow through Supabase with validation in `lib/validation/` and deduplication routines in `lib/integrations/conversation-deduplication.ts`.

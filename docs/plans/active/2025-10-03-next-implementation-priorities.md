@@ -8,7 +8,7 @@
 
 ## Priority 1: Fix Remaining Message Duplication (Message #2) ⚡ URGENT
 
-**Plan:** `docs/sessions/2025-10-03-message-duplication-fix-continuation.md`
+**Plan:** `docs/reports/session-context/2025-10-03-message-duplication-fix-continuation.md`
 **Status:** IN PROGRESS - Reduced from 3 to 2 messages
 **Estimated Time:** 1-2 hours
 
@@ -218,7 +218,7 @@ Chatwoot Webhook → n8n AI Response Handler
 
 ## Immediate Next Steps (Today)
 
-1. ✅ Session summary created: `docs/sessions/2025-10-02-broker-chat-alignment-implementation-session.md`
+1. ✅ Session summary created: `docs/reports/session-context/2025-10-02-broker-chat-alignment-implementation-session.md`
 2. ✅ Plan status updated: `2025-09-26-broker-chat-alignment-plan.md` → READY_FOR_TESTING
 3. ⏳ **User Action:** Test complete broker flow with fresh form submission
 4. ⏳ **User Action:** Disable legacy webhook in Chatwoot admin
@@ -271,7 +271,7 @@ Chatwoot Webhook → n8n AI Response Handler
 
 ## Related Documentation
 
-- Implementation Session: `docs/sessions/2025-10-02-broker-chat-alignment-implementation-session.md`
+- Implementation Session: `docs/reports/session-context/2025-10-02-broker-chat-alignment-implementation-session.md`
 - Broker Chat Alignment Plan: `docs/plans/active/2025-09-26-broker-chat-alignment-plan.md`
 - Webhook Disable Procedure: `docs/runbooks/chatwoot-webhook-disable-procedure.md`
 - n8n Coordination Guide: `docs/runbooks/n8n-workflow-coordination.md`

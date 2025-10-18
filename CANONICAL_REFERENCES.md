@@ -703,46 +703,79 @@
 
 ---
 
-## Response-Awareness Framework Documentation (Tier 1)
+## Documentation Folder Structure (Tier 1)
 
-### Completion Drive Folders
+### docs/ Organization Standards
 
-**Purpose:** Storage for response-awareness framework documentation used by slash commands, skills, and AI learning systems (Claude, Codex, Factory AI).
+**Last Updated:** 2025-10-18
+**Purpose:** Canonical folder structure for all project documentation
 
-**Location:** `docs/completion_drive_plans/` and `docs/completion_drive_checkpoints/`
+**Root-Level Files (Canonical References):**
+- `docs/ARCHITECTURE.md` - System architecture and technical design
+- `docs/DESIGN_SYSTEM.md` - Design tokens and component patterns
+- `docs/KNOWN_ISSUES.md` - Current workarounds and bugs
+- `docs/work-log.md` - Daily work log (Tier 2 working document)
+- `docs/overview.md` - Documentation index/map
 
-**Status:** ✅ PRODUCTION - Used by response-awareness framework
+**Folder Structure (10 Folders):**
 
-**Folders:**
+**`docs/plans/`** - Tier 3: Temporary decision documents
+- `active/` - Current implementation plans (<200 lines)
+- `archive/YYYY/MM/` - Completed plans (date-organized)
+- `backlog/` - Future work
+- **Rule:** Plans are temporary, archived after completion
 
-**`docs/completion_drive_plans/`**
-- Domain-organized subfolders: `ai/`, `api/`, `data/`, `forms/`, `integration/`, etc.
-- Specialized plans: `ai-chat-intelligence-system/`, `17-10-2025_lead-form-chat-handoff/`
-- Completion reports: `archive_report.md`, `cleanup_completion_report.md`, `code_reference_verification.md`
-- Integration coordination: `integration-coordination-plan.md`
+**`docs/runbooks/`** - Tier 2: Implementation guides
+- Domain-organized: `chatops/`, `devops/`, `mobile-form-optimization/`, etc.
+- **Rule:** Runbooks LINK to Tier 1 code, never duplicate it
+- **Rule:** Runbooks never expire (unlike plans)
 
-**`docs/completion_drive_checkpoints/`**
-- Currently empty - Reserved for future checkpoint storage
+**`docs/reports/`** - Investigation findings and reports
+- `decisions/` - Architecture decision documents
+- `evaluations/` - Technology evaluations
+- `investigations/` - Ad-hoc investigation findings
+- `research/` - Research reports
+- `session-context/` - Session summaries
+- `validation/` - Validation reports
 
-**Usage:**
-- Referenced by slash commands for learning context
-- Used by skills for domain-specific knowledge
-- Provides training data for response-awareness tiers (LIGHT/MEDIUM/HEAVY/FULL)
-- Maintains completion drive state across sessions
+**`docs/_templates/`** - Document templates
+
+**`docs/completion_drive_plans/`** - Response-awareness framework plans
+- Domain-organized: `ai/`, `api/`, `data/`, `forms/`, `integration/`
+- Used by slash commands and skills for AI learning
+
+**`docs/completion_drive_checkpoints/`** - Response-awareness checkpoints
+- Reserved for framework checkpoint storage
+
+**`docs/design/`** - Design assets and mockups
+
+**`docs/mortgage-lessons/`** - Domain knowledge (mortgage industry)
+
+**`docs/openai-apps-sdk/`** - SDK research and documentation
+
+**`docs/troubleshooting/`** - Troubleshooting guides
+
+**Deprecated Folders (Consolidated 2025-10-18):**
+- ❌ `docs/sessions/` → Merged into `docs/reports/session-context/`
+- ❌ `docs/evaluations/` → Merged into `docs/reports/evaluations/`
+- ❌ `docs/validation-reports/` → Merged into `docs/reports/validation/`
+- ❌ `docs/meta/` → Archived to `docs/plans/archive/2025/09/meta-legacy/`
+- ❌ `docs/audits/` → Was empty, removed
 
 **Allowed Changes:**
-- Add new domain folders as projects evolve
-- Add completion reports after major milestones
-- Update integration coordination documents
-- Add checkpoint files as framework evolves
+- Add new runbooks in domain folders
+- Create new plans in `active/` (archive after completion)
+- Add investigation reports to `reports/investigations/`
+- Add new domain folders in `completion_drive_plans/` as projects evolve
 
 **Forbidden Changes:**
-- Do NOT delete without checking slash command/skill dependencies
-- Do NOT move to general docs/ folders (framework-specific location)
-- Do NOT archive (active learning system documentation)
-- Do NOT rename root folders (breaking change for framework)
+- Do NOT create new top-level folders without updating this file
+- Do NOT create files at `docs/` root (except the 5 canonical references)
+- Do NOT recreate deprecated folders (sessions/, evaluations/, validation-reports/, meta/)
+- Do NOT move completion_drive folders (breaking change for response-awareness framework)
 
 **Related Files:**
+- `CLAUDE.md` - 3-tier documentation system rules
 - `AGENTS.md` - Agent configuration references completion drive
 - `SKILL.md` - Skill definitions may reference completion drive content
 - `.mcp.json` - MCP server configuration for skills/commands
