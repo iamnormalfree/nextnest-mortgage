@@ -1,4 +1,4 @@
-import { CheckCircle, Shield, TrendingUp } from './icons'
+import { CheckCircle, Shield, TrendingUp } from '@/components/shared/icons'
 
 const ServicesSection = () => {
   return (

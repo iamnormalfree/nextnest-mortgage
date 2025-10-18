@@ -1,6 +1,6 @@
 'use client'
 
-import AnimatedCounter from './AnimatedCounter'
+import AnimatedCounter from '@/components/shared/AnimatedCounter'
 
 export default function StatsSection() {
   return (

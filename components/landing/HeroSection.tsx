@@ -1,4 +1,4 @@
-import { Clock, Users, Star } from './icons'
+import { Clock, Users, Star } from '@/components/shared/icons'
 
 const HeroSection = () => {
   return (

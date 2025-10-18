@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { ConditionalNav } from '@/components/ConditionalNav'
+import { ConditionalNav } from '@/components/layout/ConditionalNav'
 
 export const metadata: Metadata = {
   title: 'NextNest - Singapore\'s Most Transparent Mortgage Advisor',
