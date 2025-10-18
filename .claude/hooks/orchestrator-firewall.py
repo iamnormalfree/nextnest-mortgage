@@ -284,10 +284,16 @@ class OrchestratorFirewall:
             # Even without Task(), HEAVY/FULL should delegate
             return (True, 'BLOCK', self._generate_message('HEAVY_FULL_NO_TASK'))
 
-        # AUTO tier (router): Check if Task() used
+        # AUTO tier (router): Restrict to read-only operations
         if self.tier == 'AUTO':
             if self.used_task:
                 return (True, 'BLOCK', self._generate_message('AUTO_ORCHESTRATOR'))
+            # Router mode: Allow reading for complexity assessment, block implementation
+            if self.tool_name in ['Edit', 'Write', 'NotebookEdit']:
+                return (True, 'BLOCK', self._generate_message('AUTO_ROUTER_IMPLEMENTING'))
+            # Allow TodoWrite check (router might create initial assessment notes)
+            if self.tool_name == 'TodoWrite':
+                return (True, 'WARN', self._generate_message('AUTO_ROUTER_TODO'))
             return (False, 'ALLOW', '')
 
         # Default: Allow with warning
@@ -586,6 +592,72 @@ Since you used Task(), you are now an {Colors.BOLD}ORCHESTRATOR{Colors.END}.
 Deploy implementation agents instead of implementing directly.
 
 {Colors.RED}Tool usage BLOCKED.{Colors.END}
+""",
+
+            'AUTO_ROUTER_IMPLEMENTING': f"""
+{Colors.RED}🛑 ORCHESTRATOR FIREWALL - ROUTER VIOLATION{Colors.END}
+
+{Colors.BOLD}ROUTER MODE - IMPLEMENTATION ATTEMPT DETECTED{Colors.END}
+
+{Colors.CYAN}State:{Colors.END}
+- Mode: {Colors.BOLD}AUTO ROUTER{Colors.END} (/response-awareness command)
+- Tool: {Colors.BOLD}{self.tool_name}{Colors.END}
+- Role: {Colors.BOLD}ROUTER{Colors.END} (not implementer)
+
+{Colors.RED}❌ CRITICAL VIOLATION:{Colors.END}
+The router's ONLY job is to:
+1. Read files to assess complexity
+2. Calculate complexity score (0-12)
+3. Announce routing decision: "→ Routing to [TIER] tier"
+4. {Colors.BOLD}STOP IMMEDIATELY{Colors.END}
+
+{Colors.YELLOW}You are attempting to:{Colors.END}
+- {Colors.RED}Edit/Write files{Colors.END} (implementation work)
+- This bypasses the entire tier system
+- The tier Skill should handle this, NOT the router
+
+{Colors.CYAN}Required routing announcement format:{Colors.END}
+```
+Task complexity analysis:
+- File Scope: X/3
+- Requirement Clarity: X/3
+- Integration Risk: X/3
+- Change Type: X/3
+- Total Score: X/12
+
+→ Routing to: [TIER] tier (Score X matches range Y-Z)
+
+The [TIER] tier Skill will now handle this task.
+```
+
+{Colors.BOLD}After this announcement: STOP.{Colors.END}
+The tier Skill loads automatically and takes over.
+
+{Colors.RED}This {self.tool_name} operation is BLOCKED.{Colors.END}
+""",
+
+            'AUTO_ROUTER_TODO': f"""
+{Colors.YELLOW}⚠️  ORCHESTRATOR FIREWALL - ROUTER WARNING{Colors.END}
+
+{Colors.BOLD}ROUTER MODE - TodoWrite DETECTED{Colors.END}
+
+{Colors.CYAN}State:{Colors.END}
+- Mode: {Colors.BOLD}AUTO ROUTER{Colors.END}
+- Tool: {Colors.BOLD}TodoWrite{Colors.END}
+
+{Colors.YELLOW}Warning:{Colors.END}
+Router should only:
+1. Assess complexity
+2. Announce routing decision
+3. STOP
+
+{Colors.CYAN}TodoWrite is tier work{Colors.END} (not router work).
+The tier Skill creates task lists, not the router.
+
+{Colors.YELLOW}Recommendation:{Colors.END}
+Announce routing decision and let tier Skill handle task management.
+
+{Colors.GREEN}Proceeding with WARNING (not blocked){Colors.END}
 """,
         }
 
