@@ -54,7 +54,7 @@ This guide explains how the homepage, forms, AI broker UI, and Chatwoot integrat
 ## 2) How the homepage renders
 
 - `app/page.tsx` composes: `HeroSection`, `ServicesSection`, `ContactSection`.
-- `app/layout.tsx` wraps all pages and shows `components/ConditionalNav.tsx` except on `/redesign/*`.
+- `app/layout.tsx` wraps all pages and shows `components/ConditionalNav.tsx` for all production routes.
 - Most homepage UI is server-rendered (small hydration cost). It uses more decorative effects (blur/rounded) than redesign, which adds paint cost.
 
 ---
@@ -135,7 +135,7 @@ Think of it as the single source of truth for a user’s form session.
 
 - __Visuals (safe to change)__
   - Homepage UI: `components/*.tsx`
-  - Redesign UI: `redesign/*.tsx`
+  - Archived UI experiments: `components/archive/2025-10/redesign-experiments/`
   - Tokens & gradients: `tailwind.config.ts`
   - Global rules: `app/globals.css`
   - Brand lint: `npm run lint:brand`

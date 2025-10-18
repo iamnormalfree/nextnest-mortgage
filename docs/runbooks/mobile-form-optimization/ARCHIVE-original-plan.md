@@ -71,7 +71,7 @@ This guide assumes you are a skilled developer but know **nothing about our code
    - NO framer-motion (40KB bundle) - use native touch events
 
 5. **Design System: Sophisticated Flow**
-   - Reference: `/app/redesign/sophisticated-flow/page.tsx` (single source of truth)
+   - Reference: Design system tokens in `tailwind.config.ts` (canonical source of truth)
    - Color: 90% monochrome + 10% yellow accent (#FCD34D)
    - ❌ FORBIDDEN: Purple, rounded corners, font-medium/font-bold
    - ✅ ALLOWED: font-light (300), font-normal (400), font-semibold (600)

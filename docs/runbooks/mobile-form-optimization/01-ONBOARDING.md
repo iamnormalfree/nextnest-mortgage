@@ -108,7 +108,7 @@ Requirements:
 
 ### 5. Design System: Sophisticated Flow
 
-**Reference:** `/app/redesign/sophisticated-flow/page.tsx` (single source of truth)
+**Reference:** Design system documented in `docs/DESIGN_SYSTEM.md` and `tailwind.config.ts`
 
 **Rules:**
 - **Colors:** 90% monochrome + 10% yellow accent (#FCD34D)

@@ -1,7 +1,7 @@
 # Design System Rules - Path2 Mobile-First Form
 
 **Source:** Path2 Plan Lines 66-79
-**Reference:** `/app/redesign/sophisticated-flow/page.tsx` (single source of truth)
+**Reference:** `tailwind.config.ts` (single source of truth for design tokens)
 
 ---
 
@@ -144,4 +144,4 @@ Before committing any UI component:
 - [ ] Touch targets ≥48px on mobile
 - [ ] No framer-motion imports
 
-**See:** `/app/redesign/sophisticated-flow/page.tsx` for canonical examples
+**See:** `docs/DESIGN_SYSTEM.md` and `tailwind.config.ts` for canonical design system
