@@ -59,3 +59,7 @@ nul
 
 # Temporary files (QA findings, test artifacts)
 /temp/
+
+# Upstream reference no longer needed with git subtree
+.claude/upstream-reference/*
+!.claude/upstream-reference/README.md

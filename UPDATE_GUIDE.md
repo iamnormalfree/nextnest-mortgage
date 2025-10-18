@@ -6,13 +6,21 @@ This guide explains how to sync your customized response-awareness framework wit
 
 ## Architecture Overview
 
-**Three-Layer System:**
+**Two-Layer System:**
 
 1. **Shared Repository** (`https://github.com/iamnormalfree/claude-shared`) - Canonical frameworks
-2. **Local Subtree** (`.claude/frameworks/shared/`) - Git subtree of shared repository
-3. **Configuration Layer** (`.claude/config/`) - Project-specific settings
+   - Git subtree embedded at `.claude/frameworks/shared/`
+   - Version controlled via git
+   - Updates via `git subtree pull`
 
-**Key Principle:** Shared frameworks are managed via git subtree. Updates from shared repository automatically sync to all projects.
+2. **Configuration Layer** (`.claude/config/`) - Project-specific settings
+   - `response-awareness-config.json` - Feature flags, paths, tier preferences
+   - `logging-config.json` - Logging configuration
+   - `agents-config.json` - Custom agents
+
+**Key Principle:** Shared frameworks are managed via git subtree. Updates from shared repository sync to all projects via git commands.
+
+**Note:** `.claude/upstream-reference/` is no longer needed with git subtree - git tracks versions automatically.
 
 ---
 

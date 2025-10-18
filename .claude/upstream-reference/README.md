@@ -1,6 +1,19 @@
 # Upstream Reference Directory
 
-This directory stores pristine copies of the response-awareness framework for comparison purposes.
+⚠️ **OBSOLETE:** This directory is no longer needed with the git subtree approach.
+
+**Why it's obsolete:**
+- Git subtree tracks versions automatically
+- No need to download ZIPs manually
+- Comparison done via `git diff` if needed
+
+**This README is kept for historical reference only.**
+
+---
+
+## Historical Purpose (Pre-Subtree)
+
+This directory stored pristine copies of the response-awareness framework for comparison purposes.
 
 ## Purpose
 
