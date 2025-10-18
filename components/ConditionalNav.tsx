@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import Image from 'next/image'
-import Logo from '@/assets/nn-logo-nobg-img.png'
+import Logo from '@/public/images/logos/nn-logo-nobg-img.png'
 import { FEATURE_FLAGS } from '@/lib/features/feature-flags'
 
 export function ConditionalNav() {

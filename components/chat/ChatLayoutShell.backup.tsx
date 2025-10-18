@@ -3,7 +3,7 @@
 import React, { ReactNode } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import Logo from '@/assets/nn-logo-nobg-img.png'
+import Logo from '@/public/images/logos/nn-logo-nobg-img.png'
 import { ArrowLeft, LayoutDashboard } from 'lucide-react'
 
 interface ChatLayoutShellProps {

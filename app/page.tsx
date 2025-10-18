@@ -17,7 +17,7 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import Logo from '@/assets/nn-logo-nobg-img.png'
+import Logo from '@/public/images/logos/nn-logo-nobg-img.png'
 import ContactSection from '@/components/ContactSection'
 
 type ViewState = 'landing' | 'loanTypeSelection'
