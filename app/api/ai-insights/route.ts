@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { mortgageFormSchema, AIContext, aiContextSchema } from '@/lib/validation/mortgage-schemas'
+import { getPlaceholderRate } from '@/lib/calculations/instant-profile'
 import { z } from 'zod'
 
 interface AIInsight {
@@ -103,18 +104,21 @@ function generateRefinanceInsights(formData: any, aiContext?: AIContext): AIInsi
   const insights: AIInsight[] = []
 
   // Rate opportunity analysis
-  if (formData.currentRate && formData.currentRate > 3.2) {
-    const potentialSavings = Math.round((formData.currentRate - 3.0) * formData.outstandingLoan / 100 / 12)
-    insights.push({
-      type: 'rate_opportunity',
-      title: 'High Savings Potential Detected',
-      message: `Your ${formData.currentRate}% rate is ${(formData.currentRate - 3.0).toFixed(1)}% above current market rates. Refinancing could save significant monthly payments.`,
-      urgency: formData.currentRate > 4.0 ? 'high' : 'medium',
-      value: `SGD ${potentialSavings.toLocaleString()}/month`,
-      data: { monthlySavings: potentialSavings, yearlyTotal: potentialSavings * 12 },
-      actionable: true,
-      category: 'financial'
-    })
+  if (formData.currentRate && formData.outstandingLoan) {
+    const marketRate = getPlaceholderRate(formData.propertyType || 'Private', 'refinance')
+    if (formData.currentRate > marketRate) {
+      const potentialSavings = Math.round((formData.currentRate - marketRate) * formData.outstandingLoan / 100 / 12)
+      insights.push({
+        type: 'rate_opportunity',
+        title: 'High Savings Potential Detected',
+        message: `Your ${formData.currentRate}% rate is ${(formData.currentRate - marketRate).toFixed(1)}% above current market rates. Refinancing could save significant monthly payments.`,
+        urgency: formData.currentRate > 4.0 ? 'high' : 'medium',
+        value: `SGD ${potentialSavings.toLocaleString()}/month`,
+        data: { monthlySavings: potentialSavings, yearlyTotal: potentialSavings * 12 },
+        actionable: true,
+        category: 'financial'
+      })
+    }
   }
 
   // Lock-in status insights

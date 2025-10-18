@@ -1,10 +1,12 @@
 /**
  * Dynamic G3 Validation Strategy
  * Lead: Dr. Elena Rossi & Marcus Chen
- * 
+ *
  * Intent-based validation that adapts to loan type and available data
  * Enables intelligent AI analysis regardless of field completeness
  */
+
+import { getPlaceholderRate } from '@/lib/calculations/instant-profile'
 
 export interface G3ValidationContext {
   loanType: 'new_purchase' | 'refinance' | 'commercial'
@@ -121,10 +123,13 @@ export function calculateFinancialMetrics(formData: Record<string, any>) {
   
   // Potential Savings (for refinance)
   let potentialSavings = null
-  if (currentRate > 0 && outstanding > 0 && currentRate > 2.8) {
-    const currentMonthly = outstanding * (currentRate / 100 / 12)
-    const newMonthly = outstanding * (2.8 / 100 / 12) // Assume market rate of 2.8%
-    potentialSavings = Math.round(currentMonthly - newMonthly)
+  if (currentRate > 0 && outstanding > 0) {
+    const marketRate = getPlaceholderRate(formData.propertyType || 'Private', 'refinance')
+    if (currentRate > marketRate) {
+      const currentMonthly = outstanding * (currentRate / 100 / 12)
+      const newMonthly = outstanding * (marketRate / 100 / 12)
+      potentialSavings = Math.round(currentMonthly - newMonthly)
+    }
   }
   
   // Affordability (for new purchase)
