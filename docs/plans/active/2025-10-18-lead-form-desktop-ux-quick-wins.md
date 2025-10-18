@@ -1,9 +1,21 @@
-# Lead Form Conversion Optimization - Path 1 (Quick Wins)
+---
+status: active
+priority: critical
+created: 2025-10-17
+updated: 2025-10-18
+workstream: forms
+complexity: light
+estimated_hours: 8
+blocks: 2025-10-18-lead-form-mobile-first-rebuild.md
+---
 
-**Timeline:** 1 week
-**Expected Impact:** 15-20% conversion increase
+# Lead Form Desktop UX Quick Wins
+
+**Timeline:** 1 week (Week 1 of Phase 1)
+**Expected Impact:** 15-20% desktop conversion increase
 **Complexity:** Low
 **Risk:** Low
+**Blocks:** Path 2 mobile-first rebuild (same component modifications)
 
 ## Context
 
@@ -977,23 +989,20 @@ Before starting, clarify:
 
 ---
 
-## Next Steps (Path 2)
+## Next Steps After Completion
 
-After Path 1 deploys successfully:
+**Prerequisite checks before starting Path 2 (mobile-first rebuild):**
+- [ ] Desktop conversion increased by ≥15% (verified via analytics)
+- [ ] No console errors or regressions in production
+- [ ] All Path 1 tests passing
+- [ ] Visual weight changes validated by users (2+ weeks of data)
+- [ ] Baseline metrics collected for mobile A/B testing
 
-1. **Mobile-First Redesign:**
-   - Touch-optimized inputs
-   - Swipe navigation between steps
-   - Simplified field layout
+**Then proceed to:**
+See: `docs/plans/active/2025-10-18-lead-form-mobile-first-rebuild.md`
 
-2. **Smart Defaults:**
-   - Remember user's last session
-   - Pre-fill common values
-   - Location-based property suggestions
-
-3. **A/B Testing Framework:**
-   - Test different CTA copy
-   - Test field ordering variations
-   - Test progressive disclosure timing
-
-See: `docs/plans/active/2025-10-17-lead-form-conversion-optimization-path2.md`
+**Why Path 2 is blocked by Path 1:**
+1. Both modify same components (`ProgressiveFormWithController.tsx`, Step 3 sections)
+2. Path 1 establishes baseline desktop UX that mobile build depends on
+3. Desktop metrics inform mobile A/B testing strategy
+4. Sequential execution avoids merge conflicts from parallel work

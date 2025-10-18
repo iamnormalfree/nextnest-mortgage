@@ -1,14 +1,32 @@
 ---
-status: active
+status: draft
+priority: high
 owner: engineering
 created: 2025-10-17
-updated: 2025-10-17
+updated: 2025-10-18
 workstream: forms
 complexity: medium
 estimated_hours: 40
+blocked_by: 2025-10-18-lead-form-desktop-ux-quick-wins.md
 ---
 
-# Mobile Lead Form Optimization
+# Lead Form Mobile-First Rebuild
+
+## Prerequisites
+
+**BLOCKED BY:** `2025-10-18-lead-form-desktop-ux-quick-wins.md`
+
+Path 1 (desktop UX quick wins) must complete first because:
+1. Both modify same components (`ProgressiveFormWithController.tsx`, Step 3 sections)
+2. Path 1 establishes baseline desktop UX that mobile build depends on
+3. Desktop conversion metrics inform mobile A/B testing strategy
+4. Sequential execution avoids merge conflicts from parallel work on same files
+
+**Before starting Phase 2:**
+- [ ] Path 1 deployed to production
+- [ ] Desktop conversion metrics collected (2 weeks minimum)
+- [ ] Baseline established for mobile comparison
+- [ ] No regressions or console errors from Path 1 changes
 
 ## Problem Statement
 
