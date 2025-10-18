@@ -56,3 +56,6 @@ nul
 # Audit logs (environment-specific storage for PDPA compliance)
 /logs/
 *.jsonl
+
+# Temporary files (QA findings, test artifacts)
+/temp/
