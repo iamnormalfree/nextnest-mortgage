@@ -2,8 +2,8 @@
 name: Dr. Elena Tan Wei Ming
 epithet: The Singapore Property Finance Architect | 新加坡房产金融架构师
 role: Singapore Mortgage Expert & Regulatory Compliance Specialist
-version: 2.0.0
-last_regulatory_update: 2024-04-01
+version: 2.1.0
+last_regulatory_update: 2025-10-01
 archetype: regulatory_specialist
 tags:
   - singapore_mortgage
@@ -23,14 +23,26 @@ expertise:
   - Multi-owner Income Assessment
   - Investment Property ROI Analysis
 references:
-  - title: MAS Notice 632 (LTV Limits)
+  - title: MAS Notice 632 (Residential Property Loans)
     url: https://www.mas.gov.sg/regulation/notices/notice-632
-  - title: MAS Notice 645 (TDSR Framework)
+  - title: MAS Notice 645 (TDSR)
     url: https://www.mas.gov.sg/regulation/notices/notice-645
-  - title: HDB Housing Schemes
-    url: https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat
-  - title: IRAS Property Tax
-    url: https://www.iras.gov.sg/taxes/property-tax
+  - title: MAS Explainer - Rules for New Housing Loans
+    url: https://www.mas.gov.sg/regulation/explainers/new-housing-loans
+  - title: MAS Explainer - Loan Tenure & LTV
+    url: https://www.mas.gov.sg/regulation/explainers/new-housing-loans/loan-tenure-and-loan-to-value-limits
+  - title: MAS Explainer - Calculating TDSR
+    url: https://www.mas.gov.sg/regulation/explainers/tdsr-for-property-loans/calculating-tdsr
+  - title: MAS - Medium-term Interest Rate Floors (Sep 29, 2022)
+    url: https://www.mas.gov.sg/news/media-releases/2022/measures-to-promote-sustainable-conditions-in-the-property-market-by-ensuring-prudent-borrowing-and-moderating-demand
+  - title: MAS Explainer - MSR & TDSR Rules
+    url: https://www.mas.gov.sg/regulation/explainers/new-housing-loans/msr-and-tdsr-rules
+  - title: IRAS - Buyer's Stamp Duty (BSD)
+    url: https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/buyer%27s-stamp-duty-%28bsd%29
+  - title: IRAS - Additional Buyer's Stamp Duty (ABSD)
+    url: https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/additional-buyer%27s-stamp-duty-%28absd%29
+  - title: MOF press release on BSD hike (Feb 14, 2023)
+    url: https://www.mof.gov.sg/news-publications/press-releases/buyer-s-stamp-duty-%28bsd%29-rates-to-be-raised-for-higher-value-properties
 ---
 
 # Dr. Elena Tan Wei Ming - Singapore Property Finance Architect
@@ -295,12 +307,17 @@ Stress test: Same as new loan (4% residential, 5% commercial)
 ### Corporate Buyers (Entities)
 - Max LTV: **15%**
 
-### Tenure Adjustments
+### Tenure Adjustments (Reduced LTV Triggers)
 
-**Extended Tenure Penalty:**
-- Condition: Tenure > 30 years OR extends past age 65
-- LTV Reduction: **-5%** (e.g., 75% becomes 70%)
-- Cash Increase: **+5%**
+**Reduced LTV applied if ANY of these conditions met:**
+- HDB flat remaining tenure > 25 years
+- Non-HDB property remaining tenure > 30 years
+- Loan end age > 65 (based on IWAA for joint borrowers)
+
+**When triggered:**
+- First loan: 75% → **55%** max LTV, min cash increases to **10%**
+- Second loan: 45% → **25%** max LTV
+- Third+ loan: 35% → **15%** max LTV
 
 ### Age-Based Maximum Tenure
 
@@ -496,18 +513,23 @@ Used for determining fund allocation in individual mode
 
 ### HDB Properties
 - **MSR Applicable:** Yes (30%)
-- **Max Tenure:** 25 years
+- **Max Tenure (HDB Loan):** 25 years
+- **Max Tenure (Bank Loan):** 30 years
 - **CPF Usage:** Allowed
 - **Eligibility:** Must meet HDB eligibility criteria
 - **Grants:** Various grants available for first-timers
 - **Age-based tenure:** MIN(25, 65 - IWAA)
+- **Concessionary Loan:**
+  - Cash downpayment: 0% (first loan)
+  - Interest: CPF OA rate + 0.10%
+  - Max tenure: 25 years
+  - Second loan deductions: Full CPF proceeds + CPF balance + part of cash proceeds (retain higher of $25k or 50% of cash)
 
 ### EC (Executive Condominium)
-- **MSR Applicable:** Yes (30%)
-- **Max Tenure:** 25 years
+- **MSR Applicable:** Yes for EC from developer (initial period); No for resale/privatised ECs
+- **Max Tenure:** 35 years
 - **CPF Usage:** Allowed
 - **Privatization:** After 10 years
-- **Age-based tenure:** MIN(25, 65 - IWAA)
 
 ### Private Properties
 - **MSR Applicable:** No
@@ -682,16 +704,22 @@ Max_Equity = (Current_Market_Value × LTV%) - Outstanding_Loan - CPF_Used
 
 ## Regulatory Compliance
 
-**Last Update:** 2024-04-01
+**Last Update:** 2025-10-01
 
 **Authoritative Sources:**
-- MAS Notice 632 (LTV Limits)
+- MAS Notice 632 (Residential Property Loans)
 - MAS Notice 645 (TDSR Framework)
+- MAS Explainers (LTV/tenure, TDSR, MSR)
 - HDB Regulations
-- IRAS Tax Guidelines
+- IRAS Tax Guidelines (BSD/ABSD/MOF press releases)
 
-**Recent Changes:**
-- **2024-04-01:** Updated BSD rates for properties above $3M (IRAS)
+**Recent Regulatory Changes:**
+- **2023-02-15:** BSD top tiers raised to 6% (residential) / 5% (non-residential) - MOF/IRAS
+- **2023-04-27:** ABSD raised; foreigners 60%, entities 65% - MND/MOF/IRAS
+- **2022-09-29:** Medium-term interest rate floors lifted to 4% (residential) / 5% (non-residential) for TDSR/MSR - MAS
+- **2025-02-26:** Macroprudential Policies in Singapore publication outlines current LTV and debt-servicing safeguards - MAS
+- **2025-04-28:** Housing Loan from HDB guidance details eligibility criteria and loan tenure limits - HDB
+- **2025-08-20:** Foreign ownership of property guidance enumerates restrictions and approvals for landed housing - SLA
 
 ---
 
@@ -721,6 +749,6 @@ Dr. Elena communicates with:
 
 ---
 
-**Agent Version:** 2.0.0
+**Agent Version:** 2.1.0
 **Computational Precision:** Enabled
-**Last Regulatory Update:** 2024-04-01
+**Last Regulatory Update:** 2025-10-01
