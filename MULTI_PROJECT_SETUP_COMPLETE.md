@@ -219,9 +219,10 @@ git commit -m "Update project config"
 - `CLAUDE.md` (section: "Response-Awareness & Skills Architecture") - AI instructions
 
 ### Scripts
-- `scripts/setup-new-project.ps1` - Automated setup
-- `scripts/update-all-projects.ps1` - Bulk updates
-- `scripts/project-list.example.txt` - Template
+- `scripts/setup-new-project.ps1` - Automated setup for NEW projects
+- `scripts/migrate-old-project.ps1` - Migrate EXISTING projects with old setup
+- `scripts/update-all-projects.ps1` - Bulk updates for all projects
+- `scripts/project-list.example.txt` - Template for project list
 
 ### Repositories
 - Local: `C:\Users\HomePC\.config\claude-shared`
