@@ -9,7 +9,7 @@ Universal entry point that assesses task complexity and routes to the appropriat
 
 ## Load NextNest Customizations
 
-Read file `.claude/skills/response-awareness-shared/NEXTNEST_CUSTOMIZATIONS.md`
+Read file `.claude/frameworks/shared/frameworks/response-awareness/response-awareness-shared/NEXTNEST_CUSTOMIZATIONS.md`
 
 **Apply Phase 0 Extensions before standard complexity assessment:**
 - Extension 0.1: Git worktree check (if uncommitted changes detected)
