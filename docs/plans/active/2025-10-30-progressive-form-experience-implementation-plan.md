@@ -204,7 +204,7 @@ context: Execute the refreshed Step 2/Step 3 UX and calculator updates defin
 ### 9. Documentation & Handoff
 - [ ] Update `docs/plans/active/2025-10-30-progressive-form-experience-spec.md` with any clarifications uncovered during build (coordinate with Brent).
 - [ ] Log QA cases and calculator fixtures in `validation-reports/` or dedicated doc.
-- [ ] Note changes and remaining risks in `docs/codex-journal.md`.
+- [ ] Note changes and remaining risks in `docs/work-log.md`.
 - [ ] Prepare PR summary referencing this plan and the spec.
 - Include summary of persona references used (e.g., section numbers) in PR description.
 - Provide testing commands executed at the end for reviewer.

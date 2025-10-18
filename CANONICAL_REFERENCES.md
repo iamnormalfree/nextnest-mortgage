@@ -700,3 +700,49 @@
 2. Is this a new feature domain? (Yes → create domain folder)
 3. Is this temporary/experimental? (Yes → use `archive/YYYY-MM/`)
 4. Otherwise → use existing shared/ or layout/ folders
+
+---
+
+## Response-Awareness Framework Documentation (Tier 1)
+
+### Completion Drive Folders
+
+**Purpose:** Storage for response-awareness framework documentation used by slash commands, skills, and AI learning systems (Claude, Codex, Factory AI).
+
+**Location:** `docs/completion_drive_plans/` and `docs/completion_drive_checkpoints/`
+
+**Status:** ✅ PRODUCTION - Used by response-awareness framework
+
+**Folders:**
+
+**`docs/completion_drive_plans/`**
+- Domain-organized subfolders: `ai/`, `api/`, `data/`, `forms/`, `integration/`, etc.
+- Specialized plans: `ai-chat-intelligence-system/`, `17-10-2025_lead-form-chat-handoff/`
+- Completion reports: `archive_report.md`, `cleanup_completion_report.md`, `code_reference_verification.md`
+- Integration coordination: `integration-coordination-plan.md`
+
+**`docs/completion_drive_checkpoints/`**
+- Currently empty - Reserved for future checkpoint storage
+
+**Usage:**
+- Referenced by slash commands for learning context
+- Used by skills for domain-specific knowledge
+- Provides training data for response-awareness tiers (LIGHT/MEDIUM/HEAVY/FULL)
+- Maintains completion drive state across sessions
+
+**Allowed Changes:**
+- Add new domain folders as projects evolve
+- Add completion reports after major milestones
+- Update integration coordination documents
+- Add checkpoint files as framework evolves
+
+**Forbidden Changes:**
+- Do NOT delete without checking slash command/skill dependencies
+- Do NOT move to general docs/ folders (framework-specific location)
+- Do NOT archive (active learning system documentation)
+- Do NOT rename root folders (breaking change for framework)
+
+**Related Files:**
+- `AGENTS.md` - Agent configuration references completion drive
+- `SKILL.md` - Skill definitions may reference completion drive content
+- `.mcp.json` - MCP server configuration for skills/commands

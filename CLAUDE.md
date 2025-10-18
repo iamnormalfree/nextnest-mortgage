@@ -352,7 +352,7 @@ How to undo if it fails
 
 **During implementation, use ONLY:**
 - `TodoWrite` tool for task tracking
-- `docs/codex-journal.md` for daily notes
+- `docs/work-log.md` for daily notes
 - Git commits as execution log
 - Nothing else
 
@@ -362,7 +362,7 @@ How to undo if it fails
 - Status updates (use journal)
 - Fix summaries (git log is your summary)
 
-**Update codex-journal.md structure:**
+**Update work-log.md structure:**
 ```markdown
 ## {YYYY-MM-DD} - {Feature Name}
 
@@ -454,8 +454,8 @@ git mv docs/plans/active/{plan}-COMPLETION.md docs/plans/archive/2025/10/
 |---------------|----------|
 | Active plan | `docs/plans/active/` |
 | Implementation todos | TodoWrite tool |
-| Daily notes | `docs/codex-journal.md` |
+| Daily notes | `docs/work-log.md` |
 | Completion report | `docs/plans/active/` then archive |
 | Archived plans | `docs/plans/archive/{year}/{month}/` |
 | Implementation guides | `docs/runbooks/{domain}/` |
-| Investigation findings | `docs/codex-journal.md` |
+| Investigation findings | `docs/work-log.md` |

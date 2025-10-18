@@ -23,7 +23,7 @@ context: Remediate instant analysis math, Step 3 readiness logic, and regression
   - `dr-elena-mortgage-expert-v2.json` (ground truth for all formulas, limits, reason codes).
   - `docs/runbooks/PROGRESSIVE_FORM_COMPACT_EXECUTION_PLAYBOOK.md` (working style expectations).
   - `SKILL.md` → Executing Plans workflow.
-  - `docs/codex-journal.md` (to understand the in-flight work log; update it as progress is made).
+  - `docs/work-log.md` (to understand the in-flight work log; update it as progress is made).
 - **Key Directories**
   - `lib/calculations/` — calculator helpers and persona logic.
   - `components/forms/` — progressive form UI, Step 2/Step 3 panels.
@@ -52,7 +52,7 @@ context: Remediate instant analysis math, Step 3 readiness logic, and regression
      - In the “Completion Summary,” append a short sentence citing the 2025-10-31 audit findings (no history recap, just note misalignment discovered).
      - Add “Action Items” section summarising the three remediation tracks with links to this plan.
 2. **Journal update**
-   - Log the kickoff in `docs/codex-journal.md` task list and add a dated entry noting branch name, scope, and dependency on dr Elena persona.
+   - Log the kickoff in `docs/work-log.md` task list and add a dated entry noting branch name, scope, and dependency on dr Elena persona.
 3. **Optional confirmation**
    - If there are any previously failing tests unrelated to this effort, document them in the journal and surface to Brent before proceeding.
 
@@ -184,7 +184,7 @@ Lock in correctness through robust fixtures, tests, and documentation updates.
 4. **Documentation updates**
    - `docs/reports/DR_ELENA_V2_CALCULATION_MATRIX.md`: update tables to reflect final constants (e.g., commercial LTV assumptions, CPF valuation/withdrawal logic). Record any unresolved gaps.
    - `docs/plans/active/2025-10-30-dr-elena-audit-plan.md`: add a “Resolved Gaps” section referencing this plan and note any outstanding items.
-   - `docs/codex-journal.md`: log progress and remaining TODOs after each workstream.
+   - `docs/work-log.md`: log progress and remaining TODOs after each workstream.
 5. **Final verification script**
    - Run sequentially:
      ```bash

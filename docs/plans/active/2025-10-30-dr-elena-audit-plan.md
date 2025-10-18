@@ -50,7 +50,7 @@ Take notes; you will reference them in documentation deliverables.
 - Updated implementation plan annotations (if gaps found).
 - New audit doc summarising persona-to-plan mapping: `docs/reports/DR_ELENA_V2_CALCULATION_MATRIX.md`.
 - Calculator fixture outline under `tests/fixtures`.
-- Journal update (`docs/codex-journal.md`) recording findings and TODOs.
+- Journal update (`docs/work-log.md`) recording findings and TODOs.
 - Issue list (if discrepancies) captured in the audit doc and highlighted to Brent before implementation begins.
 
 ## Step-by-Step Audit Tasks
@@ -123,7 +123,7 @@ Take notes; you will reference them in documentation deliverables.
 - Commit: `docs: enrich implementation plan with persona acceptance criteria`.
 
 ### 8. Update Documentation Trails
-- [ ] Update `docs/codex-journal.md` with audit progress, highlighting completed steps and remaining work.
+- [ ] Update `docs/work-log.md` with audit progress, highlighting completed steps and remaining work.
 - [ ] If new insights affect other docs (e.g., `docs/reports/INSTANT_CALCULATION_STRATEGY_v2.md`), add TODO markers referencing this audit.
 - Commit: `docs: journal dr elena audit findings`.
 

@@ -53,7 +53,7 @@ Reference: `docs/plans/active/2025-10-18-function-usage-audit-plan.md`
 
 ## 2025-10-28
 
-- Synced with Brent: use `docs/codex-journal.md` as interim TodoWrite. Logged spec-shaping task for progressive form restoration aligned with instant calculation strategy v2.
+- Synced with Brent: use `docs/work-log.md` as interim TodoWrite. Logged spec-shaping task for progressive form restoration aligned with instant calculation strategy v2.
 - Requirements alignment with Brent:
   - Goal balance: funnel completion, MAS transparency, and rich data collection equally.
   - Sequence: new purchase journey first; refinance later.

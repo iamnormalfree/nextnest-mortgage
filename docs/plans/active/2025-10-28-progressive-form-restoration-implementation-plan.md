@@ -135,7 +135,7 @@ Take notes as you read; do not proceed until the flow and controller responsibil
 ### 11. Documentation & Handoff
 - [x] Update `docs/plans/active/2025-10-14-progressive-form-restoration-plan.md` status if appropriate (coordinate with Brent).
 - [x] Add notes to `validation-reports/` or create a new QA log describing test cases run, issues found/fixed.
-- [x] Update `docs/codex-journal.md` task status if you are the one executing.
+- [x] Update `docs/work-log.md` task status if you are the one executing.
 - [x] Prepare change summary for PR (link to plan + doc references).
 
 ## Future Work (Do Not Implement Now)
@@ -165,6 +165,6 @@ Take notes as you read; do not proceed until the flow and controller responsibil
 - `lib/forms/form-config.ts`
 - `lib/validation/mortgage-schemas.ts`
 - `components/ContactSection.tsx` (homepage entry point reassurance)
-- `docs/codex-journal.md` (task tracking)
+- `docs/work-log.md` (task tracking)
 
 Follow this plan step-by-step, keep Brent in the loop on any ambiguity, and do not skip TDD or linting. Stop and ask for clarification whenever something feels off.

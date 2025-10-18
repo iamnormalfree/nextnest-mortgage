@@ -31,7 +31,7 @@ These are canonical reference docs:
 - `ARCHITECTURE.md` (8.8K) - Core architecture reference
 - `DESIGN_SYSTEM.md` (3.8K) - Design tokens and patterns
 - `KNOWN_ISSUES.md` (3.3K) - Current workarounds
-- `codex-journal.md` (23K) - Daily work log (Tier 2 working doc)
+- `work-log.md` (23K) - Daily work log (Tier 2 working doc)
 
 **⚠️ IMPLEMENTATION PLANS (4 files) → Should be in docs/plans/**
 These look like old plans that should be archived:
@@ -123,7 +123,7 @@ docs/
 ├── ARCHITECTURE.md                    # ✅ Root - Core reference
 ├── DESIGN_SYSTEM.md                   # ✅ Root - Design reference
 ├── KNOWN_ISSUES.md                    # ✅ Root - Known issues
-├── codex-journal.md                   # ✅ Root - Daily log
+├── work-log.md                   # ✅ Root - Daily log
 │
 ├── plans/                             # ✅ Plans (Tier 3)
 │   ├── active/                        # Current work
@@ -224,7 +224,7 @@ mkdir -p docs/reports/evaluations  # Technology evaluations
 ## Verification Checklist
 
 After reorganization, verify:
-- [ ] No files at docs/ root except: ARCHITECTURE.md, DESIGN_SYSTEM.md, KNOWN_ISSUES.md, codex-journal.md
+- [ ] No files at docs/ root except: ARCHITECTURE.md, DESIGN_SYSTEM.md, KNOWN_ISSUES.md, work-log.md
 - [ ] All plans in docs/plans/ (active, archive, or backlog)
 - [ ] All implementation guides in docs/runbooks/
 - [ ] All reports in docs/reports/ subdirectories
@@ -239,7 +239,7 @@ After reorganization, verify:
 2. **docs/meta/** - What is this folder's purpose?
 3. **docs/completion_drive_*** - Are these from a previous project? Archive?
 4. **docs/archive/** vs **docs/plans/archive/** - What's the distinction?
-5. **codex-log.md** - Different from codex-journal.md? Can we delete it?
+5. **codex-log.md** - Different from work-log.md? Can we delete it?
 
 ---
 
