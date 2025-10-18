@@ -1,5 +1,3 @@
-[2025-10-17 14:34:21] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
-[2025-10-17 14:35:34] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-17 14:35:34] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-17 14:35:34] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-17 14:36:05] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
@@ -498,3 +496,5 @@
 [2025-10-18 16:55:42] [assumption-detector      ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-18 16:55:42] [question-suppression     ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
 [2025-10-18 16:55:42] [orchestrator-firewall    ] [NONE  ] [SKIPPED] [Unknown        ] Not in response-awareness mode
+[2025-10-18 16:59:45] [orchestrator-firewall    ] [FULL  ] [BLOCK  ] [Unknown        ] Orchestrator attempted direct implementation
+[2025-10-18 16:59:45] [assumption-detector      ] [FULL  ] [ALLOW  ] [Unknown        ] No unverified assumptions detected
