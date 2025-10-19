@@ -290,6 +290,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 {...field}
                 id="self-employed-business-age"
                 type="number"
+                min="0"
                 placeholder="5"
                 onChange={(event) => {
                   const value = event.target.value
@@ -317,6 +318,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 {...field}
                 id="self-employed-average-profit"
                 type="number"
+                min="0"
                 placeholder="9000"
                 className="font-mono"
                 onChange={(event) => {
@@ -357,6 +359,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 {...field}
                 id="variable-average-income"
                 type="number"
+                min="0"
                 placeholder="8500"
                 className="font-mono"
                 onChange={(event) => {
@@ -385,6 +388,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 {...field}
                 id="variable-lowest-income"
                 type="number"
+                min="0"
                 placeholder="5000"
                 className="font-mono"
                 onChange={(event) => {
@@ -426,6 +430,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                   {...field}
                   id="monthly-income-primary"
                   type="number"
+                  min="0"
                   className="font-mono"
                   placeholder="8000"
                   onChange={(event) => {
@@ -457,6 +462,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                   {...field}
                   id="variable-income"
                   type="number"
+                  min="0"
                   className="font-mono"
                   placeholder="1500"
                   onChange={(event) => {
@@ -488,6 +494,9 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                   {...field}
                   id="age-primary"
                   type="number"
+                  min="18"
+                  max="99"
+                  step="1"
                   placeholder="35"
                   onChange={(event) => {
                     const value = ensureNumber(event.target.value)
@@ -580,6 +589,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                     {...field}
                     id="joint-income"
                     type="number"
+                    min="0"
                     className="font-mono"
                     placeholder="6000"
                     onChange={(event) => {
@@ -691,6 +701,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                               type="number"
                               className="font-mono"
                               placeholder="0"
+                              min="0"
                               onChange={(event) => {
                                 field.onChange(event.target.value)
                                 onFieldChange(`liabilities.${config.key}.outstandingBalance`, ensureNumber(event.target.value), {
@@ -719,6 +730,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                               type="number"
                               className="font-mono"
                               placeholder="0"
+                              min="0"
                               onChange={(event) => {
                                 field.onChange(event.target.value)
                                 onFieldChange(`liabilities.${config.key}.monthlyPayment`, ensureNumber(event.target.value), {

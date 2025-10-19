@@ -281,6 +281,7 @@ export function Step3Refinance({
                   {...field}
                   id="monthly-income-primary"
                   type="number"
+                  min="0"
                   className="font-mono"
                   placeholder="8000"
                   onChange={(e) => {
@@ -311,6 +312,9 @@ export function Step3Refinance({
                   {...field}
                   id="age-primary"
                   type="number"
+                  min="18"
+                  max="99"
+                  step="1"
                   placeholder="35"
                   onChange={(e) => {
                     const value = parseInt(e.target.value) || 0
@@ -383,6 +387,7 @@ export function Step3Refinance({
                     {...field}
                     id="monthly-income-joint"
                     type="number"
+                    min="0"
                     className="font-mono"
                     placeholder="6000"
                     onChange={(e) => {
@@ -554,6 +559,7 @@ export function Step3Refinance({
                       {...field}
                       id="cash-out-amount"
                       type="number"
+                      min="0"
                       className="font-mono"
                       placeholder="50000"
                       onChange={(e) => {
@@ -624,6 +630,7 @@ export function Step3Refinance({
                   {...field}
                   id="months-remaining"
                   type="number"
+                  min="0"
                   className="font-mono"
                   placeholder="12"
                   onChange={(e) => {

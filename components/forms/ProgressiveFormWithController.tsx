@@ -747,6 +747,9 @@ export function ProgressiveFormWithController({
                         {...field}
                         id="combined-age"
                         type="number"
+                        min="18"
+                        max="99"
+                        step="1"
                         placeholder="35"
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0
@@ -801,6 +804,7 @@ export function ProgressiveFormWithController({
                         type="number"
                         className="font-mono"
                         placeholder="400000"
+                        min="0"
                         onChange={(e) => {
                           const value = parseInt(e.target.value) || 0
                           field.onChange(value)
