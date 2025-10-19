@@ -49,6 +49,35 @@ Extracted from `FORM_COMPACT_MODE_AND_APPLY_PAGE_TASKLIST.md` (2025-09-17).
 
 ---
 
+## 2025-10-19: Step 2 Instant Analysis - Pure LTV Fix
+
+**Task:** Create plan for fixing Step 2 instant analysis architectural issue
+
+**Error Classification:**
+- **Type:** Architectural Logic Error / Premature Data Assumption
+- **Category:** Calculation Accuracy
+- **Severity:** HIGH - Affects all property types, misleads users
+- **Scope:** Step 2 instant analysis using MSR/TDSR before income collected
+
+**Problem:** Step 2 instant analysis currently uses `calculateInstantProfile()` with hardcoded $8,000 income and applies MSR (30%) and TDSR (55%) limits BEFORE user provides income data. This violates design principle that Step 2 should show pure LTV calculation only.
+
+**Plan Created:** `docs/plans/active/2025-10-19-step2-instant-analysis-pure-ltv-calculation.md`
+
+**Key Requirements:**
+1. Create new `calculatePureLtvMaxLoan()` function - NO income assumptions
+2. Update Step 2 to use pure LTV: `Max Loan = Property Price × LTV Tier %`
+3. Remove "Based on your income" messaging from Step 2
+4. Preserve full MSR/TDSR analysis for Step 3+ (where income IS collected)
+
+**Expected Results:**
+- HDB $1M, age 35, first property → $750k (75% LTV), currently shows $454k (MSR-limited)
+- Private $1.5M, first property → $1.125M (75% LTV), currently shows ~$375k
+- Private $1.5M, second property → $675k (45% LTV), currently shows wrong amount
+
+**Next Steps:** Implement TDD approach - write failing tests, create pure LTV function, update Step 2 logic
+
+---
+
 ## Deferred Opportunities (Logged 2025-10-18)
 Reference: `docs/plans/archive/2025/10/2025-10-18-function-usage-audit-plan.md`
 
@@ -410,4 +439,91 @@ Completed all 5 tasks from plan `2025-10-19-progressive-form-input-validation-an
 - ✅ No new lint warnings introduced
 
 **Status:** Ready for code review and manual QA testing
+
+**Issue Discovered During Testing (OUT OF SCOPE):**
+
+During manual testing of the instant analysis feature, discovered a calculation accuracy bug unrelated to validation/reactivity:
+
+- **Symptom:** Max loan showing $375k instead of expected ~$1.125M for $1.5M resale HDB property (age 35)
+- **Root Cause:** Calculator receiving `existingProperties = 1` (second property tier) instead of `0` (first property tier)
+- **Impact:** Shows 25% LTV instead of 75% LTV for first-time buyers
+- **Evidence:**
+  - Singapore MAS regulations: First property = 75% LTV, Second property = 45% LTV
+  - Field `existingProperties` not initialized in `lib/forms/form-config.ts`
+  - No visible UI field found for this value
+  - Source: `hooks/useProgressiveFormController.ts:329` reads `formData.existingProperties` via `parseNumber(formData.existingProperties, 0)`
+- **Action Taken:** Created investigation plan `docs/plans/active/2025-10-19-property-tier-calculation-investigation.md`
+- **Next Steps:** Brainstorming session required to determine fix approach (default value vs explicit UI field vs inferred from other data)
+- **Related:** Previous calculation correction plan (`2025-10-31-progressive-form-calculation-correction-plan.md`) did not address property tier logic
+
+
+
+---
+
+## 2025-10-19: Phase 3B Critical Discovery - Core Fix Still Missing
+
+**Context:** Progressive form calculation fix implementation (Phases 0-3C)
+
+**Status:** Build passing ✅ BUT functionality still broken ❌
+
+### What Actually Got Done
+
+**Phase 3A ✅ COMPLETE:**
+- Created discriminated union types (PureLtvCalcResult, FullAnalysisCalcResult)
+- Implemented `calculatePureLtvMaxLoan()` function (pure LTV, no income)
+- All 11/11 tests passing, 100% Dr. Elena v2 compliance
+
+**Phase 3C ✅ COMPLETE:**
+- Fixed all type mismatches in UI components
+- Added type guards for discriminated unions
+- Updated Step3NewPurchase component types
+- Build now passing successfully
+
+**Phase 3B ⚠️ INCOMPLETE:**
+- Helper functions added (`hasRequiredStep2Data`, `hasRequiredStep3Data`)
+- Type imports added
+- **CRITICAL: `calculateInstant()` function body NEVER replaced**
+- Line 374 still has hardcoded $8,000 income fallback
+- Step 2 still calling old `calculateInstantProfile()` with income
+
+### The Bug Still Exists
+
+**User Report:** Step 2 (HDB $1M, age 38) shows:
+- Current: "$454,000" with "Based on your income... MSR guidelines"
+- Expected: "$750,000" with "Based on property regulations"
+
+**Root Cause:** Lines 320-533 in `useProgressiveFormController.ts` still use old logic:
+- Always calls `calculateInstantProfile()` (includes MSR/TDSR)
+- Never checks `currentStep` for routing
+- Never calls `calculatePureLtvMaxLoan()` (pure LTV function)
+- Hardcoded income default at line 374
+
+### What Needs To Happen Next
+
+**File:** `hooks/useProgressiveFormController.ts`
+**Lines:** 320-533 (entire `calculateInstant` function body)
+
+**Required Changes:**
+1. Add step-aware routing: `if (currentStep === 2)` vs `else if (currentStep >= 3)`
+2. Step 2 path: Call `calculatePureLtvMaxLoan()` with NO income parameter
+3. Step 3+ path: Validate `actualIncomes[0]` (no default), use actual value
+4. Update dependencies: Add `currentStep`, `hasRequiredStep2Data`, `hasRequiredStep3Data`
+
+**Reference Documents:**
+- `PHASE_3B_INCOMPLETE_STATUS.md` - Detailed status and exact fix needed
+- `IMPLEMENTATION_STATUS_FINAL.md` lines 83-131 - Exact replacement code
+- `docs/plans/active/2025-10-19-calculation-fix-synthesis.md` - Full plan
+
+### Verification Checklist After Fix
+
+- [ ] Step 2 shows $750k for HDB $1M first property (not $454k)
+- [ ] Step 2 message: "Based on property regulations" (not "Based on your income")
+- [ ] `instantCalcResult.calculationType === 'pure_ltv'` on Step 2
+- [ ] No MSR/TDSR in reason codes on Step 2
+- [ ] Step 3+ validates income > 0 before calculating
+- [ ] All 11 pure LTV tests still passing
+
+**Next Session Action:** Read `PHASE_3B_INCOMPLETE_STATUS.md` and implement the function replacement.
+
+---
 
