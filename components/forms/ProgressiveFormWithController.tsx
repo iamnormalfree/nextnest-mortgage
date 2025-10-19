@@ -752,7 +752,8 @@ export function ProgressiveFormWithController({
                         step="1"
                         placeholder="35"
                         onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0
+                          // Don't default to 0 when field is empty - preserve undefined
+                          const value = e.target.value === '' ? undefined : parseInt(e.target.value)
                           field.onChange(value)
                           onFieldChange('combinedAge', value)
                         }}
@@ -780,7 +781,8 @@ export function ProgressiveFormWithController({
                         step="0.01"
                         placeholder="3.0"
                         onChange={(e) => {
-                          const value = parseFloat(e.target.value) || 0
+                          // Don't default to 0 when field is empty - preserve undefined
+                          const value = e.target.value === '' ? undefined : parseFloat(e.target.value)
                           field.onChange(value)
                         }}
                       />
@@ -806,7 +808,8 @@ export function ProgressiveFormWithController({
                         placeholder="400000"
                         min="0"
                         onChange={(e) => {
-                          const value = parseInt(e.target.value) || 0
+                          // Don't default to 0 when field is empty - preserve undefined
+                          const value = e.target.value === '' ? undefined : parseInt(e.target.value)
                           field.onChange(value)
                         }}
                       />

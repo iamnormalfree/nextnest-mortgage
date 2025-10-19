@@ -455,7 +455,7 @@ export function useProgressiveFormController({
     if (currentStep !== 2 || !hasCalculated) return
 
     const timer = setTimeout(() => {
-      const values = form.getValues()
+      // Use watchedFields directly instead of form.getValues() to ensure we get the latest values
       const {
         propertyValue,
         loanQuantum,
@@ -464,7 +464,7 @@ export function useProgressiveFormController({
         propertyType,
         priceRange,
         propertyPrice
-      } = values
+      } = watchedFields
 
       // Only recalculate if we have minimum required fields
       const hasMinimumFields = mappedLoanType === 'new_purchase'
@@ -481,7 +481,7 @@ export function useProgressiveFormController({
     }, 500) // 500ms debounce to prevent excessive calculations
 
     return () => clearTimeout(timer)
-  }, [instantAnalysisFields, currentStep, hasCalculated, mappedLoanType, form, calculateInstant])
+  }, [instantAnalysisFields, currentStep, hasCalculated, mappedLoanType, watchedFields, calculateInstant])
 
   // Instant calculation triggers (from ProgressiveForm) - use specific field dependencies
   useEffect(() => {
