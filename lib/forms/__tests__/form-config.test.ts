@@ -8,7 +8,7 @@ describe('form-config defaults', () => {
     const defaults = getDefaultValues('new_purchase')
 
     expect(defaults).toHaveProperty('actualVariableIncomes')
-    expect(defaults.actualVariableIncomes).toEqual({ 0: 0, 1: undefined })
+    expect(defaults.actualVariableIncomes).toEqual({ 0: undefined, 1: undefined })
 
     expect(defaults).toHaveProperty('employmentDetails')
     expect(defaults.employmentDetails).toEqual({
