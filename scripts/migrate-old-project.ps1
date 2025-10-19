@@ -342,13 +342,83 @@ if ($existingAgents) {
 }
 Write-Host ""
 
-# Step 9: Final commit
+# Step 9: Create skill junctions
+Write-Host "Step 9: Creating skill junctions..." -ForegroundColor Yellow
+
+if ($DryRun) {
+    Write-Host "  [DRY RUN] Would create junctions:" -ForegroundColor Gray
+    Write-Host "    - response-awareness-light, medium, heavy, full" -ForegroundColor Gray
+    Write-Host "    - brainstorming (-> superpowers)" -ForegroundColor Gray
+} else {
+    $skillsDir = ".claude\skills"
+    $frameworksDir = ".claude\frameworks\shared\frameworks"
+
+    # Response-Awareness Tiers
+    $tiers = @("light", "medium", "heavy", "full")
+    foreach ($tier in $tiers) {
+        $junctionPath = Join-Path $skillsDir "response-awareness-$tier"
+        $targetPath = Join-Path $frameworksDir "response-awareness\response-awareness-$tier"
+
+        if (Test-Path $junctionPath) {
+            Write-Host "  Skipped: response-awareness-$tier (already exists)" -ForegroundColor Yellow
+        } else {
+            New-Item -ItemType Junction -Path $junctionPath -Target $targetPath | Out-Null
+            Write-Host "  Created: response-awareness-$tier" -ForegroundColor Green
+        }
+    }
+
+    # Superpowers (brainstorming, systematic-debugging)
+    $superpowersJunction = Join-Path $skillsDir "brainstorming"
+    $superpowersTarget = Join-Path $frameworksDir "superpowers"
+
+    if (Test-Path $superpowersJunction) {
+        Write-Host "  Skipped: brainstorming (already exists)" -ForegroundColor Yellow
+    } else {
+        New-Item -ItemType Junction -Path $superpowersJunction -Target $superpowersTarget | Out-Null
+        Write-Host "  Created: brainstorming" -ForegroundColor Green
+    }
+}
+Write-Host ""
+
+# Step 10: Update .gitignore
+Write-Host "Step 10: Updating .gitignore..." -ForegroundColor Yellow
+
+$gitignorePath = ".gitignore"
+$junctionEntries = @"
+
+# Skill symlinks/junctions to subtree (managed locally, not committed)
+.claude/skills/response-awareness-light
+.claude/skills/response-awareness-medium
+.claude/skills/response-awareness-heavy
+.claude/skills/response-awareness-full
+.claude/skills/brainstorming
+"@
+
+if ($DryRun) {
+    Write-Host "  [DRY RUN] Would update .gitignore with junction entries" -ForegroundColor Gray
+} else {
+    if (Test-Path $gitignorePath) {
+        $existingContent = Get-Content $gitignorePath -Raw
+        if ($existingContent -notmatch "\.claude/skills/response-awareness-light") {
+            Add-Content -Path $gitignorePath -Value $junctionEntries
+            Write-Host "  Added junction entries to .gitignore" -ForegroundColor Green
+        } else {
+            Write-Host "  Junction entries already in .gitignore" -ForegroundColor Gray
+        }
+    } else {
+        Set-Content -Path $gitignorePath -Value $junctionEntries.TrimStart()
+        Write-Host "  Created .gitignore with junction entries" -ForegroundColor Green
+    }
+}
+Write-Host ""
+
+# Step 11: Final commit
 if (-not $DryRun) {
-    Write-Host "Step 9: Final commit..." -ForegroundColor Yellow
+    Write-Host "Step 11: Final commit..." -ForegroundColor Yellow
 
     $hasChanges = git status --porcelain
     if ($hasChanges) {
-        git add .claude/
+        git add .claude/ .gitignore
 
         $commitMsg = @"
 feat: migrate to git subtree for response-awareness frameworks
@@ -356,6 +426,7 @@ feat: migrate to git subtree for response-awareness frameworks
 - Archived old files to .claude/skills/archive/2025-10-pre-subtree/
 - Added git subtree from claude-shared repository
 - Updated response-awareness.md to use subtree paths
+- Created skill junctions (local only, in .gitignore)
 - Ready for multi-project framework management
 "@
 
@@ -370,7 +441,7 @@ feat: migrate to git subtree for response-awareness frameworks
         Write-Host "  No changes to commit" -ForegroundColor Gray
     }
 } else {
-    Write-Host "Step 9: Skipped (dry run)" -ForegroundColor Gray
+    Write-Host "Step 11: Skipped (dry run)" -ForegroundColor Gray
 }
 Write-Host ""
 
@@ -400,12 +471,20 @@ if ($DryRun) {
         Write-Host "  ✓ Added git subtree at .claude\frameworks\shared\" -ForegroundColor Gray
     }
     Write-Host "  ✓ Updated configuration" -ForegroundColor Gray
+    Write-Host "  ✓ Created skill junctions" -ForegroundColor Gray
     Write-Host "  ✓ Committed changes" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "Skills available:" -ForegroundColor White
+    Write-Host "  response-awareness-light, medium, heavy, full" -ForegroundColor Gray
+    Write-Host "  brainstorming, systematic-debugging" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor White
     Write-Host "  1. Test: /response-awareness 'test task'" -ForegroundColor Gray
     Write-Host "  2. Add to project list: scripts\project-list.txt" -ForegroundColor Gray
     Write-Host "  3. Future updates: git subtree pull --prefix .claude/frameworks/shared $SharedRepoUrl $Branch --squash" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "Note: Skill junctions are local only (not committed to git)" -ForegroundColor Gray
+    Write-Host "      On fresh clone: Run .\scripts\setup-skill-junctions.ps1" -ForegroundColor Gray
 }
 
 Write-Host ""

@@ -166,14 +166,75 @@ if (Test-Path ".claude\frameworks\shared\templates\agents\worktree-helper.md") {
 }
 Write-Host ""
 
-# Step 7: Commit changes
-Write-Host "Step 7: Committing changes..." -ForegroundColor Yellow
-git add .claude/
+# Step 7: Create skill junctions
+Write-Host "Step 7: Creating skill junctions..." -ForegroundColor Yellow
+
+$skillsDir = ".claude\skills"
+$frameworksDir = ".claude\frameworks\shared\frameworks"
+
+# Response-Awareness Tiers
+$tiers = @("light", "medium", "heavy", "full")
+foreach ($tier in $tiers) {
+    $junctionPath = Join-Path $skillsDir "response-awareness-$tier"
+    $targetPath = Join-Path $frameworksDir "response-awareness\response-awareness-$tier"
+
+    if (Test-Path $junctionPath) {
+        Write-Host "  Skipped: response-awareness-$tier (already exists)" -ForegroundColor Gray
+    } else {
+        New-Item -ItemType Junction -Path $junctionPath -Target $targetPath | Out-Null
+        Write-Host "  Created: response-awareness-$tier" -ForegroundColor Green
+    }
+}
+
+# Superpowers (brainstorming, systematic-debugging)
+$superpowersJunction = Join-Path $skillsDir "brainstorming"
+$superpowersTarget = Join-Path $frameworksDir "superpowers"
+
+if (Test-Path $superpowersJunction) {
+    Write-Host "  Skipped: brainstorming (already exists)" -ForegroundColor Gray
+} else {
+    New-Item -ItemType Junction -Path $superpowersJunction -Target $superpowersTarget | Out-Null
+    Write-Host "  Created: brainstorming" -ForegroundColor Green
+}
+Write-Host ""
+
+# Step 8: Update .gitignore
+Write-Host "Step 8: Updating .gitignore..." -ForegroundColor Yellow
+
+$gitignorePath = ".gitignore"
+$junctionEntries = @"
+
+# Skill symlinks/junctions to subtree (managed locally, not committed)
+.claude/skills/response-awareness-light
+.claude/skills/response-awareness-medium
+.claude/skills/response-awareness-heavy
+.claude/skills/response-awareness-full
+.claude/skills/brainstorming
+"@
+
+if (Test-Path $gitignorePath) {
+    $existingContent = Get-Content $gitignorePath -Raw
+    if ($existingContent -notmatch "\.claude/skills/response-awareness-light") {
+        Add-Content -Path $gitignorePath -Value $junctionEntries
+        Write-Host "  Added junction entries to .gitignore" -ForegroundColor Green
+    } else {
+        Write-Host "  Junction entries already in .gitignore" -ForegroundColor Gray
+    }
+} else {
+    Set-Content -Path $gitignorePath -Value $junctionEntries.TrimStart()
+    Write-Host "  Created .gitignore with junction entries" -ForegroundColor Green
+}
+Write-Host ""
+
+# Step 9: Commit changes
+Write-Host "Step 9: Committing changes..." -ForegroundColor Yellow
+git add .claude/ .gitignore
 git commit -m "feat: add claude-shared frameworks via git subtree
 
 - Added git subtree at .claude/frameworks/shared
 - Set up config files from templates
 - Created response-awareness command
+- Created skill junctions (local only, in .gitignore)
 - Ready for multi-project framework usage"
 
 if ($LASTEXITCODE -eq 0) {
@@ -192,10 +253,17 @@ Write-Host ""
 Write-Host "Configuration files:" -ForegroundColor White
 Write-Host "  $ProjectPath\.claude\config\" -ForegroundColor Gray
 Write-Host ""
+Write-Host "Skills available:" -ForegroundColor White
+Write-Host "  response-awareness-light, medium, heavy, full" -ForegroundColor Gray
+Write-Host "  brainstorming, systematic-debugging" -ForegroundColor Gray
+Write-Host ""
 Write-Host "Next steps:" -ForegroundColor White
 Write-Host "  1. Customize .claude\config\response-awareness-config.json for your project" -ForegroundColor Gray
 Write-Host "  2. Test: /response-awareness 'test task'" -ForegroundColor Gray
 Write-Host "  3. To update frameworks: git subtree pull --prefix .claude/frameworks/shared $SharedRepoUrl $Branch --squash" -ForegroundColor Gray
+Write-Host ""
+Write-Host "Note: Skill junctions are local only (not committed to git)" -ForegroundColor Gray
+Write-Host "      On fresh clone: Run .\scripts\setup-skill-junctions.ps1" -ForegroundColor Gray
 Write-Host ""
 Write-Host "See UPDATE_GUIDE.md (in NextNest repo) for full documentation" -ForegroundColor Gray
 Write-Host ""
