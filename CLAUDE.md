@@ -7,6 +7,22 @@ You are an experienced, pragmatic software engineer. Simple solutions over compl
 **Rule #1:** If you want an exception to ANY rule, STOP and get explicit permission from Brent first.
 
 ---
+## Quick Navigation
+
+| Section | Purpose |
+|---------|---------|
+| [Working Relationship](#working-relationship) | Communication style and collaboration |
+| [Critical Rules](#critical-rules-never-break-these) | TDD, version control, code changes |
+| [Code Standards](#code-standards) | Design, quality, naming, debugging |
+| [Project Quick Reference](#project-quick-reference) | Tech stack, commands, patterns |
+| [Component Placement](docs/COMPONENT_PLACEMENT_DECISION_TREE.md) | Where to create files |
+| [Root Directory Rules](docs/ROOT_DIRECTORY_GUIDE.md) | Repository organization |
+| [Task Management](#task-management) | TodoWrite usage |
+| [Response-Awareness](#response-awareness--skills-architecture) | Skills and routing system |
+| [Planning & Documentation](#planning--documentation-workflow) | 3-tier system, plan workflow |
+| [Planning Templates](docs/PLANNING_TEMPLATES.md) | Plan, checklist, completion formats |
+
+---
 
 ## Working Relationship
 
@@ -125,107 +141,30 @@ npm run lint         # Code quality check
 
 ## Component Placement Decision Tree
 
-**Before creating ANY file in app/ or components/, answer these questions:**
+**Before creating ANY file in app/ or components/, use the decision tree:**
 
-### Question 1: Is this a test/development page?
-- **YES** → Create in `app/_dev/[feature-name]/page.tsx`
-  - Underscore prefix excludes from production builds
-  - Examples: `app/_dev/test-mobile/`, `app/_dev/test-broker/`
-- **NO** → Continue to Question 2
+See **[Component Placement Decision Tree](docs/COMPONENT_PLACEMENT_DECISION_TREE.md)** for the complete 6-question workflow.
 
-### Question 2: Is this experimental/in-progress code?
-- **YES** → Create in `components/archive/YYYY-MM/[experiment-name]/`
-  - Use date format: `2025-10`, `2025-11`
-  - Add README explaining the experiment
-- **NO** → Continue to Question 3
+**Quick summary:**
+- Test/development pages → `app/_dev/`
+- Experimental code → `components/archive/YYYY-MM/`
+- Production pages → `app/[route-name]/`
+- Reusable components → Domain-specific folders (ui, layout, forms, etc.)
+- NO `.backup.tsx` files, NO `app/test-*` pages
 
-### Question 3: Is this a production page route?
-- **YES** → Create in `app/[route-name]/page.tsx`
-  - ✅ Allowed: `app/apply/`, `app/calculator/`, `app/chat/`
-  - ❌ Forbidden: `app/test-*`, `app/temp-*`, `app/*.backup.tsx`
-- **NO** → Continue to Question 4
-
-### Question 4: Is this a reusable component?
-- **YES** → Determine folder based on purpose:
-  - **UI primitives** → `components/ui/[component-name].tsx` (Shadcn/ui components)
-  - **Layout components** → `components/layout/[component-name].tsx` (Footer, Header, Nav)
-  - **Landing page sections** → `components/landing/[SectionName].tsx` (Hero, Services, CTA)
-  - **Shared utilities** → `components/shared/[component-name].tsx` (ErrorBoundary, icons, AnimatedCounter)
-  - **Forms** → `components/forms/[component-name].tsx`
-  - **Form sections** → `components/forms/sections/[section-name].tsx`
-  - **Mobile forms** → `components/forms/mobile/[component-name].tsx`
-  - **AI Broker** → `components/ai-broker/[component-name].tsx`
-  - **Chat** → `components/chat/[component-name].tsx`
-  - **Analytics** → `components/analytics/[component-name].tsx`
-  - **Calculators** → `components/calculators/[component-name].tsx`
-- **NO** → STOP - Reconsider if you need this file
-
-### Question 5: Where do tests go?
-- **Component tests** → `components/[folder]/__tests__/[ComponentName].test.tsx`
-- **Integration tests** → `tests/[domain]/[feature].test.ts`
-- **E2E tests** → `tests/e2e/[flow].test.ts`
-- **Test fixtures** → `tests/fixtures/[data-set].ts`
-
-### Question 6: What about backup files?
-- **NEVER commit .backup.tsx files** - Use git history instead (`git show HEAD~1:path/to/file.tsx`)
-- **Alternative implementation?** → Archive to `components/archive/YYYY-MM/[descriptive-name].tsx`
-
-### Forbidden Patterns
-- ❌ `app/test-*` pages (use `app/_dev/` instead)
-- ❌ `app/temp-*` pages (use `app/_dev/` or delete)
-- ❌ `*.backup.tsx` files (use git history)
-- ❌ Top-level components without clear domain (organize into subfolders)
-- ❌ Random subfolders without 3+ related files
+**Key principle:** Every file must have clear purpose and proper location.
 
 ---
 
 ## Root Directory Requirements
 
-**Allowed at repository root:**
+See **[Root Directory Guide](docs/ROOT_DIRECTORY_GUIDE.md)** for complete file organization standards.
 
-**Package & Configuration:**
-- `package.json`, `package-lock.json` - NPM dependencies
-- `tsconfig.json`, `tsconfig.tsbuildinfo` - TypeScript config
-- `next.config.js` - Next.js configuration
-- `postcss.config.js` - CSS processing
-- `jest.config.mjs`, `jest.setup.ts` - Test configuration
-- `components.json` - Shadcn/ui config
-- `tailwind.config.ts` - Design system (canonical)
-- `tailwind.bloomberg.config.ts` - Historical reference (archived 2025-10-17)
-
-**Environment & Deployment:**
-- `.env.example`, `.env.local` - Environment variables
-- `.gitignore`, `.dockerignore` - VCS exclusions
-- `.eslintrc.json` - Linting rules
-- `.mcp.json` - MCP server config
-- `docker-compose.yml`, `Dockerfile` - Container config
-- `railway.toml`, `Procfile` - Deployment config
-
-**Documentation (5 files only):**
-- `README.md` - Project overview
-- `CLAUDE.md` - AI assistant instructions
-- `CANONICAL_REFERENCES.md` - Tier 1 file catalog
-- `AGENTS.md` - Agent configuration
-- `SKILL.md` - Skill definitions
-
-**Data Sources:**
-- `dr-elena-mortgage-expert-v2.json` - Canonical Dr Elena v2 persona
-- `next-env.d.ts` - Auto-generated Next.js types
-
-**FORBIDDEN at root:**
-- `*.log` files - Should be in `logs/` directory or `.gitignore`
-- `test-*.ts`, `test-*.js`, `test-*.json` - Should be in `tests/` or `scripts/test-data/`
-- `*.backup`, `*.new`, `*.tmp.*` - Delete or archive to `docs/reports/investigations/`
-- `*.patch` files - Archive to `docs/reports/investigations/`
-- Script files (`*.py`, `*.ps1`, `*.sh`) - Should be in `scripts/`
-- Temp files (`_*.js`, `_*.py`, `nul`, `temp*`) - Delete
-- `verify-*.js` - Should be in `scripts/`
-
-**Directory structure at root:**
-- Standard Next.js: `app/`, `components/`, `lib/`, `public/`, `styles/`
-- Project-specific: `docs/`, `scripts/`, `tests/`, `hooks/`
-- Data: `data/`, `database/`, `supabase/`
-- Archives: `_archived/`, `backups/` (if needed)
+**Critical rules:**
+- Only standard configs, package files, and 5 docs allowed at root
+- NO `*.log`, `test-*.js`, `*.backup`, `*.patch` files
+- NO temp files, status reports, or investigation docs
+- Use proper directories: `docs/`, `scripts/`, `tests/`, `data/`
 
 ---
 
@@ -279,109 +218,39 @@ npm run lint         # Code quality check
 
 ### When to Use Each Skill
 
-**For Bugs/Errors:**
-```bash
-# ALWAYS use systematic-debugging for ANY bug
-# Router will detect debug keywords and offer this automatically
-/response-awareness "Fix calculation returning NaN"
-→ Detects "fix" keyword → Offers systematic-debugging skill → Root cause investigation
-```
-
-**For Vague Ideas:**
-```bash
-# Use brainstorming to clarify before implementation
-/response-awareness "I'm thinking about adding a dashboard"
-→ Detects "thinking about" → Offers brainstorming skill → Refine requirements → Plan → Implement
-```
-
-**For Clear Requirements:**
-```bash
-# Router assesses complexity and routes to appropriate tier
-/response-awareness "Add email validation to signup form"
-→ Complexity score: 2 → MEDIUM tier → Optional planning → Implementation
-```
-
-**For Parallel Work:**
-```bash
-# Uncommitted changes + new unrelated task = worktree offer
-git status  # Shows uncommitted changes
-/response-awareness "Add new feature X"
-→ Detects uncommitted work → Offers worktree creation → Isolated workspace
-```
+- **Bugs/Errors:** Use `systematic-debugging` (router detects "fix" keywords)
+- **Vague Ideas:** Use `brainstorming` to clarify before planning
+- **Clear Requirements:** Router assesses complexity and routes to appropriate tier
+- **Parallel Work:** Router offers worktree when uncommitted changes conflict with new task
 
 ### Configuration-Driven Behavior
 
-All paths and features come from config files, NOT hardcoded:
-
-```javascript
-// Logging location (from logging-config.json)
-const logPath = config.paths.verbose_logs;  // docs/completion_drive_logs
-
-// Feature toggles (from response-awareness-config.json)
-if (config.features.worktree_integration) {
-  // Offer worktree when appropriate
-}
-
-if (config.features.brainstorming_precheck) {
-  // Detect vague language and offer brainstorming
-}
-```
+All paths and features come from config files (`.claude/config/*.json`), NOT hardcoded. Use `logging-config.json` for verbose logs, `response-awareness-config.json` for feature flags.
 
 ### Syncing with Upstream
 
 **When response-awareness framework updates:**
+1. Download latest ZIP → `.claude/upstream-reference/response-awareness-vX.X.X/`
+2. Run comparison: `node scripts/compare-upstream.js vX.X.X`
+3. Manually merge while preserving NextNest customizations
+4. Update version in `.claude/config/response-awareness-config.json`
 
-1. Download latest ZIP from GitHub
-2. Unzip to `.claude/upstream-reference/response-awareness-vX.X.X/`
-3. Run comparison: `node scripts/compare-upstream.js vX.X.X`
-4. Review differences (what changed upstream vs your customizations)
-5. Manually merge improvements while preserving NextNest customizations
-6. Update `.claude/config/response-awareness-config.json` upstream_version
-7. Test: `/response-awareness "test task"`
-
-**See:** [UPDATE_GUIDE.md](UPDATE_GUIDE.md) for full sync workflow
+See [UPDATE_GUIDE.md](UPDATE_GUIDE.md) for full workflow.
 
 ### NextNest Customizations to Preserve
 
-**When syncing upstream, ALWAYS preserve:**
-
-1. **Configuration Loading**
-   - Config file paths
-   - Feature flag checks
-   - NextNest-specific settings
-
-2. **Worktree Integration**
-   - Phase 0 pre-checks
-   - worktree-helper agent deployment
-
-3. **Brainstorming Pre-Checks**
-   - Vague language detection
-   - Requirement clarification offers
-
-4. **CLAUDE.md Compliance**
-   - TDD enforcement
-   - CANONICAL_REFERENCES checks
-   - Component Placement Decision Tree
-   - YAGNI ruthlessness
-
-5. **Logging Paths**
-   - `docs/completion_drive_logs/` (not upstream default)
-   - Learning mode summaries
-   - Plan persistence to `docs/plans/`
+When syncing upstream, ALWAYS preserve:
+1. **Configuration Loading** - Config file paths, feature flags, NextNest settings
+2. **Worktree Integration** - Phase 0 pre-checks, worktree-helper deployment
+3. **Brainstorming Pre-Checks** - Vague language detection, requirement clarification
+4. **CLAUDE.md Compliance** - TDD enforcement, CANONICAL_REFERENCES checks, Component Placement, YAGNI
+5. **Logging Paths** - `docs/completion_drive_logs/`, learning mode, plan persistence
 
 ### Communication Style for Skills
 
-**For Exploratory/Vague Requests:**
-- Proactively offer brainstorming skill
-- "I notice some ambiguity. Would you like structured brainstorming or conversational exploration?"
-
-**For Bug Reports:**
-- ALWAYS offer systematic-debugging
-- "This appears to be a debugging task. Should I use systematic-debugging skill for root cause analysis?"
-
-**For Clear Implementations:**
-- Route through response-awareness automatically
-- Announce tier: "Complexity assessment: MEDIUM tier (2-5 files, moderate integration)"
+- Exploratory/vague requests → Offer brainstorming skill
+- Bug reports → ALWAYS offer systematic-debugging
+- Clear implementations → Route through response-awareness, announce tier
 
 ### Forbidden Patterns
 
@@ -454,170 +323,35 @@ if (config.features.brainstorming_precheck) {
 - Plans contain DECISIONS (what to build, why, testing)
 - Plans do NOT contain INSTRUCTIONS (code examples, tutorials)
 
-**Required sections:**
-```yaml
----
-status: draft | active | completed
-complexity: light | medium | heavy
-estimated_hours: X
----
+See **[Planning Templates](docs/PLANNING_TEMPLATES.md)** for:
+- Plan template structure (required sections, frontmatter format)
+- Pre-implementation checklist (file placement, test planning)
+- Work-log entry format (daily progress tracking)
+- Completion report template (outcome documentation)
 
-# Feature Name
-
-## Problem (2-3 sentences)
-What are we solving?
-
-## Success Criteria (3-5 measurable outcomes)
-- Outcome 1
-- Outcome 2
-
-## Tasks (5-15 tasks, each <2h)
-- [ ] Task 1 (test file, doc link if needed)
-- [ ] Task 2
-
-## Testing Strategy
-Unit/Integration/E2E: which files
-
-## Rollback Plan
-How to undo if it fails
-```
-
-**Red flags your plan is too long:**
-- Contains code examples >20 lines
-- Contains "read this first" prerequisites
-- Contains troubleshooting sections
-- Contains copy-paste tutorials
-- Over 200 lines
-
-**When plan grows too large:**
-1. Extract code examples → delete or move to `docs/runbooks/`
-2. Extract tutorials → link to existing runbook
-3. Split into Phase 1, Phase 2 plans if still >200 lines
-
-**Before creating a new plan:**
-1. Check `docs/plans/active/` - does a plan for this feature already exist?
-2. If yes, update existing plan instead of creating new one
-3. If creating new plan, set old related plans to `status: archived` and move them
-
-**Pre-implementation checklist (add to every plan):**
-```markdown
-## Pre-Implementation Checklist
-
-**Before starting implementation:**
-- [ ] Check CANONICAL_REFERENCES.md for folder structure standards
-- [ ] Verify no Tier 1 files will be modified (if yes, review change rules)
-- [ ] Confirm file placement using Component Placement Decision Tree (CLAUDE.md)
-- [ ] Check for existing similar components/features to avoid duplication
-- [ ] Identify which tests need to be written first (TDD)
-- [ ] Review related runbooks for implementation patterns
-
-**File placement decisions:**
-- [ ] New app/ routes → Production route or app/_dev/?
-- [ ] New components → Which domain folder? (ui, layout, landing, shared, forms, etc.)
-- [ ] New tests → Colocated __tests__/ or tests/ directory?
-- [ ] New utilities → lib/ or hooks/?
-- [ ] Archive format → YYYY-MM if archiving anything
-```
+**Plan size management:**
+- Red flags: code examples >20 lines, "read this first" prerequisites, troubleshooting sections, copy-paste tutorials
+- If too large: extract code examples to runbooks, link to existing docs, or split into phases
+- Check `docs/plans/active/` before creating new plans - update existing instead of duplicating
 
 ### Execution Rules
 
-**During implementation, use ONLY:**
-- `TodoWrite` tool for task tracking
-- `docs/work-log.md` for daily notes
-- Git commits as execution log
-- Nothing else
-
-**DO NOT create during execution:**
-- New plans
-- Investigation reports (use journal)
-- Status updates (use journal)
-- Fix summaries (git log is your summary)
-
-**Update work-log.md structure:**
-```markdown
-## {YYYY-MM-DD} - {Feature Name}
-
-**Branch:** {branch-name}
-**Plan:** docs/plans/active/{date}-{feature-slug}.md
-**Status:** in-progress | blocked | completed
-
-### Progress Today
-- [x] Completed task 1
-- [ ] Blocked on task 2
-
-### Key Decisions
-- Decision: {what we chose and why}
-
-### Issues Found
-- Issue: {description} - fixed in commit abc1234
-
-### Next Session
-- Start with task X
-```
+**During implementation:**
+- Use ONLY: TodoWrite tool, `docs/work-log.md`, git commits
+- DO NOT create: new plans, investigation reports, status updates, fix summaries
 
 ### Completion Rules
 
 **Create ONE completion report when fully done:**
-
-**File format:** `docs/plans/active/{date}-{feature-slug}-COMPLETION.md`
-
-**Required sections:**
-```markdown
----
-plan: {date}-{feature-slug}.md
-completed: YYYY-MM-DD
-outcome: success | partial | failed
----
-
-# Completion: Feature Name
-
-## What We Built
-- Feature 1: {1 sentence}
-
-## Metrics
-- Baseline: X → Current: Y
-
-## What Worked / Didn't Work
-...
-
-## Next Actions
-- [ ] Monitor X
-- [ ] Archive plan
-```
-
-**When to create completion report:**
-- All tasks in plan are completed OR explicitly deferred
-- All tests are passing
-- Code is merged to main branch
-- Never create partial/interim reports
-
-### Archive Rules
-
-**Archive immediately after completion report:**
-```bash
-git mv docs/plans/active/{plan}.md docs/plans/archive/2025/10/
-git mv docs/plans/active/{plan}-COMPLETION.md docs/plans/archive/2025/10/
-```
-
-**Archive structure:** `docs/plans/archive/{year}/{month}/`
+- File format: `docs/plans/active/{date}-{feature-slug}-COMPLETION.md`
+- When: All tasks completed/deferred, all tests passing, code merged
+- Archive immediately after completion to `docs/plans/archive/{year}/{month}/`
 
 ### Forbidden: Root-Level Documentation
 
 **NEVER create these at repository root:**
-- `*_SUMMARY.md`
-- `*_REPORT.md`
-- `*_FIX.md`
-- `*_STATUS.md`
-- `*_IMPLEMENTATION.md`
-- `*.txt` status files
-
-**Exception:** README.md, CLAUDE.md, AGENTS.md, SKILL.md, standard configs
-
-**If you find root-level docs:**
-1. Is it a plan? → move to `docs/plans/archive/{year}/{month}/`
-2. Investigation notes? → move to `docs/reports/investigations/`
-3. Fix summary? → delete (git log has it)
-4. Status update? → delete (stale)
+- `*_SUMMARY.md`, `*_REPORT.md`, `*_FIX.md`, `*_STATUS.md`, `*_IMPLEMENTATION.md`, `*.txt` status files
+- **Exception:** README.md, CLAUDE.md, AGENTS.md, SKILL.md, standard configs
 
 ### Quick Reference: Where Things Go
 
