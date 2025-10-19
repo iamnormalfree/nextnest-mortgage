@@ -58,6 +58,7 @@ We're colleagues ("Brent" and "Claude") working together with honest, direct com
 - Commit frequently throughout development, even for WIP
 - Stop and ask about uncommitted changes before starting new work
 - Create WIP branch if no clear branch exists for the task
+- **Pre-commit hook validates plan lengths:** Warns at 180 lines, blocks at 250 lines (run manually: `bash scripts/validate-plan-length.sh`)
 
 **Session Continuation Protocol:**
 - When resuming work from previous session, ALWAYS check `git status` and `git branch` first
@@ -333,6 +334,8 @@ See **[Planning Templates](docs/PLANNING_TEMPLATES.md)** for:
 - Red flags: code examples >20 lines, "read this first" prerequisites, troubleshooting sections, copy-paste tutorials
 - If too large: extract code examples to runbooks, link to existing docs, or split into phases
 - Check `docs/plans/active/` before creating new plans - update existing instead of duplicating
+- **Automated validation:** Pre-commit hook checks plan lengths (soft limit: 180 lines, hard limit: 250 lines)
+- **Manual check:** Run `bash scripts/validate-plan-length.sh` to validate all active plans before committing
 
 ### Execution Rules
 
