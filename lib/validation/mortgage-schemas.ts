@@ -333,11 +333,11 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
       phone: singaporePhoneSchema,
       // Step 3 specific fields (actual field names from form)
       actualIncomes: z.object({
-        0: z.number().min(0, 'Income cannot be negative').max(9999999, 'Please enter a valid income amount'),
+        0: z.number().min(0, 'Income cannot be negative').max(9999999, 'Please enter a valid income amount').optional(),
         1: z.number().min(0, 'Income cannot be negative').max(9999999, 'Please enter a valid income amount').optional()
       }),
       actualAges: z.object({
-        0: z.number().int('Age must be a whole number').min(18, 'Must be at least 18 years old').max(99, 'Age must be 99 or less'),
+        0: z.number().int('Age must be a whole number').min(18, 'Must be at least 18 years old').max(99, 'Age must be 99 or less').optional(),
         1: z.number().int('Age must be a whole number').min(18, 'Must be at least 18 years old').max(99, 'Age must be 99 or less').optional()
       }),
       employmentType: z.enum(['employed', 'self-employed', 'variable', 'not-working', 'other', 'contract'], {
