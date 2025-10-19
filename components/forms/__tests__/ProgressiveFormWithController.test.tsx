@@ -610,6 +610,70 @@ describe('ProgressiveFormWithController', () => {
 
       jest.useRealTimers()
     })
+
+    it('recalculates instant analysis when age or property price changes', async () => {
+      jest.useFakeTimers()
+      const user = await advanceToStep2(userEvent.setup({ advanceTimers: jest.advanceTimersByTime }))
+
+      // Fill initial values
+      await completeStep2Fields(user, { price: '750000', age: '35' })
+
+      // Wait for initial instant analysis
+      await act(async () => {
+        jest.advanceTimersByTime(500) // Debounce timer
+      })
+      await act(async () => {
+        jest.advanceTimersByTime(1000) // Initial calculation delay
+      })
+      await screen.findByText(/you qualify for up to/i)
+
+      mockPublishEvent.mockClear()
+      mockInstantProfile.mockClear()
+
+      // Change age field
+      const ageInput = screen.getByLabelText(/Combined Age/i) as HTMLInputElement
+      await user.clear(ageInput)
+      await user.type(ageInput, '40')
+
+      // Should show loading state during debounce
+      await act(async () => {
+        jest.advanceTimersByTime(100)
+      })
+      await screen.findByText(/Analyzing.../i)
+
+      // Complete debounce and recalculation
+      await act(async () => {
+        jest.advanceTimersByTime(500) // Complete 500ms debounce
+      })
+
+      // Instant analysis should recalculate with new age
+      await screen.findByText(/you qualify for up to/i)
+      expect(mockInstantProfile).toHaveBeenCalled()
+
+      mockInstantProfile.mockClear()
+
+      // Change property price field
+      const priceInput = screen.getByLabelText(/Property Price/i) as HTMLInputElement
+      await user.clear(priceInput)
+      await user.type(priceInput, '900000')
+
+      // Should show loading state during debounce
+      await act(async () => {
+        jest.advanceTimersByTime(100)
+      })
+      await screen.findByText(/Analyzing.../i)
+
+      // Complete debounce and recalculation
+      await act(async () => {
+        jest.advanceTimersByTime(500) // Complete 500ms debounce
+      })
+
+      // Instant analysis should recalculate with new price
+      await screen.findByText(/you qualify for up to/i)
+      expect(mockInstantProfile).toHaveBeenCalled()
+
+      jest.useRealTimers()
+    })
   })
 
   it('hides technical details by default but shows tenure cap info when expanded', async () => {

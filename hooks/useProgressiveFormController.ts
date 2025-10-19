@@ -448,6 +448,9 @@ export function useProgressiveFormController({
     // Only apply reactivity on step 2 and after initial calculation
     if (currentStep !== 2 || !hasCalculated) return
 
+    // Set loading state immediately when fields change
+    setIsInstantCalcLoading(true)
+
     const timer = setTimeout(() => {
       // Read directly from watchedFields (the full form watch)
       const {
@@ -457,12 +460,13 @@ export function useProgressiveFormController({
         ltvMode,
         propertyType,
         priceRange,
-        propertyPrice
+        propertyPrice,
+        combinedAge
       } = watchedFields
 
       // Only recalculate if we have minimum required fields
       const hasMinimumFields = mappedLoanType === 'new_purchase'
-        ? (priceRange || propertyPrice) && actualAges?.[0]
+        ? (priceRange || propertyPrice) && (actualAges?.[0] || combinedAge)
         : propertyValue && loanQuantum
 
       if (hasMinimumFields) {
@@ -470,6 +474,7 @@ export function useProgressiveFormController({
           priceRange,
           propertyPrice,
           actualAges,
+          combinedAge,
           ltvMode,
           propertyType
         })
@@ -480,16 +485,25 @@ export function useProgressiveFormController({
           ltvMode: ltvMode || 75
         })
       }
+
+      // Clear loading state after recalculation
+      setIsInstantCalcLoading(false)
     }, 500) // 500ms debounce to prevent excessive calculations
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      // If effect is cleaned up before timer fires, clear loading state
+      setIsInstantCalcLoading(false)
+    }
     // CRITICAL FIX: Depend on the specific watched field values, not a separate useWatch
+    // Watch both actualAges[0] (primitive) AND combinedAge to catch all age changes
   }, [
     watchedFields.priceRange,
     watchedFields.propertyPrice,
     watchedFields.propertyValue,
     watchedFields.loanQuantum,
-    watchedFields.actualAges,
+    watchedFields.actualAges?.[0],  // Watch first element as primitive, not array reference
+    watchedFields.combinedAge,       // Watch combinedAge from Step 2
     watchedFields.ltvMode,
     watchedFields.propertyType,
     currentStep,
