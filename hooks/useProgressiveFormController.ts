@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useForm, Control, UseFormRegister, UseFormHandleSubmit, UseFormWatch, UseFormSetValue, UseFormTrigger } from 'react-hook-form'
+import { useForm, useWatch, Control, UseFormRegister, UseFormHandleSubmit, UseFormWatch, UseFormSetValue, UseFormTrigger } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LeadForm } from '@/lib/domains/forms/entities/LeadForm'
 import { createStepSchema } from '@/lib/validation/mortgage-schemas'
@@ -147,6 +147,7 @@ export function useProgressiveFormController({
   } = form
 
   const watchedFields = watch()
+
 
   // Lead scoring logic - FIXED: use ref to avoid infinite loops
   useEffect(() => {
@@ -441,6 +442,46 @@ export function useProgressiveFormController({
       setHasCalculated(true)
     }
   }, [mappedLoanType, watchedFields, hasCalculated, propertyCategory])
+
+  // Watch specific fields that affect instant analysis for reactivity
+  const instantAnalysisFields = useWatch({
+    control,
+    name: ['propertyValue', 'loanQuantum', 'actualAges', 'ltvMode', 'propertyType', 'priceRange', 'propertyPrice']
+  })
+
+  // Debounced instant analysis recalculation when watched fields change
+  useEffect(() => {
+    // Only apply reactivity on step 2 and after initial calculation
+    if (currentStep !== 2 || !hasCalculated) return
+
+    const timer = setTimeout(() => {
+      const values = form.getValues()
+      const {
+        propertyValue,
+        loanQuantum,
+        actualAges,
+        ltvMode,
+        propertyType,
+        priceRange,
+        propertyPrice
+      } = values
+
+      // Only recalculate if we have minimum required fields
+      const hasMinimumFields = mappedLoanType === 'new_purchase'
+        ? (priceRange || propertyPrice) && actualAges?.[0]
+        : propertyValue && loanQuantum
+
+      if (hasMinimumFields) {
+        // Force recalculation with current values
+        calculateInstant({
+          force: true,
+          ltvMode: ltvMode || 75
+        })
+      }
+    }, 500) // 500ms debounce to prevent excessive calculations
+
+    return () => clearTimeout(timer)
+  }, [instantAnalysisFields, currentStep, hasCalculated, mappedLoanType, form, calculateInstant])
 
   // Instant calculation triggers (from ProgressiveForm) - use specific field dependencies
   useEffect(() => {
