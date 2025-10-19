@@ -737,26 +737,29 @@ export function ProgressiveFormWithController({
                   control={control}
                   render={({ field }) => (
                     <div>
-                      <label 
+                      <label
                         htmlFor="combined-age"
                         className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
                       >
                         Combined Age *
                       </label>
                       <Input
-                        {...field}
+                        name={field.name}
+                        ref={field.ref}
                         id="combined-age"
                         type="number"
                         min="18"
                         max="99"
                         step="1"
                         placeholder="35"
+                        value={field.value ?? ''} // Convert undefined to empty string for controlled input
                         onChange={(e) => {
                           // Don't default to 0 when field is empty - preserve undefined
                           const value = e.target.value === '' ? undefined : parseInt(e.target.value)
                           field.onChange(value)
                           onFieldChange('combinedAge', value)
                         }}
+                        onBlur={field.onBlur}
                       />
                       {errors.combinedAge && (
                         <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.combinedAge)}</p>

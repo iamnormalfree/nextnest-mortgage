@@ -443,19 +443,13 @@ export function useProgressiveFormController({
     }
   }, [mappedLoanType, watchedFields, hasCalculated, propertyCategory])
 
-  // Watch specific fields that affect instant analysis for reactivity
-  const instantAnalysisFields = useWatch({
-    control,
-    name: ['propertyValue', 'loanQuantum', 'actualAges', 'ltvMode', 'propertyType', 'priceRange', 'propertyPrice']
-  })
-
   // Debounced instant analysis recalculation when watched fields change
   useEffect(() => {
     // Only apply reactivity on step 2 and after initial calculation
     if (currentStep !== 2 || !hasCalculated) return
 
     const timer = setTimeout(() => {
-      // Use watchedFields directly instead of form.getValues() to ensure we get the latest values
+      // Read directly from watchedFields (the full form watch)
       const {
         propertyValue,
         loanQuantum,
@@ -472,6 +466,14 @@ export function useProgressiveFormController({
         : propertyValue && loanQuantum
 
       if (hasMinimumFields) {
+        console.log('🔄 Instant analysis recalculating with:', {
+          priceRange,
+          propertyPrice,
+          actualAges,
+          ltvMode,
+          propertyType
+        })
+
         // Force recalculation with current values
         calculateInstant({
           force: true,
@@ -481,7 +483,20 @@ export function useProgressiveFormController({
     }, 500) // 500ms debounce to prevent excessive calculations
 
     return () => clearTimeout(timer)
-  }, [instantAnalysisFields, currentStep, hasCalculated, mappedLoanType, watchedFields, calculateInstant])
+    // CRITICAL FIX: Depend on the specific watched field values, not a separate useWatch
+  }, [
+    watchedFields.priceRange,
+    watchedFields.propertyPrice,
+    watchedFields.propertyValue,
+    watchedFields.loanQuantum,
+    watchedFields.actualAges,
+    watchedFields.ltvMode,
+    watchedFields.propertyType,
+    currentStep,
+    hasCalculated,
+    mappedLoanType,
+    calculateInstant
+  ])
 
   // Instant calculation triggers (from ProgressiveForm) - use specific field dependencies
   useEffect(() => {

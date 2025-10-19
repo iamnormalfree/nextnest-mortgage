@@ -1,0 +1,81 @@
+// ABOUTME: E2E test for Step 3 New Purchase UX - identifies all UX issues
+
+import { test, expect, Page } from '@playwright/test';
+
+interface UXIssue {
+  issue: string;
+  location: string;
+  userImpact: string;
+  severity: 'Critical' | 'High' | 'Medium' | 'Low';
+}
+
+const uxIssues: UXIssue[] = [];
+
+function reportIssue(issue: UXIssue) {
+  uxIssues.push(issue);
+  console.log(`[${issue.severity}] ${issue.issue}`);
+  console.log(`Location: ${issue.location}`);
+  console.log(`Impact: ${issue.userImpact}
+`);
+}
+
+test.describe('Step 3 New Purchase UX Testing', () => {
+  test.beforeEach(async ({ page }) => {
+    uxIssues.length = 0;
+    await page.goto('/apply?loanType=new_purchase');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test.afterAll(async () => {
+    console.log('
+========== UX ISSUES REPORT ==========
+');
+    console.log(`Total Issues Found: ${uxIssues.length}
+`);
+    
+    const categories = ['Critical', 'High', 'Medium', 'Low'];
+    categories.forEach(severity => {
+      const issues = uxIssues.filter(i => i.severity === severity);
+      if (issues.length > 0) {
+        console.log(`## ${severity} Priority Issues (${issues.length})
+`);
+        issues.forEach((issue, idx) => {
+          console.log(`${idx + 1}. **${issue.issue}**`);
+          console.log(`   - Location: ${issue.location}`);
+          console.log(`   - Impact: ${issue.userImpact}
+`);
+        });
+      }
+    });
+  });
+
+  test('Income fields validation', async ({ page }) => {
+    // Step 1
+    await page.fill('input[name="contactName"]', 'John Doe');
+    await page.fill('input[name="contactEmail"]', 'john@example.com');
+    await page.fill('input[name="contactPhone"]', '91234567');
+    await page.click('button:has-text("Next")');
+    await page.waitForTimeout(1000);
+    
+    // Step 2
+    await page.fill('input[name="priceRange"]', '1000000');
+    await page.click('button:has-text("Next")');
+    await page.waitForTimeout(1000);
+    
+    // Step 3 - Income testing
+    const incomeInput = page.locator('input#monthly-income-primary');
+    await incomeInput.waitFor({ state: 'visible', timeout: 5000 });
+    
+    await incomeInput.fill('-5000');
+    const negValue = await incomeInput.inputValue();
+    
+    if (negValue.includes('-')) {
+      reportIssue({
+        issue: 'Income field accepts negative numbers',
+        location: 'Monthly income input',
+        userImpact: 'Invalid negative income values allowed',
+        severity: 'High'
+      });
+    }
+  });
+});

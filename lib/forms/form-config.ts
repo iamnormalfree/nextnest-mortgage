@@ -119,7 +119,7 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     defaults.propertyCategory = 'resale' // Default category
     defaults.propertyType = 'HDB' // Default property type
     defaults.priceRange = 500000 // Default price range
-    defaults.combinedAge = 35 // Default combined age
+    defaults.combinedAge = undefined // User must enter their age (no default to prevent concatenation bug)
     defaults.developmentName = undefined // Optional field
     defaults.paymentScheme = undefined // Optional field
   } else if (loanType === 'refinance') {
