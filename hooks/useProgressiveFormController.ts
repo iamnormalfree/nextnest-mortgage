@@ -287,8 +287,12 @@ export function useProgressiveFormController({
 
   // Calculate instant results
   const calculateInstant = useCallback((options: { force?: boolean; ltvMode?: number } = {}) => {
+    console.log('🔍 calculateInstant called:', { force: options.force, ltvMode: options.ltvMode, hasCalculated })
     const { force = false, ltvMode: ltvOverride } = options
-    if (hasCalculated && !force) return
+    if (hasCalculated && !force) {
+      console.log('🔍 calculateInstant: Early return (already calculated and not forced)')
+      return
+    }
 
     const formData = watchedFields
     let result = null
@@ -425,33 +429,51 @@ export function useProgressiveFormController({
       }
     }
 
+    console.log('🔍 calculateInstant: result =', result ? 'valid result' : 'NULL')
+
     if (result) {
+      console.log('🔍 calculateInstant: Result is valid, setting up display timer')
       if (instantCalcTimerRef.current) {
         clearTimeout(instantCalcTimerRef.current)
       }
 
       setInstantCalcResult(result)
+      console.log('🔍 calculateInstant: Setting loading state TRUE')
       setIsInstantCalcLoading(true)
       setShowInstantCalc(false)
 
       instantCalcTimerRef.current = setTimeout(() => {
+        console.log('🔍 calculateInstant: 1000ms timer fired, showing results and clearing loading')
         setShowInstantCalc(true)
         setIsInstantCalcLoading(false)
       }, 1000)
 
       setHasCalculated(true)
+    } else {
+      console.log('🔍 calculateInstant: Result is NULL, not setting loading state')
     }
-  }, [mappedLoanType, watchedFields, hasCalculated, propertyCategory])
+  }, [mappedLoanType, propertyCategory]) // Removed watchedFields and hasCalculated from dependencies to avoid constant recreation
 
   // Debounced instant analysis recalculation when watched fields change
   useEffect(() => {
-    // Only apply reactivity on step 2 and after initial calculation
-    if (currentStep !== 2 || !hasCalculated) return
+    console.log('🔍 Debounced recalc effect triggered:', {
+      currentStep,
+      hasCalculated,
+      combinedAge: watchedFields.combinedAge
+    })
 
+    // Only apply reactivity on step 2 and after initial calculation
+    if (currentStep !== 2 || !hasCalculated) {
+      console.log('🔍 Debounced recalc: Early return (not step 2 or not calculated yet)')
+      return
+    }
+
+    console.log('🔍 Debounced recalc: Setting loading state TRUE')
     // Set loading state immediately when fields change
     setIsInstantCalcLoading(true)
 
     const timer = setTimeout(() => {
+      console.log('🔍 Debounced recalc: setTimeout callback executing')
       // Read directly from watchedFields (the full form watch)
       const {
         propertyValue,
@@ -469,6 +491,8 @@ export function useProgressiveFormController({
         ? (priceRange || propertyPrice) && (actualAges?.[0] || combinedAge)
         : propertyValue && loanQuantum
 
+      console.log('🔍 Debounced recalc: hasMinimumFields =', hasMinimumFields)
+
       if (hasMinimumFields) {
         console.log('🔄 Instant analysis recalculating with:', {
           priceRange,
@@ -484,19 +508,24 @@ export function useProgressiveFormController({
           force: true,
           ltvMode: ltvMode || 75
         })
+      } else {
+        console.log('🔍 Debounced recalc: Minimum fields NOT met, skipping calculation')
       }
 
       // Clear loading state after recalculation
+      console.log('🔍 Debounced recalc: Setting loading state FALSE (line 491)')
       setIsInstantCalcLoading(false)
     }, 500) // 500ms debounce to prevent excessive calculations
 
     return () => {
+      console.log('🔍 Debounced recalc: Cleanup function running')
       clearTimeout(timer)
       // If effect is cleaned up before timer fires, clear loading state
       setIsInstantCalcLoading(false)
     }
-    // CRITICAL FIX: Depend on the specific watched field values, not a separate useWatch
-    // Watch both actualAges[0] (primitive) AND combinedAge to catch all age changes
+    // CRITICAL FIX: Removed calculateInstant from dependencies to prevent infinite loop
+    // calculateInstant reads watchedFields directly, so it always has fresh data
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     watchedFields.priceRange,
     watchedFields.propertyPrice,
@@ -508,43 +537,73 @@ export function useProgressiveFormController({
     watchedFields.propertyType,
     currentStep,
     hasCalculated,
-    mappedLoanType,
-    calculateInstant
+    mappedLoanType
+    // calculateInstant removed - causes infinite loop because it's recreated on every watchedFields change
   ])
 
   // Instant calculation triggers (from ProgressiveForm) - use specific field dependencies
   useEffect(() => {
     const shouldTriggerCalculation = () => {
-      if (currentStep !== 2) return false
-      if (hasCalculated) return false
+      console.log('🔍 Initial trigger: Checking if should trigger calculation', {
+        currentStep,
+        hasCalculated,
+        mappedLoanType
+      })
+
+      if (currentStep !== 2) {
+        console.log('🔍 Initial trigger: Not step 2')
+        return false
+      }
+      if (hasCalculated) {
+        console.log('🔍 Initial trigger: Already calculated')
+        return false
+      }
 
       const fields = watchedFields
 
       if (mappedLoanType === 'new_purchase') {
-        return !!(
+        const result = !!(
           fields.propertyCategory &&
           fields.propertyType &&
           (fields.priceRange || fields.propertyPrice) &&
           fields.combinedAge
         )
+        console.log('🔍 Initial trigger (new_purchase): Has required fields?', result, {
+          propertyCategory: fields.propertyCategory,
+          propertyType: fields.propertyType,
+          priceRange: fields.priceRange,
+          propertyPrice: fields.propertyPrice,
+          combinedAge: fields.combinedAge
+        })
+        return result
       } else if (mappedLoanType === 'refinance') {
-        return !!(
+        const result = !!(
           fields.propertyType &&
           fields.currentRate &&
           fields.outstandingLoan &&
           fields.currentBank
         )
+        console.log('🔍 Initial trigger (refinance): Has required fields?', result)
+        return result
       }
       return false
     }
 
     if (shouldTriggerCalculation()) {
+      console.log('🔍 Initial trigger: Triggering calculation in 500ms')
       const timer = setTimeout(() => {
+        console.log('🔍 Initial trigger: Timer fired, calling calculateInstant()')
         calculateInstant()
       }, 500)
-      return () => clearTimeout(timer)
+      return () => {
+        console.log('🔍 Initial trigger: Cleanup - clearing timer')
+        clearTimeout(timer)
+      }
     }
-  }, [currentStep, mappedLoanType, hasCalculated, watchedFields, calculateInstant])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, mappedLoanType, hasCalculated, watchedFields
+    // calculateInstant removed - it reads watchedFields directly so always has fresh data
+  ])
 
   // AI insight request handler
   const requestAIInsight = useCallback(async (fieldName: string, value: any) => {
