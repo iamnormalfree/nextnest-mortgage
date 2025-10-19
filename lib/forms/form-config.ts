@@ -64,15 +64,15 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     applicantType: 'joint',
     // Initialize actualAges and actualIncomes to prevent controlled/uncontrolled input warnings
     actualAges: {
-      0: 30, // Set reasonable defaults
+      0: undefined, // Set reasonable defaults
       1: undefined
     },
     actualIncomes: {
-      0: 5000, // Set reasonable defaults
+      0: undefined, // Set reasonable defaults
       1: undefined
     },
     actualVariableIncomes: {
-      0: 0,
+      0: undefined,
       1: undefined
     },
     // Step 3 fields (Your Finances)
