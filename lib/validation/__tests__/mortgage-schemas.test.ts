@@ -363,7 +363,8 @@ describe('Mortgage Schemas - Core Validation', () => {
       const validData = {
         loanType: 'new_purchase',
         name: 'John Doe',
-        email: 'john@example.com'
+        email: 'john@example.com',
+        phone: '91234567'
       }
       const result = gate1Schema.safeParse(validData)
       expect(result.success).toBe(true)

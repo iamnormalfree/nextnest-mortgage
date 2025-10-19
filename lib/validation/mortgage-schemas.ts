@@ -45,7 +45,10 @@ const variableIncomesSchema = z.object({
 })
 const employmentDetailsSchema = z.object({
   'self-employed': z.object({
-    businessAgeYears: z.union([z.string(), z.number()]).optional(),
+    businessAgeYears: z.union([
+      z.string(),
+      z.number().int('Business age must be a whole number').min(0, 'Business age cannot be negative').max(100, 'Please verify business age')
+    ]).optional(),
     noaSubmitted: z.boolean().optional(),
     averageReportedIncome: z.union([z.string(), z.number()]).optional()
   }),
@@ -56,8 +59,14 @@ const employmentDetailsSchema = z.object({
 })
 const liabilityDetailsSchema = z.object({
   enabled: z.boolean().optional(),
-  outstandingBalance: z.union([z.number(), z.string()]).optional(),
-  monthlyPayment: z.union([z.number(), z.string()]).optional()
+  outstandingBalance: z.union([
+    z.number().min(0, 'Balance cannot be negative'),
+    z.string()
+  ]).optional(),
+  monthlyPayment: z.union([
+    z.number().min(0, 'Payment cannot be negative'),
+    z.string()
+  ]).optional()
 })
 const liabilitiesSchema = z.object({
   propertyLoans: liabilityDetailsSchema.optional(),
@@ -324,12 +333,12 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
       phone: singaporePhoneSchema,
       // Step 3 specific fields (actual field names from form)
       actualIncomes: z.object({
-        0: z.number().min(0, 'Applicant 1 income is required').max(9999999, 'Please enter a valid income amount'),
+        0: z.number().min(0, 'Income cannot be negative').max(9999999, 'Please enter a valid income amount'),
         1: z.number().min(0, 'Income cannot be negative').max(9999999, 'Please enter a valid income amount').optional()
       }),
       actualAges: z.object({
-        0: z.number().min(18, 'Must be at least 18 years old').max(80, 'Please verify your age'),
-        1: z.number().min(18, 'Must be at least 18 years old').max(80, 'Please verify your age').optional()
+        0: z.number().int('Age must be a whole number').min(18, 'Must be at least 18 years old').max(99, 'Age must be 99 or less'),
+        1: z.number().int('Age must be a whole number').min(18, 'Must be at least 18 years old').max(99, 'Age must be 99 or less').optional()
       }),
       employmentType: z.enum(['employed', 'self-employed', 'variable', 'not-working', 'other', 'contract'], {
         message: 'Please select your employment type'
