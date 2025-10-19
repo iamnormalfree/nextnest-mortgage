@@ -1,11 +1,344 @@
-# ABOUTME: Implementation guide for progressive form input reactivity and number input fixes
-# Covers zero-prefix bug resolution and instant analysis recalculation patterns
+# ABOUTME: Implementation guide for progressive form input validation, reactivity and number input fixes
+# Covers input validation patterns, zero-prefix bug resolution and instant analysis recalculation patterns
 
-# Progressive Form Input Reactivity Implementation Guide
+# Progressive Form Input Validation & Reactivity Implementation Guide
 
-**Purpose:** Technical implementation patterns for fixing number input "0" prefix bug and instant analysis reactivity issues.
+**Purpose:** Technical implementation patterns for input validation, number input "0" prefix bug fixes, and instant analysis reactivity issues.
 
-**Related Plan:** `docs/plans/active/2025-10-19-progressive-form-input-reactivity-fixes.md`
+**Related Plan:** `docs/plans/active/2025-10-19-progressive-form-input-validation-and-reactivity-fixes.md`
+
+**Related Audit:** `docs/reports/step3-ux-audit-report.md`
+
+---
+
+## Table of Contents
+
+1. [Input Validation Patterns](#input-validation-patterns)
+2. [Number Input "0" Prefix Bug](#number-input-0-prefix-bug---implementation)
+3. [Instant Analysis Reactivity](#instant-analysis-reactivity---implementation)
+4. [Testing Patterns](#testing-patterns)
+5. [Performance Considerations](#performance-considerations)
+6. [Rollback Procedure](#rollback-procedure)
+
+---
+
+## Input Validation Patterns
+
+### Overview
+
+Critical validation patterns to prevent invalid user input (negative numbers, unrealistic values) from corrupting calculations and database state.
+
+**Source:** Based on UX audit findings (`docs/reports/step3-ux-audit-report.md`)
+
+### HTML Input Attributes
+
+**Pattern: Numeric Fields with Minimum Values**
+
+```typescript
+// Income, liabilities, business age - must be non-negative
+<input
+  type="number"
+  min="0"
+  step="any"
+  placeholder="5000"
+  {...register('monthlyIncome', { valueAsNumber: true })}
+/>
+```
+
+**Pattern: Age Field with Range**
+
+```typescript
+// Age must be 18-99
+<input
+  type="number"
+  min="18"
+  max="99"
+  step="1"
+  placeholder="35"
+  {...register('actualAges.0', { valueAsNumber: true })}
+/>
+```
+
+**Key Attributes:**
+- `min` - Prevents values below threshold (enforced by browser)
+- `max` - Prevents values above threshold
+- `step="1"` - Prevents decimals (integers only)
+- `step="any"` - Allows decimals (for monetary values)
+
+### Zod Schema Validation
+
+**Pattern: Non-Negative Numeric Fields**
+
+```typescript
+// lib/validation/mortgage-schemas.ts
+import { z } from 'zod';
+
+const mortgageSchema = z.object({
+  // Income fields - must be >= 0
+  monthlyIncome: z.number()
+    .min(0, 'Income cannot be negative')
+    .optional(),
+
+  variableIncome: z.number()
+    .min(0, 'Variable income cannot be negative')
+    .optional(),
+
+  // Liability fields - must be >= 0
+  existingLoanBalance: z.number()
+    .min(0, 'Balance cannot be negative')
+    .optional(),
+
+  monthlyLoanPayment: z.number()
+    .min(0, 'Payment cannot be negative')
+    .optional(),
+});
+```
+
+**Pattern: Age Field with Range + Integer Constraint**
+
+```typescript
+const mortgageSchema = z.object({
+  actualAges: z.array(
+    z.number()
+      .int('Age must be a whole number')
+      .min(18, 'Age must be at least 18')
+      .max(99, 'Age must be 99 or less')
+  ).optional(),
+});
+```
+
+**Pattern: Self-Employed Business Age**
+
+```typescript
+const mortgageSchema = z.object({
+  businessAge: z.number()
+    .int('Business age must be a whole number')
+    .min(0, 'Business age cannot be negative')
+    .max(100, 'Please verify business age')
+    .optional(),
+});
+```
+
+### Error Message Display
+
+**Pattern: Show Validation Errors Below Input**
+
+```typescript
+import { useFormContext } from 'react-hook-form';
+
+function IncomeField() {
+  const { register, formState: { errors } } = useFormContext();
+
+  return (
+    <div className="space-y-1">
+      <label htmlFor="monthlyIncome">Monthly Income</label>
+      <input
+        id="monthlyIncome"
+        type="number"
+        min="0"
+        className={errors.monthlyIncome ? 'border-red-500' : ''}
+        {...register('monthlyIncome', { valueAsNumber: true })}
+      />
+      {errors.monthlyIncome && (
+        <p className="text-sm text-red-600">
+          {errors.monthlyIncome.message}
+        </p>
+      )}
+    </div>
+  );
+}
+```
+
+**Pattern: Age Field with Helpful Context**
+
+```typescript
+<div className="space-y-1">
+  <label htmlFor="age">Your Age</label>
+  <input
+    id="age"
+    type="number"
+    min="18"
+    max="99"
+    step="1"
+    className={errors.actualAges?.[0] ? 'border-red-500' : ''}
+    {...register('actualAges.0', { valueAsNumber: true })}
+  />
+  {errors.actualAges?.[0] && (
+    <p className="text-sm text-red-600">
+      {errors.actualAges[0].message}
+    </p>
+  )}
+  <p className="text-xs text-gray-500">
+    Age affects maximum loan tenure and LTV limits
+  </p>
+</div>
+```
+
+### Validation Flow
+
+**Client-Side (Browser):**
+1. HTML attributes (`min`, `max`, `step`) provide immediate feedback
+2. Browser shows native validation UI on form submit
+3. Prevents typing invalid characters (e.g., 'e', '-' for integers)
+
+**Application-Level (Zod):**
+1. Schema validation runs on form submit
+2. Custom error messages displayed
+3. Prevents form progression with invalid data
+
+**Server-Side (API):**
+1. Re-validate with same Zod schema
+2. Prevent malicious/corrupted submissions
+3. Return validation errors to client
+
+### Files to Update
+
+**Components:**
+- `components/forms/ProgressiveFormWithController.tsx` (Step 2: age, property value, loan quantum)
+- `components/forms/sections/Step3NewPurchase.tsx` (income, age, liabilities, business age)
+- `components/forms/sections/Step3Refinance.tsx` (income, loan balance, property value)
+
+**Schemas:**
+- `lib/validation/mortgage-schemas.ts` (all numeric field validations)
+
+**Tests:**
+- `lib/validation/__tests__/mortgage-schemas.test.ts` (schema validation tests)
+- `components/forms/__tests__/Step3NewPurchase.test.tsx` (component validation tests)
+
+### Common Pitfalls
+
+**❌ Don't: Trust client-side validation alone**
+```typescript
+// Insufficient - user can bypass browser validation
+<input type="number" min="0" />
+```
+
+**✅ Do: Layer validations (HTML + Zod + Server)**
+```typescript
+// HTML attribute
+<input type="number" min="0" {...register('income')} />
+
+// Zod schema
+z.number().min(0, 'Income cannot be negative')
+
+// API route
+export async function POST(req: Request) {
+  const parsed = mortgageSchema.safeParse(await req.json());
+  if (!parsed.success) return NextResponse.json({ errors: parsed.error }, { status: 400 });
+}
+```
+
+**❌ Don't: Use generic error messages**
+```typescript
+z.number().min(0) // Shows "Number must be greater than or equal to 0"
+```
+
+**✅ Do: Provide context-specific messages**
+```typescript
+z.number().min(0, 'Income cannot be negative')
+z.number().min(18, 'You must be at least 18 years old to apply')
+```
+
+### Testing Validation
+
+**Unit Tests (Schema):**
+```typescript
+// lib/validation/__tests__/mortgage-schemas.test.ts
+describe('mortgage schema validation', () => {
+  it('rejects negative income', () => {
+    const result = mortgageSchema.safeParse({
+      monthlyIncome: -5000
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].message).toContain('cannot be negative');
+    }
+  });
+
+  it('rejects age below 18', () => {
+    const result = mortgageSchema.safeParse({
+      actualAges: [15]
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects age above 99', () => {
+    const result = mortgageSchema.safeParse({
+      actualAges: [150]
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts valid age range', () => {
+    const result = mortgageSchema.safeParse({
+      actualAges: [35]
+    });
+    expect(result.success).toBe(true);
+  });
+});
+```
+
+**Component Tests:**
+```typescript
+// components/forms/__tests__/Step3NewPurchase.test.tsx
+it('displays error when negative income entered', async () => {
+  render(<Step3NewPurchase />);
+
+  const incomeInput = screen.getByLabelText(/Monthly Income/i);
+  await userEvent.type(incomeInput, '-5000');
+
+  const submitButton = screen.getByRole('button', { name: /continue/i });
+  await userEvent.click(submitButton);
+
+  expect(screen.getByText(/cannot be negative/i)).toBeInTheDocument();
+});
+
+it('displays error when age is outside valid range', async () => {
+  render(<Step3NewPurchase />);
+
+  const ageInput = screen.getByLabelText(/Your Age/i);
+  await userEvent.type(ageInput, '150');
+
+  const submitButton = screen.getByRole('button', { name: /continue/i });
+  await userEvent.click(submitButton);
+
+  expect(screen.getByText(/Age must be/i)).toBeInTheDocument();
+});
+```
+
+**Manual Tests (Playwright):**
+```typescript
+// e2e/form-validation.spec.ts
+test('rejects negative income values', async ({ page }) => {
+  await page.goto('/apply');
+  // Fill Step 1, navigate to Step 3
+  await page.getByLabel(/Monthly Income/i).fill('-5000');
+  await page.getByRole('button', { name: /continue/i }).click();
+
+  await expect(page.getByText(/cannot be negative/i)).toBeVisible();
+});
+
+test('enforces age range 18-99', async ({ page }) => {
+  await page.goto('/apply');
+  // Navigate to Step 3
+  const ageInput = page.getByLabel(/Your Age/i);
+
+  // Test below minimum
+  await ageInput.fill('15');
+  await page.getByRole('button', { name: /continue/i }).click();
+  await expect(page.getByText(/at least 18/i)).toBeVisible();
+
+  // Test above maximum
+  await ageInput.fill('150');
+  await page.getByRole('button', { name: /continue/i }).click();
+  await expect(page.getByText(/99 or less/i)).toBeVisible();
+
+  // Test valid value
+  await ageInput.fill('35');
+  // Should not show error
+  await expect(page.getByText(/Age must be/i)).not.toBeVisible();
+});
+```
 
 ---
 
