@@ -241,10 +241,7 @@ jest.mock('@/lib/calculations/instant-profile', () => ({
     reasonCodes: ['ltv_reduced_age_trigger', 'mas_compliant_calculation'],
     policyRefs: ['MAS Notice 645']
   })),
-  roundMonthlyPayment: jest.fn((amount) => Math.round(amount))
-}))
-
-jest.mock('@/lib/calculations/mortgage', () => ({
+  roundMonthlyPayment: jest.fn((amount) => Math.round(amount)),
   calculateRefinancingSavings: jest.fn(() => ({
     monthlySavings: 500,
     outstandingLoan: 400000,

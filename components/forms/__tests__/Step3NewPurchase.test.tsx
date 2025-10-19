@@ -207,18 +207,65 @@ describe('Step3NewPurchase', () => {
   })
 
   describe('Liabilities Panel', () => {
-    it('renders liabilities checklist toggles', () => {
+    it('renders liabilities gate question with Yes/No buttons', () => {
       RenderWithForm()
 
-      expect(screen.getByRole('checkbox', { name: /Property loans/i })).toBeInTheDocument()
-      expect(screen.getByRole('checkbox', { name: /Car loans/i })).toBeInTheDocument()
-      expect(screen.getByRole('checkbox', { name: /Credit cards/i })).toBeInTheDocument()
-      expect(screen.getByRole('checkbox', { name: /Personal lines/i })).toBeInTheDocument()
+      expect(screen.getByText(/Do you have any existing loans or commitments/i)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /^No$/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /^Yes$/i })).toBeInTheDocument()
     })
 
-    it('reveals structured liability inputs when toggled on', async () => {
+    it('hides liability inputs initially before any selection', () => {
       RenderWithForm()
 
+      // Initially, no liability inputs should be visible
+      expect(screen.queryByLabelText(/Property loan outstanding balance/i)).not.toBeInTheDocument()
+      expect(screen.queryByLabelText(/Car loan outstanding balance/i)).not.toBeInTheDocument()
+    })
+
+    it('reveals liability input section when Yes is clicked', async () => {
+      RenderWithForm()
+
+      const yesButton = screen.getByRole('button', { name: /^Yes$/i })
+      fireEvent.click(yesButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Tell us about your commitments/i)).toBeInTheDocument()
+      })
+    })
+
+    it('hides liability inputs when No is clicked after Yes was selected', async () => {
+      RenderWithForm()
+
+      // First click Yes
+      const yesButton = screen.getByRole('button', { name: /^Yes$/i })
+      fireEvent.click(yesButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Tell us about your commitments/i)).toBeInTheDocument()
+      })
+
+      // Then click No
+      const noButton = screen.getByRole('button', { name: /^No$/i })
+      fireEvent.click(noButton)
+
+      await waitFor(() => {
+        expect(screen.queryByText(/Tell us about your commitments/i)).not.toBeInTheDocument()
+      })
+    })
+
+    it('allows specific liability types to be toggled on and reveals their input fields', async () => {
+      RenderWithForm()
+
+      // First enable commitments
+      const yesButton = screen.getByRole('button', { name: /^Yes$/i })
+      fireEvent.click(yesButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Tell us about your commitments/i)).toBeInTheDocument()
+      })
+
+      // Now toggle on a specific liability (e.g., Car loans)
       const carToggle = screen.getByRole('checkbox', { name: /Car loans/i })
       fireEvent.click(carToggle)
 
@@ -229,8 +276,16 @@ describe('Step3NewPurchase', () => {
       expect(screen.getByLabelText(/Car loan monthly payment/i)).toBeInTheDocument()
     })
 
-    it('allows other commitments to be captured in textarea', () => {
+    it('allows other commitments to be captured in textarea', async () => {
       RenderWithForm()
+
+      // First enable commitments
+      const yesButton = screen.getByRole('button', { name: /^Yes$/i })
+      fireEvent.click(yesButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Tell us about your commitments/i)).toBeInTheDocument()
+      })
 
       const textarea = screen.getByLabelText(/Other commitments/i)
       fireEvent.change(textarea, { target: { value: 'Tuition fees' } })
@@ -351,6 +406,14 @@ describe('Step3NewPurchase', () => {
 
       calculateInstantProfile.mockClear()
 
+      // First enable commitments
+      const yesButton = screen.getByRole('button', { name: /^Yes$/i })
+      fireEvent.click(yesButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Tell us about your commitments/i)).toBeInTheDocument()
+      })
+
       const propertyToggle = screen.getByRole('checkbox', { name: /Property loans/i })
       const carToggle = screen.getByRole('checkbox', { name: /Car loans/i })
 
@@ -394,6 +457,14 @@ describe('Step3NewPurchase', () => {
     it('emits analytics for liabilities toggle changes', async () => {
       const mockOnFieldChange = jest.fn()
       RenderWithForm({ onFieldChange: mockOnFieldChange })
+
+      // First enable commitments
+      const yesButton = screen.getByRole('button', { name: /^Yes$/i })
+      fireEvent.click(yesButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Tell us about your commitments/i)).toBeInTheDocument()
+      })
 
       const propertyToggle = screen.getByRole('checkbox', { name: /Property loans/i })
       fireEvent.click(propertyToggle)
