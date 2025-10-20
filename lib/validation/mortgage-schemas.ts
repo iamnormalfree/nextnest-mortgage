@@ -40,7 +40,7 @@ const ageSchema = z.number()
   .min(21, 'Minimum age for mortgage is 21')
   .max(100, 'Please enter a valid age')
 const variableIncomesSchema = z.object({
-  0: z.number().min(0, 'Variable income cannot be negative').max(9999999, 'Please enter a valid amount'),
+  0: z.number().min(0, 'Variable income cannot be negative').max(9999999, 'Please enter a valid amount').optional(),
   1: z.number().min(0, 'Variable income cannot be negative').max(9999999, 'Please enter a valid amount').optional()
 })
 const employmentDetailsSchema = z.object({
