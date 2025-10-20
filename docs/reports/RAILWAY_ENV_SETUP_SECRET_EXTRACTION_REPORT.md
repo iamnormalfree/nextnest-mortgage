@@ -28,7 +28,7 @@
 |---------------|---------|------------|---------------|-------|
 | OPENAI_API_KEY | OpenAI API authentication for Dr. Elena AI broker | **YES - CRITICAL** | ✅ YES | Referenced in 171+ files including `lib/queue/broker-worker.ts`, `lib/ai/dr-elena-explainer.ts`, all API routes. **PRODUCTION CRITICAL** |
 
-**Value in file:** `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`
+**Value in file:** `[REDACTED - See Railway dashboard or .env.local]`
 
 ---
 
@@ -41,7 +41,7 @@
 
 **Values in file:**
 - `NEXT_PUBLIC_SUPABASE_URL`: `https://xlncuntbqajqfkegmuvo.supabase.co`
-- `SUPABASE_SERVICE_KEY`: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsbmN1bnRicWFqcWZrZWdtdXZvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzU1MzY4MywiZXhwIjoyMDczMTI5NjgzfQ.vTtYX4dPce_KlkT8XlgB1-OGFqI-sV7CPNnovNA0kXE`
+- `SUPABASE_SERVICE_KEY`: `[REDACTED]`
 
 ---
 
@@ -57,7 +57,7 @@
 
 **Values in file:**
 - `CHATWOOT_BASE_URL`: `https://chat.nextnest.sg`
-- `CHATWOOT_API_TOKEN`: `ML1DyhzJyDKFFvsZLvEYfHnC`
+- `CHATWOOT_API_TOKEN`: `[REDACTED]`
 - `CHATWOOT_ACCOUNT_ID`: `1`
 - `CHATWOOT_INBOX_ID`: `1`
 - `CHATWOOT_WEBSITE_TOKEN`: `SBSfsRrvWSyzfVUXv7QKjoa2`
@@ -287,15 +287,15 @@ git filter-repo --invert-paths --path RAILWAY_ENV_SETUP.md
 
 ```plaintext
 # OpenAI
-OPENAI_API_KEY=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
+OPENAI_API_KEY=[REDACTED - See Railway dashboard or .env.local]
 
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://xlncuntbqajqfkegmuvo.supabase.co
-SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsbmN1bnRicWFqcWZrZWdtdXZvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzU1MzY4MywiZXhwIjoyMDczMTI5NjgzfQ.vTtYX4dPce_KlkT8XlgB1-OGFqI-sV7CPNnovNA0kXE
+NEXT_PUBLIC_SUPABASE_URL=[REDACTED - See Railway dashboard or .env.local]
+SUPABASE_SERVICE_KEY=[REDACTED - See Railway dashboard or .env.local]
 
 # Chatwoot
 CHATWOOT_BASE_URL=https://chat.nextnest.sg
-CHATWOOT_API_TOKEN=ML1DyhzJyDKFFvsZLvEYfHnC
+CHATWOOT_API_TOKEN=[REDACTED - See Railway dashboard or .env.local]
 CHATWOOT_ACCOUNT_ID=1
 CHATWOOT_INBOX_ID=1
 CHATWOOT_WEBSITE_TOKEN=SBSfsRrvWSyzfVUXv7QKjoa2
@@ -347,7 +347,7 @@ LANGFUSE_BASE_URL=https://analytics.nextnest.sg
 **Chatwoot:**
 ```
 1. Go to: https://chat.nextnest.sg → Settings → Integrations → API
-2. Revoke token: ML1DyhzJyDKFFvsZLvEYfHnC
+2. Revoke token: [REDACTED - check Chatwoot settings]
 3. Generate new token
 4. Update in Vercel environment variables
 5. Test webhook integration
@@ -451,7 +451,7 @@ git push origin --force --all
 ### OpenAI Configuration
 ```
 Variable: OPENAI_API_KEY
-Value: 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
+Value: [REDACTED - See Railway dashboard or .env.local]
 ```
 
 ### Redis Configuration (Should already exist - verify it)
@@ -468,7 +468,7 @@ Value: https://xlncuntbqajqfkegmuvo.supabase.co
 
 ```
 Variable: SUPABASE_SERVICE_KEY
-Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsbmN1bnRicWFqcWZrZWdtdXZvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzU1MzY4MywiZXhwIjoyMDczMTI5NjgzfQ.vTtYX4dPce_KlkT8XlgB1-OGFqI-sV7CPNnovNA0kXE
+Value: [REDACTED - See Railway dashboard or .env.local]
 ```
 
 ### Chatwoot Configuration
