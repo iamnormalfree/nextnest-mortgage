@@ -603,12 +603,12 @@ export default function SophisticatedProgressiveForm({
                         <span className="ml-2">Instant Analysis</span>
                       </h4>
                       <div className="space-y-2">
-                        {selectedLoanType === 'new' && instantCalcResult.maxLoan && (
+                        {selectedLoanType === 'new' && 'maxLoan' in instantCalcResult && instantCalcResult.maxLoan && (
                           <p className="text-sm text-graphite">
                             Maximum Loan: <span className="font-mono font-medium">${instantCalcResult.maxLoan.toLocaleString()}</span>
                           </p>
                         )}
-                        {selectedLoanType === 'refinance' && instantCalcResult.monthlySavings && (
+                        {selectedLoanType === 'refinance' && 'monthlySavings' in instantCalcResult && instantCalcResult.monthlySavings && (
                           <p className="text-sm text-graphite">
                             Monthly Savings: <span className="font-mono font-medium text-emerald">${instantCalcResult.monthlySavings.toLocaleString()}</span>
                           </p>
