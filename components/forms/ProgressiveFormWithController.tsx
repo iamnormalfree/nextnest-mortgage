@@ -1518,8 +1518,12 @@ export function ProgressiveFormWithController({
           loanType: loanType || 'new_purchase',
           propertyCategory: fieldValues.propertyCategory,
           propertyType: fieldValues.propertyType,
-          actualAges: fieldValues.actualAges,
-          actualIncomes: fieldValues.actualIncomes,
+          actualAges: Array.isArray(fieldValues.actualAges)
+            ? fieldValues.actualAges
+            : (fieldValues.actualAges ? Object.values(fieldValues.actualAges) : []),
+          actualIncomes: Array.isArray(fieldValues.actualIncomes)
+            ? fieldValues.actualIncomes
+            : (fieldValues.actualIncomes ? Object.values(fieldValues.actualIncomes) : []),
           employmentType: fieldValues.employmentType,
           hasExistingLoan: fieldValues.hasExistingLoan,
           existingLoanDetails: fieldValues.existingLoanDetails
