@@ -1519,11 +1519,11 @@ export function ProgressiveFormWithController({
           propertyCategory: fieldValues.propertyCategory,
           propertyType: fieldValues.propertyType,
           actualAges: Array.isArray(fieldValues.actualAges)
-            ? fieldValues.actualAges
-            : (fieldValues.actualAges ? Object.values(fieldValues.actualAges) : []),
+            ? fieldValues.actualAges.filter((v): v is number => typeof v === 'number')
+            : (fieldValues.actualAges ? Object.values(fieldValues.actualAges).filter((v): v is number => typeof v === 'number') : []),
           actualIncomes: Array.isArray(fieldValues.actualIncomes)
-            ? fieldValues.actualIncomes
-            : (fieldValues.actualIncomes ? Object.values(fieldValues.actualIncomes) : []),
+            ? fieldValues.actualIncomes.filter((v): v is number => typeof v === 'number')
+            : (fieldValues.actualIncomes ? Object.values(fieldValues.actualIncomes).filter((v): v is number => typeof v === 'number') : []),
           employmentType: fieldValues.employmentType,
           hasExistingLoan: fieldValues.hasExistingLoan,
           existingLoanDetails: fieldValues.existingLoanDetails
