@@ -57,9 +57,9 @@ export class ConversationDeduplicator {
 
       const conversations = data.payload || data || []
 
-      // Filter for open/pending conversations
+      // Filter for open/pending conversations (guard against null/undefined entries)
       const activeConversations = conversations.filter(
-        (conv: any) => conv.status === 'open' || conv.status === 'pending'
+        (conv: any) => conv && (conv.status === 'open' || conv.status === 'pending')
       )
 
       if (activeConversations.length === 0) {
