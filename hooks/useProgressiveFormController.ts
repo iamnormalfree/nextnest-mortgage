@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { LeadForm } from '@/lib/domains/forms/entities/LeadForm'
 import { createStepSchema } from '@/lib/validation/mortgage-schemas'
 import { FormStep, LeadScore, AIInsightResponse, LoanType } from '@/lib/contracts/form-contracts'
+import type { InstantCalcResult, PureLtvCalcResult, FullAnalysisCalcResult, RefinanceCalcResult } from '@/lib/contracts/form-contracts'
 import { conversionTracker } from '@/lib/analytics/conversion-tracking'
 import { eventBus, FormEvents, useEventPublisher, useCreateEvent } from '@/lib/events/event-bus'
 import {
@@ -22,6 +23,7 @@ import {
   calculateIWAA,
   getPlaceholderRate
 } from '@/lib/calculations/instant-profile'
+import { calculatePureLtvMaxLoan } from '@/lib/calculations/instant-profile-pure-ltv'
 import { formSteps, getDefaultValues } from '@/lib/forms/form-config'
 
 // Interface for the controller's return value
@@ -34,7 +36,7 @@ export interface ProgressiveFormController {
   isAnalyzing: boolean
   isInstantCalcLoading: boolean
   isSubmitting: boolean
-  instantCalcResult: any
+  instantCalcResult: InstantCalcResult | null
   leadScore: number
   propertyCategory: 'resale' | 'new_launch' | 'bto' | 'commercial' | null
   fieldValues: Record<string, any>
@@ -101,7 +103,7 @@ export function useProgressiveFormController({
   const [leadScore, setLeadScore] = useState(0)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isInstantCalcLoading, setIsInstantCalcLoading] = useState(false)
-  const [instantCalcResult, setInstantCalcResult] = useState<any>(null)
+  const [instantCalcResult, setInstantCalcResult] = useState<InstantCalcResult | null>(null)
   const [fieldValues, setFieldValues] = useState<Record<string, any>>({})
   const [trustSignalsShown, setTrustSignalsShown] = useState<string[]>([])
   const [showInstantCalc, setShowInstantCalc] = useState(false)
@@ -285,99 +287,281 @@ export function useProgressiveFormController({
     // conversionTracker.trackFieldInteraction(name, currentStep)
   }, [currentStep, setValue, leadForm, publishEvent, createEvent, sessionId, mappedLoanType])
 
-  // Calculate instant results
+  /**
+   * Check if Step 2 required data is complete for pure LTV calculation
+   * Pure LTV needs: propertyPrice, propertyType, combinedAge, existingProperties
+   * Does NOT need income
+   */
+  const hasRequiredStep2Data = useCallback((): boolean => {
+    const formData = form.getValues()
+    
+    return !!(
+      (formData.priceRange || formData.propertyPrice) &&
+      formData.propertyType &&
+      formData.combinedAge &&
+      formData.existingProperties !== undefined  // 0 is valid (first property)
+    )
+  }, [form])
+
+  /**
+   * Check if Step 3 required data is complete for full analysis
+   * Full analysis needs: all Step 2 data + actual income
+   */
+  const hasRequiredStep3Data = useCallback((): boolean => {
+    const formData = form.getValues()
+    
+    return (
+      hasRequiredStep2Data() &&
+      (formData.actualIncomes?.[0] ?? 0) > 0  // Must have positive income
+    )
+  }, [form, hasRequiredStep2Data])
+
+
+  // Calculate instant results with step-aware routing
   const calculateInstant = useCallback((options: { force?: boolean; ltvMode?: number } = {}) => {
-    console.log('🔍 calculateInstant called:', { force: options.force, ltvMode: options.ltvMode, hasCalculated })
+    console.log('🔍 calculateInstant called:', { force: options.force, ltvMode: options.ltvMode, hasCalculated, currentStep })
     const { force = false, ltvMode: ltvOverride } = options
     if (hasCalculated && !force) {
       console.log('🔍 calculateInstant: Early return (already calculated and not forced)')
       return
     }
 
-    const formData = watchedFields
-    let result = null
+    // CRITICAL FIX: Use getValues() to get FRESH form data instead of stale watchedFields closure
+    const formData = form.getValues()
 
-    if (mappedLoanType === 'new_purchase') {
+    // STEP-AWARE ROUTING: Different calculation logic based on current step
+    if (currentStep === 2 && mappedLoanType === 'new_purchase') {
+      // ========================================
+      // STEP 2: PURE LTV CALCULATION (NO INCOME)
+      // ========================================
+      console.log('🔍 Step 2: Using PURE LTV calculation (no income)')
+
+      if (!hasRequiredStep2Data()) {
+        console.log('🔍 Step 2: Missing required data, setting result to NULL')
+        setInstantCalcResult(null)
+        return
+      }
+
       const parseNumber = (value: any, fallback: number) => {
         const parsed = Number(value)
         return Number.isFinite(parsed) ? parsed : fallback
       }
 
+      const rawPrice = formData.priceRange ?? formData.propertyPrice ?? 0
+      const propertyPrice = parseNumber(rawPrice, 0)
+
+      if (propertyPrice <= 0) {
+        console.log('🔍 Step 2: propertyPrice <= 0, setting result to NULL')
+        setInstantCalcResult(null)
+        return
+      }
+
+      const rawPropertyType: string | undefined = formData.propertyType || (propertyCategory === 'commercial' ? 'Commercial' : undefined)
+      const personaPropertyType: 'HDB' | 'Private' | 'EC' | 'Commercial' = (() => {
+        switch (rawPropertyType) {
+          case 'Private':
+          case 'Landed':
+            return 'Private'
+          case 'EC':
+            return 'EC'
+          case 'Commercial':
+            return 'Commercial'
+          case 'HDB':
+          default:
+            return 'HDB'
+        }
+      })()
+
+      const existingProperties = parseNumber(formData.existingProperties, 0)
+      const age = parseNumber(formData.combinedAge, 35)
+
+      console.log('🔍 Step 2: Calling calculatePureLtvMaxLoan with:', {
+        property_price: propertyPrice,
+        existing_properties: existingProperties,
+        age,
+        property_type: personaPropertyType
+      })
+
+      // ⚠️ CRITICAL: Call pure LTV function (NO INCOME PARAMETER)
+      const pureLtvResult = calculatePureLtvMaxLoan({
+        property_price: propertyPrice,
+        existing_properties: existingProperties,
+        age,
+        property_type: personaPropertyType
+      })
+
+      console.log('🔍 Step 2: Pure LTV result:', pureLtvResult)
+
+      // Set result and trigger display animation
+      setInstantCalcResult(pureLtvResult) // calculationType: 'pure_ltv'
+      setIsInstantCalcLoading(true)
+      setShowInstantCalc(false)
+
+      if (instantCalcTimerRef.current) {
+        clearTimeout(instantCalcTimerRef.current)
+      }
+
+      instantCalcTimerRef.current = setTimeout(() => {
+        console.log('🔍 Step 2: 1000ms timer fired, showing pure LTV results')
+        setShowInstantCalc(true)
+        setIsInstantCalcLoading(false)
+      }, 1000)
+
+      setHasCalculated(true)
+
+    } else if (currentStep >= 3 && mappedLoanType === 'new_purchase') {
+      // ========================================
+      // STEP 3+: FULL ANALYSIS WITH INCOME
+      // ========================================
+      console.log('🔍 Step 3+: Using FULL ANALYSIS calculation (with income)')
+
+      if (!hasRequiredStep3Data()) {
+        console.log('🔍 Step 3+: Missing required data (including income), setting result to NULL')
+        setInstantCalcResult(null)
+        return
+      }
+
+      const parseNumber = (value: any, fallback: number) => {
+        const parsed = Number(value)
+        return Number.isFinite(parsed) ? parsed : fallback
+      }
+
+      // ⚠️ CRITICAL: Validate actual income (NO DEFAULT FALLBACK)
+      const actualIncome = parseNumber(formData.actualIncomes?.[0], 0)
+      if (actualIncome <= 0) {
+        console.log('🔍 Step 3+: No valid income provided, setting result to NULL')
+        setInstantCalcResult(null)
+        return
+      }
+
       const ltvModeValue = ltvOverride ?? 75
       const rawPrice = formData.priceRange ?? formData.propertyPrice ?? 0
       const propertyPrice = parseNumber(rawPrice, 0)
+
       if (propertyPrice <= 0) {
-        result = null
-      } else {
-        const rawPropertyType: string | undefined = formData.propertyType || (propertyCategory === 'commercial' ? 'Commercial' : undefined)
-        const personaPropertyType: 'HDB' | 'Private' | 'EC' | 'Commercial' = (() => {
-          switch (rawPropertyType) {
-            case 'Private':
-            case 'Landed':
-              return 'Private'
-            case 'EC':
-              return 'EC'
-            case 'Commercial':
-              return 'Commercial'
-            case 'HDB':
-            default:
-              return 'HDB'
-          }
-        })()
-
-        const buyerProfile = (formData.buyerProfile as 'SC' | 'PR' | 'Foreigner') || 'SC'
-        const existingProperties = parseNumber(formData.existingProperties, 0)
-        const age = parseNumber(formData.combinedAge, 35)
-        const tenure = Math.max(parseNumber(formData.requestedTenure, 25), 1)
-        const income = Math.max(parseNumber(formData.actualIncomes?.[0] ?? formData.monthlyIncome, 8000), 0)
-        const commitments = Math.max(parseNumber(formData.existingCommitments, 0), 0)
-        const rateAssumption = getPlaceholderRate(personaPropertyType, mappedLoanType)
-
-        const profile = calculateInstantProfile({
-          property_price: propertyPrice,
-          property_type: personaPropertyType,
-          buyer_profile: buyerProfile,
-          existing_properties: existingProperties,
-          income,
-          commitments,
-          rate: rateAssumption,
-          tenure,
-          age,
-          loan_type: 'new_purchase',
-          is_owner_occupied: true
-        }, ltvModeValue)
-
-        const monthlyPayment = roundMonthlyPayment(
-          profile.maxLoan * ((rateAssumption / 100 / 12) * Math.pow(1 + rateAssumption / 100 / 12, tenure * 12)) /
-          (Math.pow(1 + rateAssumption / 100 / 12, tenure * 12) - 1)
-        )
-
-        const minCashRequired = Math.round((profile.minCashPercent / 100) * propertyPrice)
-
-        result = {
-          propertyPrice,
-          propertyType: personaPropertyType,
-          ltvRatio: profile.maxLTV,
-          maxLoanAmount: profile.maxLoan,
-          downPayment: profile.downpaymentRequired,
-          estimatedMonthlyPayment: monthlyPayment,
-          minCashPercent: profile.minCashPercent,
-          minCashRequired,
-          cpfAllowed: profile.cpfAllowed,
-          cpfAllowedAmount: profile.cpfAllowedAmount,
-          tenureCapYears: profile.tenureCapYears,
-          tenureCapSource: profile.tenureCapSource,
-          limitingFactor: profile.limitingFactor,
-          tdsrAvailable: profile.tdsrAvailable,
-          absdRate: profile.absdRate,
-          reasonCodes: profile.reasonCodes,
-          policyRefs: profile.policyRefs,
-          ltvMode: ltvModeValue,
-          rateAssumption,
-          personaProfile: profile
-        }
+        console.log('🔍 Step 3+: propertyPrice <= 0, setting result to NULL')
+        setInstantCalcResult(null)
+        return
       }
+
+      const rawPropertyType: string | undefined = formData.propertyType || (propertyCategory === 'commercial' ? 'Commercial' : undefined)
+      const personaPropertyType: 'HDB' | 'Private' | 'EC' | 'Commercial' = (() => {
+        switch (rawPropertyType) {
+          case 'Private':
+          case 'Landed':
+            return 'Private'
+          case 'EC':
+            return 'EC'
+          case 'Commercial':
+            return 'Commercial'
+          case 'HDB':
+          default:
+            return 'HDB'
+        }
+      })()
+
+      const buyerProfile = (formData.buyerProfile as 'SC' | 'PR' | 'Foreigner') || 'SC'
+      const existingProperties = parseNumber(formData.existingProperties, 0)
+      const age = parseNumber(formData.combinedAge, 35)
+      const tenure = Math.max(parseNumber(formData.requestedTenure, 25), 1)
+      const commitments = Math.max(parseNumber(formData.existingCommitments, 0), 0)
+      const rateAssumption = getPlaceholderRate(personaPropertyType, mappedLoanType)
+
+      console.log('🔍 Step 3+: Calling calculateInstantProfile with:', {
+        property_price: propertyPrice,
+        property_type: personaPropertyType,
+        buyer_profile: buyerProfile,
+        existing_properties: existingProperties,
+        income: actualIncome, // ← ACTUAL income, NOT hardcoded
+        commitments,
+        rate: rateAssumption,
+        tenure,
+        age,
+        ltvModeValue
+      })
+
+      const profile = calculateInstantProfile({
+        property_price: propertyPrice,
+        property_type: personaPropertyType,
+        buyer_profile: buyerProfile,
+        existing_properties: existingProperties,
+        income: actualIncome, // ← ACTUAL income, NOT hardcoded
+        commitments,
+        rate: rateAssumption,
+        tenure,
+        age,
+        loan_type: 'new_purchase',
+        is_owner_occupied: true
+      }, ltvModeValue)
+
+      console.log('🔍 Step 3+: Full analysis result:', {
+        maxLoan: profile.maxLoan,
+        maxLTV: profile.maxLTV,
+        limitingFactor: profile.limitingFactor,
+        ltvCapApplied: profile.ltvCapApplied
+      })
+
+      const monthlyPayment = roundMonthlyPayment(
+        profile.maxLoan * ((rateAssumption / 100 / 12) * Math.pow(1 + rateAssumption / 100 / 12, tenure * 12)) /
+        (Math.pow(1 + rateAssumption / 100 / 12, tenure * 12) - 1)
+      )
+
+      const minCashRequired = Math.round((profile.minCashPercent / 100) * propertyPrice)
+      const cashDownPayment = minCashRequired
+      const cpfDownPayment = Math.max(0, profile.downpaymentRequired - minCashRequired)
+
+      const fullAnalysisResult: FullAnalysisCalcResult = {
+        calculationType: 'full_analysis' as const,
+        propertyPrice,
+        propertyType: personaPropertyType,
+        ltvRatio: profile.maxLTV,
+        ltvPercentage: profile.maxLTV,
+        maxLoanAmount: profile.maxLoan,
+        downPayment: profile.downpaymentRequired,
+        estimatedMonthlyPayment: monthlyPayment,
+        minCashPercent: profile.minCashPercent,
+        minCashRequired,
+        cpfAllowed: profile.cpfAllowed,
+        cpfAllowedAmount: profile.cpfAllowedAmount,
+        cashDownPayment,
+        cpfDownPayment,
+        effectiveTenure: profile.tenureCapYears || 25,
+        tenureCapSource: profile.tenureCapSource,
+        limitingFactor: profile.limitingFactor,
+        tdsrAvailable: profile.tdsrAvailable,
+        msrLimit: profile.msrLimit,
+        msrPass: profile.reasonCodes?.includes('msr_pass'),
+        tdsrPass: profile.reasonCodes?.includes('tdsr_pass'),
+        msrUsagePercent: undefined,
+        tdsrUsagePercent: undefined,
+        absdRate: profile.absdRate,
+        reasonCodes: profile.reasonCodes,
+        policyRefs: profile.policyRefs,
+        ltvMode: ltvModeValue,
+        rateAssumption
+      }
+
+      // Set result and trigger display animation
+      setInstantCalcResult(fullAnalysisResult)
+      setIsInstantCalcLoading(true)
+      setShowInstantCalc(false)
+
+      if (instantCalcTimerRef.current) {
+        clearTimeout(instantCalcTimerRef.current)
+      }
+
+      instantCalcTimerRef.current = setTimeout(() => {
+        console.log('🔍 Step 3+: 1000ms timer fired, showing full analysis results')
+        setShowInstantCalc(true)
+        setIsInstantCalcLoading(false)
+      }, 1000)
+
+      setHasCalculated(true)
+
     } else if (mappedLoanType === 'refinance') {
+      // ========================================
+      // REFINANCE CALCULATION (unchanged)
+      // ========================================
       const parseNumber = (value: any, fallback: number) => {
         const parsed = Number(value)
         return Number.isFinite(parsed) ? parsed : fallback
@@ -415,7 +599,11 @@ export function useProgressiveFormController({
       })
 
       // Map to format expected by UI
-      result = {
+      const refinanceResult: RefinanceCalcResult = {
+        calculationType: 'refinance_analysis' as const,
+        propertyPrice: propertyValue,
+        propertyType,
+        maxLoanAmount: outstandingLoan,
         monthlySavings: outlook?.projectedMonthlySavings ?? 0,
         currentMonthlyPayment: outlook?.currentMonthlyPayment ?? 0,
         currentRate: currentRate,
@@ -425,40 +613,40 @@ export function useProgressiveFormController({
         reasonCodes: outlook?.reasonCodes ?? [],
         policyRefs: outlook?.policyRefs ?? [],
         ltvCapApplied: outlook?.ltvCapApplied ?? 0,
-        cpfRedemptionAmount: outlook?.cpfRedemptionAmount ?? 0
+        cpfRedemptionAmount: outlook?.cpfRedemptionAmount ?? 0,
+        rateAssumption: 2.6
       }
-    }
 
-    console.log('🔍 calculateInstant: result =', result ? 'valid result' : 'NULL')
+      console.log('🔍 Refinance: result =', refinanceResult)
 
-    if (result) {
-      console.log('🔍 calculateInstant: Result is valid, setting up display timer')
+      setInstantCalcResult(refinanceResult)
+      setIsInstantCalcLoading(true)
+      setShowInstantCalc(false)
+
       if (instantCalcTimerRef.current) {
         clearTimeout(instantCalcTimerRef.current)
       }
 
-      setInstantCalcResult(result)
-      console.log('🔍 calculateInstant: Setting loading state TRUE')
-      setIsInstantCalcLoading(true)
-      setShowInstantCalc(false)
-
       instantCalcTimerRef.current = setTimeout(() => {
-        console.log('🔍 calculateInstant: 1000ms timer fired, showing results and clearing loading')
+        console.log('🔍 Refinance: 1000ms timer fired, showing results')
         setShowInstantCalc(true)
         setIsInstantCalcLoading(false)
       }, 1000)
 
       setHasCalculated(true)
     } else {
-      console.log('🔍 calculateInstant: Result is NULL, not setting loading state')
+      console.log('🔍 calculateInstant: No matching calculation path, setting result to NULL')
+      setInstantCalcResult(null)
     }
-  }, [mappedLoanType, propertyCategory]) // Removed watchedFields and hasCalculated from dependencies to avoid constant recreation
+  }, [currentStep, hasRequiredStep2Data, hasRequiredStep3Data, form, mappedLoanType, propertyCategory, hasCalculated])
 
   // Debounced instant analysis recalculation when watched fields change
   useEffect(() => {
     console.log('🔍 Debounced recalc effect triggered:', {
       currentStep,
       hasCalculated,
+      priceRange: watchedFields.priceRange,
+      propertyPrice: watchedFields.propertyPrice,
       combinedAge: watchedFields.combinedAge
     })
 
@@ -535,6 +723,7 @@ export function useProgressiveFormController({
     watchedFields.combinedAge,       // Watch combinedAge from Step 2
     watchedFields.ltvMode,
     watchedFields.propertyType,
+    watchedFields.existingProperties, // Watch property ownership changes (1st/2nd/3rd property)
     currentStep,
     hasCalculated,
     mappedLoanType
@@ -770,3 +959,4 @@ export function useProgressiveFormController({
     calculateInstant
   }
 }
+
