@@ -288,7 +288,33 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
             message: 'Please select property type'
           }),
           priceRange: z.number().min(300000, 'Minimum property price is $300,000').max(5000000, 'Property price seems too high'),
-          combinedAge: z.number().min(18, 'Combined age must be at least 18').max(120, 'Please verify combined age'),
+          combinedAge: z.preprocess(
+            (val) => {
+              console.log('🔍 z.preprocess combinedAge (Gate 2):', {
+                input: val,
+                inputType: typeof val,
+                isEmptyString: val === '',
+                isNull: val === null,
+                isUndefined: val === undefined
+              })
+
+              // Allow empty during typing, but will be required on submit
+              if (val === '' || val === null || val === undefined) {
+                console.log('🔍 PREPROCESS RETURNING: undefined')
+                return undefined
+              }
+
+              if (typeof val === 'string') {
+                const parsed = parseInt(val, 10)
+                console.log('🔍 PREPROCESS STRING:', { val, parsed, isNaN: isNaN(parsed) })
+                return isNaN(parsed) ? undefined : parsed
+              }
+
+              console.log('🔍 PREPROCESS PASSTHROUGH:', val)
+              return val
+            },
+            z.number().min(18, 'Combined age must be at least 18').max(120, 'Please verify combined age').optional()
+          ),
           // Optional fields for context block
           developmentName: z.string().optional(),
           paymentScheme: z.enum(['cash', 'cpf_plus_cash', 'full_cpf', 'bank_loan', 'not_sure']).optional()
@@ -299,9 +325,61 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
           propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial'], {
             message: 'Please select property type'
           }),
-          currentRate: z.number().min(1, 'Current rate must be at least 1%').max(10, 'Please verify current rate'),
+          currentRate: z.preprocess(
+            (val) => {
+              console.log('🔍 z.preprocess currentRate (Gate 2):', {
+                input: val,
+                inputType: typeof val,
+                isEmptyString: val === '',
+                isNull: val === null,
+                isUndefined: val === undefined
+              })
+
+              // Allow empty during typing, but will be required on submit
+              if (val === '' || val === null || val === undefined) {
+                console.log('🔍 PREPROCESS RETURNING: undefined')
+                return undefined
+              }
+
+              if (typeof val === 'string') {
+                const parsed = parseFloat(val)
+                console.log('🔍 PREPROCESS STRING:', { val, parsed, isNaN: isNaN(parsed) })
+                return isNaN(parsed) ? undefined : parsed
+              }
+
+              console.log('🔍 PREPROCESS PASSTHROUGH:', val)
+              return val
+            },
+            z.number().min(1, 'Current rate must be at least 1%').max(10, 'Please verify current rate').optional()
+          ),
           lockInStatus: z.enum(['ending_soon', 'no_lock', 'locked', 'not_sure']),
-          outstandingLoan: z.number().min(0, 'Outstanding loan cannot be negative').max(10000000, 'Loan amount seems too high'),
+          outstandingLoan: z.preprocess(
+            (val) => {
+              console.log('🔍 z.preprocess outstandingLoan (Gate 2):', {
+                input: val,
+                inputType: typeof val,
+                isEmptyString: val === '',
+                isNull: val === null,
+                isUndefined: val === undefined
+              })
+
+              // Allow empty during typing, but will be required on submit
+              if (val === '' || val === null || val === undefined) {
+                console.log('🔍 PREPROCESS RETURNING: undefined')
+                return undefined
+              }
+
+              if (typeof val === 'string') {
+                const parsed = parseInt(val, 10)
+                console.log('🔍 PREPROCESS STRING:', { val, parsed, isNaN: isNaN(parsed) })
+                return isNaN(parsed) ? undefined : parsed
+              }
+
+              console.log('🔍 PREPROCESS PASSTHROUGH:', val)
+              return val
+            },
+            z.number().min(0, 'Outstanding loan cannot be negative').max(10000000, 'Loan amount seems too high').optional()
+          ),
           currentBank: z.string().min(1, 'Please select your current bank'),
           propertyValue: z.number().min(300000, 'Minimum property value is $300,000').max(10000000, 'Property value seems too high').optional(),
           remainingTenure: z.number().min(1, 'Remaining tenure is required').max(35, 'Remaining tenure cannot exceed 35 years').optional()
@@ -362,7 +440,33 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
           propertyCategory: z.enum(['resale', 'new_launch', 'bto', 'commercial']),
           propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
           priceRange: z.number().min(300000, 'Minimum property price is $300,000').max(5000000, 'Property price seems too high'),
-          combinedAge: z.number().min(18, 'Combined age must be at least 18').max(120, 'Please verify combined age'),
+          combinedAge: z.preprocess(
+            (val) => {
+              console.log('🔍 z.preprocess combinedAge (Gate 3):', {
+                input: val,
+                inputType: typeof val,
+                isEmptyString: val === '',
+                isNull: val === null,
+                isUndefined: val === undefined
+              })
+
+              // Allow empty during typing, but will be required on submit
+              if (val === '' || val === null || val === undefined) {
+                console.log('🔍 PREPROCESS RETURNING: undefined')
+                return undefined
+              }
+
+              if (typeof val === 'string') {
+                const parsed = parseInt(val, 10)
+                console.log('🔍 PREPROCESS STRING:', { val, parsed, isNaN: isNaN(parsed) })
+                return isNaN(parsed) ? undefined : parsed
+              }
+
+              console.log('🔍 PREPROCESS PASSTHROUGH:', val)
+              return val
+            },
+            z.number().min(18, 'Combined age must be at least 18').max(120, 'Please verify combined age').optional()
+          ),
           // Optional Step 2 fields
           developmentName: z.string().optional(),
           paymentScheme: z.enum(['cash', 'cpf_plus_cash', 'full_cpf', 'bank_loan', 'not_sure']).optional()
@@ -372,9 +476,61 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
         return baseGate3Schema.extend({
           // Step 2 fields (carry forward)
           propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
-          currentRate: z.number().min(1, 'Current rate must be at least 1%').max(10, 'Please verify current rate'),
+          currentRate: z.preprocess(
+            (val) => {
+              console.log('🔍 z.preprocess currentRate (Gate 3):', {
+                input: val,
+                inputType: typeof val,
+                isEmptyString: val === '',
+                isNull: val === null,
+                isUndefined: val === undefined
+              })
+
+              // Allow empty during typing, but will be required on submit
+              if (val === '' || val === null || val === undefined) {
+                console.log('🔍 PREPROCESS RETURNING: undefined')
+                return undefined
+              }
+
+              if (typeof val === 'string') {
+                const parsed = parseFloat(val)
+                console.log('🔍 PREPROCESS STRING:', { val, parsed, isNaN: isNaN(parsed) })
+                return isNaN(parsed) ? undefined : parsed
+              }
+
+              console.log('🔍 PREPROCESS PASSTHROUGH:', val)
+              return val
+            },
+            z.number().min(1, 'Current rate must be at least 1%').max(10, 'Please verify current rate').optional()
+          ),
           lockInStatus: z.enum(['ending_soon', 'no_lock', 'locked', 'not_sure']),
-          outstandingLoan: z.number().min(0, 'Outstanding loan cannot be negative').max(10000000, 'Loan amount seems too high'),
+          outstandingLoan: z.preprocess(
+            (val) => {
+              console.log('🔍 z.preprocess outstandingLoan (Gate 3):', {
+                input: val,
+                inputType: typeof val,
+                isEmptyString: val === '',
+                isNull: val === null,
+                isUndefined: val === undefined
+              })
+
+              // Allow empty during typing, but will be required on submit
+              if (val === '' || val === null || val === undefined) {
+                console.log('🔍 PREPROCESS RETURNING: undefined')
+                return undefined
+              }
+
+              if (typeof val === 'string') {
+                const parsed = parseInt(val, 10)
+                console.log('🔍 PREPROCESS STRING:', { val, parsed, isNaN: isNaN(parsed) })
+                return isNaN(parsed) ? undefined : parsed
+              }
+
+              console.log('🔍 PREPROCESS PASSTHROUGH:', val)
+              return val
+            },
+            z.number().min(0, 'Outstanding loan cannot be negative').max(10000000, 'Loan amount seems too high').optional()
+          ),
           currentBank: z.string().min(1, 'Please select your current bank'),
           propertyValue: z.number().min(300000, 'Minimum property value is $300,000').max(10000000, 'Property value seems too high').optional(),
           remainingTenure: z.number().min(1, 'Remaining tenure is required').max(35, 'Remaining tenure cannot exceed 35 years').optional(),

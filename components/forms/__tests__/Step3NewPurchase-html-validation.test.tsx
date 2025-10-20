@@ -72,7 +72,7 @@ const RenderWithForm = (
   return render(
     <Step3NewPurchase
       onFieldChange={props.onFieldChange || jest.fn()}
-      showJointApplicant={false}
+      showJointApplicant={props.showJointApplicant || false}
       errors={{}}
       getErrorMessage={jest.fn()}
       {...props}
@@ -86,8 +86,22 @@ describe('Step3NewPurchase - HTML Validation Attributes', () => {
     it('monthly income input has min="0" attribute', () => {
       RenderWithForm()
       const input = screen.getByLabelText(/Monthly income/i) as HTMLInputElement
-      expect(input).toHaveAttribute('type', 'number')
-      expect(input).toHaveAttribute('min', '0')
+      expect(input).toHaveAttribute('type', 'text')
+      expect(input).toHaveAttribute('inputMode', 'numeric')
+    })
+
+    it('variable income input has min="0" attribute', () => {
+      RenderWithForm()
+      const input = screen.getByLabelText(/Variable.*bonus income/i) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'text')
+      expect(input).toHaveAttribute('inputMode', 'numeric')
+    })
+
+    it('joint applicant income has min="0" attribute', () => {
+      RenderWithForm({ showJointApplicant: true })
+      const input = screen.getByLabelText(/Monthly income/i, { selector: '#joint-income' }) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'text')
+      expect(input).toHaveAttribute('inputMode', 'numeric')
     })
   })
 
@@ -113,6 +127,22 @@ describe('Step3NewPurchase - HTML Validation Attributes', () => {
     it('average reported income has min="0" attribute', () => {
       RenderWithForm({}, { employmentType: 'self-employed' })
       const input = screen.getByLabelText(/Average 12-month profit/i) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'number')
+      expect(input).toHaveAttribute('min', '0')
+    })
+  })
+
+  describe('Variable Income Fields', () => {
+    it('average past twelve months has min="0" attribute', () => {
+      RenderWithForm({}, { employmentType: 'variable' })
+      const input = screen.getByLabelText(/Average monthly income over 12 months/i) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'number')
+      expect(input).toHaveAttribute('min', '0')
+    })
+
+    it('lowest observed income has min="0" attribute', () => {
+      RenderWithForm({}, { employmentType: 'variable' })
+      const input = screen.getByLabelText(/Lowest observed monthly income/i) as HTMLInputElement
       expect(input).toHaveAttribute('type', 'number')
       expect(input).toHaveAttribute('min', '0')
     })

@@ -106,7 +106,7 @@ describe('Step3NewPurchase - Leading Zeros Bug Fix', () => {
     fireEvent.change(input, { target: { value: '8000' } })
     
     // Should show 8000, not 08000
-    expect(input.value).toBe('8000')
+    expect(input.value).toBe('8,000')
     expect(input.value).not.toContain('08')
   })
 

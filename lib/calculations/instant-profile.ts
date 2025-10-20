@@ -914,3 +914,7 @@ export function calculateRefinancingSavings(
     worthRefinancing: monthlySavings > 150 && breakEvenMonths < 24, // At least $150/month and break-even within 2 years
   }
 }
+
+
+// Export pure LTV calculation function
+export { calculatePureLtvMaxLoan } from './instant-profile-pure-ltv';

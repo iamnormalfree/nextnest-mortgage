@@ -133,7 +133,8 @@ export function useProgressiveFormController({
 
   const form = useForm<Record<string, any>>({
     resolver: zodResolver(currentSchema) as any,
-    mode: 'onChange',
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',  // Prevent validation on every keystroke after first error
     defaultValues
   })
 

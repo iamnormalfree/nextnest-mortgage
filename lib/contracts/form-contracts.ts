@@ -416,3 +416,119 @@ export const isAIResponse = (value: any): value is AIInsightResponse => {
          typeof value.confidence === 'number' &&
          ['ai', 'algorithmic', 'cached'].includes(value.source)
 }
+
+// ============================================================================
+// INSTANT CALCULATION RESULT TYPES
+// ============================================================================
+
+/**
+ * Instant Calculation Result Types
+ * Discriminated union to distinguish between Step 2 (pure LTV) and Step 3+ (full analysis)
+ */
+
+/**
+ * Base fields shared across all instant calculation result types
+ */
+export interface BaseInstantCalcResult {
+  propertyPrice: number
+  propertyType: 'HDB' | 'Private' | 'EC' | 'Commercial'
+  maxLoanAmount: number
+  ltvRatio: number
+  downPayment: number
+  reasonCodes: string[]
+  policyRefs: string[]
+  rateAssumption: number
+}
+
+/**
+ * Step 2: Pure LTV calculation (no income)
+ * Based ONLY on property regulations and LTV limits
+ */
+export interface PureLtvCalcResult extends BaseInstantCalcResult {
+  calculationType: 'pure_ltv'
+  ltvPercentage: number
+  minCashPercent: number
+  minCashRequired: number
+  cpfAllowed: boolean
+  cpfAllowedAmount: number
+  cashDownPayment: number
+  cpfDownPayment: number
+  effectiveTenure: number
+  tenureCapSource?: 'age' | 'regulation' | 'both'
+  limitingFactor: 'LTV' // Always LTV for pure calculations
+}
+
+/**
+ * Step 3+: Full analysis with income and commitments
+ * Includes MSR/TDSR compliance calculations
+ */
+export interface FullAnalysisCalcResult extends BaseInstantCalcResult {
+  calculationType: 'full_analysis'
+  ltvPercentage: number
+  minCashPercent: number
+  minCashRequired: number
+  cpfAllowed: boolean
+  cpfAllowedAmount: number
+  cashDownPayment: number
+  cpfDownPayment: number
+  effectiveTenure: number
+  tenureCapSource?: 'age' | 'regulation' | 'both'
+  estimatedMonthlyPayment: number
+  limitingFactor: 'MSR' | 'TDSR' | 'LTV'
+  tdsrAvailable?: number
+  msrLimit?: number
+  msrPass?: boolean
+  tdsrPass?: boolean
+  msrUsagePercent?: number
+  tdsrUsagePercent?: number
+  absdRate?: number
+  ltvMode?: number
+  personaProfile?: any
+}
+
+/**
+ * Refinance calculation result (Step 2+)
+ */
+export interface RefinanceCalcResult {
+  calculationType: 'refinance_analysis'
+  propertyPrice: number
+  propertyType: 'HDB' | 'Private' | 'EC' | 'Commercial'
+  maxLoanAmount: number
+  monthlySavings: number
+  currentMonthlyPayment: number
+  currentRate: number
+  outstandingLoan: number
+  maxCashOut: number
+  timingGuidance: string
+  reasonCodes: string[]
+  policyRefs: string[]
+  ltvCapApplied: number
+  cpfRedemptionAmount: number
+  rateAssumption: number
+}
+
+/**
+ * Discriminated union type for all instant calculation results
+ */
+export type InstantCalcResult = PureLtvCalcResult | FullAnalysisCalcResult | RefinanceCalcResult
+
+/**
+ * Type guard for pure LTV results
+ */
+export const isPureLtvResult = (result: InstantCalcResult): result is PureLtvCalcResult => {
+  return result.calculationType === 'pure_ltv'
+}
+
+/**
+ * Type guard for full analysis results
+ */
+export const isFullAnalysisResult = (result: InstantCalcResult): result is FullAnalysisCalcResult => {
+  return result.calculationType === 'full_analysis'
+}
+
+/**
+ * Type guard for refinance results
+ */
+export const isRefinanceResult = (result: InstantCalcResult): result is RefinanceCalcResult => {
+  return result.calculationType === 'refinance_analysis'
+}

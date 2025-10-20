@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { getEmploymentRecognitionRate, calculateInstantProfile } from '@/lib/calculations/instant-profile'
+import type { InstantCalcResult } from '@/lib/contracts/form-contracts'
+import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 
 type LiabilityKey = 'propertyLoans' | 'carLoans' | 'creditCards' | 'personalLines'
 
@@ -28,51 +30,36 @@ interface Step3NewPurchaseProps {
   errors: any
   getErrorMessage: (error: any) => string
   control: Control<any>
-  instantCalcResult?: {
-    maxLoanAmount?: number
-    propertyPrice?: number
-    rateAssumption?: number
-    estimatedMonthlyPayment?: number
-    downPayment?: number
-    cpfAllowedAmount?: number
-    minCashPercent?: number
-    minCashRequired?: number
-    ltvRatio?: number
-    tenureCapYears?: number
-    tenureCapSource?: string
-    limitingFactor?: string
-    reasonCodes?: string[]
-    policyRefs?: string[]
-  }
+  instantCalcResult?: InstantCalcResult | null
 }
 
 const LIABILITY_CONFIG: Array<{ key: LiabilityKey; label: string; balanceLabel: string; paymentLabel: string; analyticsKey: string }> = [
   {
     key: 'propertyLoans',
     label: 'Property loans',
-    balanceLabel: 'Property loan outstanding balance',
-    paymentLabel: 'Property loan monthly payment',
+    balanceLabel: 'Outstanding balance',
+    paymentLabel: 'Monthly payment',
     analyticsKey: 'property_loans'
   },
   {
     key: 'carLoans',
     label: 'Car loans',
-    balanceLabel: 'Car loan outstanding balance',
-    paymentLabel: 'Car loan monthly payment',
+    balanceLabel: 'Outstanding balance',
+    paymentLabel: 'Monthly payment',
     analyticsKey: 'car_loans'
   },
   {
     key: 'creditCards',
     label: 'Credit cards',
-    balanceLabel: 'Credit card outstanding balance',
-    paymentLabel: 'Credit card minimum payment',
+    balanceLabel: 'Outstanding balance',
+    paymentLabel: 'Minimum payment',
     analyticsKey: 'credit_cards'
   },
   {
     key: 'personalLines',
     label: 'Personal lines',
-    balanceLabel: 'Personal line outstanding balance',
-    paymentLabel: 'Personal line monthly payment',
+    balanceLabel: 'Outstanding balance',
+    paymentLabel: 'Monthly payment',
     analyticsKey: 'personal_lines'
   }
 ]
@@ -429,17 +416,18 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 <Input
                   {...field}
                   id="monthly-income-primary"
-                  type="number"
-                  min="0"
+                  type="text"
+                  inputMode="numeric"
                   className="font-mono"
-                  placeholder="8000"
+                  placeholder="8,000"
+                  value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                   onChange={(event) => {
-                    const value = ensureNumber(event.target.value)
-                    field.onChange(event.target.value)
-                    onFieldChange('actualIncomes.0', value, {
+                    const parsedValue = parseFormattedNumber(event.target.value) || 0
+                    field.onChange(parsedValue)
+                    onFieldChange('actualIncomes.0', parsedValue, {
                       section: 'income_panel',
                       action: 'updated_primary_income',
-                      metadata: { newValue: value, timestamp: new Date() }
+                      metadata: { newValue: parsedValue, timestamp: new Date() }
                     })
                   }}
                 />
@@ -461,17 +449,18 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 <Input
                   {...field}
                   id="variable-income"
-                  type="number"
-                  min="0"
+                  type="text"
+                  inputMode="numeric"
                   className="font-mono"
-                  placeholder="1500"
+                  placeholder="1,500"
+                  value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                   onChange={(event) => {
-                    const value = ensureNumber(event.target.value)
-                    field.onChange(event.target.value)
-                    onFieldChange('actualVariableIncomes.0', value, {
+                    const parsedValue = parseFormattedNumber(event.target.value) || 0
+                    field.onChange(parsedValue)
+                    onFieldChange('actualVariableIncomes.0', parsedValue, {
                       section: 'income_panel',
                       action: 'updated_variable_income',
-                      metadata: { newValue: value, timestamp: new Date() }
+                      metadata: { newValue: parsedValue, timestamp: new Date() }
                     })
                   }}
                 />
@@ -588,17 +577,18 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                   <Input
                     {...field}
                     id="joint-income"
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputMode="numeric"
                     className="font-mono"
-                    placeholder="6000"
+                    placeholder="6,000"
+                    value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                     onChange={(event) => {
-                      const value = ensureNumber(event.target.value)
-                      field.onChange(event.target.value)
-                      onFieldChange('actualIncomes.1', value, {
+                      const parsedValue = parseFormattedNumber(event.target.value) || 0
+                      field.onChange(parsedValue)
+                      onFieldChange('actualIncomes.1', parsedValue, {
                         section: 'income_panel',
                         action: 'updated_joint_income',
-                        metadata: { newValue: value, timestamp: new Date() }
+                        metadata: { newValue: parsedValue, timestamp: new Date() }
                       })
                     }}
                   />
@@ -689,33 +679,38 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                   />
 
                   {liabilities[config.key].enabled && (
-                    <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid grid-cols-[1fr_1fr] gap-3">
                       <Controller
                         name={`liabilities.${config.key}.outstandingBalance` as const}
                         control={control}
                         render={({ field }) => (
-                          <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
-                            <span>{config.balanceLabel}</span>
+                          <div>
+                            <label htmlFor={`${config.key}-balance`} className="text-[10px] uppercase tracking-wider text-[#666666] mb-2 block">
+                              {config.balanceLabel}
+                            </label>
                             <Input
                               {...field}
-                              type="number"
+                              id={`${config.key}-balance`}
+                              type="text"
+                              inputMode="numeric"
                               className="font-mono"
                               placeholder="0"
-                              min="0"
+                              value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                               onChange={(event) => {
-                                field.onChange(event.target.value)
-                                onFieldChange(`liabilities.${config.key}.outstandingBalance`, ensureNumber(event.target.value), {
+                                const parsedValue = parseFormattedNumber(event.target.value) || 0
+                                field.onChange(parsedValue)
+                                onFieldChange(`liabilities.${config.key}.outstandingBalance`, parsedValue, {
                                   section: 'liabilities_panel',
                                   action: 'balance_updated',
                                   metadata: {
                                     liabilityType: config.key,
-                                    newValue: ensureNumber(event.target.value),
+                                    newValue: parsedValue,
                                     timestamp: new Date()
                                   }
                                 })
                               }}
                             />
-                          </label>
+                          </div>
                         )}
                       />
 
@@ -723,28 +718,33 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                         name={`liabilities.${config.key}.monthlyPayment` as const}
                         control={control}
                         render={({ field }) => (
-                          <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
-                            <span>{config.paymentLabel}</span>
+                          <div>
+                            <label htmlFor={`${config.key}-payment`} className="text-[10px] uppercase tracking-wider text-[#666666] mb-2 block">
+                              {config.paymentLabel}
+                            </label>
                             <Input
                               {...field}
-                              type="number"
+                              id={`${config.key}-payment`}
+                              type="text"
+                              inputMode="numeric"
                               className="font-mono"
                               placeholder="0"
-                              min="0"
+                              value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                               onChange={(event) => {
-                                field.onChange(event.target.value)
-                                onFieldChange(`liabilities.${config.key}.monthlyPayment`, ensureNumber(event.target.value), {
+                                const parsedValue = parseFormattedNumber(event.target.value) || 0
+                                field.onChange(parsedValue)
+                                onFieldChange(`liabilities.${config.key}.monthlyPayment`, parsedValue, {
                                   section: 'liabilities_panel',
                                   action: 'payment_updated',
                                   metadata: {
                                     liabilityType: config.key,
-                                    newValue: ensureNumber(event.target.value),
+                                    newValue: parsedValue,
                                     timestamp: new Date()
                                   }
                                 })
                               }}
                             />
-                          </label>
+                          </div>
                         )}
                       />
                     </div>
@@ -756,10 +756,13 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 name="liabilities.otherCommitments"
                 control={control}
                 render={({ field }) => (
-                  <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold space-y-2">
-                    <span>Other commitments (optional)</span>
+                  <div>
+                    <label htmlFor="other-commitments" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                      Other commitments (optional)
+                    </label>
                     <textarea
                       {...field}
+                      id="other-commitments"
                       rows={3}
                       className="w-full border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-black focus:outline-none focus:ring-1 focus:ring-black"
                       placeholder="School fees, guarantor obligations, allowances"
@@ -772,7 +775,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                         })
                       }}
                     />
-                  </label>
+                  </div>
                 )}
               />
             </div>

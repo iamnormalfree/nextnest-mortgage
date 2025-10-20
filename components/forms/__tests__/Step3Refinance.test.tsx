@@ -277,8 +277,8 @@ describe('Step3Refinance', () => {
       const mockOnFieldChange = jest.fn()
       RenderWithForm({ onFieldChange: mockOnFieldChange })
 
-      const objectiveButton = screen.getByRole('button', { name: /reduce monthly payments/i })
-      fireEvent.click(objectiveButton)
+      const objectiveCheckbox = screen.getByRole('checkbox', { name: /reduce monthly payments/i })
+      fireEvent.click(objectiveCheckbox)
 
       expect(mockOnFieldChange).toHaveBeenCalledWith(
         'refinancingGoals',
@@ -303,12 +303,83 @@ describe('Step3Refinance', () => {
       expect(screen.getByText('Also cash out equity')).toBeInTheDocument()
     })
 
+    it('allows multiple objective selections simultaneously', async () => {
+      const mockOnFieldChange = jest.fn()
+      RenderWithForm({ onFieldChange: mockOnFieldChange })
+
+      // Select first objective: Reduce monthly payments
+      const paymentCheckbox = screen.getByRole('checkbox', { name: /reduce monthly payments/i })
+      fireEvent.click(paymentCheckbox)
+
+      expect(mockOnFieldChange).toHaveBeenCalledWith(
+        'refinancingGoals',
+        ['lower_monthly_payment'],
+        expect.objectContaining({
+          section: 'refinance_objectives',
+          action: 'goal_selected'
+        })
+      )
+      mockOnFieldChange.mockClear()
+
+      // Select second objective: Shorten tenure (should not deselect first)
+      const tenureCheckbox = screen.getByRole('checkbox', { name: /shorten my loan tenure/i })
+      fireEvent.click(tenureCheckbox)
+
+      expect(mockOnFieldChange).toHaveBeenCalledWith(
+        'refinancingGoals',
+        expect.arrayContaining(['lower_monthly_payment', 'shorten_tenure']),
+        expect.objectContaining({
+          section: 'refinance_objectives',
+          action: 'goal_selected'
+        })
+      )
+      mockOnFieldChange.mockClear()
+
+      // Select third objective: Rate certainty (both previous should remain)
+      const rateCheckbox = screen.getByRole('checkbox', { name: /lock in rate certainty/i })
+      fireEvent.click(rateCheckbox)
+
+      expect(mockOnFieldChange).toHaveBeenCalledWith(
+        'refinancingGoals',
+        expect.arrayContaining(['lower_monthly_payment', 'shorten_tenure', 'rate_certainty']),
+        expect.objectContaining({
+          section: 'refinance_objectives',
+          action: 'goal_selected'
+        })
+      )
+    })
+
+    it('allows deselecting objectives', async () => {
+      const mockOnFieldChange = jest.fn()
+      RenderWithForm({
+        onFieldChange: mockOnFieldChange,
+        fieldValues: {
+          refinancingGoals: ['lower_monthly_payment', 'shorten_tenure']
+        }
+      })
+
+      // Deselect one objective
+      const paymentCheckbox = screen.getByRole('checkbox', { name: /reduce monthly payments/i })
+      expect(paymentCheckbox).toBeChecked()
+
+      fireEvent.click(paymentCheckbox)
+
+      expect(mockOnFieldChange).toHaveBeenCalledWith(
+        'refinancingGoals',
+        ['shorten_tenure'],
+        expect.objectContaining({
+          section: 'refinance_objectives',
+          action: 'goal_deselected'
+        })
+      )
+    })
+
     it('allows single objective selection', async () => {
       const mockOnFieldChange = jest.fn()
       RenderWithForm({ onFieldChange: mockOnFieldChange })
 
-      const paymentButton = screen.getByRole('button', { name: /reduce monthly payments/i })
-      fireEvent.click(paymentButton)
+      const paymentCheckbox = screen.getByRole('checkbox', { name: /reduce monthly payments/i })
+      fireEvent.click(paymentCheckbox)
 
       expect(mockOnFieldChange).toHaveBeenCalledWith(
         'refinancingGoals',
@@ -325,12 +396,12 @@ describe('Step3Refinance', () => {
       const mockOnFieldChange = jest.fn()
       RenderWithForm({ onFieldChange: mockOnFieldChange })
 
-      // Test shorten tenure button
-      const tenureButton = screen.getByRole('button', { name: /shorten my loan tenure/i })
-      fireEvent.click(tenureButton)
+      // Test shorten tenure checkbox
+      const tenureCheckbox = screen.getByRole('checkbox', { name: /shorten my loan tenure/i })
+      fireEvent.click(tenureCheckbox)
       expect(mockOnFieldChange).toHaveBeenCalledWith(
         'refinancingGoals',
-        ['shorten_tenure'],
+        expect.arrayContaining(['shorten_tenure']),
         expect.objectContaining({
           section: 'refinance_objectives',
           action: 'goal_selected',
@@ -339,12 +410,12 @@ describe('Step3Refinance', () => {
       )
       mockOnFieldChange.mockClear()
 
-      // Test rate certainty button
-      const rateButton = screen.getByText('Lock in rate certainty')
-      fireEvent.click(rateButton)
+      // Test rate certainty checkbox
+      const rateCheckbox = screen.getByRole('checkbox', { name: /lock in rate certainty/i })
+      fireEvent.click(rateCheckbox)
       expect(mockOnFieldChange).toHaveBeenCalledWith(
         'refinancingGoals',
-        ['rate_certainty'],
+        expect.arrayContaining(['rate_certainty']),
         expect.objectContaining({
           section: 'refinance_objectives',
           action: 'goal_selected',
@@ -375,12 +446,12 @@ describe('Step3Refinance', () => {
     it('shows selected objective styling', async () => {
       RenderWithForm()
 
-      const paymentButton = screen.getByRole('button', { name: /reduce monthly payments/i })
-      fireEvent.click(paymentButton)
-      const cashOutCheckbox = screen.getByLabelText('Also cash out equity')
+      const paymentCheckbox = screen.getByRole('checkbox', { name: /reduce monthly payments/i })
+      fireEvent.click(paymentCheckbox)
+      const cashOutCheckbox = screen.getByRole('checkbox', { name: /also cash out equity/i })
       fireEvent.click(cashOutCheckbox)
 
-      expect(paymentButton).toHaveClass('bg-[#FCD34D]')
+      expect(paymentCheckbox).toBeChecked()
       expect(cashOutCheckbox).toBeChecked()
     })
   })
@@ -548,7 +619,7 @@ describe('Step3Refinance', () => {
       const incomeInput = screen.getByLabelText(/monthly income \*/i)
       fireEvent.change(incomeInput, { target: { value: '10000' } })
 
-      expect(incomeInput).toHaveValue(10000)
+      expect(incomeInput).toHaveValue('10,000')
     })
 
     it('accepts numeric input for age field', async () => {
@@ -596,6 +667,43 @@ describe('Step3Refinance', () => {
       expect(screen.getByText('Current Loan Information')).toBeInTheDocument()
       expect(screen.getByText('Refinance Objectives')).toBeInTheDocument()
       expect(screen.getByText('Timing Analysis')).toBeInTheDocument()
+    })
+  })
+
+  describe('HTML Validation Attributes', () => {
+    it('income input has min="0" attribute', () => {
+      RenderWithForm()
+      const input = screen.getByLabelText(/monthly income \*/i) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'text')
+      expect(input).toHaveAttribute('inputMode', 'numeric')
+    })
+
+    it('age input has min="18", max="99", step="1" attributes', () => {
+      RenderWithForm()
+      const input = screen.getByLabelText(/your age \*/i) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'number')
+      expect(input).toHaveAttribute('min', '18')
+      expect(input).toHaveAttribute('max', '99')
+      expect(input).toHaveAttribute('step', '1')
+    })
+
+    it('cashOut amount input has min="0" attribute', () => {
+      RenderWithForm({
+        fieldValues: {
+          propertyType: 'Private',
+          refinancingGoals: ['cash_out']
+        }
+      })
+      const input = screen.getByLabelText(/cash-out amount/i) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'number')
+      expect(input).toHaveAttribute('min', '0')
+    })
+
+    it('months remaining input has min="0" attribute', () => {
+      RenderWithForm()
+      const input = screen.getByLabelText(/months remaining/i) as HTMLInputElement
+      expect(input).toHaveAttribute('type', 'number')
+      expect(input).toHaveAttribute('min', '0')
     })
   })
 })

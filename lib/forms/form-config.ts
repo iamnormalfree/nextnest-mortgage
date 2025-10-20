@@ -80,6 +80,8 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     employmentType: 'employed', // Set a default value
     creditCardCount: 0,
     hasJointApplicant: false,
+    // Property ownership (affects LTV tier: 1st property = 75%, 2nd = 45%, 3rd+ = 35%)
+    existingProperties: 0, // Default to first property (most common case)
     employmentDetails: {
       'self-employed': {
         businessAgeYears: '',
@@ -118,7 +120,7 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
   if (loanType === 'new_purchase') {
     defaults.propertyCategory = 'resale' // Default category
     defaults.propertyType = 'HDB' // Default property type
-    defaults.priceRange = 500000 // Default price range
+    defaults.priceRange = undefined // No default to avoid test/UX issues with default values
     defaults.combinedAge = undefined // User must enter their age (no default to prevent concatenation bug)
     defaults.developmentName = undefined // Optional field
     defaults.paymentScheme = undefined // Optional field

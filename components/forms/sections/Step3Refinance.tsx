@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertTriangle } from 'lucide-react'
 import { calculateComplianceSnapshot, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
+import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 
 interface Step3RefinanceProps {
   onFieldChange: (field: string, value: any, analytics?: any) => void
@@ -227,13 +228,34 @@ export function Step3Refinance({
     cpfRedemptionAmount: 0
   }
 
-  const handlePrimaryGoalSelect = (goal: 'lower_monthly_payment' | 'shorten_tenure' | 'rate_certainty') => {
+  const handleGoalToggle = (goal: 'lower_monthly_payment' | 'shorten_tenure' | 'rate_certainty') => {
+    const isCurrentlySelected = selectedGoals.includes(goal)
     const preservedCashOut = selectedGoals.includes('cash_out')
-    const nextGoals = preservedCashOut ? [goal, 'cash_out'] : [goal]
+
+    let nextGoals: string[]
+    if (isCurrentlySelected) {
+      // Deselect: remove this goal but keep others
+      nextGoals = selectedGoals.filter(g => g !== goal)
+      // Ensure at least one non-cash-out goal remains, default to lower_monthly_payment
+      const hasOtherGoals = nextGoals.some(g => g !== 'cash_out')
+      if (!hasOtherGoals && preservedCashOut) {
+        nextGoals = ['lower_monthly_payment', 'cash_out']
+      } else if (nextGoals.length === 0) {
+        nextGoals = ['lower_monthly_payment']
+      }
+    } else {
+      // Select: add this goal to existing ones
+      const baseGoals = selectedGoals.filter(g => g !== 'cash_out')
+      nextGoals = [...baseGoals, goal]
+      if (preservedCashOut) {
+        nextGoals.push('cash_out')
+      }
+    }
+
     setValue('refinancingGoals' as any, nextGoals, { shouldDirty: true })
     onFieldChange('refinancingGoals', nextGoals, {
       section: 'refinance_objectives',
-      action: 'goal_selected',
+      action: isCurrentlySelected ? 'goal_deselected' : 'goal_selected',
       metadata: {
         goal,
         previousGoals: selectedGoals
@@ -280,14 +302,15 @@ export function Step3Refinance({
                 <Input
                   {...field}
                   id="monthly-income-primary"
-                  type="number"
-                  min="0"
+                  type="text"
+                  inputMode="numeric"
                   className="font-mono"
-                  placeholder="8000"
+                  placeholder="8,000"
+                  value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value) || 0
-                    field.onChange(value)
-                    onFieldChange('actualIncomes.0', value, {
+                    const parsedValue = parseFormattedNumber(e.target.value) || 0
+                    field.onChange(parsedValue)
+                    onFieldChange('actualIncomes.0', parsedValue, {
                       section: 'refinance_income',
                       action: 'updated'
                     })
@@ -309,15 +332,18 @@ export function Step3Refinance({
                   Your Age *
                 </label>
                 <Input
-                  {...field}
                   id="age-primary"
                   type="number"
                   min="18"
                   max="99"
                   step="1"
                   placeholder="35"
+                  name={field.name}
+                  ref={field.ref}
+                  value={field.value ?? ''}
+                  onBlur={field.onBlur}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value) || 0
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value)
                     field.onChange(value)
                     onFieldChange('actualAges.0', value, {
                       section: 'refinance_demographics',
@@ -384,14 +410,17 @@ export function Step3Refinance({
                     Monthly Income
                   </label>
                   <Input
-                    {...field}
                     id="monthly-income-joint"
                     type="number"
                     min="0"
                     className="font-mono"
                     placeholder="6000"
+                    name={field.name}
+                    ref={field.ref}
+                    value={field.value ?? ''}
+                    onBlur={field.onBlur}
                     onChange={(e) => {
-                      const value = parseInt(e.target.value) || 0
+                      const value = e.target.value === '' ? '' : parseInt(e.target.value)
                       field.onChange(value)
                       onFieldChange('actualIncomes.1', value)
                     }}
@@ -493,48 +522,55 @@ export function Step3Refinance({
       {/* Refinance Objectives Panel */}
       <div className="space-y-4">
         <h3 className="text-sm font-semibold text-black">Refinance Objectives</h3>
-        
+
         <div className="space-y-4 p-4 border border-[#E5E5E5]">
           <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
             What are you trying to achieve?
           </p>
-          
+
           <div className="space-y-3">
-            <button
-              type="button"
-              onClick={() => handlePrimaryGoalSelect('lower_monthly_payment')}
-              className={`w-full px-4 py-2 text-sm font-mono transition-colors text-left ${selectedGoals.includes('lower_monthly_payment') ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'}`}
-            >
-              Reduce monthly payments
-            </button>
+            <label className="flex items-center space-x-3 px-4 py-2 text-sm border border-[#E5E5E5] cursor-pointer hover:bg-[#F8F8F8] transition-colors">
+              <input
+                type="checkbox"
+                checked={selectedGoals.includes('lower_monthly_payment')}
+                onChange={() => handleGoalToggle('lower_monthly_payment')}
+                className="w-4 h-4 text-[#FCD34D] border-[#E5E5E5] rounded focus:ring-[#FCD34D]"
+                aria-label="Reduce monthly payments"
+              />
+              <span className="font-mono text-[#666666]">Reduce monthly payments</span>
+            </label>
 
-            <button
-              type="button"
-              onClick={() => handlePrimaryGoalSelect('shorten_tenure')}
-              className={`w-full px-4 py-2 text-sm font-mono transition-colors text-left ${selectedGoals.includes('shorten_tenure') ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'}`}
-            >
-              Shorten my loan tenure
-            </button>
+            <label className="flex items-center space-x-3 px-4 py-2 text-sm border border-[#E5E5E5] cursor-pointer hover:bg-[#F8F8F8] transition-colors">
+              <input
+                type="checkbox"
+                checked={selectedGoals.includes('shorten_tenure')}
+                onChange={() => handleGoalToggle('shorten_tenure')}
+                className="w-4 h-4 text-[#FCD34D] border-[#E5E5E5] rounded focus:ring-[#FCD34D]"
+                aria-label="Shorten my loan tenure"
+              />
+              <span className="font-mono text-[#666666]">Shorten my loan tenure</span>
+            </label>
 
-            <button
-              type="button"
-              onClick={() => handlePrimaryGoalSelect('rate_certainty')}
-              className={`w-full px-4 py-2 text-sm font-mono transition-colors text-left ${selectedGoals.includes('rate_certainty') ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'}`}
-            >
-              Lock in rate certainty
-            </button>
-          </div>
+            <label className="flex items-center space-x-3 px-4 py-2 text-sm border border-[#E5E5E5] cursor-pointer hover:bg-[#F8F8F8] transition-colors">
+              <input
+                type="checkbox"
+                checked={selectedGoals.includes('rate_certainty')}
+                onChange={() => handleGoalToggle('rate_certainty')}
+                className="w-4 h-4 text-[#FCD34D] border-[#E5E5E5] rounded focus:ring-[#FCD34D]"
+                aria-label="Lock in rate certainty"
+              />
+              <span className="font-mono text-[#666666]">Lock in rate certainty</span>
+            </label>
 
-          {/* Cash-out Checkbox */}
-          <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
-            <label className="flex items-center space-x-2 text-sm cursor-pointer">
+            <label className="flex items-center space-x-3 px-4 py-2 text-sm border border-[#E5E5E5] cursor-pointer hover:bg-[#F8F8F8] transition-colors">
               <input
                 type="checkbox"
                 checked={selectedGoals.includes('cash_out')}
                 onChange={(e) => handleCashOutToggle(e.target.checked)}
                 className="w-4 h-4 text-[#FCD34D] border-[#E5E5E5] rounded focus:ring-[#FCD34D]"
+                aria-label="Also cash out equity"
               />
-              <span className="text-[#666666]">Also cash out equity</span>
+              <span className="font-mono text-[#666666]">Also cash out equity</span>
             </label>
           </div>
         </div>
@@ -556,14 +592,17 @@ export function Step3Refinance({
                       Cash-Out Amount *
                     </label>
                     <Input
-                      {...field}
                       id="cash-out-amount"
                       type="number"
                       min="0"
                       className="font-mono"
                       placeholder="50000"
+                      name={field.name}
+                      ref={field.ref}
+                      value={field.value ?? ''}
+                      onBlur={field.onBlur}
                       onChange={(e) => {
-                        const value = parseInt(e.target.value) || 0
+                        const value = e.target.value === '' ? '' : parseInt(e.target.value)
                         field.onChange(value)
                         onFieldChange('cashOutAmount', value, {
                           section: 'refinance_cash_out',
@@ -627,14 +666,17 @@ export function Step3Refinance({
                   Months Remaining in Lock-in Period
                 </label>
                 <Input
-                  {...field}
                   id="months-remaining"
                   type="number"
                   min="0"
                   className="font-mono"
                   placeholder="12"
+                  name={field.name}
+                  ref={field.ref}
+                  value={field.value ?? ''}
+                  onBlur={field.onBlur}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value) || 0
+                    const value = e.target.value === '' ? '' : parseInt(e.target.value)
                     field.onChange(value)
                     onFieldChange('monthsRemaining', value, {
                       section: 'refinance_timing',

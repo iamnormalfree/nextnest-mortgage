@@ -11,7 +11,10 @@ import {
   FormStep,
   LeadScore,
   AIInsightResponse,
-  LoanType
+  LoanType,
+  isPureLtvResult,
+  isFullAnalysisResult,
+  isRefinanceResult
 } from '@/lib/contracts/form-contracts'
 import {
   eventBus,
@@ -638,6 +641,12 @@ export function ProgressiveFormWithController({
                         onValueChange={(value) => {
                           field.onChange(value)
                           onFieldChange('propertyType', value)
+
+                          // Reset existingProperties to 0 when switching to HDB (can't own 2 HDBs)
+                          if (value === 'HDB') {
+                            setValue('existingProperties', 0)
+                            calculateInstant({ force: true })
+                          }
                         }}
                       >
                         <SelectTrigger id="property-type">
@@ -678,6 +687,11 @@ export function ProgressiveFormWithController({
                       onValueChange={(value) => {
                         field.onChange(value)
                         onFieldChange('propertyType', value)
+
+                        // Reset existingProperties to 0 when switching to HDB (can't own 2 HDBs)
+                        if (value === 'HDB') {
+                          setValue('existingProperties', 0)
+                        }
                       }}
                     >
                       <SelectTrigger id="property-type">
@@ -694,6 +708,39 @@ export function ProgressiveFormWithController({
                     {errors.propertyType && (
                       <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
                     )}
+                  </div>
+                )}
+              />
+            )}
+
+            {/* Property Ownership - Only show for Private/EC/Landed (HDB buyers can't own 2 HDBs) */}
+            {loanType === 'new_purchase' &&
+             (fieldValues.propertyType === 'Private' ||
+              fieldValues.propertyType === 'EC' ||
+              fieldValues.propertyType === 'Landed') && (
+              <Controller
+                name="existingProperties"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-center gap-3 p-3 bg-[#F8F8F8] rounded-lg border border-[#E5E5E5]">
+                    <input
+                      type="checkbox"
+                      id="second-property"
+                      checked={field.value === 1}
+                      onChange={(e) => {
+                        const newValue = e.target.checked ? 1 : 0
+                        field.onChange(newValue)
+                        onFieldChange('existingProperties', newValue)
+                        calculateInstant({ force: true })
+                      }}
+                      className="w-4 h-4 text-nextnest-primary border-gray-300 rounded focus:ring-nextnest-primary"
+                    />
+                    <label
+                      htmlFor="second-property"
+                      className="text-sm text-[#666666] cursor-pointer flex-1"
+                    >
+                      I&apos;m keeping my current property <span className="text-xs text-[#999999]">(second home, LTV capped at 45%)</span>
+                    </label>
                   </div>
                 )}
               />
@@ -721,6 +768,7 @@ export function ProgressiveFormWithController({
                         value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
                         onChange={(e) => {
                           const parsedValue = parseFormattedNumber(e.target.value) || 0
+                          console.log('[PRICE INPUT] onChange fired:', { rawValue: e.target.value, parsedValue })
                           field.onChange(parsedValue)
                           onFieldChange('priceRange', parsedValue)
                         }}
@@ -735,37 +783,50 @@ export function ProgressiveFormWithController({
                 <Controller
                   name="combinedAge"
                   control={control}
-                  render={({ field }) => (
-                    <div>
-                      <label
-                        htmlFor="combined-age"
-                        className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
-                      >
-                        Combined Age *
-                      </label>
-                      <Input
-                        name={field.name}
-                        ref={field.ref}
-                        id="combined-age"
-                        type="number"
-                        min="18"
-                        max="99"
-                        step="1"
-                        placeholder="35"
-                        value={field.value ?? ''} // Convert undefined to empty string for controlled input
-                        onChange={(e) => {
-                          // Don't default to 0 when field is empty - preserve undefined
-                          const value = e.target.value === '' ? undefined : parseInt(e.target.value)
-                          field.onChange(value)
-                          onFieldChange('combinedAge', value)
-                        }}
-                        onBlur={field.onBlur}
-                      />
-                      {errors.combinedAge && (
-                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.combinedAge)}</p>
-                      )}
-                    </div>
-                  )}
+                  render={({ field, fieldState, formState }) => {
+                    console.log('🔍 CONTROLLER RENDER combinedAge:', {
+                      fieldValue: field.value,
+                      fieldValueType: typeof field.value,
+                      error: fieldState.error,
+                      isDirty: fieldState.isDirty,
+                      isTouched: fieldState.isTouched,
+                      isValidating: formState.isValidating
+                    })
+
+                    return (
+                      <div>
+                        <label
+                          htmlFor="combined-age"
+                          className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
+                        >
+                          Combined Age *
+                        </label>
+                        <Input
+                          name={field.name}
+                          ref={field.ref}
+                          id="combined-age"
+                          type="number"
+                          min="18"
+                          max="99"
+                          step="1"
+                          placeholder="35"
+                          value={field.value ?? ''} // Convert undefined to empty string for controlled input
+                          onChange={(e) => {
+                            const value = e.target.value === '' ? '' : parseInt(e.target.value)
+                            console.log('🔧 combinedAge onChange:', { raw: e.target.value, parsed: value, type: typeof value })
+                            field.onChange(value)
+                            onFieldChange('combinedAge', value)
+                          }}
+                          onBlur={field.onBlur}
+                        />
+                        {errors.combinedAge && (
+                          <p className="text-[#EF4444] text-xs mt-1">
+                            {getErrorMessage(errors.combinedAge)}
+                          </p>
+                        )}
+                      </div>
+                    )
+                  }}
                 />
               </>
             ) : loanType === 'refinance' && (
@@ -773,54 +834,83 @@ export function ProgressiveFormWithController({
                 <Controller
                   name="currentRate"
                   control={control}
-                  render={({ field }) => (
-                    <div>
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                        Current Interest Rate (%) *
-                      </label>
-                      <Input
-                        {...field}
-                        type="number"
-                        step="0.01"
-                        placeholder="3.0"
-                        onChange={(e) => {
-                          // Don't default to 0 when field is empty - preserve undefined
-                          const value = e.target.value === '' ? undefined : parseFloat(e.target.value)
-                          field.onChange(value)
-                        }}
-                      />
-                      {errors.currentRate && (
-                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.currentRate)}</p>
-                      )}
-                    </div>
-                  )}
+                  render={({ field, fieldState, formState }) => {
+                    console.log('🔍 CONTROLLER RENDER currentRate:', {
+                      fieldValue: field.value,
+                      fieldValueType: typeof field.value,
+                      error: fieldState.error,
+                      isDirty: fieldState.isDirty,
+                      isTouched: fieldState.isTouched,
+                      isValidating: formState.isValidating
+                    })
+
+                    return (
+                      <div>
+                        <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                          Current Interest Rate (%) *
+                        </label>
+                        <Input
+                          {...field}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="3.0"
+                          value={field.value ?? ''}
+                          onChange={(e) => {
+                            const value = e.target.value === '' ? '' : parseFloat(e.target.value)
+                            console.log('🔧 currentRate onChange:', { raw: e.target.value, parsed: value, type: typeof value })
+                            field.onChange(value)
+                          }}
+                        />
+                        {errors.currentRate && (
+                          <p className="text-[#EF4444] text-xs mt-1">
+                            {getErrorMessage(errors.currentRate)}
+                          </p>
+                        )}
+                      </div>
+                    )
+                  }}
                 />
 
                 <Controller
                   name="outstandingLoan"
                   control={control}
-                  render={({ field }) => (
-                    <div>
-                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                        Outstanding Loan Amount *
-                      </label>
-                      <Input
-                        {...field}
-                        type="number"
-                        className="font-mono"
-                        placeholder="400000"
-                        min="0"
-                        onChange={(e) => {
-                          // Don't default to 0 when field is empty - preserve undefined
-                          const value = e.target.value === '' ? undefined : parseInt(e.target.value)
-                          field.onChange(value)
-                        }}
-                      />
-                      {errors.outstandingLoan && (
-                        <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.outstandingLoan)}</p>
-                      )}
-                    </div>
-                  )}
+                  render={({ field, fieldState, formState }) => {
+                    console.log('🔍 CONTROLLER RENDER outstandingLoan:', {
+                      fieldValue: field.value,
+                      fieldValueType: typeof field.value,
+                      error: fieldState.error,
+                      isDirty: fieldState.isDirty,
+                      isTouched: fieldState.isTouched,
+                      isValidating: formState.isValidating
+                    })
+
+                    return (
+                      <div>
+                        <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                          Outstanding Loan Amount *
+                        </label>
+                        <Input
+                          {...field}
+                          type="text"
+                          inputMode="numeric"
+                          className="font-mono"
+                          placeholder="400,000"
+                          value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
+                          onChange={(e) => {
+                            const parsedValue = parseFormattedNumber(e.target.value) || 0
+                            console.log('🔧 outstandingLoan onChange:', { raw: e.target.value, parsed: parsedValue, type: typeof parsedValue })
+                            field.onChange(parsedValue)
+                          }}
+                        />
+                        {errors.outstandingLoan && (
+                          <p className="text-[#EF4444] text-xs mt-1">
+                            {getErrorMessage(errors.outstandingLoan)}
+                          </p>
+                        )}
+                      </div>
+                    )
+                  }}
                 />
 
                 <Controller
@@ -880,11 +970,13 @@ export function ProgressiveFormWithController({
                 return Math.round(monthlyPayment)
               }
 
-              if (loanType === 'new_purchase' && instantCalcResult.maxLoanAmount) {
+              if (loanType === 'new_purchase' && !isRefinanceResult(instantCalcResult) && instantCalcResult.maxLoanAmount) {
                 const propertyPrice = instantCalcResult.propertyPrice ?? Number(fieldValues.priceRange ?? 0)
                 const maxLoan = instantCalcResult.maxLoanAmount
                 const rateAssumption = instantCalcResult.rateAssumption ?? 2.8
-                const monthlyPayment = instantCalcResult.estimatedMonthlyPayment ?? calculateMonthlyPayment(maxLoan, rateAssumption)
+                const monthlyPayment = isFullAnalysisResult(instantCalcResult) && instantCalcResult.estimatedMonthlyPayment
+                  ? instantCalcResult.estimatedMonthlyPayment
+                  : calculateMonthlyPayment(maxLoan, rateAssumption)
                 const downPayment = instantCalcResult.downPayment ?? Math.max(propertyPrice - maxLoan, 0)
                 const cpfAllowedAmount = instantCalcResult.cpfAllowedAmount ?? Math.min(downPayment * 0.8, 200000)
                 const cashRequired = Math.max(downPayment - cpfAllowedAmount, 0)
@@ -893,7 +985,7 @@ export function ProgressiveFormWithController({
                 const ltvPercent = typeof instantCalcResult.ltvRatio === 'number'
                   ? instantCalcResult.ltvRatio
                   : (propertyPrice > 0 ? Math.round((maxLoan / propertyPrice) * 100) : ltvMode)
-                const tenureCapYears = instantCalcResult.tenureCapYears
+                const tenureCapYears = instantCalcResult.effectiveTenure
                 const tenureCapSource = instantCalcResult.tenureCapSource
                 const limitingFactor = instantCalcResult.limitingFactor
                 const reasonCodes: string[] = instantCalcResult.reasonCodes ?? []
@@ -968,7 +1060,7 @@ export function ProgressiveFormWithController({
               }
 
               // Calculate additional metrics for refinance
-              if (loanType === 'refinance' && instantCalcResult.monthlySavings) {
+              if (loanType === 'refinance' && isRefinanceResult(instantCalcResult) && instantCalcResult.monthlySavings) {
                 // Use currentMonthlyPayment from calculateRefinanceOutlook() which handles missing rates
                 const currentMonthlyPayment = instantCalcResult.currentMonthlyPayment ?? 0
                 const newMonthlyPayment = currentMonthlyPayment - instantCalcResult.monthlySavings

@@ -3,6 +3,7 @@
 ## Task List
 
 - [ ] Maintain this journal as the working task log until an official TodoWrite tool is available.
+- [x] Archive completed plans to docs/plans/archive/2025/10/ (2025-10-20)
 - [x] Compare `dr-elena-mortgage-expert-v2.json` with `dr-elena-mortgage-expert.json` for Singapore mortgage accuracy.
 - [ ] Revalidate `dr-elena` JSON conclusions with current MAS/HDB/SLA guidance now that network access is available.
 - [ ] Shape progressive form restoration & instant analysis spec with Brent.
@@ -13,9 +14,9 @@
 - [x] Cross-check calculator behaviour with `docs/plans/active/2025-10-30-dr-elena-audit-plan.md`.
 - [x] Execute initial remediation tasks from `docs/plans/active/2025-10-31-progressive-form-calculation-correction-plan.md`.
 - [x] **Phase 3B: Step-Aware Routing Implementation** - Fix Step 2 hardcoded income bug (2025-10-20)
-- [ ] Workstream 1 Task 3 – compliance snapshot corrections.
-- [ ] Workstream 1 Task 4 – refinance outlook recalibration.
-- [ ] Workstream 1 Task 5 – controller wiring audit.
+- [x] Workstream 1 Task 3 – compliance snapshot corrections.
+- [x] Workstream 1 Task 4 – refinance outlook recalibration.
+- [x] Workstream 1 Task 5 – controller wiring audit.
 
 ## Misc Tasks Checklist (Progressive Form Polish)
 
@@ -76,6 +77,153 @@ Extracted from `FORM_COMPACT_MODE_AND_APPLY_PAGE_TASKLIST.md` (2025-09-17).
 - Private $1.5M, second property → $675k (45% LTV), currently shows wrong amount
 
 **Next Steps:** Implement TDD approach - write failing tests, create pure LTV function, update Step 2 logic
+
+---
+
+## 2025-10-20: Number Formatting Implementation ✅ COMPLETE
+
+**Task:** Implement comma formatting for Step 3 income/liability fields (Task 1 from Desktop UX Quick Wins)
+
+**Scope:** 15 fields updated with comma formatting pattern
+- Step3NewPurchase: 4 income fields (primary, variable, joint primary, joint variable)
+- Step3NewPurchase: 8 liability fields (property loans, car loans, credit cards, personal lines - balance + payment each)
+- Step3Refinance: 1 income field
+- ProgressiveFormWithController: 2 refinance fields (outstandingLoan, propertyValue)
+
+**Implementation Pattern:**
+```typescript
+// From type="number" to type="text" with comma formatting
+<Input
+  type="text"
+  inputMode="numeric"
+  placeholder="8,000"
+  value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
+  onChange={(e) => {
+    const parsedValue = parseFormattedNumber(e.target.value) || 0
+    field.onChange(parsedValue)
+    onFieldChange(fieldName, parsedValue, {...})
+  }}
+/>
+```
+
+**Files Modified:**
+1. `components/forms/sections/Step3NewPurchase.tsx` - Added import, updated 4 income fields
+2. `components/forms/sections/Step3Refinance.tsx` - Added import, updated 1 income field
+3. `components/forms/ProgressiveFormWithController.tsx` - Updated outstandingLoan field
+4. `components/forms/__tests__/Step3-number-formatting.test.tsx` - New test file (5 tests)
+5. `components/forms/__tests__/Step3NewPurchase-html-validation.test.tsx` - Updated expectations
+6. `components/forms/__tests__/Step3NewPurchase-leading-zeros.test.tsx` - Updated expectations
+7. `components/forms/__tests__/Step3Refinance.test.tsx` - Updated expectations
+
+**Test Results:**
+- ✅ All 109 Step3 tests passing
+- ✅ New formatting tests: 5/5 passing
+- ✅ Updated validation tests: All passing
+- ✅ Existing functionality preserved
+
+**TDD Approach:**
+1. Wrote failing tests first (TDD red phase)
+2. Implemented formatting changes (TDD green phase)
+3. Updated test expectations to match new behavior
+4. Verified all tests pass
+
+**Implementation Time:** ~2.5 hours (within LIGHT tier estimate)
+
+---
+
+## 2025-10-20: Plan Archival ✅ COMPLETE
+
+**Task:** Archive completed plans to `docs/plans/archive/2025/10/`
+
+**Plans Archived:**
+1. **`2025-10-19-progressive-form-input-reactivity-fixes-COMPLETION.md`**
+   - Status: Completion report
+   - Outcome: All 9 validation/reactivity issues verified, 64 tests passing
+   - Archived from: `docs/plans/active/`
+
+2. **`2025-10-31-progressive-form-calculation-correction-plan.md`**
+   - Status: Marked `completed` in frontmatter
+   - Outcome: 4 workstreams complete, 252/256 tests passing (98.4%)
+   - Archived from: `docs/plans/active/`
+
+3. **`2025-10-18-lead-form-desktop-ux-quick-wins.md`** + **COMPLETION.md**
+   - Status: Rescoped (66% tasks obsolete), Task 1 completed
+   - Outcome: Number formatting implemented for 15 monetary fields
+   - Created completion report before archiving
+   - Archived from: `docs/plans/active/`
+
+**Impact:**
+- Active plans reduced from 11 to 7 files
+- Cleaner focus on current work (Phase 1 critical path)
+- Mobile-first rebuild plan unblocked (desktop UX quick wins no longer blocking)
+
+**Next Steps:**
+- Consider archiving `2025-10-30-dr-elena-audit-plan.md` if confirmed complete
+- Review `mobile-loan-form-optimization.md` for relevance (dated 2025-09-20)
+
+**Benefits:**
+- Consistent number formatting across all monetary fields
+- Mobile numeric keyboard via `inputMode="numeric"`
+- Improved readability for high-value inputs ($25,500 vs $25500)
+- Trust signal through professional formatting
+
+**Follow-up (added after user feedback):**
+- ✅ User reported liability fields were missing formatting
+- ✅ Added 8 liability fields (property loans, car loans, credit cards, personal lines)
+- ✅ All tests still passing (109/109)
+- **Final total:** 15 fields with comma formatting
+
+**Notes:**
+- Pattern reuses existing `formatNumberWithCommas`/`parseFormattedNumber` helpers from priceRange field
+- All monetary input fields now have consistent formatting throughout Step 3
+
+---
+
+## 2025-10-20: Desktop UX Quick Wins Plan - Audit & Rescope ✅ COMPLETE
+
+**Task:** Brainstorm relevance of `2025-10-18-lead-form-desktop-ux-quick-wins.md` against current roadmap
+
+**Approach:**
+1. Code analysis of instant calc behavior (hooks/useProgressiveFormController.ts)
+2. Audit of all numeric input fields across Step 2 & Step 3
+3. Comparison of plan assumptions vs current implementation (Phase 3B)
+
+**Key Findings:**
+
+**Issue 2 - "Cognitive Overload" → ✅ ALREADY FIXED:**
+- Phase 3B step-aware routing (2025-10-20) implemented pure LTV calculation on Step 2
+- Step 2 now shows property-based max loan WITHOUT income assumptions (no premature MSR/TDSR)
+- 500ms debounce + 1s loading spinner provides smooth UX
+- Step 3+ upgrades to full analysis AFTER income collected
+- **Verdict:** "Hide behind button" NOT needed - auto-display behavior is correct
+
+**Issue 3 - "Visual Weight" → ⚠️ DEFER:**
+- Needs holistic design review, not piecemeal technical fixes
+- Better addressed in mobile-first rebuild plan (comprehensive redesign)
+- **Verdict:** Defer to mobile plan for systematic visual hierarchy improvements
+
+**Issue 1 - "Number Formatting" → ❌ STILL VALID:**
+- Audit found: Only 1 of 18+ numeric fields uses comma formatting
+- ✅ Property Price (`priceRange`): Shows "500,000" with commas
+- ❌ All income fields: Show "8000" without commas (18 fields)
+- ❌ All liability fields: Plain numbers
+- **Pattern already exists:** `priceRange` field uses `formatNumberWithCommas`/`parseFormattedNumber` helpers
+- **Verdict:** Apply same pattern to Step 3 income/liability fields
+
+**Rescope Summary:**
+- **Original plan:** 3 tasks, 8 hours, "critical" priority, blocks mobile rebuild
+- **Rescoped plan:** 1 task, 3 hours, "medium" priority, no blockers
+- **Plan obsolescence:** 66% (2 of 3 tasks removed)
+- **New estimated impact:** 5-10% conversion increase (vs original 15-20%)
+
+**Plan Updated:** `docs/plans/active/2025-10-18-lead-form-desktop-ux-quick-wins.md`
+- Added "Audit Findings (2025-10-20)" section documenting discoveries
+- Removed Tasks 2, 3, 4 (already fixed or deferred)
+- Kept Task 1 (number formatting) with detailed field list (18 fields)
+- Removed mobile rebuild blocker status
+- Updated success criteria, testing strategy, metrics
+
+**Recommendation:** Execute Task 1 only as quick polish pass. Mobile rebuild can proceed independently.
 
 ---
 
