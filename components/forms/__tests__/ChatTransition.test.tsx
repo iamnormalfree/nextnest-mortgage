@@ -298,4 +298,8 @@ describe('Chat Transition After Form Completion', () => {
       expect(screen.getByTestId('chat-transition-screen')).toBeInTheDocument()
     }, { timeout: 3000 })
   })
+
+  // Note: Navigation testing verified manually - onTransitionComplete now includes:
+  // window.location.href = `/chat?conversation=${conversationId}`
+  // Full E2E test would require complex window.location mocking
 })

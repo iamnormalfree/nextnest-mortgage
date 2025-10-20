@@ -1528,6 +1528,8 @@ export function ProgressiveFormWithController({
         sessionId={sessionId}
         onTransitionComplete={(conversationId) => {
           console.log('Chat transition complete:', conversationId)
+          // Navigate to chat page with conversation ID
+          window.location.href = `/chat?conversation=${conversationId}`
         }}
         onFallbackRequired={(fallbackData) => {
           console.log('Fallback required:', fallbackData)
