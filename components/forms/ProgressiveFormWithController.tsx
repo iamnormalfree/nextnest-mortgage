@@ -447,7 +447,11 @@ export function ProgressiveFormWithController({
 
   // Handle form submission for current step
   const handleStepSubmit = handleSubmit(async (data) => {
+    console.log('✅ Form validation passed, submitting step', { currentStep, data })
     await next(data)
+  }, (errors) => {
+    console.error('❌ Form validation failed:', { currentStep, errors })
+    console.log('Current form values:', watch())
   })
 
   /**
