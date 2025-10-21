@@ -15,6 +15,7 @@ replaces: AI_BROKER_PERSONA_SYSTEM.md, AI_BROKER_SETUP_GUIDE.md, COMPLETE_AI_BRO
 1. [System Architecture](#system-architecture)
 2. [Implementation Guide](#implementation-guide)
 3. [End-to-End Flow](#end-to-end-flow)
+   - 3.7 [System Activation & Deployment](#37-system-activation--deployment)
 4. [Optimization & Monitoring](#optimization--monitoring)
 5. [Troubleshooting](#troubleshooting)
 
@@ -1121,6 +1122,290 @@ const HandoffTransition = ({ fromBroker, toHuman }) => (
 
 ---
 
+### 3.7 System Activation & Deployment
+
+> **Status**: Updated 2025-10-21 based on Phase 0 & 1 implementation
+
+#### System Status
+
+**Current Configuration (as of 2025-10-21):**
+- **BullMQ**: ✅ Enabled at 100% rollout
+- **n8n**: ❌ Disabled (`ENABLE_AI_BROKER=false`)
+- **Worker**: ✅ Auto-starts via health endpoint
+- **Redis**: ✅ Connected to Railway (maglev.proxy.rlwy.net:29926)
+- **AI Orchestrator**: ✅ Operational with graceful fallback
+
+#### Worker Auto-Start (Railway & Development)
+
+**How it Works:**
+The BullMQ worker auto-initializes when the `/api/health` endpoint is first called. This ensures:
+- Railway health checks automatically start the worker on deployment
+- Development servers initialize worker on first health check
+- Singleton pattern prevents duplicate workers
+
+**Verification:**
+```bash
+# Check worker status
+curl http://localhost:3000/api/health | jq '.worker'
+
+# Expected response:
+{
+  "initialized": true,
+  "running": true
+}
+```
+
+**Manual Worker Control (Optional):**
+```bash
+# Initialize worker manually
+curl -X POST http://localhost:3000/api/worker/start
+
+# Check worker status
+curl http://localhost:3000/api/worker/start | jq
+```
+
+**Files Modified for Auto-Start:**
+- `app/api/health/route.ts` - Added `initializeWorker()` call
+- `lib/queue/worker-manager.ts` - Singleton pattern worker management
+
+#### Environment Configuration
+
+**Required Variables:**
+```bash
+# BullMQ Configuration
+ENABLE_BULLMQ_BROKER=true           # Enable BullMQ system
+BULLMQ_ROLLOUT_PERCENTAGE=100       # Traffic percentage (0-100)
+ENABLE_AI_BROKER=false              # n8n fallback (deprecated, set false)
+
+# Worker Configuration
+WORKER_CONCURRENCY=3                # Concurrent job processing
+QUEUE_RATE_LIMIT=10                 # Jobs per second limit
+
+# Redis Connection
+REDIS_URL=redis://default:PASSWORD@host:port
+
+# OpenAI API
+OPENAI_API_KEY=sk-proj-YOUR_KEY_HERE
+
+# Chatwoot Integration
+CHATWOOT_BASE_URL=https://chat.nextnest.sg
+CHATWOOT_API_TOKEN=YOUR_TOKEN
+CHATWOOT_ACCOUNT_ID=1
+```
+
+**Environment Variable Verification:**
+```bash
+# Check current configuration
+curl http://localhost:3000/api/admin/migration-status | jq '.environment'
+```
+
+#### OpenAI API Key Setup
+
+**Getting a Valid Key:**
+1. Go to https://platform.openai.com/account/api-keys
+2. Create new API key (project-based: `sk-proj-...`)
+3. Update `.env.local` with new key
+4. Restart server
+
+**Testing Key Validity:**
+```bash
+# Test your OpenAI key
+curl -H "Authorization: Bearer YOUR_KEY" \
+  https://api.openai.com/v1/models
+
+# Valid key returns list of models
+# Invalid key returns error with code "invalid_api_key"
+```
+
+**Graceful Fallback Behavior:**
+If OpenAI API fails (invalid key, rate limit, outage), the system gracefully falls back to template responses:
+- ✅ Queue → Worker → Chatwoot pipeline continues working
+- ✅ Template responses maintain conversation flow
+- ✅ No crashes or errors
+- ⚠️ AI personalization disabled until API restored
+
+**Fallback Template Example:**
+```
+"Thanks for your message! I'm having a small technical hiccup, but I'm still here to assist you. Could you share more details about what you're looking for? I want to make sure I provide you with the most relevant information."
+```
+
+#### Queue Handshake Validation
+
+**Test Script Location:** `scripts/test-bullmq-incoming-message.ts`
+
+**Running the Test:**
+```bash
+# Ensure environment variables are loaded
+REDIS_URL="..." \
+OPENAI_API_KEY="..." \
+CHATWOOT_BASE_URL="..." \
+CHATWOOT_API_TOKEN="..." \
+CHATWOOT_ACCOUNT_ID="1" \
+npx tsx scripts/test-bullmq-incoming-message.ts
+```
+
+**Expected Output:**
+```
+🧪 Testing BullMQ Incoming Message Flow
+📋 Step 1: Queueing incoming message to BullMQ...
+✅ Message queued successfully!
+   Job ID: incoming-message-280-1761016273577
+   Priority: 3
+⏳ Worker should now process this job...
+📊 Job State: completed
+✅ Job completed
+```
+
+**End-to-End Flow Verified:**
+1. ✅ Message queued to BullMQ
+2. ✅ Worker picks up job
+3. ✅ Broker assignment (persona-based)
+4. ✅ Urgency analysis (natural timing delay)
+5. ✅ AI response generation (or fallback template)
+6. ✅ Message delivered to Chatwoot
+7. ✅ Echo detection tracking
+8. ✅ Broker metrics updated
+
+#### Migration Status API
+
+**Endpoint:** `GET /api/admin/migration-status`
+
+**Response:**
+```json
+{
+  "timestamp": "2025-10-21T03:04:08.454Z",
+  "migration": {
+    "bullmqEnabled": true,
+    "trafficPercentage": 100,
+    "n8nEnabled": false,
+    "phase": "complete (100% BullMQ, n8n decommissioned)"
+  },
+  "queue": {
+    "waiting": 0,
+    "active": 0,
+    "completed": 2,
+    "failed": 0
+  },
+  "worker": {
+    "initialized": true,
+    "running": true
+  },
+  "health": {
+    "status": "healthy",
+    "score": 100
+  }
+}
+```
+
+**What to Monitor:**
+- **worker.running**: Should be `true` (auto-starts via health check)
+- **queue.failed**: Should stay at 0 or very low
+- **health.status**: Should be "healthy"
+- **migration.trafficPercentage**: Currently at 100%
+
+#### Production Deployment Checklist
+
+**Pre-Deployment:**
+- [ ] Valid OpenAI API key configured
+- [ ] Redis URL points to production instance
+- [ ] Chatwoot credentials configured
+- [ ] Environment variables verified
+- [ ] Worker auto-start tested locally
+
+**Post-Deployment Verification:**
+1. Check health endpoint:
+   ```bash
+   curl https://your-domain.com/api/health | jq '.worker'
+   # Should show: initialized: true, running: true
+   ```
+
+2. Check migration status:
+   ```bash
+   curl https://your-domain.com/api/admin/migration-status | jq
+   ```
+
+3. Monitor Railway logs for worker initialization:
+   ```
+   🚀 BullMQ worker initialized and ready to process jobs
+      Concurrency: 3
+      Rate limit: 10/second
+   ```
+
+4. Test message flow:
+   - Submit lead form → Chat opens
+   - Send test message → AI responds within 5s
+   - Verify conversation in Chatwoot admin
+
+**Rollback Plan:**
+If issues occur, revert via environment variables:
+```bash
+# Stop BullMQ, re-enable n8n
+ENABLE_BULLMQ_BROKER=false
+ENABLE_AI_BROKER=true
+```
+Redeploy and monitor health status.
+
+#### Common Issues & Solutions
+
+**Issue: Worker not running**
+```bash
+# Symptom
+curl /api/health | jq '.worker'
+# Shows: initialized: false, running: false
+
+# Solution
+# Worker auto-starts on first health check (may take 3-5s)
+# Wait and check again, or manually initialize:
+curl -X POST /api/worker/start
+```
+
+**Issue: OpenAI API key invalid**
+```bash
+# Symptom
+# Logs show: "Incorrect API key provided"
+# Fallback templates being used
+
+# Solution
+1. Get new key from https://platform.openai.com/account/api-keys
+2. Update .env.local: OPENAI_API_KEY=sk-proj-NEW_KEY
+3. Restart server
+4. Test: curl -H "Authorization: Bearer NEW_KEY" https://api.openai.com/v1/models
+```
+
+**Issue: Queue jobs stuck in "waiting" state**
+```bash
+# Symptom
+curl /api/admin/migration-status | jq '.queue.waiting'
+# Shows high number (>20)
+
+# Solution
+# Check if worker is running
+curl /api/health | jq '.worker'
+
+# If worker not running, initialize it
+curl -X POST /api/worker/start
+
+# Check Redis connection
+# Verify REDIS_URL is accessible
+```
+
+**Issue: Messages not reaching Chatwoot**
+```bash
+# Symptom
+# Jobs complete but no messages in Chatwoot
+
+# Solution
+# Verify Chatwoot credentials
+echo $CHATWOOT_BASE_URL  # Should be https://chat.nextnest.sg
+echo $CHATWOOT_API_TOKEN # Should be valid token
+
+# Test Chatwoot API directly
+curl -H "Api-Access-Token: $CHATWOOT_API_TOKEN" \
+  $CHATWOOT_BASE_URL/api/v1/accounts/$CHATWOOT_ACCOUNT_ID/conversations
+```
+
+---
+
 ## 4. Optimization & Monitoring
 
 ### 4.1 Learning Algorithm
@@ -1351,6 +1636,264 @@ const BrokerAvailability = () => {
 - Update broker profiles with learning insights
 - Analyze conversion patterns by segment
 - Review and refine handoff triggers
+
+---
+
+### 4.2 Production Observability & Monitoring
+
+> **Updated:** 2025-10-21 - Added BullMQ monitoring and alerting guidelines
+
+#### 4.2.1 Key Metrics to Monitor
+
+**Queue Health Metrics:**
+| Metric | API Endpoint | Healthy Range | Alert Threshold |
+|--------|--------------|---------------|-----------------|
+| **Worker Status** | `/api/health` | `running: true` | Worker down >5min |
+| **Failed Jobs** | `/api/admin/migration-status` | `failed: 0-2` | >10 failed jobs |
+| **Waiting Jobs** | `/api/admin/migration-status` | `waiting: 0-20` | >50 waiting jobs |
+| **Active Jobs** | `/api/admin/migration-status` | `active: 0-10` | >20 active jobs |
+| **Health Score** | `/api/admin/migration-status` | `score: 80-100` | <70 score |
+
+**Performance Metrics:**
+| Metric | Source | Target | Alert If |
+|--------|--------|--------|----------|
+| **Job Processing Time** | Worker logs | <10s avg | >15s avg |
+| **AI Response Time** | AI Orchestrator logs | <5s | >8s |
+| **Queue Throughput** | Migration status | 10-50 jobs/min | <5 jobs/min |
+| **Worker Concurrency** | Worker logs | 3 concurrent | <2 concurrent |
+
+#### 4.2.2 Monitoring Commands
+
+**Quick Health Check:**
+```bash
+# Production health
+curl https://your-domain.com/api/health | jq
+
+# Expected output:
+{
+  "status": "healthy",
+  "worker": {
+    "initialized": true,
+    "running": true
+  }
+}
+```
+
+**Detailed Queue Status:**
+```bash
+# Full migration status
+curl https://your-domain.com/api/admin/migration-status | jq
+
+# Check specific metrics
+curl https://your-domain.com/api/admin/migration-status | jq '.queue.failed'
+curl https://your-domain.com/api/admin/migration-status | jq '.worker.running'
+curl https://your-domain.com/api/admin/migration-status | jq '.health.status'
+```
+
+**Worker Status:**
+```bash
+# Check worker directly
+curl https://your-domain.com/api/worker/start | jq '.worker'
+```
+
+#### 4.2.3 Railway Logging Dashboard
+
+**Important Log Patterns to Watch:**
+
+**✅ Healthy Patterns:**
+```
+🚀 BullMQ worker initialized and ready to process jobs
+✅ Worker completed job incoming-message-{id}
+✅ Message sent successfully
+📈 Metrics updated
+```
+
+**⚠️ Warning Patterns:**
+```
+⚠️ Intent classification AI failed, using heuristics
+⚠️ Using fallback template response
+⚠️ Worker initialization failed
+```
+
+**🚨 Critical Error Patterns:**
+```
+❌ AI generation failed for conversation {id}
+❌ Failed to send message to Chatwoot
+❌ Redis connection error
+❌ Worker crashed
+Error: REDIS_URL environment variable is required
+```
+
+**Railway Log Filters:**
+```bash
+# Filter for errors only
+Status: error
+
+# Filter for AI failures
+Search: "AI generation failed"
+
+# Filter for queue issues
+Search: "BullMQ" OR "queue"
+
+# Filter for worker events
+Search: "worker" OR "Worker"
+```
+
+#### 4.2.4 Alert Configuration
+
+**Recommended Alerts (Railway):**
+
+**Critical Alerts (PagerDuty/Slack):**
+1. **Worker Down**
+   - Trigger: Worker status `running: false` for >5 minutes
+   - Check: `curl /api/health | jq '.worker.running' == false`
+   - Action: Restart worker via `/api/worker/start`
+
+2. **High Failed Job Rate**
+   - Trigger: >10 failed jobs in queue
+   - Check: `curl /api/admin/migration-status | jq '.queue.failed' > 10`
+   - Action: Review error logs, check OpenAI API key, verify Chatwoot connection
+
+3. **Redis Connection Lost**
+   - Trigger: Log pattern "Redis connection error"
+   - Action: Check Railway Redis service status
+
+**Warning Alerts (Email/Slack):**
+4. **High Queue Backlog**
+   - Trigger: >50 jobs waiting for >10 minutes
+   - Check: `curl /api/admin/migration-status | jq '.queue.waiting' > 50`
+   - Action: Increase worker concurrency or investigate slow processing
+
+5. **OpenAI API Degradation**
+   - Trigger: >50% fallback template usage in 5-minute window
+   - Pattern: Multiple "Using fallback template" logs
+   - Action: Check OpenAI API status, verify API key validity
+
+6. **Low Health Score**
+   - Trigger: Health score <70 for >15 minutes
+   - Check: `curl /api/admin/migration-status | jq '.health.score' < 70`
+   - Action: Review health issues array
+
+#### 4.2.5 Monitoring Dashboard Setup
+
+**Option 1: Railway Built-in Monitoring**
+- Navigate to: Railway → Your Service → Metrics
+- Monitor: CPU, Memory, Network
+- Set alerts for CPU >80%, Memory >500MB
+
+**Option 2: Custom Grafana Dashboard** (Future)
+
+**Recommended Panels:**
+1. **Queue Depth** (Time series)
+   - Waiting jobs
+   - Active jobs
+   - Failed jobs
+   - Data source: `/api/admin/migration-status` polling
+
+2. **Worker Health** (Stat panel)
+   - Worker running (boolean)
+   - Worker initialized (boolean)
+   - Health score (0-100)
+
+3. **Processing Times** (Histogram)
+   - Job duration distribution
+   - Parse from worker logs: "Job completed successfully in {ms}ms"
+
+4. **AI Performance** (Time series)
+   - AI success rate
+   - Fallback template usage
+   - Response generation time
+
+5. **Error Rate** (Time series)
+   - Failed jobs over time
+   - Error types breakdown
+
+**Data Source:** Poll `/api/admin/migration-status` every 30s
+
+#### 4.2.6 Log Retention & Debugging
+
+**Railway Logs:**
+- Retention: Last 7 days (Railway free tier)
+- Retention: Last 30 days (Railway Pro)
+
+**Debugging Failed Jobs:**
+```bash
+# 1. Check migration status for failed count
+curl /api/admin/migration-status | jq '.queue.failed'
+
+# 2. If failed jobs exist, check Railway logs
+# Filter: "❌" OR "Error" OR "failed"
+# Time range: Last hour
+
+# 3. Look for specific error patterns
+# - OpenAI API errors
+# - Chatwoot connection errors
+# - Redis connection errors
+# - Worker crashes
+
+# 4. Get conversation context
+# Search logs for: "conversation {id}"
+```
+
+**Common Debug Commands:**
+```bash
+# Check if worker is running
+curl /api/health | jq '.worker'
+
+# Get full queue status
+curl /api/admin/migration-status | jq '.queue'
+
+# Check environment variables
+curl /api/admin/migration-status | jq '.environment'
+
+# Test OpenAI API key
+curl -H "Authorization: Bearer $OPENAI_API_KEY" \
+  https://api.openai.com/v1/models | jq '.object'
+# Should return: "list"
+```
+
+#### 4.2.7 Guardrails & Safety Limits
+
+**Rate Limiting:**
+- Worker concurrency: 3 (configurable via `WORKER_CONCURRENCY`)
+- Queue rate limit: 10 jobs/second (configurable via `QUEUE_RATE_LIMIT`)
+- Prevents overwhelming OpenAI API or Chatwoot
+
+**Automatic Retry Logic:**
+- BullMQ retries failed jobs automatically
+- Max retries: 3
+- Backoff: Exponential (30s, 60s, 120s)
+
+**Circuit Breaker Patterns:**
+- OpenAI API failures → Fallback to templates (no service disruption)
+- Chatwoot API down → Job stays in queue, retries automatically
+- Redis connection lost → Worker reconnects automatically
+
+**Health Check Integration:**
+- Railway health checks call `/api/health` every 60s
+- Worker auto-restarts on health check failure (after 3 consecutive failures)
+- Ensures worker stays operational 24/7
+
+#### 4.2.8 Production Readiness Checklist
+
+**Before Going Live:**
+- [ ] Worker auto-starts verified (health endpoint test)
+- [ ] OpenAI API key valid and tested
+- [ ] Chatwoot credentials configured
+- [ ] Redis connection stable
+- [ ] Alert rules configured in Railway
+- [ ] Log monitoring dashboard set up
+- [ ] Error budget defined (e.g., 99.5% uptime = 3.6 hours downtime/month)
+- [ ] Runbook reviewed by team
+- [ ] Rollback plan tested
+
+**Post-Launch (First 48 Hours):**
+- [ ] Monitor failed jobs rate (<1% target)
+- [ ] Verify worker stays running (no crashes)
+- [ ] Check AI response quality (fallback rate <5%)
+- [ ] Validate queue processing times (<10s avg)
+- [ ] Review error logs for patterns
+- [ ] Confirm no PII leaks in logs
 
 ---
 

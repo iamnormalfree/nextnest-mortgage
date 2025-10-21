@@ -797,3 +797,259 @@ During manual testing of the instant analysis feature, discovered a calculation 
 
 ---
 
+## 2025-10-21: AI Broker Chat Activation - Phase 0 & 1 Implementation
+
+**Task:** Implement Phase 0 & 1 of `2025-10-21-ai-broker-chat-activation-plan.md`
+
+**Branch:** (to be created)
+
+### Phase 0: Current State Confirmation ✅ COMPLETE
+
+**Task 0.1 - Read Canonical References:** ✅ Complete
+- Read 5 canonical files:
+  1. `docs/runbooks/AI_BROKER_COMPLETE_GUIDE.md` - Complete AI broker system guide
+  2. `lib/queue/broker-queue.ts` - BullMQ job structure and queue functions
+  3. `lib/queue/broker-worker.ts` - Worker implementation with existing function integration
+  4. `lib/ai/broker-ai-service.ts` - AI response generation with Vercel SDK
+  5. `components/chat/CustomChatInterface.tsx` - Chat UI with message role normalization
+
+**Key Findings from References:**
+- **Persona System:** 5 broker personas (Marcus Chen, Sarah Wong, David Lim, Rachel Tan, Ahmad Ibrahim) already defined with personality types (aggressive/balanced/conservative)
+- **Queue System:** BullMQ already implemented with lazy initialization, job deduplication, priority scoring
+- **Worker Lifecycle:** Calls existing functions from broker-assignment.ts, broker-availability.ts, broker-persona.ts, chatwoot-client.ts
+- **AI Integration:** Supports multi-model (OpenAI + Anthropic), Dr. Elena routing for calculations, intent classification
+- **Message Role Contract:** API normalizes Chatwoot messages to `role: 'user' | 'agent' | 'system'` for clean UI rendering
+
+**Task 0.2 - Migration Status Snapshot:** ✅ Complete
+
+**API Endpoint:** `GET /api/admin/migration-status`
+
+**Current Migration Status (2025-10-21):**
+
+```json
+{
+  "timestamp": "2025-10-21T03:04:08.454Z",
+  "migration": {
+    "bullmqEnabled": true,
+    "trafficPercentage": 100,
+    "n8nEnabled": false,
+    "parallelMode": false,
+    "phase": "complete (100% BullMQ, n8n decommissioned)",
+    "description": "100% cutover complete. n8n can be decommissioned."
+  },
+  "queue": {
+    "waiting": 0,
+    "active": 0,
+    "completed": 2,
+    "failed": 0,
+    "delayed": 0,
+    "total": 0
+  },
+  "worker": {
+    "initialized": false,
+    "running": false,
+    "isPaused": false,
+    "isRunning": false
+  },
+  "recommendations": [
+    "✅ Migration complete - BullMQ is sole system",
+    "n8n workflow can be archived/decommissioned"
+  ],
+  "health": {
+    "status": "warning",
+    "score": 70,
+    "issues": ["Worker not initialized"],
+    "summary": "System operational with minor issues"
+  },
+  "environment": {
+    "ENABLE_BULLMQ_BROKER": "true",
+    "BULLMQ_ROLLOUT_PERCENTAGE": "100",
+    "ENABLE_AI_BROKER": "false",
+    "WORKER_CONCURRENCY": "3",
+    "QUEUE_RATE_LIMIT": "10"
+  }
+}
+```
+
+**Key Observations:**
+1. ⚠️ **UNEXPECTED STATE:** Plan expects traffic at 0%, but it's already at 100%
+2. ⚠️ **Worker Not Running:** Despite BullMQ enabled, worker shows `initialized: false, running: false`
+3. ✅ **Queue Healthy:** No failed jobs, 2 completed jobs
+4. ⚠️ **n8n Already Disabled:** `ENABLE_AI_BROKER=false` means n8n is already turned off
+5. ⚠️ **Health Warning:** System flagged with "Worker not initialized" issue
+
+**CRITICAL DISCREPANCY:**
+- **Plan Assumption (Phase 1.1):** Start at 10% rollout with n8n fallback enabled
+- **Current Reality:** Already at 100% rollout with n8n disabled
+- **Implication:** Cannot follow plan's staged rollout approach (10% → 50% → 100%)
+
+**Question for Brent:** The plan assumes BullMQ is at 0% and we'll gradually roll out from 10%, but the system is already at 100% with n8n disabled. The main issue is that the worker is not running. Should we:
+- **Option A:** Follow plan as-is (revert to 10%, re-enable n8n fallback) for staged rollout
+- **Option B:** Acknowledge 100% is already live, focus on Task 1.2 (worker initialization) as the blocker
+- **Option C:** Different approach?
+
+**Next Steps (pending Brent's direction):**
+- If Option A: Task 1.1 will revert environment to 10% with n8n fallback
+- If Option B: Skip to Task 1.2 worker health check and initialization
+- Document final decision before proceeding
+
+**Decision:** Option B confirmed by Brent - proceed with worker initialization as primary blocker
+
+### Phase 1: Reactivate BullMQ Message Flow
+
+**Task 1.1: SKIPPED** ✅
+- Environment already at desired end state (100% BullMQ, n8n disabled)
+- No changes needed
+
+**Task 1.2: Worker Health Check and Initialization** ✅ COMPLETE
+
+**Actions Taken:**
+1. **GET /api/worker/start** (before): `initialized: false, running: false`
+2. **POST /api/worker/start** (initialize): Success
+3. **GET /api/worker/start** (after): `initialized: true, running: true`
+
+**Server Logs Confirmed:**
+```
+🚀 Manual worker initialization requested...
+🚀 Initializing BullMQ worker...
+✅ Message tracking utility initialized: {
+  fingerprintTTL: '600s',
+  botCacheTTL: '900s',
+  cleanupInterval: '300s',
+  maxMessagesPerConv: 10,
+  maxMessageIds: 20
+}
+✅ Redis configuration loaded: {
+  host: 'maglev.proxy.rlwy.net',
+  port: 29926,
+  tls: false,
+  env: 'development'
+}
+🚀 BullMQ worker initialized and ready to process jobs
+   Concurrency: 3
+   Rate limit: 10/second
+   Environment: development
+```
+
+**Verification:**
+- ✅ Worker shows "🚀 BullMQ worker initialized" message
+- ✅ Concurrency: 3 (matches WORKER_CONCURRENCY env var)
+- ✅ Rate limit: 10/second (matches QUEUE_RATE_LIMIT env var)
+- ✅ Redis connected to Railway (maglev.proxy.rlwy.net:29926)
+- ✅ Message tracking utility operational
+- ✅ Worker status: `running: true`
+
+**Status:** ✅ PRIMARY BLOCKER RESOLVED - Worker now operational
+
+**Task 1.3: Validate Queue Handshake** ✅ COMPLETE
+
+**Test Script:** `scripts/test-bullmq-incoming-message.ts`
+
+**Execution:**
+```bash
+REDIS_URL="..." OPENAI_API_KEY="..." CHATWOOT_BASE_URL="..." \
+CHATWOOT_API_TOKEN="..." CHATWOOT_ACCOUNT_ID="1" \
+npx tsx scripts/test-bullmq-incoming-message.ts
+```
+
+**End-to-End Flow Verified:**
+1. ✅ Message queued to BullMQ: `Job ID: incoming-message-280-1761016273577`
+2. ✅ Worker picked up job (`state: active`)
+3. ✅ Broker assignment: Rachel Tan (balanced type)
+4. ✅ Persona loaded correctly from broker-persona.ts
+5. ✅ Urgency analysis: 4000ms natural timing delay
+6. ✅ AI Orchestrator initialized
+7. ✅ Intent classification: greeting (90% confidence, gpt-4o-mini)
+8. ✅ **Graceful degradation:** Fallback template response when OpenAI API failed
+9. ✅ Message sent to Chatwoot successfully (message_id: 1450)
+10. ✅ Echo detection tracking operational
+11. ✅ Broker metrics updated
+12. ✅ Job completed in 6489ms
+
+**Worker Processing Logs Confirmed:**
+```
+============================================================
+🤖 Processing incoming-message for conversation 280
+   Broker: Rachel Tan
+   Lead Score: 65
+============================================================
+📊 Step 1: Getting broker assignment... ✅ Broker found: Rachel Tan
+🎭 Step 2: Getting broker persona... ✅ Persona loaded: Rachel Tan
+⏱️ Step 3: Analyzing message urgency... ✅ Urgency analyzed
+⏳ Step 4: Waiting 4000ms for natural timing... ✅ Wait complete
+🧠 Step 5: Generating AI response... ✅ Fallback template (225 chars)
+📤 Step 6: Sending AI response to Chatwoot... ✅ Message sent (ID: 1450)
+📈 Step 8: Updating broker metrics... ✅ Metrics updated
+✅ Job completed successfully in 6489ms
+```
+
+**Key Success Indicators:**
+- Queue → Worker handshake: ✅ Working
+- Worker → AI Orchestrator: ✅ Working
+- AI graceful degradation: ✅ Fallback template used (expected OpenAI key invalid)
+- Chatwoot integration: ✅ Message delivered
+- Redis connection: ✅ Stable (maglev.proxy.rlwy.net:29926)
+- Message tracking: ✅ Echo detection operational
+
+**Status:** ✅ COMPLETE - Full queue-to-Chatwoot pipeline verified
+
+**Task 1.4: Configuration Audit** ✅ COMPLETE
+
+**Actions Taken:**
+1. ✅ Verified no redundant worker scripts exist (`find scripts -name "*worker*"` → no results)
+2. ✅ Confirmed `lib/queue/worker-manager.ts` is single canonical entrypoint
+   - Singleton pattern prevents multiple instances
+   - Called by `/api/worker/start` and `/api/health`
+   - Server-side only execution with graceful shutdown
+3. ✅ n8n fallback audit skipped (n8n already disabled per Option B decision)
+
+**Worker Manager Verification:**
+- Location: `lib/queue/worker-manager.ts`
+- Purpose: Ensures BullMQ worker runs server-side only
+- Integration points: `/api/health/route.ts`, `/api/worker/start/route.ts`
+- No competing scripts found in `scripts/` directory
+
+**Status:** ✅ COMPLETE - Configuration clean, worker-manager.ts is single source of truth
+
+---
+
+## Phase 0 & 1 Summary ✅ COMPLETE
+
+**Total Implementation Time:** ~2 hours
+
+### Phase 0: Current State Confirmation ✅
+- Read 5 canonical reference files
+- Discovered system already at 100% BullMQ (unexpected state)
+- Identified worker not running as primary blocker
+
+### Phase 1: BullMQ Message Flow Activation ✅
+- Skipped Task 1.1 (environment already at desired state)
+- **Task 1.2:** Initialized worker successfully via `POST /api/worker/start`
+- **Task 1.3:** Validated complete queue→worker→Chatwoot pipeline
+- **Task 1.4:** Verified clean configuration, single worker entrypoint
+
+### Key Achievements:
+1. ✅ Worker operational (concurrency: 3, rate: 10/sec)
+2. ✅ Queue handshake validated (end-to-end message flow working)
+3. ✅ Redis connection stable (Railway: maglev.proxy.rlwy.net:29926)
+4. ✅ AI Orchestrator functional with graceful degradation
+5. ✅ Chatwoot integration working (message delivery confirmed)
+6. ✅ Echo detection and message tracking operational
+
+### Critical Findings:
+- **Unexpected State:** System was already at 100% BullMQ rollout (plan assumed 0%)
+- **Primary Blocker:** Worker not running (resolved via manual initialization)
+- **Option B Selected:** Proceed with current 100% state vs reverting to staged rollout
+- **OpenAI API Key:** Invalid in test environment (fallback templates working correctly)
+
+### Production Readiness:
+- ✅ **For Development:** Fully operational, worker must be started via `POST /api/worker/start`
+- ⚠️ **For Railway Production:** Need to ensure worker auto-starts on deployment
+
+### Next Steps (Not in Phase 0/1 Scope):
+- Phase 2: Hardening & UX Polish (integration tests, mobile verification)
+- Phase 3: Rollout & Monitoring (staged rollout plan, production verification)
+- Railway deployment: Ensure worker auto-starts (add to health check or startup script)
+
+---
+

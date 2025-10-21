@@ -1,0 +1,94 @@
+{
+  "timestamp": "2025-10-21T05:24:58.799Z",
+  "testResults": [
+    {
+      "name": "Health Check",
+      "url": "http://localhost:3001/api/health",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": false,
+      "timestamp": "2025-10-21T05:25:02.240Z",
+      "responseData": {
+        "status": "healthy",
+        "timestamp": "2025-10-21T05:25:01.644Z",
+        "uptime": 99.5504504,
+        "version": "0.1.0",
+        "worker": {
+          "initialized": false,
+          "running": false
+        }
+      },
+      "hasWorkerStatus": false
+    },
+    {
+      "name": "Fetch Messages API",
+      "url": "http://localhost:3001/api/chatwoot/messages?conversationId=280",
+      "expectedStatus": 200,
+      "actualStatus": 404,
+      "passed": false,
+      "timestamp": "2025-10-21T05:25:14.966Z"
+    },
+    {
+      "name": "Conversation Metadata",
+      "url": "http://localhost:3001/api/chatwoot/conversations/280",
+      "expectedStatus": 200,
+      "actualStatus": 404,
+      "passed": false,
+      "timestamp": "2025-10-21T05:25:16.251Z"
+    },
+    {
+      "name": "Queue Metrics",
+      "url": "http://localhost:3001/api/admin/migration-status",
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "passed": false,
+      "timestamp": "2025-10-21T05:25:17.580Z",
+      "responseData": {
+        "timestamp": "2025-10-21T05:25:17.571Z",
+        "migration": {
+          "bullmqEnabled": true,
+          "trafficPercentage": 100,
+          "n8nEnabled": false,
+          "parallelMode": false,
+          "phase": "complete (100% BullMQ, n8n decommissioned)",
+          "description": "100% cutover complete. n8n can be decommissioned."
+        },
+        "queue": {
+          "waiting": 0,
+          "active": 0,
+          "completed": 1,
+          "failed": 0,
+          "delayed": 0,
+          "total": 0
+        },
+        "worker": {
+          "initialized": false,
+          "running": false,
+          "isPaused": false,
+          "isRunning": false
+        },
+        "recommendations": [
+          "✅ Migration complete - BullMQ is sole system",
+          "n8n workflow can be archived/decommissioned"
+        ],
+        "health": {
+          "status": "warning",
+          "score": 70,
+          "issues": [
+            "Worker not initialized"
+          ],
+          "summary": "System operational with minor issues"
+        },
+        "environment": {
+          "ENABLE_BULLMQ_BROKER": "true",
+          "BULLMQ_ROLLOUT_PERCENTAGE": "100",
+          "ENABLE_AI_BROKER": "false",
+          "WORKER_CONCURRENCY": "3",
+          "QUEUE_RATE_LIMIT": "10"
+        }
+      },
+      "hasQueueMetrics": true,
+      "workerRunning": false
+    }
+  ]
+}

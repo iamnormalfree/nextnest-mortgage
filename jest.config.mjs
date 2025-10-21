@@ -12,6 +12,10 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
+  // Transform ESM modules (BullMQ, msgpackr, etc.)
+  transformIgnorePatterns: [
+    'node_modules/(?!(bullmq|msgpackr|ioredis)/)',
+  ],
 };
 
 export default createJestConfig(customJestConfig);

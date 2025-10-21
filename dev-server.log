@@ -2,14 +2,456 @@
 > modernmortgage-simple@0.1.0 dev
 > next dev
 
- ⚠ Port 3000 is in use, trying 3001 instead.
- ⚠ Port 3001 is in use, trying 3002 instead.
- ⚠ Port 3002 is in use, trying 3003 instead.
- ⚠ Port 3003 is in use, trying 3004 instead.
- ⚠ Port 3004 is in use, trying 3005 instead.
   ▲ Next.js 14.2.32
-  - Local:        http://localhost:3005
+  - Local:        http://localhost:3000
   - Environments: .env.local
 
  ✓ Starting...
- ✓ Ready in 6.3s
+ ✓ Ready in 7s
+ ○ Compiling / ...
+ ✓ Compiled / in 11.8s (552 modules)
+ GET / 200 in 13588ms
+ ✓ Compiled in 1796ms (260 modules)
+ ○ Compiling /apply ...
+ ✓ Compiled /apply in 5.9s (965 modules)
+🎯 LeadForm.progressToStep called! {
+  targetStep: 1,
+  currentStep: 0,
+  formDataSize: 1,
+  formDataEntries: { loanType: 'new_purchase' },
+  loanType: 'new_purchase'
+}
+🔎 About to validate step requirements...
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔍 LeadForm validation debug: {
+  step: 0,
+  requirements: {
+    requiredFields: [ 'loanType' ],
+    requiresEmail: false,
+    requiresPhone: false
+  },
+  formData: { loanType: 'new_purchase' },
+  formDataSize: 1,
+  hasRequiredFields: [
+    {
+      field: 'loanType',
+      hasField: true,
+      value: 'new_purchase',
+      valueType: 'string'
+    }
+  ]
+}
+✅ LeadForm validation passed!
+📊 Validation result: true
+ GET /apply 200 in 6920ms
+🎯 LeadForm.progressToStep called! {
+  targetStep: 1,
+  currentStep: 0,
+  formDataSize: 1,
+  formDataEntries: { loanType: 'new_purchase' },
+  loanType: 'new_purchase'
+}
+🔎 About to validate step requirements...
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔍 LeadForm validation debug: {
+  step: 0,
+  requirements: {
+    requiredFields: [ 'loanType' ],
+    requiresEmail: false,
+    requiresPhone: false
+  },
+  formData: { loanType: 'new_purchase' },
+  formDataSize: 1,
+  hasRequiredFields: [
+    {
+      field: 'loanType',
+      hasField: true,
+      value: 'new_purchase',
+      valueType: 'string'
+    }
+  ]
+}
+✅ LeadForm validation passed!
+📊 Validation result: true
+ GET /apply 200 in 186ms
+🎯 LeadForm.progressToStep called! {
+  targetStep: 1,
+  currentStep: 0,
+  formDataSize: 1,
+  formDataEntries: { loanType: 'new_purchase' },
+  loanType: 'new_purchase'
+}
+🔎 About to validate step requirements...
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔍 LeadForm validation debug: {
+  step: 0,
+  requirements: {
+    requiredFields: [ 'loanType' ],
+    requiresEmail: false,
+    requiresPhone: false
+  },
+  formData: { loanType: 'new_purchase' },
+  formDataSize: 1,
+  hasRequiredFields: [
+    {
+      field: 'loanType',
+      hasField: true,
+      value: 'new_purchase',
+      valueType: 'string'
+    }
+  ]
+}
+✅ LeadForm validation passed!
+📊 Validation result: true
+ GET /apply 200 in 61ms
+🎯 LeadForm.progressToStep called! {
+  targetStep: 1,
+  currentStep: 0,
+  formDataSize: 1,
+  formDataEntries: { loanType: 'new_purchase' },
+  loanType: 'new_purchase'
+}
+🔎 About to validate step requirements...
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔍 LeadForm validation debug: {
+  step: 0,
+  requirements: {
+    requiredFields: [ 'loanType' ],
+    requiresEmail: false,
+    requiresPhone: false
+  },
+  formData: { loanType: 'new_purchase' },
+  formDataSize: 1,
+  hasRequiredFields: [
+    {
+      field: 'loanType',
+      hasField: true,
+      value: 'new_purchase',
+      valueType: 'string'
+    }
+  ]
+}
+✅ LeadForm validation passed!
+📊 Validation result: true
+ GET /apply 200 in 96ms
+🎯 LeadForm.progressToStep called! {
+  targetStep: 1,
+  currentStep: 0,
+  formDataSize: 1,
+  formDataEntries: { loanType: 'new_purchase' },
+  loanType: 'new_purchase'
+}
+🔎 About to validate step requirements...
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔍 LeadForm validation debug: {
+  step: 0,
+  requirements: {
+    requiredFields: [ 'loanType' ],
+    requiresEmail: false,
+    requiresPhone: false
+  },
+  formData: { loanType: 'new_purchase' },
+  formDataSize: 1,
+  hasRequiredFields: [
+    {
+      field: 'loanType',
+      hasField: true,
+      value: 'new_purchase',
+      valueType: 'string'
+    }
+  ]
+}
+✅ LeadForm validation passed!
+📊 Validation result: true
+ GET /apply 200 in 87ms
+ ✓ Compiled in 4s (974 modules)
+ ✓ Compiled in 2.2s (974 modules)
+ ✓ Compiled in 817ms (475 modules)
+ ○ Compiling /api/health ...
+ ✓ Compiled /api/health in 1225ms (529 modules)
+ GET /api/health 200 in 1535ms
+ ○ Compiling /api/admin/migration-status ...
+ ✓ Compiled /api/admin/migration-status in 3s (1009 modules)
+✅ Redis configuration loaded: {
+  host: 'maglev.proxy.rlwy.net',
+  port: 29926,
+  tls: false,
+  env: 'development'
+}
+ GET /api/admin/migration-status 200 in 3905ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 3.2s (1007 modules)
+ GET /api/health 404 in 3612ms
+ ○ Compiling /api/worker/start ...
+ ✓ Compiled /api/worker/start in 519ms (1008 modules)
+ GET /api/worker/start 200 in 665ms
+🚀 Manual worker initialization requested...
+🚀 Initializing BullMQ worker...
+✅ Message tracking utility initialized: {
+  fingerprintTTL: '600s',
+  botCacheTTL: '900s',
+  cleanupInterval: '300s',
+  maxMessagesPerConv: 10,
+  maxMessageIds: 20
+}
+✅ Redis configuration loaded: {
+  host: 'maglev.proxy.rlwy.net',
+  port: 29926,
+  tls: false,
+  env: 'development'
+}
+🚀 BullMQ worker initialized and ready to process jobs
+   Concurrency: 3
+   Rate limit: 10/second
+   Environment: development
+✅ BullMQ worker initialized successfully
+   Concurrency: 3
+   Rate limit: 10/second
+   Environment: development
+ POST /api/worker/start 200 in 897ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/migration-status/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/migration-status/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/migration-status/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+ ✓ Compiled in 1886ms (974 modules)
+ ○ Compiling /api/health ...
+ ✓ Compiled /api/health in 943ms (1005 modules)
+🚀 Initializing BullMQ worker...
+✅ Message tracking utility initialized: {
+  fingerprintTTL: '600s',
+  botCacheTTL: '900s',
+  cleanupInterval: '300s',
+  maxMessagesPerConv: 10,
+  maxMessageIds: 20
+}
+✅ Redis configuration loaded: {
+  host: 'maglev.proxy.rlwy.net',
+  port: 29926,
+  tls: false,
+  env: 'development'
+}
+🚀 BullMQ worker initialized and ready to process jobs
+   Concurrency: 3
+   Rate limit: 10/second
+   Environment: development
+✅ BullMQ worker initialized successfully
+   Concurrency: 3
+   Rate limit: 10/second
+   Environment: development
+ GET /api/health 200 in 2053ms
+✅ Worker already initialized
+ GET /api/health 200 in 35ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/worker/start/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/worker/start/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/worker/start/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/migration-status/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/migration-status/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/migration-status/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1169ms (1469 modules)
+ ⨯ Error: Invariant: missing bootstrap script. This is a bug in Next.js
+    at rR (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:39:2277)
+    at C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:39:25591
+    at C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\lib\trace\tracer.js:191:62
+    at C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:36:24)
+    at C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\lib\trace\tracer.js:122:103
+    at NoopContextManager.with (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:25:19)
+    at ContextAPI.with (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NextTracerImpl.trace (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\lib\trace\tracer.js:122:28)
+    at C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\lib\trace\tracer.js:191:31
+    at r3 (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\next-server\app-page.runtime.dev.js:41:1678)
+    at async doRender (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\base-server.js:1427:30)
+    at async cacheEntry.responseCache.get.routeKind (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\base-server.js:1588:28)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 3.4s (1695 modules)
+ GET /api/health 500 in 8138ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/worker/start/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/worker/start/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/worker/start/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-app-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-app-loader.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\bundle5.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\bundle5.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\webpack.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\webpack.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\plugins\define-env-plugin.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\plugins\define-env-plugin.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\swc\index.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\swc\index.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/migration-status/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/migration-status/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/migration-status/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-app-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-app-loader.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\loader-runner\LoaderRunner.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\bundle5.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\bundle5.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\webpack.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\compiled\webpack\webpack.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\plugins\define-env-plugin.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\plugins\define-env-plugin.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\swc\index.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\swc\index.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+ GET /api/health 404 in 359ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/worker/start/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/worker/start/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/worker/start/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/migration-status/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/migration-status/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/migration-status/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/worker/start/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/worker/start/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/worker/start/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/migration-status/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/migration-status/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/migration-status/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+   Reload env: .env.local
+ ✓ Compiled in 2.2s (1199 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/worker/start/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/worker/start/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/worker/start/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/migration-status/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/migration-status/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/migration-status/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\handle-externals.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/worker/start/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/worker/start/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/worker/start/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\worker\start\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/migration-status/route' in C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/migration-status/route' in 'C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/migration-status/route (expected C:\Users\HomePC\Desktop\Code\NextNest\.next\server\app\api\admin\migration-status\route.js)
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\require.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\utils.js
+<w>  at file dependencies C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs C:\Users\HomePC\Desktop\Code\NextNest\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
