@@ -14,7 +14,7 @@ const customJestConfig = {
   },
   // Transform ESM modules (BullMQ, msgpackr, etc.)
   transformIgnorePatterns: [
-    'node_modules/(?!(bullmq|msgpackr|ioredis)/)',
+    'node_modules/(?!(bullmq|msgpackr|ioredis|get-port|uuid|cron-parser|@msgpack)/)',
   ],
 };
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import {
   checkHealthAndAlert,
   logAlerts,
+  sendAlertNotification,
   formatAlertSummary,
   DEFAULT_THRESHOLDS,
   type AlertThresholds,
@@ -29,8 +30,19 @@ export async function GET(request: Request) {
     // Check health and generate alerts
     const alerts = await checkHealthAndAlert(DEFAULT_THRESHOLDS);
 
-    // Log alerts to console (visible in Railway logs)
-    logAlerts(alerts);
+    // Enhanced logging for Railway dashboard visibility
+    alerts.forEach(alert => {
+      const emoji = alert.severity === 'critical' ? '🚨' : '⚠️';
+      console.log(`${emoji} [${alert.severity.toUpperCase()}] ${alert.message}`);
+      if (alert.details) {
+        console.log(`   Details: ${alert.details}`);
+      }
+    });
+
+    // Send Slack notifications for critical alerts
+    if (alerts.some(a => a.severity === 'critical')) {
+      await sendAlertNotification(alerts);
+    }
 
     // If check-only mode, just return summary
     if (checkOnly) {
@@ -38,6 +50,7 @@ export async function GET(request: Request) {
         timestamp: new Date().toISOString(),
         status: alerts.length === 0 ? 'healthy' : 'alerts_detected',
         alertCount: alerts.length,
+        criticalCount: alerts.filter(a => a.severity === 'critical').length,
       });
     }
 
@@ -83,7 +96,19 @@ export async function POST(request: Request) {
     // Check with custom thresholds
     const alerts = await checkHealthAndAlert(thresholds);
 
-    logAlerts(alerts);
+    // Enhanced logging
+    alerts.forEach(alert => {
+      const emoji = alert.severity === 'critical' ? '🚨' : '⚠️';
+      console.log(`${emoji} [${alert.severity.toUpperCase()}] ${alert.message}`);
+      if (alert.details) {
+        console.log(`   Details: ${alert.details}`);
+      }
+    });
+
+    // Send Slack notifications for critical alerts
+    if (alerts.some(a => a.severity === 'critical')) {
+      await sendAlertNotification(alerts);
+    }
 
     const summary = formatAlertSummary(alerts);
 

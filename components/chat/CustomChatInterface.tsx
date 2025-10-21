@@ -405,7 +405,7 @@ export default function CustomChatInterface({
     <div className="flex flex-col h-full w-full">
 
       {/* Messages Area - 75% of height */}
-      <div className="overflow-y-auto px-4 py-3 space-y-2 bg-white" style={{ height: '75%' }}>
+      <div data-testid="messages-container" className="overflow-y-auto px-4 py-3 space-y-2 bg-white" style={{ height: '75%' }}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="w-16 h-1 bg-fog overflow-hidden">
@@ -451,6 +451,7 @@ export default function CustomChatInterface({
             return (
               <div
                 key={message.id}
+                data-testid="message-item"
                 className={cn(
                   'flex gap-3',
                   isUser ? 'justify-end' : 'justify-start'
@@ -511,7 +512,7 @@ export default function CustomChatInterface({
         )}
         
         {isAgentTyping && (
-          <div className="flex gap-3 justify-start">
+          <div data-testid="typing-indicator" className="flex gap-3 justify-start">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-mist border border-fog flex items-center justify-center">
                 <Bot className="w-4 h-4 text-graphite" />
@@ -536,7 +537,7 @@ export default function CustomChatInterface({
 
       {/* Error Message */}
       {error && (
-        <div className="px-6 py-3 bg-ruby/10 border-t border-ruby/30">
+        <div data-testid="error-state" className="px-6 py-3 bg-ruby/10 border-t border-ruby/30">
           <p className="text-sm text-ruby">{error}</p>
         </div>
       )}
@@ -553,6 +554,7 @@ export default function CustomChatInterface({
             className="flex gap-2"
           >
             <input
+              data-testid="message-input"
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
@@ -561,6 +563,7 @@ export default function CustomChatInterface({
               disabled={isSending}
             />
             <button
+              data-testid="send-button"
               type="submit"
               disabled={!inputMessage.trim() || isSending}
               className="h-10 px-4 bg-gold hover:bg-gold-dark text-ink text-sm font-medium transition-colors disabled:opacity-50"
@@ -574,25 +577,25 @@ export default function CustomChatInterface({
           </form>
 
           {/* Subtle Quick Actions - Floating Text */}
-          <div className="flex items-center gap-3 mt-1">
-            <span className="text-xs text-silver">Quick:</span>
+          <div data-testid="quick-actions" className="flex items-center gap-3 mt-1 overflow-x-auto">
+            <span className="text-xs text-silver flex-shrink-0">Quick:</span>
             <button
               onClick={() => setInputMessage('What are current market rates?')}
-              className="text-xs text-graphite hover:text-gold transition-colors"
+              className="text-xs text-graphite hover:text-gold transition-colors flex-shrink-0"
             >
               Current rates
             </button>
-            <span className="text-xs text-silver">•</span>
+            <span className="text-xs text-silver flex-shrink-0">•</span>
             <button
               onClick={() => setInputMessage('When is the best time to refinance?')}
-              className="text-xs text-graphite hover:text-gold transition-colors"
+              className="text-xs text-graphite hover:text-gold transition-colors flex-shrink-0"
             >
               Best time
             </button>
-            <span className="text-xs text-silver">•</span>
+            <span className="text-xs text-silver flex-shrink-0">•</span>
             <button
               onClick={() => setInputMessage('Calculate my potential savings')}
-              className="text-xs text-graphite hover:text-gold transition-colors"
+              className="text-xs text-graphite hover:text-gold transition-colors flex-shrink-0"
             >
               Calculate savings
             </button>

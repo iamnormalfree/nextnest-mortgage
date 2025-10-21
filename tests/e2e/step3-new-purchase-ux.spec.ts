@@ -27,9 +27,9 @@ test.describe('Step 3 New Purchase UX Testing', () => {
   });
 
   test.afterAll(async () => {
-    console.log('
+    console.log(`
 ========== UX ISSUES REPORT ==========
-');
+`);
     console.log(`Total Issues Found: ${uxIssues.length}
 `);
     
@@ -51,15 +51,35 @@ test.describe('Step 3 New Purchase UX Testing', () => {
 
   test('Income fields validation', async ({ page }) => {
     // Step 1
-    await page.fill('input[name="contactName"]', 'John Doe');
-    await page.fill('input[name="contactEmail"]', 'john@example.com');
-    await page.fill('input[name="contactPhone"]', '91234567');
-    await page.click('button:has-text("Next")');
+    const nameInput = page.locator('input#full-name');
+    await nameInput.fill('John Doe');
+    await nameInput.blur();
+
+    const emailInput = page.locator('input#email');
+    await emailInput.fill('john@example.com');
+    await emailInput.blur();
+
+    const phoneInput = page.locator('input#phone');
+    await phoneInput.fill('91234567');
+    await phoneInput.blur();
+
+    const stepOneCta = page.locator('button:has-text("Continue to property details")');
+    await expect(stepOneCta).toBeEnabled({ timeout: 5000 });
+    await stepOneCta.click();
     await page.waitForTimeout(1000);
     
     // Step 2
-    await page.fill('input[name="priceRange"]', '1000000');
-    await page.click('button:has-text("Next")');
+    const priceInput = page.locator('input[name="priceRange"]');
+    await priceInput.fill('1000000');
+    await priceInput.blur();
+
+    const ageInput = page.locator('input#combined-age');
+    await ageInput.fill('35');
+    await ageInput.blur();
+
+    const stepTwoCta = page.locator('button:has-text("Get instant loan estimate")');
+    await expect(stepTwoCta).toBeEnabled({ timeout: 5000 });
+    await stepTwoCta.click();
     await page.waitForTimeout(1000);
     
     // Step 3 - Income testing

@@ -318,3 +318,6 @@ export async function streamBrokerResponse(
     temperature: 0.7,
   });
 }
+
+// Export for Task 2.3 (Persona Validation)
+export { createSystemPromptFromPersona };

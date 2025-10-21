@@ -26,7 +26,7 @@ export default function TestChatInterfacePage() {
       <div className="mb-4 p-4 bg-white rounded-lg shadow">
         <h1 className="text-xl font-bold mb-4">CustomChatInterface Test</h1>
 
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-4">
           <button
             onClick={() => setViewport('mobile-320')}
             className={`px-4 py-2 rounded ${viewport === 'mobile-320' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}

@@ -1696,7 +1696,188 @@ curl https://your-domain.com/api/admin/migration-status | jq '.health.status'
 curl https://your-domain.com/api/worker/start | jq '.worker'
 ```
 
-#### 4.2.3 Railway Logging Dashboard
+#### 4.2.3 Automated Alert System
+
+**Overview:**
+
+NextNest AI Broker uses a hybrid alerting system (PATH C approach):
+- **All alerts**: Console logs (visible in Railway dashboard)
+- **Critical alerts**: Slack notifications (if webhook configured)
+
+**Alert Severity Levels:**
+
+| Severity | Condition | Delivery |
+|----------|-----------|----------|
+| Critical | Worker crash, >10 failed jobs | Slack + Logs |
+| Warning | Queue lag >100, response time >5s | Logs only |
+
+**Automated Monitoring with Railway Cron:**
+
+Railway Cron automatically calls the alert endpoint every 5 minutes:
+- **Schedule**: `*/5 * * * *` (every 5 minutes)
+- **Command**: `curl https://nextnest-production.up.railway.app/api/monitoring/alerts`
+- **Logs**: Visible in Railway dashboard
+
+**Configuration Steps:**
+1. Open Railway Dashboard → Your Service → Cron Jobs
+2. Add new cron job
+3. Schedule: `*/5 * * * *`
+4. Command: `curl https://nextnest-production.up.railway.app/api/monitoring/alerts`
+5. Save
+
+**CLI Commands:**
+
+```bash
+# Local development
+npm run monitor:alerts   # Check alerts
+npm run monitor:health   # Health status
+npm run monitor:queue    # Queue metrics
+
+# Production
+npm run monitor:alerts:prod
+```
+
+**Expected Output:**
+
+```json
+{
+  "timestamp": "2025-10-21T07:30:10.905Z",
+  "status": "alerts_detected",
+  "summary": {
+    "total": 2,
+    "critical": 1,
+    "warning": 1,
+    "categories": {
+      "worker": 1,
+      "queue": 1
+    }
+  },
+  "alerts": [
+    {
+      "severity": "critical",
+      "category": "worker",
+      "message": "Worker not running",
+      "details": "Jobs will not be processed",
+      "timestamp": "2025-10-21T07:30:10.905Z"
+    }
+  ]
+}
+```
+
+**Alert Thresholds (Default):**
+
+From `lib/monitoring/alert-service.ts`:
+
+```typescript
+{
+  maxFailedJobs: 10,       // Critical if >10 failed jobs
+  maxWaitingJobs: 50,      // Warning if >50 queued
+  maxActiveJobs: 20,       // Warning if >20 processing
+  minHealthScore: 70,      // Warning if health <70%
+  maxAvgProcessingTime: 15000,  // Warning if avg >15s
+  maxAIResponseTime: 8000, // Warning if AI >8s
+  minThroughput: 5,        // Warning if <5 jobs/min
+  workerDownTime: 5        // Critical if worker down >5 min
+}
+```
+
+**Tuning Thresholds:**
+
+1. Edit `lib/monitoring/alert-service.ts`
+2. Adjust `DEFAULT_THRESHOLDS` values
+3. Redeploy application
+4. Monitor for false positives (1 week)
+5. Iterate as needed
+
+**Slack Integration Setup (Optional):**
+
+**One-Time Configuration:**
+
+1. **Create Slack App**:
+   - Go to https://api.slack.com/apps
+   - Click "Create New App" → "From scratch"
+   - Name: "NextNest Alerts"
+   - Workspace: Your team workspace
+
+2. **Enable Incoming Webhooks**:
+   - In app settings, go to "Incoming Webhooks"
+   - Toggle "Activate Incoming Webhooks" to On
+   - Click "Add New Webhook to Workspace"
+   - Select channel: #nextnest-alerts (or create it)
+   - Copy webhook URL
+
+3. **Configure Railway Environment**:
+   - Railway Dashboard → Variables
+   - Add: `SLACK_ALERT_WEBHOOK_URL` = [webhook URL]
+   - Redeploy application
+
+4. **Test Integration**:
+   ```bash
+   # Manually trigger alert check
+   curl https://nextnest-production.up.railway.app/api/monitoring/alerts
+   # If critical alerts exist, Slack notification sent
+   ```
+
+**Graceful Fallback:**
+- If `SLACK_ALERT_WEBHOOK_URL` not set → Console logging only
+- If Slack API fails → Error logged, doesn't block alert system
+- No webhook = no production blocker
+
+**Alert Response Procedures:**
+
+**Critical: Worker Not Running**
+
+**Symptoms**: Slack alert "Worker not running"
+
+**Diagnosis**:
+1. Check Railway deployment: `https://railway.app/project/nextnest`
+2. Verify environment: `BULL_WORKER_ENABLED=true`
+3. Check logs for startup errors
+
+**Resolution**:
+1. Restart worker: `POST /api/worker/start`
+2. If fails: Check Redis connection (`REDIS_URL`)
+3. If persists: Redeploy from main branch
+4. Verify fix: `GET /api/worker/start` should show `running: true`
+
+**Escalation**: If restart fails, check Redis health in Railway metrics
+
+**Critical: High Failure Rate (>10 Failed Jobs)**
+
+**Symptoms**: Slack alert "High failure rate: X failed jobs"
+
+**Diagnosis**:
+1. Check queue status: `npm run monitor:queue`
+2. Review error logs: Railway Dashboard → Search "Job failed"
+3. Identify error pattern (Supabase timeout? API error?)
+
+**Resolution**:
+- **If Supabase timeout**: Check connection pool (Railway metrics)
+- **If OpenAI API error**: Verify `OPENAI_API_KEY`, check rate limits
+- **If Chatwoot error**: Verify `CHATWOOT_API_TOKEN`, check Chatwoot status
+- **If unknown**: Manually retry failed jobs: `POST /api/admin/retry-failed`
+
+**Escalation**: If >50% job failure rate, pause queue, investigate
+
+**Warning: Queue Lag >100 Jobs**
+
+**Symptoms**: Console log "Queue backup: X jobs waiting"
+
+**Diagnosis**:
+1. Check Chatwoot dashboard: Traffic spike?
+2. Check worker concurrency: `WORKER_CONCURRENCY` setting
+3. Review recent chat volume
+
+**Resolution**:
+1. If traffic spike: Scale worker concurrency (Railway)
+2. If sustained: Add worker replicas in Railway
+3. Monitor for 30 minutes
+4. If worsening: Escalate to critical
+
+**Escalation**: If lag grows >200, critical alert
+
+
+#### 4.2.4 Railway Logging Dashboard
 
 **Important Log Patterns to Watch:**
 
@@ -1739,7 +1920,7 @@ Search: "BullMQ" OR "queue"
 Search: "worker" OR "Worker"
 ```
 
-#### 4.2.4 Alert Configuration
+#### 4.2.5 Alert Configuration
 
 **Recommended Alerts (Railway):**
 
@@ -1774,7 +1955,7 @@ Search: "worker" OR "Worker"
    - Check: `curl /api/admin/migration-status | jq '.health.score' < 70`
    - Action: Review health issues array
 
-#### 4.2.5 Monitoring Dashboard Setup
+#### 4.2.6 Monitoring Dashboard Setup
 
 **Option 1: Railway Built-in Monitoring**
 - Navigate to: Railway → Your Service → Metrics
@@ -1810,7 +1991,7 @@ Search: "worker" OR "Worker"
 
 **Data Source:** Poll `/api/admin/migration-status` every 30s
 
-#### 4.2.6 Log Retention & Debugging
+#### 4.2.7 Log Retention & Debugging
 
 **Railway Logs:**
 - Retention: Last 7 days (Railway free tier)
@@ -1852,7 +2033,7 @@ curl -H "Authorization: Bearer $OPENAI_API_KEY" \
 # Should return: "list"
 ```
 
-#### 4.2.7 Guardrails & Safety Limits
+#### 4.2.8 Guardrails & Safety Limits
 
 **Rate Limiting:**
 - Worker concurrency: 3 (configurable via `WORKER_CONCURRENCY`)
@@ -1874,7 +2055,7 @@ curl -H "Authorization: Bearer $OPENAI_API_KEY" \
 - Worker auto-restarts on health check failure (after 3 consecutive failures)
 - Ensures worker stays operational 24/7
 
-#### 4.2.8 Production Readiness Checklist
+#### 4.2.9 Production Readiness Checklist
 
 **Before Going Live:**
 - [ ] Worker auto-starts verified (health endpoint test)

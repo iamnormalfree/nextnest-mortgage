@@ -3,6 +3,9 @@
 ## Task List
 
 - [ ] Maintain this journal as the working task log until an official TodoWrite tool is available.
+- [x] **Playwright Mobile/Desktop QA Enhancement** - Complete (2025-10-21): Enhanced chat-playwright-test page with polling (3s interval), localStorage persistence, and error handling. Test pass rate improved from 20/35 (57%) to 34/35 (97%). Remaining 1 failure is pre-existing horizontal overflow issue on /test-chat-interface page.
+- [x] **BullMQ Integration Testing with Vitest** - Complete (2025-10-21): Migrated from ioredis-mock to redis-memory-server, resolved cmsgpack Lua script issues, wired real queue helpers (queueIncomingMessage, queueNewConversation) for authentic code path testing, all 9 integration tests passing
+- [x] **AI Broker Phase 2 Remediation** - Complete (2025-10-21): 4 tasks delivered, 11 persona tests passing, 80% QA pass rate, Slack alerting + CLI + comprehensive docs (see completion report)
 - [x] Archive completed plans to docs/plans/archive/2025/10/ (2025-10-20)
 - [x] Compare `dr-elena-mortgage-expert-v2.json` with `dr-elena-mortgage-expert.json` for Singapore mortgage accuracy.
 - [ ] Revalidate `dr-elena` JSON conclusions with current MAS/HDB/SLA guidance now that network access is available.
@@ -1052,4 +1055,39 @@ npx tsx scripts/test-bullmq-incoming-message.ts
 - Railway deployment: Ensure worker auto-starts (add to health check or startup script)
 
 ---
+
+
+## 2025-10-21: Task 2.3 - Persona Validation & PII Assessment
+
+### Automated Persona Tests Created
+- Created `tests/ai/persona-prompt-validation.test.ts` with 11 tests
+- All tests passing (100% coverage of prompt structure)
+- Validates tone keywords for all 3 persona types
+- Validates compliance guardrails in all prompts
+- Validates lead data context injection
+- Validates Singapore market terminology
+
+### PII in AI Prompts - Accepted Risk (Test Environment)
+**Status**: Accepted Risk (Test Environment)  
+**Severity**: Low (current), Medium (if logging added)  
+**Location**: `lib/ai/broker-ai-service.ts` lines 210-218
+
+**Details**:
+- Customer PII (name, income, property price) included in OpenAI system prompts
+- Prompts sent over HTTPS to OpenAI API (encrypted in transit)
+- OpenAI data usage: should verify `store: false` setting
+- NO prompt logging currently enabled (no PII in logs)
+
+**Mitigation Plan**:
+- Test environment uses synthetic data only (current state)
+- Before production: Verify OpenAI `store: false` setting
+- Before adding logging: Implement PII redaction helper (Task 2.4)
+- Document in privacy policy: "AI uses your data to generate responses"
+
+**Tracking**:
+- Task 2.4 (Observability): Add logging with PII redaction
+- Backlog: Token-based customer references (architectural change)
+
+### Technical Fixes
+- Added TransformStream polyfill to `jest.setup.ts` for AI SDK compatibility
 

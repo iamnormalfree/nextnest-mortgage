@@ -42,6 +42,7 @@ export interface Alert {
   threshold: number | boolean;
   timestamp: Date;
   resolved: boolean;
+  details?: string;
 }
 
 interface SystemMetrics {
@@ -81,7 +82,8 @@ export async function checkHealthAndAlert(
         alerts.push({
           severity: 'critical',
           category: 'queue',
-          message: `High failure rate detected: ${queueMetrics.failed} failed jobs exceeds threshold of ${thresholds.maxFailedJobs}`,
+          message: `High failure rate: ${queueMetrics.failed} failed jobs`,
+          details: `Threshold: ${thresholds.maxFailedJobs} jobs`,
           metric: 'failed_jobs',
           value: queueMetrics.failed,
           threshold: thresholds.maxFailedJobs,
@@ -106,7 +108,8 @@ export async function checkHealthAndAlert(
         alerts.push({
           severity: 'critical',
           category: 'queue',
-          message: `Queue backup detected: ${queueMetrics.waiting} jobs waiting exceeds threshold of ${thresholds.maxWaitingJobs}`,
+          message: `Queue backup: ${queueMetrics.waiting} jobs waiting`,
+          details: `Threshold: ${thresholds.maxWaitingJobs} jobs`,
           metric: 'waiting_jobs',
           value: queueMetrics.waiting,
           threshold: thresholds.maxWaitingJobs,
@@ -147,7 +150,8 @@ export async function checkHealthAndAlert(
         alerts.push({
           severity: 'critical',
           category: 'worker',
-          message: 'Worker not initialized - jobs will not be processed',
+          message: 'Worker not initialized',
+          details: 'Jobs will not be processed',
           metric: 'worker_initialized',
           value: false,
           threshold: true,
@@ -158,7 +162,8 @@ export async function checkHealthAndAlert(
         alerts.push({
           severity: 'critical',
           category: 'worker',
-          message: 'Worker not running - jobs will not be processed',
+          message: 'Worker not running',
+          details: 'Jobs will not be processed',
           metric: 'worker_running',
           value: false,
           threshold: true,
@@ -174,7 +179,8 @@ export async function checkHealthAndAlert(
       alerts.push({
         severity,
         category: 'system',
-        message: `System health score (${healthScore}) below threshold of ${thresholds.minHealthScore}`,
+        message: `System health score: ${healthScore}`,
+        details: `Below threshold of ${thresholds.minHealthScore}`,
         metric: 'health_score',
         value: healthScore,
         threshold: thresholds.minHealthScore,
@@ -254,18 +260,86 @@ export function logAlerts(alerts: Alert[]): void {
 }
 
 /**
- * Send alert notification (extend this for email/Slack/etc.)
+ * Send critical alerts to Slack webhook
+ * Gracefully degrades to console logging if webhook not configured
  */
-export async function sendAlertNotification(alert: Alert): Promise<void> {
-  // TODO: Implement notification delivery
-  // Options:
-  // 1. Email via SendGrid/AWS SES
-  // 2. Slack webhook
-  // 3. PagerDuty/OpsGenie
-  // 4. SMS via Twilio
-  // 5. Discord webhook
-
-  console.log(`📬 Alert notification (not implemented): ${alert.message}`);
+export async function sendAlertNotification(alerts: Alert[]): Promise<void> {
+  const webhookUrl = process.env.SLACK_ALERT_WEBHOOK_URL;
+  
+  // Only send Slack notifications for critical alerts
+  const criticalAlerts = alerts.filter(a => a.severity === 'critical');
+  
+  if (criticalAlerts.length === 0) {
+    console.log('No critical alerts, skipping Slack notification');
+    return;
+  }
+  
+  if (!webhookUrl) {
+    console.warn('SLACK_ALERT_WEBHOOK_URL not configured, critical alerts logged only');
+    return;
+  }
+  
+  const message = {
+    text: `🚨 *${criticalAlerts.length} Critical Alert(s)*`,
+    blocks: [
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: `🚨 NextNest AI Broker Critical Alert`
+        }
+      },
+      ...criticalAlerts.map(alert => ({
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*${alert.message}*
+${alert.details || ''}`
+        }
+      })),
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `Detected at ${new Date().toISOString()}`
+          }
+        ]
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'View Logs' },
+            url: 'https://railway.app/project/nextnest/logs',
+            style: 'danger'
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Check Queue' },
+            url: (process.env.NEXT_PUBLIC_URL || 'http://localhost:3000') + '/api/admin/migration-status'
+          }
+        ]
+      }
+    ]
+  };
+  
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(message)
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to send Slack notification:', await response.text());
+    } else {
+      console.log(`✅ Sent ${criticalAlerts.length} critical alerts to Slack`);
+    }
+  } catch (error) {
+    console.error('Error sending Slack notification:', error);
+  }
 }
 
 /**

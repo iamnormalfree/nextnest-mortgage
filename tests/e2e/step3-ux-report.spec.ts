@@ -1,6 +1,6 @@
 // ABOUTME: Comprehensive E2E UX testing for Step 3 New Purchase flow
 
-import { test, Page } from '@playwright/test';
+import { test, Page, expect } from '@playwright/test';
 
 interface UXIssue {
   issue: string;
@@ -19,14 +19,34 @@ async function navigateToStep3(page: Page) {
   await page.goto('/apply?loanType=new_purchase');
   await page.waitForLoadState('networkidle');
   
-  await page.fill('input[name="contactName"]', 'Test User');
-  await page.fill('input[name="contactEmail"]', 'test@example.com');
-  await page.fill('input[name="contactPhone"]', '91234567');
-  await page.click('button:has-text("Next")');
+  const nameInput = page.locator('input#full-name');
+  await nameInput.fill('Test User');
+  await nameInput.blur();
+
+  const emailInput = page.locator('input#email');
+  await emailInput.fill('test@example.com');
+  await emailInput.blur();
+
+  const phoneInput = page.locator('input#phone');
+  await phoneInput.fill('91234567');
+  await phoneInput.blur();
+
+  const stepOneCta = page.locator('button:has-text("Continue to property details")');
+  await expect(stepOneCta).toBeEnabled({ timeout: 5000 });
+  await stepOneCta.click();
   await page.waitForTimeout(1000);
   
-  await page.fill('input[name="priceRange"]', '1000000');
-  await page.click('button:has-text("Next")');
+  const priceInput = page.locator('input[name="priceRange"]');
+  await priceInput.fill('1000000');
+  await priceInput.blur();
+
+  const ageInput = page.locator('input#combined-age');
+  await ageInput.fill('35');
+  await ageInput.blur();
+
+  const stepTwoCta = page.locator('button:has-text("Get instant loan estimate")');
+  await expect(stepTwoCta).toBeEnabled({ timeout: 5000 });
+  await stepTwoCta.click();
   await page.waitForTimeout(1000);
 }
 

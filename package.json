@@ -13,8 +13,14 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:integration": "vitest run tests/integration",
+    "test:integration:watch": "vitest tests/integration",
     "lint:brand": "node scripts/brand-lint.js",
-    "lint:all": "npm run lint && npm run lint:brand"
+    "lint:all": "npm run lint && npm run lint:brand",
+    "monitor:alerts": "curl http://localhost:3000/api/monitoring/alerts",
+    "monitor:alerts:prod": "curl https://nextnest-production.up.railway.app/api/monitoring/alerts",
+    "monitor:health": "curl http://localhost:3000/api/health",
+    "monitor:queue": "curl http://localhost:3000/api/admin/migration-status"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.27",
@@ -57,11 +63,15 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
+    "@vitest/ui": "^3.2.4",
     "dotenv": "^17.2.3",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.0.4",
+    "ioredis-mock": "^8.13.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
-    "playwright": "^1.56.1"
+    "playwright": "^1.56.1",
+    "redis-memory-server": "^0.13.0",
+    "vitest": "^3.2.4"
   }
 }

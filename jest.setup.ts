@@ -30,3 +30,9 @@ if (typeof window !== 'undefined' && !('ResizeObserver' in window)) {
   (window as any).ResizeObserver = ResizeObserverStub;
   ;(global as any).ResizeObserver = ResizeObserverStub;
 }
+
+// Polyfill for TransformStream (required by AI SDK)
+if (typeof global.TransformStream === 'undefined') {
+  const { TransformStream } = require('stream/web');
+  global.TransformStream = TransformStream;
+}
