@@ -167,18 +167,13 @@ outcome: success
 
 ---
 
-## Phase 3: Rollout & Monitoring
+## Phase 3: Rollout & Monitoring (Pending Execution)
 
-### Task 3.1: Staged Rollout Plan Finalized
-- Added staged rollout playbook to `docs/runbooks/AI_BROKER_COMPLETE_GUIDE.md` detailing traffic targets (10% -> 50% -> 100%), gating metrics, and a four-step rollback sequence.
-- Defined SLA tripwires: response P95 >5 s, failed job rate >=2%, duplicated replies trigger immediate rollback and stakeholder notification.
+### Task 3.1: Staged Rollout Plan
+- Playbook documented in `docs/runbooks/AI_BROKER_COMPLETE_GUIDE.md`, but the staged rollout itself has **not** been executed. Environment variables remain at the pre-existing 100% configuration and no stakeholder notifications have been sent.
 
 ### Task 3.2: Production Verification Checklist
-- Documented smoke test expectations for desktop and mobile chat sessions (SLA, transcript parity, persona visuals).
-- Logged Chatwoot inbox confirmations (persona naming, handoff integrity) and reliability checks (`/api/admin/migration-status`, worker health endpoint, Slack alert posture).
-- Noted that execution must occur in production/staging due to sandbox limitations; flagged for on-call follow-through.
+- Smoke chats, persistence checks, and Chatwoot inbox validation are still outstanding. Access constraints prevented exercising `/api/admin/migration-status` or worker health endpoints in staging/production during this session.
 
 ### Task 3.3: Launch Documentation & Handoff
-- Updated customer-facing messaging in `docs/runbooks/brand/messaging.md` to set chat response expectations and outline immediate human escalation language.
-- Captured post-launch monitoring instructions and communication touchpoints (Slack channels, calendar reminder) in the runbook.
-- Recorded action item for operations lead to schedule the 48 h rollout review once full cutover timing is confirmed.
+- Messaging updates are ready for use, but operational handoff (calendar invite, ownership acknowledgment) is still open. A follow-up run is required once rollout execution is scheduled.
