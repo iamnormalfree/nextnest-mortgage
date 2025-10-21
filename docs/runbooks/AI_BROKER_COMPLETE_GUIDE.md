@@ -1345,6 +1345,45 @@ ENABLE_AI_BROKER=true
 ```
 Redeploy and monitor health status.
 
+#### Staged Rollout Playbook
+
+| Stage | Traffic Target | Preconditions | Actions | Observability |
+| --- | --- | --- | --- | --- |
+| Validation | 10% of conversations | Phase 2 tests green, worker stable for 24 h, queue depth <10 | Keep `ENABLE_AI_BROKER=true`, set `BULLMQ_ROLLOUT_PERCENTAGE=10`, announce validation window in #ai-broker | `/api/admin/migration-status`, Redis `waiting` + `failed` counts, worker logs |
+| Ramp | 50% of conversations | Failed jobs <1%, P95 response <5 s, customer satisfaction >=4.3 | Update `BULLMQ_ROLLOUT_PERCENTAGE=50`, pin health metrics in #ai-broker, run hourly spot checks | Migration API, `monitor:queue`, Chatwoot transcript review, Lighthouse synthetic |
+| Full Cutover | 100% of conversations | Stable ramp for 72 h, leadership sign-off, fallback confirmed | Set `ENABLE_AI_BROKER=false`, set `BULLMQ_ROLLOUT_PERCENTAGE=100`, redeploy worker, post update in release notes | Synthetic chat script, worker health endpoint, Slack alert noise |
+
+**Rollback trigger:** Any stage breaching SLA (response P95 >5 s, failed job rate >=2%, duplicated replies) requires reverting to previous percentage and notifying stakeholders within 15 minutes.
+
+**How to revert quickly:**
+1. Restore prior `BULLMQ_ROLLOUT_PERCENTAGE`.
+2. Toggle `ENABLE_AI_BROKER=true`.
+3. Redeploy worker service.
+4. Confirm n8n path processes live messages before resuming traffic.
+
+#### Production Verification Checklist
+
+**Chat Experience**
+- [ ] Desktop smoke chat from homepage returns AI reply within 5 s.
+- [ ] Mobile smoke chat (320 px, 360 px, 390 px) renders identical transcript and maintains typing indicator fidelity.
+- [ ] Refreshing chat preserves conversation history and persona avatar on both devices.
+
+**Chatwoot Inbox**
+- [ ] Conversation shows broker persona name and status stays `bot` until intentional handoff.
+- [ ] Human takeover still routes correctly (send "speak to human", confirm assignment).
+- [ ] Activity log records BullMQ worker IDs for traceability.
+
+**Reliability**
+- [ ] `/api/admin/migration-status` reports `bullmqEnabled: true`, rollout percentage matches stage.
+- [ ] Worker health endpoint shows `running: true`, rate limit respected.
+- [ ] Slack alerts remain quiet or log only informational notices.
+
+#### Post-Launch Monitoring & Handoff
+
+- Create calendar reminder titled "AI Broker rollout review" for 48 h after scheduled full cutover; invite engineering, operations, and support leads.
+- Share staged rollout metrics and rollback plan with customer support via #customer-systems channel.
+- Hand off BullMQ monitoring duty roster (primary + backup) with links to `monitor:queue` and Slack alert playbook.
+
 #### Common Issues & Solutions
 
 **Issue: Worker not running**

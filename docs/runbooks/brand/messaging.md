@@ -105,6 +105,13 @@
 - **Transparency**: "See exactly how we analyze your situation"  
 - **Partnership**: "We succeed when you succeed long-term"
 
+### Live Chat Experience Messaging
+- Set expectation: "A licensed-style advisor replies in under five seconds whenever you open chat."
+- Tone guidance: confident, empathetic, ready to escalate; reference the persona name once to build trust.
+- Reliability proof: mention ongoing monitoring (P95 <5 s, transcript audits) without promising perfection.
+- Fallback clarity: "If you want a human immediately, just say 'speak to human' — no queue resets."
+- Closing reassurance: remind clients a human team supervises every AI conversation.
+
 ---
 
 ## Objection Handling Scripts

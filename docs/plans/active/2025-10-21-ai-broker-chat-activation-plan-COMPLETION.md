@@ -164,3 +164,21 @@ outcome: success
 **Regression-Free**: YES (pre-existing issues documented)
 **Monitoring**: IN PLACE (Slack + CLI + Railway guidance)
 **Documentation**: COMPREHENSIVE (runbook + validation reports)
+
+---
+
+## Phase 3: Rollout & Monitoring
+
+### Task 3.1: Staged Rollout Plan Finalized
+- Added staged rollout playbook to `docs/runbooks/AI_BROKER_COMPLETE_GUIDE.md` detailing traffic targets (10% -> 50% -> 100%), gating metrics, and a four-step rollback sequence.
+- Defined SLA tripwires: response P95 >5 s, failed job rate >=2%, duplicated replies trigger immediate rollback and stakeholder notification.
+
+### Task 3.2: Production Verification Checklist
+- Documented smoke test expectations for desktop and mobile chat sessions (SLA, transcript parity, persona visuals).
+- Logged Chatwoot inbox confirmations (persona naming, handoff integrity) and reliability checks (`/api/admin/migration-status`, worker health endpoint, Slack alert posture).
+- Noted that execution must occur in production/staging due to sandbox limitations; flagged for on-call follow-through.
+
+### Task 3.3: Launch Documentation & Handoff
+- Updated customer-facing messaging in `docs/runbooks/brand/messaging.md` to set chat response expectations and outline immediate human escalation language.
+- Captured post-launch monitoring instructions and communication touchpoints (Slack channels, calendar reminder) in the runbook.
+- Recorded action item for operations lead to schedule the 48 h rollout review once full cutover timing is confirmed.

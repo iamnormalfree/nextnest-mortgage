@@ -1091,3 +1091,20 @@ npx tsx scripts/test-bullmq-incoming-message.ts
 ### Technical Fixes
 - Added TransformStream polyfill to `jest.setup.ts` for AI SDK compatibility
 
+---
+
+## 2025-10-21: Phase 3 - Rollout & Monitoring
+
+### Staged Rollout Plan
+- Added rollout playbook table to `docs/runbooks/AI_BROKER_COMPLETE_GUIDE.md` with gating metrics for 10% → 50% → 100% traffic and explicit rollback trigger thresholds.
+- Documented four-step revert procedure to restore n8n path if SLA breaches occur.
+
+### Production Verification Checklist
+- Captured smoke-test expectations for desktop and mobile chat, conversation persistence, and Chatwoot persona validation.
+- Logged reliability checks (`/api/admin/migration-status`, worker health, Slack alerts) plus acceptance criteria for each stage.
+- Unable to exercise production endpoints from local sandbox; flagged for on-call execution during rollout window.
+
+### Launch Documentation & Handoff
+- Updated `docs/runbooks/brand/messaging.md` with approved customer-facing chat messaging (SLA promise, escalation script).
+- Added post-launch monitoring reminders and channel handoff instructions to the runbook.
+- Action item: operations lead to create calendar invite for the 48 h rollout review once cutover date is locked.
