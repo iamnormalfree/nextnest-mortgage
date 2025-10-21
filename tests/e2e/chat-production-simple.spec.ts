@@ -6,6 +6,8 @@ import { test, expect, Page } from '@playwright/test';
 test.describe('Production E2E - Manual Form, Automated Chat', () => {
 
   test('Complete form manually, then test chat', async ({ page }) => {
+    // Set long timeout for manual form completion
+    test.setTimeout(600000); // 10 minutes
     // Navigate to the site
     await page.goto('https://nextnest.sg');
 
