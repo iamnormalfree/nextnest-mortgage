@@ -28,7 +28,8 @@ async function sendMessage(page: Page, message: string) {
 test.describe('Chat UI - Critical Path Tests', () => {
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/chat-playwright-test');
+    // Use production chat page instead of dev test page
+    await page.goto('https://nextnest.sg/chat');
     await waitForChatReady(page);
   });
 
@@ -231,7 +232,8 @@ test.describe('Chat UI - Critical Path Tests', () => {
 test.describe('Chat UI - Viewport-Specific Validations', () => {
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000/test-chat-interface');
+    // Use production chat page instead of dev test page
+    await page.goto('https://nextnest.sg/chat');
     await waitForChatReady(page);
   });
 
