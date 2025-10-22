@@ -24,13 +24,35 @@ async function checkBrokerHealth() {
   // 2. Check chat health
   console.log('2️⃣  Checking chat integration health...');
   try {
-    const response = await fetch('https://nextnest.sg/api/health/chat-integration');
-    const data = await response.json();
+    const response = await fetch('https://nextnest.sg/api/health/chat-integration', {
+      headers: {
+        'User-Agent': 'NextNestBrokerHealth/1.0'
+      }
+    });
+    const rawText = await response.text();
 
-    console.log('   Status:', data.status);
-    console.log('   Broker Assignment:', data.brokerAssignment);
-    console.log('   Chatwoot:', data.chatwoot);
-    console.log('   AI Service:', data.aiService);
+    if (!response.ok) {
+      console.log(`   ❌ HTTP ${response.status} ${response.statusText}`);
+      console.log('   Response body:', rawText);
+    }
+
+    let data: any = {};
+    try {
+      data = rawText ? JSON.parse(rawText) : {};
+    } catch (parseError) {
+      console.log('   ⚠️ Failed to parse JSON response:', parseError);
+    }
+
+    console.log('   Status:', data.status ?? 'unknown');
+    console.log('   Broker Assignment:', data.brokerAssignment ?? data.summary?.brokerAssignment);
+    console.log('   Chatwoot:', data.chatwoot ?? data.summary?.chatwoot);
+    console.log('   AI Service:', data.aiService ?? data.summary?.aiService);
+
+    if (Array.isArray(data.checks)) {
+      data.checks.forEach((check: any) => {
+        console.log(`     - ${check.service}: ${check.status}${check.details ? ` (${check.details})` : ''}`);
+      });
+    }
     console.log('');
   } catch (error) {
     console.log('   ❌ Error:', error);
