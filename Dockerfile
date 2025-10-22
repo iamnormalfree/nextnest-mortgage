@@ -9,10 +9,10 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Skip redis-memory-server binary download in build image
-ENV REDIS_MEMORY_SERVER_SKIP_DOWNLOAD=1
+ENV REDISMS_DISABLE_POSTINSTALL=1
 
-# Install only production dependencies (dev deps not needed in build container)
-RUN npm ci --omit=dev && \
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci && \
     npm cache clean --force
 
 # Stage 2: Builder

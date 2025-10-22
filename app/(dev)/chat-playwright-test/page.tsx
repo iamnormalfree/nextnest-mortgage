@@ -7,18 +7,27 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 
+type ChatMessage = {
+  id: number
+  text: string
+  sender: 'bot' | 'user'
+  timestamp: Date
+}
+
+type StoredChatMessage = Omit<ChatMessage, 'timestamp'> & { timestamp: string | Date }
+
 const STORAGE_KEY = 'playwright-chat-messages'
 const POLL_INTERVAL_MS = 3000 // 3 seconds
 
 export default function PlaywrightChatTestPage() {
   // Load messages from localStorage on mount
-  const [messages, setMessages] = useState(() => {
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         try {
           const parsed = JSON.parse(stored)
-          return parsed.map((msg: any) => ({
+          return parsed.map((msg: StoredChatMessage) => ({
             ...msg,
             timestamp: new Date(msg.timestamp)
           }))
@@ -48,7 +57,7 @@ export default function PlaywrightChatTestPage() {
     const poll = () => {
       // Simulate occasional new message from "server"
       if (Math.random() > 0.9) { // 10% chance each poll
-        setMessages(prev => {
+        setMessages((prev) => {
           const lastId = Math.max(...prev.map(m => m.id), 0)
           return [...prev, {
             id: lastId + 1,
@@ -80,7 +89,7 @@ export default function PlaywrightChatTestPage() {
       sender: 'user' as const,
       timestamp: new Date()
     }
-    setMessages(prev => [...prev, userMessage])
+    setMessages((prev) => [...prev, userMessage])
     const messageText = inputValue
     setInputValue('')
 
@@ -111,7 +120,7 @@ export default function PlaywrightChatTestPage() {
         sender: 'bot' as const,
         timestamp: new Date()
       }
-      setMessages(prev => [...prev, botMessage])
+      setMessages((prev) => [...prev, botMessage])
     } catch (err) {
       setIsTyping(false)
       setError(err instanceof Error ? err.message : 'Failed to send message. Please try again.')
