@@ -68,15 +68,12 @@ class HealthMonitor {
         };
       }
 
-      const response = await fetch(
-        `${process.env.CHATWOOT_BASE_URL}/api/v1/accounts/${process.env.CHATWOOT_ACCOUNT_ID}/inboxes`,
-        {
-          headers: {
-            'api_access_token': process.env.CHATWOOT_API_TOKEN
-          },
-          signal: AbortSignal.timeout(5000)
-        }
-      );
+      const response = await fetch(`${process.env.CHATWOOT_BASE_URL}/api/v1/accounts/${process.env.CHATWOOT_ACCOUNT_ID}/inboxes`, {
+        headers: {
+          'Api-Access-Token': process.env.CHATWOOT_API_TOKEN as string
+        },
+        signal: AbortSignal.timeout(5000)
+      });
 
       const responseTime = Date.now() - start;
       
