@@ -56,7 +56,6 @@ export const mockIncomingMessageJob: Omit<BrokerConversationJob, 'timestamp'> = 
   brokerPersona: mockBrokerPersona,
   processedLeadData: mockLeadData,
   userMessage: 'How much can I borrow?',
-  messageId: 777, // Fix: Add messageId so job ID becomes 'incoming-message-999-777'
   skipGreeting: true,
 };
 
