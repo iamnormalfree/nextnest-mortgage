@@ -105,7 +105,7 @@ export default function TestChatInterfacePage() {
           </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" />
-            <span>Polling works (check console for "Fetched messages")</span>
+            <span>Polling works (check console for &quot;Fetched messages&quot;)</span>
           </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" />

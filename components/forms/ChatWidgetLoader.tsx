@@ -97,6 +97,8 @@ export default function ChatWidgetLoader({
     scriptLoadedRef.current = false
   }, [config.baseUrl])
 
+  const loadChatwootScriptRef = useRef<((cancelled: { value: boolean }) => Promise<void>) | null>(null)
+
   const handleLoadError = useCallback((error: Error) => {
     console.error('Chat widget load error:', error)
     console.error('Config being used:', {
@@ -121,7 +123,7 @@ export default function ChatWidgetLoader({
       setTimeout(() => {
         cleanup()
         const cancelled = { value: false }
-        loadChatwootScript(cancelled)
+        loadChatwootScriptRef.current?.(cancelled)
       }, retryDelay)
     } else {
       // Track failed load
@@ -135,7 +137,7 @@ export default function ChatWidgetLoader({
 
       onError(error)
     }
-  }, [config, cleanup, onError]) // loadChatwootScript will be added when it's defined
+  }, [config, cleanup, onError, maxRetries])
 
   const loadChatwootScript = useCallback(async (cancelled: { value: boolean }) => {
     try {
@@ -267,7 +269,23 @@ export default function ChatWidgetLoader({
     } catch (error) {
       handleLoadError(error as Error)
     }
-  }, [config.baseUrl, config.websiteToken, isDevelopment, autoOpen, handleWidgetReady, handleLoadError])
+  }, [
+    autoOpen,
+    config.baseUrl,
+    config.conversationId,
+    config.customAttributes,
+    config.hideMessageBubble,
+    config.locale,
+    config.position,
+    config.websiteToken,
+    handleLoadError,
+    handleWidgetReady,
+    isDevelopment
+  ])
+
+  useEffect(() => {
+    loadChatwootScriptRef.current = loadChatwootScript
+  }, [loadChatwootScript])
 
   useEffect(() => {
     // Check if widget is already loaded

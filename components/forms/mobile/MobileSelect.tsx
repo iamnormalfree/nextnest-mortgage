@@ -72,7 +72,6 @@ export function MobileSelect({
           )}
           aria-haspopup="dialog"
           aria-expanded={isOpen}
-          aria-invalid={error ? 'true' : 'false'}
         >
           <span className={cn(
             'text-base',

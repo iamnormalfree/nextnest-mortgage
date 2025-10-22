@@ -254,7 +254,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
       msrLimit: 30,
       reasons
     }
-  }, [age, propertyValue, propertyType, effectiveIncome, totalMonthlyCommitments, loanAmount, instantCalcResult])
+  }, [age, propertyValue, propertyType, effectiveIncome, totalMonthlyCommitments, loanAmount])
 
   const renderSelfEmployedPanel = () => {
     if (employmentType !== 'self-employed') return null
