@@ -47,7 +47,7 @@ User should feel: "I can borrow X, so I don't need as much cash!" (empowering) A
 
 ### Task 2: Write Failing Tests for Calculation Logic (TDD) (1h)
 
-**Test file**: `tests/components/Step3NewPurchase.test.tsx`
+**Test file**: `tests/components/ProgressiveFormCalculation.test.tsx`
 
 Write tests FIRST (should fail initially):
 
@@ -60,7 +60,7 @@ Write tests FIRST (should fail initially):
 - [ ] Test: Property type options filtered by category (e.g., "resale" only shows HDB/Private/EC/Landed resale)
 - [ ] Test: Calculation hidden until all fields filled
 
-Run tests: `npm test -- Step3NewPurchase.test.tsx` (should see 8 failures)
+Run tests: `npm test -- ProgressiveFormCalculation.test.tsx` (should see 8 failures)
 
 ### Task 3: Create Calculation Helper Functions (1h)
 
@@ -78,26 +78,24 @@ Link to canonical: Uses `dr-elena-mortgage-expert-v2.json` via `DR_ELENA_*` cons
 
 Run tests: Should now pass 5/8 tests (calculation logic works, UI not yet updated)
 
-### Task 4: Update Step3NewPurchase Component - Progressive Disclosure (2h)
+### Task 4: Update ProgressiveFormWithController - Progressive Disclosure (2h)
 
-**File**: `components/forms/sections/Step3NewPurchase.tsx`
+**File**: `components/forms/ProgressiveFormWithController.tsx`
 
-- [ ] Add `PROPERTY_TYPES_BY_CATEGORY` constant mapping categories to valid types
-- [ ] Add progressive visibility state: `showPropertyType`, `showRestOfForm`
-- [ ] Property Category dropdown - always visible
-- [ ] Property Type dropdown - only visible when category selected
-- [ ] Filter property type options based on selected category
-- [ ] Reset property type when category changes
-- [ ] Show remaining fields (price, age, checkbox) only after type selected
-- [ ] Remove all 55% LTV toggle UI
-- [ ] Remove "LTV Scenario Analysis" section
-- [ ] Remove verbose copy mentioning "Dr Elena"
+**Target:** Lines 594-700 (property category/type fields)
+
+- [ ] Property type dropdown already has conditional logic - verify it filters correctly by category
+- [ ] Check existing `PROPERTY_TYPES_BY_CATEGORY` mapping (should be in form-config.ts)
+- [ ] Verify property type resets when category changes
+- [ ] Remaining fields (price, age, checkbox) should show after type selected - implement if missing
 
 Run tests: Should now pass 7/8 tests (progressive disclosure works, calculation display pending)
 
-### Task 5: Update Step3NewPurchase Component - Calculation Display (1.5h)
+### Task 5: Update ProgressiveFormWithController - Calculation Display (1.5h)
 
-**File**: `components/forms/sections/Step3NewPurchase.tsx`
+**File**: `components/forms/ProgressiveFormWithController.tsx`
+
+**Target:** Lines 998-1062 (inline calculation display JSX)
 
 Replace calculation display section:
 
@@ -124,9 +122,9 @@ Manual QA on real devices or browser DevTools.
 
 ## Testing Strategy
 
-**Unit Tests** (`tests/components/Step3NewPurchase.test.tsx`):
+**Unit Tests** (`tests/components/ProgressiveFormCalculation.test.tsx`):
 - Calculation logic (max loan, tenure, caveats)
-- Progressive disclosure (show/hide fields based on selection)
+- Helper functions (calculateMaxLoan, generatePropertyCaveats, etc.)
 - Property type filtering by category
 
 **Integration Tests** (`tests/integration/lead-form-flow.test.ts`):
@@ -134,11 +132,11 @@ Manual QA on real devices or browser DevTools.
 - Second home checkbox toggles LTV correctly
 - Category change resets property type
 
-**E2E Tests** (`tests/e2e/step3-ux-report.spec.ts` - update existing):
-- Update expectations to match new UI
+**E2E Tests** (update existing form E2E tests):
+- Update expectations to match new calculation UI
 - Remove assertions for 55% toggle (no longer exists)
-- Add assertions for progressive disclosure
 - Verify personalized caveats appear
+- Test progressive disclosure flow
 
 **Manual QA Checklist**:
 - [ ] All property category/type combinations show correct caveats
@@ -171,15 +169,14 @@ Low risk (UI only, no schema changes). If needed: Git revert single commit, or f
 ## File Changes Summary
 
 **Modified**:
-- `components/forms/sections/Step3NewPurchase.tsx` (major rewrite)
+- `components/forms/ProgressiveFormWithController.tsx` (lines 998-1062, calculation display rewrite)
 - `dr-elena-mortgage-expert-v2.json` (HDB tenure rules - already done)
 
 **Created**:
 - `lib/calculations/property-loan-helpers.ts` (new calculation helpers)
-- `tests/components/Step3NewPurchase.test.tsx` (new test file)
+- `tests/components/ProgressiveFormCalculation.test.tsx` (new test file)
 
-**Archived** (after completion):
-- `components/archive/2025-10/Step3NewPurchase.old.tsx` (backup of old component)
+**Note:** ProgressiveFormWithController is large file - only modifying inline calculation JSX block (lines 998-1062), not extracting to separate component
 
 ## Success Metrics
 
