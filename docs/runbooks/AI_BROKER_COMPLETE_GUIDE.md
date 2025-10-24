@@ -1378,6 +1378,73 @@ Redeploy and monitor health status.
 - [ ] Worker health endpoint shows `running: true`, rate limit respected.
 - [ ] Slack alerts remain quiet or log only informational notices.
 
+#### Integration Testing for Activation
+
+**Test File:** `tests/integration/ai-broker-message-flow.test.ts`
+
+**Coverage Requirements:**
+1. `queueIncomingMessage` enqueues jobs with correct payload structure
+2. Worker processes job and calls `ChatwootClient.sendMessage`
+3. AI fallback returns templated text when OpenAI fails
+4. `message_type` filtering works correctly
+5. Persona prompt creation functions properly
+
+**Example Test Pattern:**
+```typescript
+describe('AI Broker Message Flow', () => {
+  it('enqueues message with correct payload', async () => {
+    const result = await queueIncomingMessage({
+      conversationId: 123,
+      messageContent: 'Test message',
+      leadData: { /* ... */ }
+    });
+
+    expect(result.jobId).toBeDefined();
+    expect(result.priority).toBe(3);
+  });
+
+  it('worker processes and sends to Chatwoot', async () => {
+    // Mock ChatwootClient
+    const sendMessageSpy = jest.spyOn(ChatwootClient.prototype, 'sendMessage');
+
+    // Enqueue and process
+    await processJob(mockJob);
+
+    expect(sendMessageSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        conversationId: 123,
+        content: expect.any(String)
+      })
+    );
+  });
+
+  it('falls back gracefully when OpenAI fails', async () => {
+    // Mock OpenAI failure
+    jest.spyOn(OpenAI.prototype, 'chat').mockRejectedValue(new Error('API error'));
+
+    const result = await generateBrokerResponse(/* ... */);
+
+    expect(result).toContain('Thanks for your message');
+    expect(result).toContain('technical hiccup');
+  });
+});
+```
+
+**Desktop & Mobile Chat UI Testing:**
+
+Test environments:
+- Desktop: 1920×1080, 1366×768
+- Mobile: 320px, 360px, 390px widths
+
+**QA Checklist:**
+- [ ] Polling updates conversation history correctly
+- [ ] Typing indicators appear and disappear properly
+- [ ] Error states show user-friendly messages (no console errors)
+- [ ] Layout doesn't break on narrow viewports
+- [ ] Conversation persists across page refresh
+
+**Testing Location:** Use `app/test-mobile/page.tsx` or component tests in `components/chat/__tests__/CustomChatInterface.test.tsx`
+
 #### Post-Launch Monitoring & Handoff
 
 - Create calendar reminder titled "AI Broker rollout review" for 48 h after scheduled full cutover; invite engineering, operations, and support leads.
