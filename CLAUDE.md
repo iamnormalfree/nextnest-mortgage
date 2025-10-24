@@ -337,6 +337,102 @@ When syncing upstream, ALWAYS preserve:
   - Log completion details in `docs/work-log.md` (constraint, CAN task, tests run).
   - Only then archive plans or move to the next constraint.
 
+---
+
+## Fractal Alignment System (Meta-Framework)
+
+**Core Principle:** Every change exists at multiple tier levels, creating bidirectional verification like double-entry accounting.
+
+**The Tiers:**
+- **Tier 5:** Re-Strategy (`docs/plans/re-strategy/Part*.md`)
+- **Tier 4:** Roadmap Constraints (`docs/plans/ROADMAP.md`)
+- **Tier 3:** Active Plans (`docs/plans/active/*.md`)
+- **Tier 2:** Runbooks (`docs/runbooks/**/*.md`)
+- **Tier 1:** Code (`CANONICAL_REFERENCES.md` files)
+- **Tier 0:** Tests (`tests/**/*.test.ts`)
+
+**Fractal Balance Equation:** System is aligned when:
+```
+Every tier references tier above (↑ upward alignment)
+AND
+Every tier has evidence below (↓ downward verification)
+AND
+All work serves active constraint (single bottleneck)
+AND
+Audit trail exists in work log
+```
+
+### Mandatory Workflow
+
+**Before ANY code change:**
+
+1. **CHECK Phase** (5-10 minutes):
+   ```bash
+   # Run pre-implementation checks:
+   # See: docs/runbooks/strategy/constraint-implementation-workflow.md Phase 0
+
+   - Identify active constraint (from matrix)
+   - Verify CAN task exists (from backlog)
+   - Check runbook exists (or CAN task to create it)
+   - Verify Tier 1 rules (from CANONICAL_REFERENCES.md)
+   - Check for conflicts (work log, active plans)
+   ```
+
+   **If ANY check fails → STOP. Do not proceed to coding.**
+
+2. **IMPLEMENT Phase**:
+   ```typescript
+   // In your code, create tier references:
+
+   // Implementation follows: docs/runbooks/[domain]/[guide].md
+   // Serves: Constraint [A/B/C/D], CAN-[###]
+
+   // Then follow TDD cycle (see Critical Rules above)
+   ```
+
+3. **VERIFY Phase**:
+   ```bash
+   # After implementation:
+   # See: docs/runbooks/strategy/constraint-implementation-workflow.md Phase 2
+
+   - Collect evidence (tests, screenshots, metrics)
+   - Verify success criteria from plan/roadmap
+   - Update status in tier above (plan → constraint → matrix)
+   - Link evidence in tracking docs
+   - Update work log
+   ```
+
+**If you skip CHECK phase → Code may not align with re-strategy → Rework required.**
+
+### Implementation Runbooks
+
+For detailed step-by-step workflows:
+
+- **Before starting work:** `docs/runbooks/strategy/constraint-implementation-workflow.md`
+- **Weekly reviews:** `docs/runbooks/strategy/weekly-constraint-review.md`
+- **Codebase audits:** `docs/runbooks/strategy/constraint-a-audit-checklist.md`
+- **System architecture:** `docs/runbooks/strategy/fractal-alignment-system.md`
+
+### Drift Detection
+
+**System is BALANCED when:**
+- ✅ One constraint showing 🟡 (all others ⬜ or ✅)
+- ✅ All active plans reference same constraint
+- ✅ Runbooks exist before code (or CAN task scheduled)
+- ✅ Evidence linked for all ✅ status claims
+- ✅ Work log updated weekly
+
+**System is DRIFTING when:**
+- 🚩 Multiple constraints showing 🟡
+- 🚩 Plans working on future constraints
+- 🚩 Code committed before runbooks created
+- 🚩 Status ✅ without evidence links
+- 🚩 Work log silent for >1 week
+
+**Weekly constraint review detects drift → Remediate within 1 week (not months).**
+
+---
+
 ### Planning Rules
 
 **File format:** `docs/plans/active/{date}-{feature-slug}.md`
