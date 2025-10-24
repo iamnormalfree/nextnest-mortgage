@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in-progress
 complexity: medium
 estimated_hours: 6
 constraint: A
@@ -45,38 +45,38 @@ User should feel: "I can borrow X, so I don't need as much cash!" (empowering) A
 
 **Evidence**: Agent completed this during brainstorming session.
 
-### Task 2: Write Failing Tests for Calculation Logic (TDD) (1h)
+### Task 2: Write Failing Tests for Calculation Logic (TDD) (✅ COMPLETED)
 
 **Test file**: `tests/components/ProgressiveFormCalculation.test.tsx`
 
 Write tests FIRST (should fail initially):
 
-- [ ] Test: Private condo (resale), age 40, first home → $600k loan, 25yr tenure (age limit)
-- [ ] Test: HDB (resale), age 30, first home → $600k loan, 25yr tenure (HDB limit)
-- [ ] Test: HDB (resale), age 30, second home → $360k loan (45% LTV), 25yr tenure
-- [ ] Test: Commercial, age 35, first home → $600k loan, "Cannot use CPF" caveat
-- [ ] Test: EC (new), age 45 → Shows "Income cap applies if buying from developer"
-- [ ] Test: Progressive disclosure - property type hidden until category selected
-- [ ] Test: Property type options filtered by category (e.g., "resale" only shows HDB/Private/EC/Landed resale)
-- [ ] Test: Calculation hidden until all fields filled
+- [x] Test: Private condo (resale), age 40, first home → $600k loan, 25yr tenure (age limit)
+- [x] Test: HDB (resale), age 30, first home → $600k loan, 25yr tenure (HDB limit)
+- [x] Test: HDB (resale), age 30, second home → $360k loan (45% LTV), 25yr tenure
+- [x] Test: Commercial, age 35, first home → $600k loan, "Cannot use CPF" caveat
+- [x] Test: EC (new), age 45 → Shows "Income cap applies if buying from developer"
+- [x] Test: Progressive disclosure - property type hidden until category selected
+- [x] Test: Property type options filtered by category (e.g., "resale" only shows HDB/Private/EC/Landed resale)
+- [x] Test: Calculation hidden until all fields filled
 
-Run tests: `npm test -- ProgressiveFormCalculation.test.tsx` (should see 8 failures)
+**Evidence**: Created 13 tests covering calculation helpers and UI behavior. Tests currently fail (TDD approach). Commit: 851d179
 
-### Task 3: Create Calculation Helper Functions (1h)
+### Task 3: Create Calculation Helper Functions (✅ COMPLETED)
 
 **File**: `lib/calculations/property-loan-helpers.ts`
 
 Implement the pure calculation functions:
 
-- [ ] `calculateMaxLoan(propertyPrice, isSecondHome)` → returns max loan (75% or 45% LTV)
-- [ ] `getPropertyTenureLimit(propertyType)` → returns max years from Dr Elena v2 rules
-- [ ] `calculateMaxTenure(combinedAge, propertyType)` → returns min(65-age, propertyLimit)
-- [ ] `getTenureMessage(maxTenure, ageLimit, propertyLimit, propertyType, combinedAge)` → returns user-friendly string
-- [ ] `generatePropertyCaveats(propertyPrice, propertyCategory, propertyType, combinedAge, isSecondHome)` → returns { maxLoan, caveats[] }
+- [x] `calculateMaxLoan(propertyPrice, isSecondHome)` → returns max loan (75% or 45% LTV)
+- [x] `getPropertyTenureLimit(propertyType)` → returns max years from Dr Elena v2 rules
+- [x] `calculateMaxTenure(combinedAge, propertyType)` → returns min(65-age, propertyLimit)
+- [x] `getTenureMessage(maxTenure, ageLimit, propertyLimit, propertyType, combinedAge)` → returns user-friendly string
+- [x] `generatePropertyCaveats(propertyPrice, propertyCategory, propertyType, combinedAge, isSecondHome)` → returns { maxLoan, caveats[] }
 
 Link to canonical: Uses `dr-elena-mortgage-expert-v2.json` via `DR_ELENA_*` constants from `lib/calculations/dr-elena-constants.ts`
 
-Run tests: Should now pass 5/8 tests (calculation logic works, UI not yet updated)
+**Evidence**: All 5 helper functions implemented as pure functions. Commit: 851d179
 
 ### Task 4: Update ProgressiveFormWithController - Progressive Disclosure (2h)
 
