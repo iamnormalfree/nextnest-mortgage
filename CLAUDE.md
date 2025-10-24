@@ -315,6 +315,28 @@ When syncing upstream, ALWAYS preserve:
 - ❌ Plan contains full code examples from instant-profile.ts
 - ❌ Runbook duplicates calculation logic from instant-profile.ts
 
+### Constraint Alignment (MANDATORY)
+
+- **Before any planning or coding:**
+  - Open `docs/plans/re-strategy/strategy-alignment-matrix.md` and `docs/plans/ROADMAP.md`.
+  - Confirm the highest-priority constraint (row status emoji). If Constraint A isn’t ✅, do not work on downstream items.
+  - Identify the relevant CAN task(s) for your work; if none exist, stop and ask Brent.
+
+- **When drafting or updating a plan:**
+  - Reference the constraint row explicitly (e.g., “Constraint B – Data In, Data Approved”).
+  - Link the plan to the exact CAN task(s) in the backlog CSV.
+  - Ensure runbooks are in place or scheduled via CAN tasks before implementation.
+
+- **During implementation:**
+  - Keep the matrix/roadmap statuses unchanged until exit criteria are met (tests, docs, evidence).
+  - Stage 0 work must update `docs/plans/re-strategy/stage0-launch-gate.md` as checkpoints are cleared.
+
+- **After completion:**
+  - Update the matrix status emoji and add notes/evidence.
+  - Update the roadmap phase notes if scope changed.
+  - Log completion details in `docs/work-log.md` (constraint, CAN task, tests run).
+  - Only then archive plans or move to the next constraint.
+
 ### Planning Rules
 
 **File format:** `docs/plans/active/{date}-{feature-slug}.md`

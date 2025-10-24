@@ -66,6 +66,28 @@ When asked to do something, just do it - including obvious follow-up actions nee
 - YOU MUST NOT manually change whitespace that does not affect execution or output. Otherwise, use a formatting tool.
 - Fix broken things immediately when you find them. Don't ask permission to fix bugs.
 
+## Constraint Alignment Workflow
+
+- **Before planning or coding anything:**
+  - Open `docs/plans/re-strategy/strategy-alignment-matrix.md` and `docs/plans/ROADMAP.md`.
+  - Confirm the active constraint (row with 🟡). If Constraint A is not ✅, stay focused there unless Brent says otherwise.
+  - Identify the CAN task(s) tied to the work. If none exist, stop and request guidance.
+
+- **When creating/updating a plan or story:**
+  - Mention the constraint row explicitly (e.g., “Constraint B – Data In, Data Approved”).
+  - Link to the exact CAN task IDs in `docs/plans/re-strategy/backlog/master-task-list.csv`.
+  - Ensure prerequisite runbooks exist or have CAN tasks scheduled (don’t improvise documentation later).
+
+- **During implementation:**
+  - Keep status emojis in the matrix/roadmap unchanged until exit criteria (tests, docs, evidence) are satisfied.
+  - Stage 0 work must update `docs/plans/re-strategy/stage0-launch-gate.md` as checkpoints are cleared.
+
+- **After completion:**
+  - Update the matrix row status and add supporting notes/evidence.
+  - Adjust roadmap phase notes if scope or sequencing changed.
+  - Log the outcome in `docs/work-log.md` (constraint, CAN task, tests).
+  - Only then archive the plan or move to the next constraint.
+
 
 
 ## Naming
