@@ -9,9 +9,11 @@ ABOUTME: Start here to understand the fractal alignment system and find the righ
 
 ## The Fractal Alignment System
 
-Every code change creates **bidirectional verification** across 6 tiers:
+Every code change creates **bidirectional verification** across 7 tiers (0-6):
 
 ```
+Tier 6: Meta-Tier (CLAUDE.md, skills, commands)
+   ║ ↓ enforces
 Tier 5: Re-Strategy (Part 01-08)
    ║ ↓ defines
 Tier 4: Roadmap Constraints (A/B/C/D)
@@ -27,7 +29,7 @@ Tier 0: Tests (verification)
 Evidence: validation-reports/, test-results/
 ```
 
-**Like double-entry accounting:** Every change recorded at multiple tiers, books must balance.
+**Like double-entry accounting:** Every change recorded at multiple tiers, books must balance. **The system even applies to itself** (Tier 6 meta-tier).
 
 ---
 
@@ -91,12 +93,12 @@ If ANY fails → STOP
 **Run every Monday (or chosen weekly cadence).**
 
 **Contains:**
-- 7-part review agenda (30-45 min)
+- 8-part review agenda (35-50 min)
 - Reconciliation checklist
 - Red flag detection (6 drift patterns)
 - Meeting output template
 
-**The 7 Parts:**
+**The 8 Parts:**
 1. Constraint status (update emojis)
 2. CAN task progress (assign 2-3 for week)
 3. Active plans (archive completed, flag future-constraint work)
@@ -104,6 +106,7 @@ If ANY fails → STOP
 5. Exit criteria (verify evidence)
 6. Evidence collection (Stage 0 gate)
 7. Meeting output (document in work log)
+8. Meta-verification (CLAUDE.md, skills, commands alignment)
 
 **When to use:**
 - Every Monday morning
@@ -124,12 +127,12 @@ If ANY fails → STOP
 **Comprehensive audit of Stage 0 launch gate requirements.**
 
 **Contains:**
-- 8 sections, 50+ checklist items
+- 9 sections, 55+ checklist items
 - Evidence collection instructions
 - Status marking (✅/🟡/❌/🔴)
 - Final completion criteria
 
-**The 8 Sections:**
+**The 9 Sections:**
 1. Homepage & landing pages
 2. Progressive form experience
 3. AI broker chat
@@ -138,6 +141,7 @@ If ANY fails → STOP
 6. Content & messaging
 7. Testing & CI/CD
 8. Documentation & handoff
+9. Meta-tier governance (Tier 6)
 
 **When to use:**
 - Now (get baseline state)

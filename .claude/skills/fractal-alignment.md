@@ -15,6 +15,7 @@ You are enforcing a **fractal double-entry system** where every change:
 4. **Creates audit trail** (work log documentation)
 
 **Tiers:**
+- **Tier 6:** Meta-tier (CLAUDE.md, AGENTS.md, `.claude/skills/`, `.claude/commands/`)
 - **Tier 5:** Re-strategy parts (`docs/plans/re-strategy/Part*.md`)
 - **Tier 4:** Roadmap constraints (`docs/plans/ROADMAP.md`)
 - **Tier 3:** Active plans (`docs/plans/active/*.md`)
@@ -48,6 +49,7 @@ CANONICAL_REFERENCES.md
 
 Analyze user request and determine tier:
 
+- Mentions "CLAUDE.md", "AGENTS.md", "slash command", ".claude/skills/", ".claude/commands/" → **Tier 6**
 - Mentions "test" or "spec" → **Tier 0**
 - Mentions file in `lib/`, `components/`, `app/` → **Tier 1**
 - Mentions "runbook" or "guide" → **Tier 2**
@@ -55,7 +57,7 @@ Analyze user request and determine tier:
 - Mentions "roadmap" or "constraint" → **Tier 4**
 - Mentions "re-strategy" or "Part 0X" → **Tier 5**
 
-**Output:** "Target tier: Tier [0-5]"
+**Output:** "Target tier: Tier [0-6]"
 
 ### Step 1.3: Verify Active Constraint
 
@@ -166,6 +168,189 @@ grep "filename" CANONICAL_REFERENCES.md
 
 **BLOCKING CHECK:** If Tier 1 rules exist → Must follow them (note in verification phase)
 
+---
+
+### Step 1.6a: Meta-Tier Checks (TIER 6 ONLY)
+
+**If user request modifies Tier 6 (meta-tier), run these checks:**
+
+#### Check 1: Slash Command ↔ CLAUDE.md Alignment
+
+**If creating/modifying `.claude/commands/*.md`:**
+
+```bash
+# Extract command name from filename
+command_name=$(basename [file] .md)
+
+# Check if CLAUDE.md references this command
+grep -i "$command_name" CLAUDE.md
+```
+
+**Questions:**
+1. Does CLAUDE.md reference this slash command?
+2. Is the command documented in "Quick Commands" or "Tools & Resources" section?
+3. Is usage example provided?
+
+**BLOCKING CHECK:** If slash command exists but CLAUDE.md doesn't reference it → STOP and say:
+```
+❌ META-TIER BLOCK: Slash command created without CLAUDE.md reference
+
+Command: /[command-name]
+File: .claude/commands/[command-name].md
+
+Per Tier 6 alignment: Meta-tier docs must reference each other bidirectionally.
+
+Action required:
+1. Add command to CLAUDE.md "Quick Commands (Daily Workflow)" section
+2. Include usage example
+3. Update "Tools & Resources" section
+
+Books must balance: Commands ↔ CLAUDE.md ↔ Runbooks
+
+Cannot proceed until CLAUDE.md updated.
+```
+
+---
+
+#### Check 2: Skill ↔ CLAUDE.md Alignment
+
+**If creating/modifying `.claude/skills/*.md`:**
+
+```bash
+# Extract skill name from filename
+skill_name=$(basename [file] .md)
+
+# Check if CLAUDE.md references this skill
+grep -i "$skill_name" CLAUDE.md
+```
+
+**Questions:**
+1. Does CLAUDE.md mention this skill?
+2. Is it listed in "Tools & Resources" → "Skill (Automatic Enforcement)"?
+3. Is the skill's purpose explained?
+
+**BLOCKING CHECK:** If skill exists but CLAUDE.md doesn't reference it → STOP and say:
+```
+❌ META-TIER BLOCK: Skill created without CLAUDE.md reference
+
+Skill: [skill-name]
+File: .claude/skills/[skill-name].md
+
+Per Tier 6 alignment: Skills must be discoverable through CLAUDE.md.
+
+Action required:
+1. Add skill to CLAUDE.md "Tools & Resources" → "Skill" section
+2. Explain when skill is invoked
+3. Document what skill enforces
+
+Cannot proceed until CLAUDE.md updated.
+```
+
+---
+
+#### Check 3: CLAUDE.md ↔ Runbook/Command/Skill Alignment
+
+**If modifying `CLAUDE.md`:**
+
+```bash
+# Extract all references to commands, skills, runbooks from changes
+# Verify each reference points to existing file
+```
+
+**Questions:**
+1. Does CLAUDE.md reference commands that exist?
+2. Does CLAUDE.md reference skills that exist?
+3. Does CLAUDE.md reference runbooks that exist?
+4. Are all referenced paths correct?
+
+**BLOCKING CHECK:** If CLAUDE.md references non-existent file → STOP and say:
+```
+❌ META-TIER BLOCK: CLAUDE.md references non-existent file
+
+Referenced: [file-path]
+In section: [section-name]
+
+Per Tier 6 alignment: References must point to real files.
+
+Action required:
+1. Create the referenced file, OR
+2. Remove the reference from CLAUDE.md, OR
+3. Fix the path to point to correct file
+
+Cannot proceed until references are valid.
+```
+
+---
+
+#### Check 4: Runbook ↔ CLAUDE.md Alignment
+
+**If creating runbook in `docs/runbooks/strategy/`:**
+
+```bash
+# Check if CLAUDE.md references this runbook
+runbook_name=$(basename [file])
+grep -i "$runbook_name" CLAUDE.md
+```
+
+**Questions:**
+1. Is this a core workflow runbook?
+2. Does CLAUDE.md link to it in "Tools & Resources"?
+3. Is it mentioned in mandatory workflow section?
+
+**BLOCKING CHECK:** If core strategy runbook created but CLAUDE.md doesn't reference it → STOP and say:
+```
+⚠️  META-TIER WARNING: Core runbook not referenced in CLAUDE.md
+
+Runbook: docs/runbooks/strategy/[runbook-name]
+
+Core strategy runbooks should be discoverable through CLAUDE.md.
+
+Recommendation:
+1. Add to CLAUDE.md "Tools & Resources" → "Runbooks" section
+2. Explain when to use this runbook
+3. Link from relevant workflow section
+
+You can proceed, but consider adding reference for discoverability.
+```
+
+---
+
+#### Check 5: Self-Consistency Check
+
+**If modifying ANY Tier 6 file, verify it follows its own rules:**
+
+```bash
+# For skills: Does the skill enforce what it describes?
+# For CLAUDE.md: Does it follow its own documented workflow?
+# For commands: Do they implement what they promise?
+```
+
+**Questions:**
+1. If this is a workflow doc, does it follow the workflow it describes?
+2. If this is CLAUDE.md and it says "run /check-alignment", did WE run it?
+3. Does this change demonstrate the pattern it teaches?
+
+**BLOCKING CHECK:** If meta-tier doc violates its own rules → STOP and say:
+```
+❌ META-TIER BLOCK: Self-consistency violation
+
+The change violates the principles it documents.
+
+Example:
+- CLAUDE.md says "run /check-alignment before coding"
+- But we modified CLAUDE.md without running /check-alignment
+- This is hypocritical (do as I say, not as I do)
+
+Action required:
+1. Apply the documented workflow to this change
+2. Demonstrate the pattern being taught
+3. "Eat your own dog food"
+
+Cannot proceed until self-consistent.
+```
+
+---
+
 ### Step 1.7: Check for Conflicts
 
 **Search work log and active plans:**
@@ -196,12 +381,13 @@ grep -i "keywords" docs/plans/active/*.md
 **User Request:** [summarize]
 
 ### Alignment Verification
-- ✅/❌ Target tier: Tier [0-5]
+- ✅/❌ Target tier: Tier [0-6]
 - ✅/❌ Active constraint: Constraint [A/B/C/D]
 - ✅/❌ Request serves active constraint: [yes/no]
 - ✅/❌ CAN task: CAN-[###] or [reason if none]
 - ✅/❌ Runbook: [path] or [CAN-### to create]
 - ✅/❌ Tier 1 rules: [rules or N/A]
+- ✅/❌ Meta-tier alignment: [N/A or checks passed]
 - ✅/❌ No conflicts: [none or describe]
 
 ### Decision
@@ -303,6 +489,13 @@ Related CAN tasks: CAN-051
 
 **Based on tier, collect appropriate evidence:**
 
+**Tier 6 (Meta-tier):**
+- Verify bidirectional references exist (slash commands ↔ CLAUDE.md ↔ skills ↔ runbooks)
+- Check self-consistency (does meta-doc follow its own rules?)
+- Test slash commands work: Run command and verify output
+- Test skills invoke correctly: Verify skill prompt loads
+- Document in work log with "Tier 6" tag
+
 **Tier 0/1 (Tests/Code):**
 - Run tests: `npm test [relevant suite]`
 - Save output to: `validation-reports/test-results-[feature]-[date].txt`
@@ -325,6 +518,13 @@ Related CAN tasks: CAN-051
 ### Step 3.2: Verify Success Criteria
 
 **From the tier above, check success criteria:**
+
+**If Tier 6 → Check Re-Strategy (Tier 5):**
+```bash
+# Verify meta-tier changes align with strategic principles
+# Check if CLAUDE.md changes support active constraint
+# Verify fractal alignment principles maintained
+```
 
 **If Tier 0/1 → Check Plan (Tier 3):**
 ```bash
@@ -356,6 +556,11 @@ code docs/plans/re-strategy/strategy-alignment-matrix.md
 ### Step 3.3: Update Tier Above
 
 **Propagate status update:**
+
+**If meta-tier changed → Verify self-reference:**
+- Ensure CLAUDE.md references updated
+- Ensure skills/commands are discoverable
+- Document in work log with Tier 6 tag
 
 **If code complete → Update plan:**
 - Mark task checkbox: `- [x] Implement feature X`
@@ -425,13 +630,14 @@ code docs/plans/re-strategy/strategy-alignment-matrix.md
 **For each constraint in matrix:**
 
 ```bash
-# Check bidirectional references
-1. Does constraint reference re-strategy part? (↑ upward)
-2. Do plans reference constraint? (↓ downward)
-3. Do runbooks exist for plans? (↓ downward)
-4. Does code follow runbooks? (↓ downward)
-5. Do tests verify code? (↓ downward)
-6. Is evidence linked? (↓ downward)
+# Check bidirectional references (7 tiers, 0-6)
+1. Does CLAUDE.md enforce fractal alignment? (Tier 6 meta-tier)
+2. Does constraint reference re-strategy part? (Tier 5 → Tier 4 upward)
+3. Do plans reference constraint? (Tier 4 → Tier 3 downward)
+4. Do runbooks exist for plans? (Tier 3 → Tier 2 downward)
+5. Does code follow runbooks? (Tier 2 → Tier 1 downward)
+6. Do tests verify code? (Tier 1 → Tier 0 downward)
+7. Is evidence linked? (Tier 0 evidence)
 ```
 
 **If ANY link broken → Flag drift for remediation.**
@@ -492,6 +698,7 @@ After completing CHECK/IMPLEMENT/VERIFY cycle, provide:
 - Work log updated: [entry added]
 
 ### Audit Trail
+- ↑ Tier 6 (Meta): [CLAUDE.md enforces fractal alignment]
 - ↑ Tier 5 (Re-Strategy): [Part reference]
 - ↑ Tier 4 (Roadmap): [Constraint + exit criterion]
 - ↑ Tier 3 (Plan): [Plan + success criterion]

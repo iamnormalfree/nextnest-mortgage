@@ -34,19 +34,22 @@ Balance:                      $0   (books balance)
 
 ```
 Change: Add homepage hero copy
-Tier 1:  Code (app/page.tsx)              → Hero component updated
+Tier 0:  Tests (e2e/homepage.spec.ts)    → Copy verified in browser
+Tier 1:  Code (app/page.tsx)             → Hero component updated
 Tier 2:  Runbook (voice-and-tone.md)     → Copy follows voice guide
 Tier 3:  Plan (homepage-copy-plan.md)    → Task marked complete
 Tier 4:  Roadmap (Constraint A)          → Exit criterion verified
 Tier 5:  Re-Strategy (Part 04)           → Brand canon satisfied
+Tier 6:  CLAUDE.md                       → Fractal Alignment enforced
                                           -------------------------
 Balance: All tiers reference each other   → System aligned
 ```
 
 **Properties:**
-- Every change recorded at multiple tiers
+- Every change recorded at multiple tiers (7 tiers: 0-6)
 - Lower tiers must reference higher tiers (upward propagation)
 - Higher tiers must have evidence from lower tiers (downward verification)
+- Meta-tier (6) ensures system applies to itself ("eating our own dog food")
 - Audit trail preserved (work log, git history, evidence files)
 - Drift detectable (weekly review finds unbalanced tiers)
 - Periodic reconciliation (weekly constraint review, audit checklist)
@@ -107,7 +110,23 @@ Verification: Stage 0 launch gate complete
 Reconciliation: Weekly constraint review
 ```
 
-**Fractal property:** The pattern is **self-similar** at all scales. Zoom in or out, the structure is the same.
+### Scale 6: Meta-Level (Tier 5 → Tier 6)
+```
+System Governance:
+  Entry 1: Re-strategy parts satisfy constraints
+  Entry 2: CLAUDE.md enforces fractal alignment
+
+Verification: Runbooks exist for all processes mentioned in CLAUDE.md
+Reconciliation: Meta-audit checks that docs self-reference correctly
+```
+
+**Example:**
+- CLAUDE.md says: "Follow constraint implementation workflow"
+- Verification: Does `docs/runbooks/strategy/constraint-implementation-workflow.md` exist? ✅
+- Verification: Does it implement what CLAUDE.md describes? ✅
+- Verification: Is it referenced in re-strategy? ✅
+
+**Fractal property:** The pattern is **self-similar** at all scales. Zoom in or out, the structure is the same. **The system even applies to itself** (meta-tier).
 
 ---
 
@@ -123,6 +142,7 @@ Every change creates **two verification directions**:
 3. Runbook fulfills plan            → Tier 3 (decisions/tasks)
 4. Plan serves constraint           → Tier 4 (exit criteria)
 5. Constraint advances strategy     → Tier 5 (re-strategy parts)
+6. Strategy enforced by governance  → Tier 6 (CLAUDE.md, skills, commands)
 ```
 
 **Verification:** Each step asks: "Does this tier reference the tier above?"
@@ -130,12 +150,13 @@ Every change creates **two verification directions**:
 ### Downward Verification (Strategy → Evidence)
 
 ```
-1. Re-strategy defines constraints  → Tier 5 (strategic intent)
-2. Roadmap defines exit criteria    → Tier 4 (measurable outcomes)
-3. Plans define success criteria    → Tier 3 (specific tasks)
-4. Runbooks define patterns         → Tier 2 (how to implement)
-5. Code implements patterns         → Tier 1 (actual execution)
-6. Tests prove correctness          → Tier 0 (evidence)
+1. CLAUDE.md enforces alignment     → Tier 6 (system governance)
+2. Re-strategy defines constraints  → Tier 5 (strategic intent)
+3. Roadmap defines exit criteria    → Tier 4 (measurable outcomes)
+4. Plans define success criteria    → Tier 3 (specific tasks)
+5. Runbooks define patterns         → Tier 2 (how to implement)
+6. Code implements patterns         → Tier 1 (actual execution)
+7. Tests prove correctness          → Tier 0 (evidence)
 ```
 
 **Verification:** Each step asks: "Is there evidence from the tier below?"
@@ -150,27 +171,31 @@ Like an accountant running a trial balance, we periodically verify tiers balance
 
 **For each constraint in the matrix:**
 
-1. **Strategy → Roadmap:**
+1. **Meta → Strategy:**
+   - Question: "Does CLAUDE.md enforce fractal alignment?"
+   - Check: Skills/commands exist to verify tiers ✅
+
+2. **Strategy → Roadmap:**
    - Question: "Does roadmap constraint match re-strategy part?"
    - Check: Constraint A references Part 02 + Part 04 ✅
 
-2. **Roadmap → Plans:**
+3. **Roadmap → Plans:**
    - Question: "Do active plans reference correct constraint?"
    - Check: All 11 active plans say "Constraint A" ✅
 
-3. **Plans → Runbooks:**
+4. **Plans → Runbooks:**
    - Question: "Do plans reference existing runbooks?"
    - Check: Plans link to runbooks, or CAN tasks exist to create them ✅
 
-4. **Runbooks → Code:**
+5. **Runbooks → Code:**
    - Question: "Does code follow runbook patterns?"
    - Check: Code review verifies adherence (manual or automated)
 
-5. **Code → Tests:**
+6. **Code → Tests:**
    - Question: "Do tests verify code correctness?"
    - Check: `npm test` passes, coverage >70% ✅
 
-6. **Tests → Evidence:**
+7. **Tests → Evidence:**
    - Question: "Is evidence collected and linked?"
    - Check: Stage 0 gate has evidence links ✅
 
@@ -183,6 +208,12 @@ Like an accountant running a trial balance, we periodically verify tiers balance
 Every change leaves a traceable path across all tiers:
 
 ### Example: "Add accessibility checklist" (CAN-037)
+
+**Tier 6 (Meta):**
+```
+CLAUDE.md → "Follow fractal alignment workflow"
+.claude/skills/fractal-alignment.md → Enforces CHECK/IMPLEMENT/VERIFY cycle
+```
 
 **Tier 5 (Re-Strategy):**
 ```
@@ -232,13 +263,14 @@ axe DevTools: 0 critical issues ✅
 ```
 docs/work-log.md
 ## Accessibility Implementation (CAN-037)
+- Tier: 2 (Runbook)
 - Created runbook
 - Updated form components
 - Tests pass, axe scan clean
 - Evidence: validation-reports/accessibility-scan-2025-10-31.pdf
 ```
 
-**Audit trail:** You can trace from **any tier** up to strategy or down to evidence. No orphaned work.
+**Audit trail:** You can trace from **any tier** up to meta-tier or down to evidence. No orphaned work.
 
 ---
 
@@ -315,12 +347,13 @@ You are enforcing the fractal double-entry alignment system.
 
 ## Step 1: Identify Tier
 What tier is this change targeting?
-- [ ] Tier 0 (tests)
-- [ ] Tier 1 (code)
-- [ ] Tier 2 (runbooks)
-- [ ] Tier 3 (plans)
-- [ ] Tier 4 (roadmap/constraints)
+- [ ] Tier 6 (meta - CLAUDE.md, skills, commands)
 - [ ] Tier 5 (re-strategy)
+- [ ] Tier 4 (roadmap/constraints)
+- [ ] Tier 3 (plans)
+- [ ] Tier 2 (runbooks)
+- [ ] Tier 1 (code)
+- [ ] Tier 0 (tests)
 
 ## Step 2: CHECK Operation
 Run pre-implementation alignment check:
@@ -458,7 +491,7 @@ Remediation: Extract runbook from code, update references
 At any moment, the system is **balanced** when:
 
 ```
-∀ tiers t ∈ {0,1,2,3,4,5}:
+∀ tiers t ∈ {0,1,2,3,4,5,6}:
   references_up(t) ≠ ∅        // Every tier references tier above
   ∧
   evidence_down(t) ≠ ∅        // Every tier has evidence below
@@ -466,6 +499,8 @@ At any moment, the system is **balanced** when:
   active_constraint_only(t)   // All work serves active constraint
   ∧
   audit_trail_exists(t)       // Work log documents change
+  ∧
+  (t = 6 → self_consistent(t)) // Meta-tier verifies itself
 ```
 
 **Imbalance indicators:**
@@ -473,6 +508,7 @@ At any moment, the system is **balanced** when:
 - `evidence_down(t) = ∅` → Unverified claim
 - `¬active_constraint_only(t)` → Premature future work
 - `¬audit_trail_exists(t)` → Undocumented change
+- `(t = 6 ∧ ¬self_consistent(t))` → Meta-tier hypocrisy ("do as I say, not as I do")
 
 **Weekly review:** Run balance equation, remediate imbalances.
 
@@ -481,47 +517,103 @@ At any moment, the system is **balanced** when:
 ## Visualizing the Fractal
 
 ```
-                    Re-Strategy (Tier 5)
-                    Part 01, 02, 03, 04...
-                           ║
-                           ║ (defines constraints)
-                           ▼
-                    Roadmap (Tier 4)
-                    Constraint A/B/C/D
-                           ║
-        ╔══════════════════╬══════════════════╗
-        ║                  ║                  ║
-        ▼                  ▼                  ▼
-    Plan 1             Plan 2             Plan N  (Tier 3)
-    CAN-001            CAN-036            CAN-051
-        ║                  ║                  ║
-        ║ (references)     ║                  ║
-        ▼                  ▼                  ▼
-    Runbook 1         Runbook 2          Runbook N (Tier 2)
-    brand/            design/            forms/
-    messaging.md      accessibility.md    mobile-opt.md
-        ║                  ║                  ║
-        ║ (implements)     ║                  ║
-        ▼                  ▼                  ▼
-    Code 1            Code 2             Code N    (Tier 1)
-    app/page.tsx      components/        components/
-                      forms/*.tsx        forms/*.tsx
-        ║                  ║                  ║
-        ║ (proves)         ║                  ║
-        ▼                  ▼                  ▼
-    Test 1            Test 2             Test N    (Tier 0)
-    e2e/*.spec.ts     a11y/*.test.ts     hooks/*.test.tsx
-        ║                  ║                  ║
-        ╚══════════════════╬══════════════════╝
-                           ║
-                           ▼
-                    Evidence Archive
-                    validation-reports/
-                    test-results/
-                    screenshots/
+            CLAUDE.md + AGENTS.md (Tier 6)
+            System Governance
+                      ║
+                      ║ (enforces alignment)
+                      ▼
+                Re-Strategy (Tier 5)
+                Part 01, 02, 03, 04...
+                      ║
+                      ║ (defines constraints)
+                      ▼
+                Roadmap (Tier 4)
+                Constraint A/B/C/D
+                      ║
+    ╔═════════════════╬═════════════════╗
+    ║                 ║                 ║
+    ▼                 ▼                 ▼
+Plan 1            Plan 2            Plan N  (Tier 3)
+CAN-001           CAN-036           CAN-051
+    ║                 ║                 ║
+    ║ (references)    ║                 ║
+    ▼                 ▼                 ▼
+Runbook 1        Runbook 2         Runbook N (Tier 2)
+brand/           design/           forms/
+messaging.md     accessibility.md   mobile-opt.md
+    ║                 ║                 ║
+    ║ (implements)    ║                 ║
+    ▼                 ▼                 ▼
+Code 1           Code 2            Code N    (Tier 1)
+app/page.tsx     components/       components/
+                 forms/*.tsx       forms/*.tsx
+    ║                 ║                 ║
+    ║ (proves)        ║                 ║
+    ▼                 ▼                 ▼
+Test 1           Test 2            Test N    (Tier 0)
+e2e/*.spec.ts    a11y/*.test.ts    hooks/*.test.tsx
+    ║                 ║                 ║
+    ╚═════════════════╬═════════════════╝
+                      ║
+                      ▼
+                Evidence Archive
+                validation-reports/
+                test-results/
+                screenshots/
 ```
 
-**Notice:** At every level, the branching pattern repeats (fractal).
+**Notice:** At every level, the branching pattern repeats (fractal). **The system even applies to itself** (Tier 6 governs all tiers including itself).
+
+---
+
+## Meta-Verification: The System Checks Itself
+
+**True fractal property:** The alignment system must apply to itself.
+
+### Meta-Tier Checklist
+
+**Every runbook/skill/governance doc must:**
+1. ✅ Reference tier above (CLAUDE.md → re-strategy → constraints)
+2. ✅ Have evidence below (tests, usage logs, work log entries)
+3. ✅ Serve active constraint (even meta-docs align with strategy)
+4. ✅ Create audit trail (changes to CLAUDE.md logged in work log)
+
+### Example: This File (`fractal-alignment-system.md`)
+
+**Tier 6 (Meta):** Itself - describes the system
+**Tier 5:** References re-strategy (Part 02 constraint chain)
+**Tier 4:** Serves Constraint A (prevents drift during public surface work)
+**Tier 3:** Referenced by plans (plans say "per fractal alignment")
+**Tier 2:** Implemented by other runbooks (workflow, review, audit)
+**Tier 1:** Code follows patterns (tier references in comments)
+**Tier 0:** Tests verify (skills work, processes followed)
+**Evidence:** Work log shows system being used
+
+**Self-check:** Does this file follow its own rules? YES
+
+### Self-Consistency Requirements
+
+**When modifying Tier 6 files:**
+
+1. **CLAUDE.md changes:**
+   - Must be logged in work log
+   - Must reference re-strategy principles
+   - Must serve active constraint (even meta changes align with strategy)
+   - Must follow own documented workflow (eat your own dog food)
+
+2. **Skill changes:**
+   - Must be referenced in CLAUDE.md (discoverable)
+   - Must implement what CLAUDE.md describes
+   - Must enforce the fractal alignment rules
+   - Must not violate rules they enforce
+
+3. **Slash command changes:**
+   - Must be documented in CLAUDE.md
+   - Must work as documented
+   - Must support documented workflows
+   - Must be tested before commitment
+
+**Red flag:** Meta-tier doc that violates its own principles = Hypocrisy = System drift
 
 ---
 

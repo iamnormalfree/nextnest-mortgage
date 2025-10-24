@@ -103,6 +103,41 @@ CANONICAL_REFERENCES.md
 
 ---
 
+### Step 5a: Check Meta-Tier Alignment (Tier 6)
+
+**If modifying CLAUDE.md, skills, or slash commands:**
+
+```bash
+# Check which Tier 6 files will be modified:
+# - CLAUDE.md
+# - AGENTS.md
+# - .claude/skills/*.md
+# - .claude/commands/*.md
+```
+
+**Questions to answer:**
+1. **If creating/modifying slash command:**
+   - Will CLAUDE.md reference this command?
+   - Does command implement a documented workflow?
+   - Does command serve active constraint?
+
+2. **If creating/modifying skill:**
+   - Will CLAUDE.md reference this skill?
+   - Does skill enforce documented principles?
+   - Does skill serve active constraint?
+
+3. **If modifying CLAUDE.md:**
+   - Are all referenced commands/skills/runbooks real?
+   - Do changes align with re-strategy principles?
+   - Does this change serve active constraint? (Even meta changes align)
+   - Will this change be logged in work log? ("eat your own dog food")
+
+**Action:** Document meta-tier changes and bidirectional references
+
+**CRITICAL:** Meta-tier must follow its own rules. If CLAUDE.md says "run /check-alignment before coding," we must run it before modifying CLAUDE.md itself.
+
+---
+
 ### Step 6: Create Phase 0 Checkpoint Document
 
 Create a brief pre-implementation checklist:
@@ -112,6 +147,7 @@ Create a brief pre-implementation checklist:
 
 **Date:** YYYY-MM-DD
 **Implementer:** [Your name]
+**Target Tier:** Tier [0-6]
 
 ### Alignment Verification
 - [ ] Active constraint: Constraint [A/B/C/D]
@@ -119,6 +155,7 @@ Create a brief pre-implementation checklist:
 - [ ] Runbook: [path] or [CAN task to create it]
 - [ ] Active plan: [path] or [new plan needed]
 - [ ] Tier 1 files: [list with change rules]
+- [ ] Tier 6 meta-checks: [N/A or bidirectional references verified]
 
 ### Exit Criteria (from roadmap/plan)
 - [ ] [Criterion 1]
@@ -288,8 +325,12 @@ ls docs/runbooks/**/*your-topic*.md
 # 4. Check active plan exists
 ls docs/plans/active/ | grep "your-feature"
 
-# 5. Check Tier 1 file rules
+# 5. Check Tier 1 file rules (if modifying canonical files)
 grep "your-file.ts" CANONICAL_REFERENCES.md
+
+# 6. Check Tier 6 meta-alignment (if modifying CLAUDE.md/skills/commands)
+# - Verify bidirectional references (commands ↔ CLAUDE.md)
+# - Check self-consistency (meta-docs follow their own rules)
 ```
 
 If ANY of these fail, STOP and resolve before coding.

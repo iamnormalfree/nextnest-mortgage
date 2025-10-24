@@ -4,7 +4,7 @@ ABOUTME: Ensures systematic progress tracking, evidence collection, and constrai
 # Weekly Constraint Review
 
 **Frequency:** Every Monday (or weekly cadence of choice)
-**Duration:** 30-45 minutes
+**Duration:** 35-50 minutes (includes meta-verification)
 **Participants:** Brent, engineering leads, AI agents (via work log)
 **Outcome:** Updated matrix, assigned CAN tasks, clear priorities for the week
 
@@ -203,6 +203,47 @@ docs/plans/active/
 
 ---
 
+### Part 8: Meta-Verification (5 minutes)
+
+**Check that governance docs are aligned:**
+
+**Open:** `CLAUDE.md`, `.claude/skills/`, `.claude/commands/`
+
+**Verification checks:**
+
+1. **CLAUDE.md references:**
+   - Does CLAUDE.md reference all critical runbooks created this week?
+   - Are slash commands documented in "Quick Commands" section?
+   - Are skills documented in "Tools & Resources" section?
+   - Do referenced paths point to existing files?
+
+2. **Skills consistency:**
+   - Do skills implement what CLAUDE.md describes?
+   - Are skill prompts up-to-date with workflow changes?
+   - Do skills enforce the fractal alignment system?
+
+3. **Runbook completeness:**
+   - Are all processes mentioned in CLAUDE.md documented as runbooks?
+   - Do runbooks cross-reference correctly?
+   - Are strategy runbooks (workflow, review, audit) still accurate?
+
+4. **Self-consistency check:**
+   - Did we follow our own documented workflows this week?
+   - Did changes to meta-tier docs (CLAUDE.md, skills, commands) get logged in work log?
+   - Did meta-tier changes serve the active constraint?
+
+**Red flags:**
+🚩 CLAUDE.md references non-existent runbooks or commands
+🚩 Slash commands exist but aren't documented in CLAUDE.md
+🚩 Skills don't enforce what they claim to enforce
+🚩 Meta-tier changes weren't logged (hypocrisy - "do as I say, not as I do")
+
+**Action:** Update CLAUDE.md if drift detected. Update skills if workflow changed. Document meta-tier changes in work log.
+
+**Why this matters:** The system that prevents drift must itself prevent its own drift. "Eat your own dog food."
+
+---
+
 ## Review Checklist
 
 Use this checklist during each weekly review:
@@ -249,6 +290,13 @@ Use this checklist during each weekly review:
 - [ ] Created work-log.md entry
 - [ ] Documented decisions and assignments
 - [ ] Shared notes with team
+
+### Part 8: Meta-Verification
+- [ ] Verified CLAUDE.md references are accurate
+- [ ] Checked skills consistency with workflows
+- [ ] Verified runbook completeness
+- [ ] Confirmed meta-tier changes logged in work log
+- [ ] Updated CLAUDE.md/skills if drift detected
 ```
 
 ---

@@ -455,6 +455,110 @@ ABOUTME: Compares current codebase state against Stage 0 launch gate requirement
 
 ---
 
+## Section 9: Meta-Tier Governance (Tier 6)
+
+### 9.1 CLAUDE.md Alignment
+
+**Files:** `CLAUDE.md`, `AGENTS.md`
+
+**Checklist:**
+- [ ] CLAUDE.md references all critical runbooks created during Constraint A
+- [ ] Slash commands documented in "Quick Commands (Daily Workflow)" section
+- [ ] Skills documented in "Tools & Resources" section
+- [ ] All referenced paths point to existing files
+- [ ] Fractal alignment workflow documented and enforced
+
+**Evidence to collect:**
+- List all runbooks referenced in CLAUDE.md
+- Verify each reference points to real file: `ls [path from CLAUDE.md]`
+- Check slash commands exist: `ls .claude/commands/`
+- Check skills exist: `ls .claude/skills/`
+
+**Status:** [ ] | **Evidence:** File existence verification
+
+---
+
+### 9.2 Skills Consistency
+
+**Files:** `.claude/skills/fractal-alignment.md`
+
+**Checklist:**
+- [ ] Fractal alignment skill implements CHECK/IMPLEMENT/VERIFY cycle
+- [ ] Skill includes Tier 6 meta-tier checks
+- [ ] Skill enforces bidirectional references (commands ↔ CLAUDE.md)
+- [ ] Skill enforces self-consistency (meta-docs follow their own rules)
+- [ ] Skill referenced in CLAUDE.md
+
+**Evidence to collect:**
+- Read skill prompt: `.claude/skills/fractal-alignment.md`
+- Verify 7 tiers documented (0-6)
+- Verify meta-tier checks present (Step 1.6a)
+- Grep CLAUDE.md for "fractal-alignment"
+
+**Status:** [ ] | **Evidence:** Skill prompt review
+
+---
+
+### 9.3 Slash Commands Operational
+
+**Files:** `.claude/commands/`
+
+**Checklist:**
+- [ ] `/check-alignment` command exists and documented
+- [ ] `/constraint-status` command exists and documented
+- [ ] `/alignment-gaps` command exists and documented
+- [ ] All commands referenced in CLAUDE.md
+- [ ] Commands tested and functional
+
+**Evidence to collect:**
+- List commands: `ls .claude/commands/`
+- Test each command manually (invoke and verify output)
+- Verify CLAUDE.md references: `grep -E "check-alignment|constraint-status|alignment-gaps" CLAUDE.md`
+
+**Status:** [ ] | **Evidence:** Command testing logs
+
+---
+
+### 9.4 Meta-Tier Work Logged
+
+**Files:** `docs/work-log.md`
+
+**Checklist:**
+- [ ] All Tier 6 changes logged in work log (CLAUDE.md, skills, commands)
+- [ ] Meta-tier changes tagged with "Tier 6" or "Meta-tier"
+- [ ] Meta-tier changes reference active constraint
+- [ ] Self-consistency verified ("eating our own dog food")
+
+**Evidence to collect:**
+- Search work log: `grep -i "tier 6\|meta-tier\|CLAUDE.md\|slash command\|skill" docs/work-log.md`
+- Verify entries include constraint alignment
+- Verify meta-tier changes followed fractal alignment workflow
+
+**Status:** [ ] | **Evidence:** Work log entries
+
+---
+
+### 9.5 Self-Verification Checklist
+
+**Concept:** The system must verify itself.
+
+**Checklist:**
+- [ ] Meta-tier docs reference re-strategy (Tier 6 → Tier 5)
+- [ ] Runbooks exist for workflows mentioned in CLAUDE.md (Tier 5 → Tier 2)
+- [ ] Skills enforce fractal alignment documented in CLAUDE.md (Tier 6 → Tier 0-5)
+- [ ] Slash commands work as documented (evidence = testing)
+- [ ] Meta-tier changes served active constraint (even meta changes align)
+
+**Evidence to collect:**
+- Cross-reference CLAUDE.md workflows with runbooks in `docs/runbooks/strategy/`
+- Verify constraint-implementation-workflow.md exists ✅
+- Verify weekly-constraint-review.md exists ✅
+- Verify constraint-a-audit-checklist.md exists (this file) ✅
+
+**Status:** [ ] | **Evidence:** Cross-reference validation
+
+---
+
 ## Final Checklist: Constraint A Completion Criteria
 
 Before marking Constraint A as ✅ in the matrix, verify ALL of these:
