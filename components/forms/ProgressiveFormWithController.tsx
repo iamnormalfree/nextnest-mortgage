@@ -26,6 +26,7 @@ import { Step3NewPurchase } from './sections/Step3NewPurchase'
 import { Step3Refinance } from './sections/Step3Refinance'
 import { cn, formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 import { calculateInstantProfile, roundMonthlyPayment } from '@/lib/calculations/instant-profile'
+import { generatePropertyCaveats } from '@/lib/calculations/property-loan-helpers'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -157,6 +158,7 @@ export function ProgressiveFormWithController({
 
   const shouldShowPropertyTypeSelect =
     loanType === 'new_purchase' &&
+    propertyCategory !== null &&
     propertyCategory !== 'bto' &&
     propertyCategory !== 'commercial'
 
@@ -717,13 +719,15 @@ export function ProgressiveFormWithController({
               />
             )}
 
-            {/* Property Ownership - Only show for Private/EC/Landed (HDB buyers can't own 2 HDBs) */}
-            {loanType === 'new_purchase' &&
-             (fieldValues.propertyType === 'Private' ||
-              fieldValues.propertyType === 'EC' ||
-              fieldValues.propertyType === 'Landed') && (
-              <Controller
-                name="existingProperties"
+            {/* Progressive disclosure: Show remaining fields ONLY after propertyType selected */}
+            {loanType === 'new_purchase' && fieldValues.propertyType && (
+              <>
+                {/* Property Ownership - Only show for Private/EC/Landed (HDB buyers can't own 2 HDBs) */}
+                {(fieldValues.propertyType === 'Private' ||
+                  fieldValues.propertyType === 'EC' ||
+                  fieldValues.propertyType === 'Landed') && (
+                  <Controller
+                    name="existingProperties"
                 control={control}
                 render={({ field }) => (
                   <div className="flex items-center gap-3 p-3 bg-[#F8F8F8] rounded-lg border border-[#E5E5E5]">
@@ -746,12 +750,10 @@ export function ProgressiveFormWithController({
                       I&apos;m keeping my current property <span className="text-xs text-[#999999]">(second home, LTV capped at 45%)</span>
                     </label>
                   </div>
+                    )}
+                  />
                 )}
-              />
-            )}
 
-            {loanType === 'new_purchase' ? (
-              <>
                 <Controller
                   name="priceRange"
                   control={control}
@@ -833,7 +835,9 @@ export function ProgressiveFormWithController({
                   }}
                 />
               </>
-            ) : loanType === 'refinance' && (
+            )}
+
+            {loanType === 'refinance' && (
               <>
                 <Controller
                   name="currentRate"
@@ -965,105 +969,105 @@ export function ProgressiveFormWithController({
               </div>
             )}
 
-            {!isInstantCalcLoading && showInstantCalc && instantCalcResult && (() => {
-              // Helper function to calculate monthly payment
-              const calculateMonthlyPayment = (loanAmount: number, rate: number = 2.8, years: number = 25) => {
-                const monthlyRate = rate / 100 / 12
-                const months = years * 12
-                const monthlyPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1)
-                return Math.round(monthlyPayment)
-              }
+            {/* 
+              ========================================
+              MOBILE RESPONSIVE TESTING CHECKLIST
+              ========================================
+              
+              Test the following viewports BEFORE merge:
+              
+              1. 320px viewport (iPhone SE)
+                 - Verify no horizontal scroll
+                 - Check calculation card fits width
+                 - Verify caveats list readable
+              
+              2. 375px viewport (iPhone 12/13)
+                 - Check spacing between elements
+                 - Verify button sizes (min 44px height)
+                 - Test caveat text wrapping
+              
+              3. 390px viewport (standard mobile)
+                 - Verify heading font sizes
+                 - Check max loan amount visibility
+                 - Test CTA link tapability
+              
+              4. Touch targets
+                 - All buttons minimum 44px (iOS guideline)
+                 - Links have adequate spacing
+                 - Checkbox has 44px touch area
+              
+              5. Readability
+                 - Text minimum 14px on mobile
+                 - Adequate line-height for lists
+                 - Color contrast meets WCAG AA
+              
+              Test command: npm run dev, open DevTools, test responsive mode
+              ========================================
+            */}
 
-              if (loanType === 'new_purchase' && !isRefinanceResult(instantCalcResult) && instantCalcResult.maxLoanAmount) {
-                const propertyPrice = instantCalcResult.propertyPrice ?? Number(fieldValues.priceRange ?? 0)
-                const maxLoan = instantCalcResult.maxLoanAmount
-                const rateAssumption = instantCalcResult.rateAssumption ?? 2.8
-                const monthlyPayment = isFullAnalysisResult(instantCalcResult) && instantCalcResult.estimatedMonthlyPayment
-                  ? instantCalcResult.estimatedMonthlyPayment
-                  : calculateMonthlyPayment(maxLoan, rateAssumption)
-                const downPayment = instantCalcResult.downPayment ?? Math.max(propertyPrice - maxLoan, 0)
-                const cpfAllowedAmount = instantCalcResult.cpfAllowedAmount ?? Math.min(downPayment * 0.8, 200000)
-                const cashRequired = Math.max(downPayment - cpfAllowedAmount, 0)
-                const minCashPercent = instantCalcResult.minCashPercent ?? (propertyPrice > 0 ? Math.round((cashRequired / propertyPrice) * 100) : 0)
-                const minCashRequired = instantCalcResult.minCashRequired ?? cashRequired
-                const ltvPercent = typeof instantCalcResult.ltvRatio === 'number'
-                  ? instantCalcResult.ltvRatio
-                  : (propertyPrice > 0 ? Math.round((maxLoan / propertyPrice) * 100) : ltvMode)
-                const tenureCapYears = instantCalcResult.effectiveTenure
-                const tenureCapSource = instantCalcResult.tenureCapSource
-                const limitingFactor = instantCalcResult.limitingFactor
-                const reasonCodes: string[] = instantCalcResult.reasonCodes ?? []
-                const policyRefs: string[] = instantCalcResult.policyRefs ?? []
+            {!isInstantCalcLoading && showInstantCalc && instantCalcResult && fieldValues.propertyType && fieldValues.propertyCategory && (() => {
+              // Handle new_purchase loan type
+              if (loanType === 'new_purchase') {
+                const propertyPrice = fieldValues.priceRange || 0
+                const propertyCategory = fieldValues.propertyCategory
+                
+                // #PATH_DECISION: Property type mapping to helper function format
+                // Map form values to helper function expected format:
+                // - Form stores: 'HDB', 'Private', 'EC', 'Landed', 'Commercial'
+                // - Helper expects: 'hdb-resale', 'private-new', etc.
+                const propertyType = propertyCategory === 'resale' 
+                  ? `${fieldValues.propertyType?.toLowerCase()}-resale`
+                  : propertyCategory === 'bto'
+                  ? 'hdb-new'
+                  : propertyCategory === 'commercial'
+                  ? 'commercial'
+                  : `${fieldValues.propertyType?.toLowerCase()}-new`
+                
+                const combinedAge = fieldValues.combinedAge || 30
+                const isSecondHome = (fieldValues.existingProperties || 0) > 0
 
-                return (
-                  <div className="mt-6 p-8 bg-white border border-[#E5E5E5]">
-                    <h4 className="text-2xl font-semibold text-[#000000] mb-4">
-                      ✨ You qualify for up to
-                    </h4>
-
-                    <div className="text-5xl font-semibold text-[#000000] mb-6">
-                      ${maxLoan.toLocaleString()}
-                    </div>
-
-                    <p className="text-[#666666] text-base mb-8">
-                      {generateUserFriendlySummary(instantCalcResult)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={() => setShowAnalysisDetails(!showAnalysisDetails)}
-                      className="text-[#666666] hover:text-[#000000] underline text-sm"
-                    >
-                      {showAnalysisDetails ? 'Hide details' : 'View full breakdown'}
-                    </button>
-
-                    {showAnalysisDetails && (
-                      <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-[#666666]">Monthly Payment</span>
-                            <span className="text-sm font-mono text-[#000000]">
-                              ${monthlyPayment.toLocaleString()}/mo
-                            </span>
-                          </div>
-
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-[#666666]">Down Payment</span>
-                            <span className="text-sm font-mono text-[#000000]">
-                              ${Math.round(downPayment).toLocaleString()}
-                            </span>
-                          </div>
-
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-[#666666]">Cash Required</span>
-                            <span className="text-sm font-mono text-[#000000]">
-                              ${Math.round(cashRequired).toLocaleString()}
-                            </span>
-                          </div>
-
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-[#666666]">CPF Allowed</span>
-                            <span className="text-sm font-mono text-[#000000]">
-                              ${Math.round(cpfAllowedAmount).toLocaleString()}
-                            </span>
-                          </div>
-
-                          {tenureCapYears && (
-                            <div className="pt-4 border-t border-[#E5E5E5]">
-                              <p className="text-xs text-[#666666]">
-                                Tenure capped at {tenureCapYears} years ({tenureCapSource === 'age' ? 'age limit' : 'regulation'})
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                const { maxLoan, caveats } = generatePropertyCaveats(
+                  propertyPrice,
+                  propertyCategory,
+                  propertyType,
+                  combinedAge,
+                  isSecondHome
                 )
 
+                return (
+                  <div className="mt-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                    <h4 className="text-2xl font-bold text-gray-900 mb-2">
+                      ✨ You can borrow up to ${maxLoan.toLocaleString()}
+                    </h4>
+                    
+                    <p className="text-gray-600 mb-4">
+                      {isSecondHome 
+                        ? "Your loan is capped at 45% LTV since you're keeping your current property."
+                        : "Your loan is capped at 75% LTV for your first home purchase."}
+                    </p>
+
+                    {/* Personalized caveats */}
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
+                      <p className="font-semibold text-amber-900 text-sm mb-2">📋 Important details:</p>
+                      {caveats.map((caveat, idx) => (
+                        <p key={idx} className="text-sm text-amber-800">{caveat}</p>
+                      ))}
+                    </div>
+
+                    {/* CTA to detailed calculator */}
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                      <p className="text-sm text-gray-600">
+                        Want to see monthly payments and full breakdown?{' '}
+                        <a href="/calculator" className="text-blue-600 hover:text-blue-800 underline font-medium">
+                          Use our detailed calculator →
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                )
               }
 
-              // Calculate additional metrics for refinance
+              // Handle refinance loan type
               if (loanType === 'refinance' && isRefinanceResult(instantCalcResult) && instantCalcResult.monthlySavings) {
                 // Use currentMonthlyPayment from calculateRefinanceOutlook() which handles missing rates
                 const currentMonthlyPayment = instantCalcResult.currentMonthlyPayment ?? 0
@@ -1151,6 +1155,7 @@ export function ProgressiveFormWithController({
 
               return null
             })()}
+
 
             
 
