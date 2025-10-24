@@ -362,23 +362,54 @@ AND
 Audit trail exists in work log
 ```
 
+### Quick Commands (Daily Workflow)
+
+**For speed and efficiency, use these slash commands:**
+
+```bash
+# Before every code change (30 seconds):
+/check-alignment [brief work description]
+
+# Quick status check ("where are we?"):
+/constraint-status
+
+# Drift detection (between weekly reviews):
+/alignment-gaps
+```
+
+**Example:**
+```bash
+/check-alignment add accessibility labels to form inputs
+
+Output:
+✅ PROCEED - Constraint A, CAN-037
+Runbook: docs/runbooks/design/accessibility-checklist.md
+Next: Write failing test, implement per runbook
+```
+
+---
+
 ### Mandatory Workflow
 
 **Before ANY code change:**
 
-1. **CHECK Phase** (5-10 minutes):
+1. **CHECK Phase** (30 seconds with command, 5-10 min manual):
    ```bash
-   # Run pre-implementation checks:
-   # See: docs/runbooks/strategy/constraint-implementation-workflow.md Phase 0
+   # Fastest: Use slash command
+   /check-alignment [work description]
 
-   - Identify active constraint (from matrix)
-   - Verify CAN task exists (from backlog)
-   - Check runbook exists (or CAN task to create it)
-   - Verify Tier 1 rules (from CANONICAL_REFERENCES.md)
-   - Check for conflicts (work log, active plans)
+   # Manual alternative (see full workflow):
+   # docs/runbooks/strategy/constraint-implementation-workflow.md Phase 0
+
+   Verifies:
+   - Active constraint (from matrix)
+   - CAN task exists (from backlog)
+   - Runbook exists (or CAN task to create it)
+   - Tier 1 rules (from CANONICAL_REFERENCES.md)
+   - No conflicts (work log, active plans)
    ```
 
-   **If ANY check fails → STOP. Do not proceed to coding.**
+   **If check returns ❌ BLOCKED → STOP. Do not proceed to coding.**
 
 2. **IMPLEMENT Phase**:
    ```typescript
@@ -404,14 +435,21 @@ Audit trail exists in work log
 
 **If you skip CHECK phase → Code may not align with re-strategy → Rework required.**
 
-### Implementation Runbooks
+### Tools & Resources
 
-For detailed step-by-step workflows:
+**Slash Commands (Daily Use):**
+- `/check-alignment [work]` - Pre-coding CHECK phase (30s)
+- `/constraint-status` - Progress overview & blockers
+- `/alignment-gaps` - Drift detection & health check
 
+**Runbooks (Comprehensive Workflows):**
 - **Before starting work:** `docs/runbooks/strategy/constraint-implementation-workflow.md`
 - **Weekly reviews:** `docs/runbooks/strategy/weekly-constraint-review.md`
 - **Codebase audits:** `docs/runbooks/strategy/constraint-a-audit-checklist.md`
 - **System architecture:** `docs/runbooks/strategy/fractal-alignment-system.md`
+
+**Skill (Automatic Enforcement):**
+- `.claude/skills/fractal-alignment.md` - Auto-runs during code changes
 
 ### Drift Detection
 
