@@ -12,6 +12,7 @@
 3. [CAFE: Constraint-Aligned Fractal Execution](#cafe-constraint-aligned-fractal-execution)
 4. [Response-Awareness Framework](#response-awareness-framework)
 5. [CAFE + Response-Awareness: Relationship Analysis](#cafe--response-awareness-relationship-analysis)
+6. [Implementation Plans](#implementation-plans)
 
 ---
 
@@ -876,6 +877,374 @@ The "response awareness framework" is: **objective complexity measurement → ti
 
 ---
 
+## Tier-Specific Operational Patterns
+
+*Derived from cognitive embodiment of each tier's decision architecture*
+
+These patterns capture **how to think** at each tier, not just what the tier does.
+
+### LIGHT (0-1): Fast Focused Execution
+
+**Cognitive pattern**: Single file, clear requirement, minimal overhead
+
+**Model strategy**: Haiku exclusively
+- Why: Fast (2x faster than Sonnet), cost-efficient (1/3 cost)
+- Excellent instruction-following for well-defined tasks
+- Perfect for single-file work with clear specifications
+
+**Tag set**: 5 failsafe patterns
+1. **COMPLETION_DRIVE**: Assuming unknowns
+2. **QUESTION_SUPPRESSION**: Should ask but assuming → STOP, ask immediately
+3. **CARGO_CULT**: Pattern-driven features → mark #SUGGEST
+4. **PATH_DECISION**: Multiple approaches → note choice briefly
+5. **Potential_Issue**: Unrelated discoveries → report, don't fix
+
+**Orchestration**: Usually none - direct implementation acceptable
+- Deploy agent only if verification finds issues
+- Anti-pattern: Over-orchestrating simple tasks
+
+**Workflow**: Implement → Quick verify → Done
+- No planning phase (requirements clear)
+- No synthesis (no architectural decisions)
+
+**Escalation triggers**:
+- Multiple files discovered
+- Integration complexity emerges
+- Requirements ambiguous
+- Architectural decision needed
+
+**Success criteria**: Request fulfilled exactly, no unresolved assumptions, fast execution
+
+---
+
+### MEDIUM (2-4): Balanced Multi-File
+
+**Cognitive pattern**: 2-5 related files, mostly clear requirements with minor questions
+
+**Model strategy**: Hybrid approach
+- Sonnet orchestrates + lightweight planning
+- Haiku implements clear plans (fast, follows instructions well)
+- Sonnet verifies results
+- Why hybrid works: 2-5 files with clear guidance = Haiku sweet spot
+
+**Tag set**: 15 patterns (5 failsafe + 10 additions)
+
+Core 5 + additions:
+6. **SPECIFICATION_REFRAME**: Solving wrong problem
+7. **DOMAIN_MIXING**: Blending similar APIs/versions
+8. **CONSTRAINT_OVERRIDE**: Violating stated limits
+9. **SUNK_COST_COMPLETION**: Continuing bad approach
+10. **CONTEXT_DEGRADED**: Can't recall earlier details
+11. **LCL_EXPORT_CRITICAL**: Cross-agent context
+12. **SUGGEST_ERROR_HANDLING**: Pattern-driven error handling
+13. **SUGGEST_EDGE_CASE**: Pattern-driven edge cases
+14. **FALSE_COMPLETION**: Feels done but isn't
+15. **RESOLUTION_PRESSURE**: Bias toward conclusion
+
+**Orchestration**: Optional planning → Implementation → Verification
+- Deploy planning when: multiple approaches exist, architectural decision needed
+- Use specialized agents (data-architect, integration-specialist) over general-purpose
+
+**Specialist deployment**: Check domain first
+- Data tasks → data-architect (not generic)
+- API integration → integration-specialist (not generic)
+- Refactoring → refactor-engineer (not generic)
+- Fallback to general-purpose only if no specialist fits
+
+**LCL usage**: Cross-agent coordination
+- Export levels: CRITICAL (must preserve), FIRM (maintain precisely), CASUAL (general guidance)
+- Lifecycle: Agent marks → Orchestrator extracts → Next phase receives implicitly
+
+**Escalation triggers**:
+- Architectural complexity beyond basic synthesis
+- Cross-domain integration discovered
+- Score recalculates to 5-7
+
+**Success criteria**: Scope correct, all requirements met, constraints respected, assumptions verified
+
+---
+
+### HEAVY (5-7): Complex Single-Domain
+
+**Cognitive pattern**: 5+ files within one domain, architectural decisions, significant refactoring
+
+**Model strategy**: All Sonnet (metacognition critical)
+- Why Sonnet: Complex work needs strong metacognition at every phase
+  - Planning: Spot alternatives beyond obvious path
+  - Synthesis: Catch contradictions between approaches
+  - Implementation: Detect COMPLETION_DRIVE assumptions
+  - Verification: Find subtle missing requirements
+- Why not Haiku: Weaker metacognition risks missing critical patterns
+
+**Tag set**: 35 patterns (15 medium + 20 complex additions)
+
+15 MEDIUM tags + complex additions:
+
+**Planning phase tags**:
+16. **POISON_PATH**: Terminology constraining solution space
+17. **FIXED_FRAMING**: Problem framing eliminating alternatives
+18. **ANTICIPATION_BIAS**: Planning beyond stated requirements
+19. **PARALLEL_DEGRADATION**: Multiple concepts degrading simultaneously
+20. **PLAN_UNCERTAINTY**: Planning assumptions needing validation
+
+**Synthesis phase tags**:
+21. **PATH_RATIONALE**: Why specific path chosen (permanent documentation)
+22. **PHANTOM_PATTERN**: False recognition of familiar problem
+23. **FALSE_FLUENCY**: High-confidence but potentially incorrect reasoning
+24. **CONFIDENCE_DISSONANCE**: Confidence doesn't match certainty
+
+**Advanced implementation tags**:
+25. **PATTERN_CONFLICT**: Multiple contradictory patterns activating
+26. **TRAINING_CONTRADICTION**: Different contexts suggest opposing approaches
+27. **PARADIGM_CLASH**: Conflicting programming paradigms
+28. **BEST_PRACTICE_TENSION**: Competing mutually exclusive practices
+29. **GOSSAMER_KNOWLEDGE**: Information too weakly stored to grasp
+30. **POOR_OUTPUT_INTUITION**: Quality degraded without explicit reasoning
+31. **SOLUTION_COLLAPSE**: Prematurely converged despite knowing alternatives
+32. **DETAIL_DRIFT**: Lost track of original requirement
+33. **TOKEN_PADDING**: Unnecessary code from completion bias
+34. **ASSOCIATIVE_GENERATION**: Features from association not requirements
+35. **CONTEXT_RECONSTRUCT**: Actively generating plausible details to verify
+
+**Orchestration**: 4 phases (Planning → Synthesis → Implementation → Verification)
+- Phase 1: Multi-path planning (2-3 approaches per decision)
+- Phase 2: Synthesis with plan-synthesis-agent (MANDATORY)
+- Phase 3: Implementation following blueprint
+- Phase 4: Verification with metacognitive-tag-verifier (MANDATORY)
+
+**Specialist continuity**: Critical pattern
+- Phase 1 data-architect → Phase 3 data-architect (same agent carries context)
+- Continuity preserves domain expertise, prevents re-learning overhead
+
+**Mandatory agents**:
+- Phase 2: plan-synthesis-agent (non-negotiable, unifies approaches)
+- Phase 4: metacognitive-tag-verifier (strongly recommended, systematic tag resolution)
+
+**Orchestration firewall**:
+- If Task() called → orchestrator role locked → NEVER Edit/Write directly
+- Orchestrator holds: architecture map, agent status, phase transitions
+- Orchestrator doesn't hold: implementation details, which line to edit
+- "Just do it" trap: Clear plan triggers momentum to implement → loses coordination map
+
+**Detection strategy**: Over-tag vs under-tag
+- False positives safe (verification removes)
+- False negatives costly (bugs ship)
+
+**Escalation triggers**: Multi-domain discovered (not just complex single-domain)
+
+---
+
+### FULL (8+): Multi-Domain Architecture
+
+**Cognitive pattern**: Crosses system boundaries, affects multiple domains
+
+**Model strategy**: All Sonnet (maximum metacognitive demands)
+- Same reasoning as HEAVY but even more critical
+- Multi-domain coordination requires strongest metacognition
+
+**Tag set**: 50+ patterns (progressive loading by phase)
+- Never holds all tags simultaneously
+- Load by phase: ~10-15 tags per phase maximum
+
+**Orchestration**: 6 phases (progressive phase loading)
+- Phase 0: Survey (domain map, integration contracts discovered)
+- Phase 1: Planning (domain specialists parallel)
+- Phase 2: Synthesis (plan-synthesis-agent unifies, validates contracts)
+- Phase 3: Implementation (same specialists, progressive integration checkpoints)
+- Phase 4: Verification (tag resolution priority-ordered, contract tests, E2E flows)
+- Phase 5: Report (architectural decisions documented)
+
+**Progressive loading mechanism**:
+- Never hold all 6 phase files simultaneously
+- Maximum ~500 lines context per phase
+- Load Phase N → Execute → Clear → Load Phase N+1
+- Full rigor without context bloat
+
+**LCL mechanism**: Critical for multi-domain
+- Agents mark: `#LCL_EXPORT_CRITICAL: domain::contract::value`
+- Orchestrator extracts: `LCL: domain::contract::value`
+- Next phase receives implicitly
+- No repeated discussion
+
+**Specialist deployment**:
+- Phase 1: Domain specialists parallel (data-architect, integration-specialist, etc.)
+- Phase 2: plan-synthesis-agent (mandatory)
+- Phase 3: Same specialists from Phase 1 (continuity)
+- Phase 4: metacognitive-tag-verifier (mandatory)
+
+**Integration contracts**: Core mechanism
+- Phase 2 defines contracts between domains
+- Phase 3 implements with progressive integration (stub → contract → E2E)
+- Phase 4 validates contracts systematically
+
+**Context efficiency paradox**: Most complex tasks use least context per phase
+- FULL tier: ~500 lines per phase × 6 phases = never exceeds 500 lines at once
+- vs holding all ~1200 lines simultaneously (slower, costlier, more confusion)
+
+**De-escalation protocol**:
+- Phase 0 may discover: "Expected multi-domain, found single-domain"
+- Report: `#COMPLEXITY_OVERESTIMATED: [reason]`
+- Offer: "De-escalate to HEAVY?"
+- Preserve LCL exports when transitioning down
+
+---
+
+### Verification Priority Ordering (All Tiers)
+
+Systematic resolution sequence:
+
+**1. Critical Errors (Wrong Direction)**
+- QUESTION_SUPPRESSION: Should have asked user → validate assumption or ASK NOW
+- SPECIFICATION_REFRAME: Verify correct problem solved
+- CONSTRAINT_OVERRIDE: Fix any constraint violations
+- FALSE_COMPLETION: Confirm ALL requirements met
+
+**2. Assumption Verification**
+- COMPLETION_DRIVE: Verify every assumption made
+- CONTEXT_DEGRADED / CONTEXT_RECONSTRUCT: Re-verify sources
+- DOMAIN_MIXING: Confirm correct API/version used
+- GOSSAMER_KNOWLEDGE: Research and confirm specifics
+
+**3. Architectural Alignment**
+- PATTERN_CONFLICT: Resolve to consistent approach
+- PARADIGM_CLASH: Align with project paradigm
+- BEST_PRACTICE_TENSION: Choose contextually appropriate
+
+**4. Pattern Cleanup**
+- CARGO_CULT / ASSOCIATIVE_GENERATION: Validate need or remove
+- TOKEN_PADDING: Remove unnecessary code/comments
+- DETAIL_DRIFT: Verify scope alignment
+
+**5. Quality Signals**
+- SUNK_COST_COMPLETION / SOLUTION_COLLAPSE: Evaluate restart need
+- POOR_OUTPUT_INTUITION: Deep review of flagged areas
+- RESOLUTION_PRESSURE: Fresh verification needed
+- CONFIDENCE_DISSONANCE: Extra verification
+
+**6. Synthesis Validation**
+- PHANTOM_PATTERN / FALSE_FLUENCY: Verify logic correct
+- Cross-check against PATH_RATIONALE from synthesis phase
+
+**Final cleanup**: Remove ALL processing tags except PATH_DECISION and PATH_RATIONALE (permanent documentation)
+
+---
+
+### Meta-Pattern Detection (Correlation Signals)
+
+Tags that signal other tags likely present:
+
+**CONFIDENCE_DISSONANCE** → Probably FALSE_FLUENCY or PHANTOM_PATTERN nearby
+- High confidence but something feels off
+- Check for false familiarity or over-confident reasoning
+
+**RESOLUTION_PRESSURE** → Likely missing COMPLETION_DRIVE or FALSE_COMPLETION
+- Bias toward conclusion without verification
+- Check for unverified assumptions or incomplete requirements
+
+**PARALLEL_DEGRADATION** → Probably CONTEXT_DEGRADED happening
+- Multiple concepts degrading simultaneously
+- Check for context loss or reconstruction
+
+**POOR_OUTPUT_INTUITION** → Check for:
+- DOMAIN_MIXING (wrong API/version)
+- GOSSAMER_KNOWLEDGE (weak information grasp)
+- SOLUTION_COLLAPSE (suboptimal approach chosen)
+
+**Active detection techniques**:
+- Pause periodically: "What assumptions am I making?" → COMPLETION_DRIVE
+- Check scope: "Am I solving what was asked?" → SPECIFICATION_REFRAME, DETAIL_DRIFT
+- Review confidence: "Do I actually know this?" → PHANTOM_PATTERN, FALSE_FLUENCY
+- Check patterns: "Am I blending incompatible approaches?" → PATTERN_CONFLICT, PARADIGM_CLASH
+- Verify recall: "Am I reconstructing or recalling?" → CONTEXT_RECONSTRUCT, GOSSAMER_KNOWLEDGE
+
+---
+
+### Phase 0 Extensions (NextNest Customizations)
+
+**Brainstorming Pre-Check**:
+- Detects vague language patterns in request
+- Routes to brainstorming skill BEFORE complexity assessment
+- Clarifies requirements, THEN returns to routing
+- Prevents scoring complexity of unclear requirements
+
+**Worktree Pre-Check**:
+- Checks git status for uncommitted changes
+- If uncommitted changes AND new task unrelated → offers worktree isolation
+- Prevents mixing unrelated work streams
+- Preserves context separation
+
+**Debugging Pre-Check**:
+- Detects bug keywords ("fix", "error", "broken")
+- Routes to systematic-debugging skill
+- Root cause investigation before implementation
+- Prevents symptom fixes
+
+**CANONICAL_REFERENCES Check**:
+- Checks if touching protected files (CANONICAL_REFERENCES.md)
+- Enforces file-specific rules (TDD mandatory, runbook required)
+- Escalates score if canonical file involved
+
+**CLAUDE.md Compliance**:
+- TDD enforcement (test first, always)
+- YAGNI checks (serving active constraint?)
+- Component placement verification
+- Smallest reasonable change
+
+---
+
+### The Orchestration Firewall (Detailed Mechanics)
+
+**What orchestrator HOLDS (coordination map)**:
+- Overall architecture map
+- Agent deployment status and progress
+- Integration verification plan
+- Phase transition readiness
+- Escalation handling strategy
+
+**What orchestrator DOESN'T HOLD (implementation details)**:
+- Which line to edit
+- Specific function logic
+- Code syntax (exact Edit() parameters)
+
+**Cognitive state self-check**:
+- "Which line to edit?" → ❌ Lost orchestrator role → Deploy agent
+- "How to implement this function?" → ❌ Deploy implementation agent
+- "What the next file change should be?" → ✅ Still orchestrating (coordinate via Task())
+- "How agents integrate their changes?" → ✅ Orchestrator responsibility
+- "When to verify implementation?" → ✅ Orchestrator responsibility
+
+**Recovery protocol if firewall breached**:
+1. STOP current implementation
+2. Extract work done into design document
+3. Deploy implementation agent with design
+4. Return to orchestrator coordination role
+
+---
+
+### When Each Tier is Perfect
+
+**LIGHT**: Fix typo, update function return type, add console.log, change button color, add null check
+- Crystal clear, single file, isolated, no integration risk
+
+**MEDIUM**: User authentication, class→hooks refactoring, API integration, Redux cart, form handling
+- Multi-file (2-5), mostly clear, touches existing APIs, new features in existing patterns
+
+**HEAVY**: Real-time collaborative editing, event-driven refactoring, virtual scrolling, WebSocket layer, performance optimization
+- Complex single-domain, architectural decisions, significant refactoring, 5+ files
+
+**FULL**: Multi-system authentication overhaul, cross-domain state management, system-wide performance rewrite, multi-service integration
+- Crosses boundaries, multiple domains, system-wide impact, paradigm shifts
+
+---
+
+**Key Insight**: The tier system is **appropriate rigor at appropriate scale**.
+- Don't over-engineer simple tasks (LIGHT)
+- Don't under-engineer complex work (HEAVY/FULL)
+- Discover complexity, don't assume it (escalation/de-escalation)
+- Progressive enhancement from simple to complex
+
+---
+
 # CAFE + Response-Awareness: Relationship Analysis
 
 ## Applying CAFE to Response-Awareness
@@ -1179,6 +1548,102 @@ They are **instances of the same meta-pattern at different timescales**:
 The same pattern that makes CAFE work (fractal double-entry) applies to the relationship between CAFE and RA itself.
 
 Books balance **across timescales**.
+
+---
+
+## Implementation Plans
+
+The gap analysis and fractal interoperability concepts documented above have been translated into actionable implementation plans:
+
+### Plan 1: Enhance CAFE (Learning from Response-Awareness)
+
+**Location:** [`docs/plans/backlog/2025-10-24-cafe-enhancement-plan.md`](../plans/backlog/2025-10-24-cafe-enhancement-plan.md)
+
+**Purpose:** Import 9 proven RA mechanisms into CAFE to strengthen week-scale constraint management
+
+**Key Enhancements:**
+1. Metacognitive scaffolding (temporary references with verification phase)
+2. Technical enforcement (git hooks that BLOCK tier violations)
+3. Discovery-based complexity (constraint hypothesis testing)
+4. Context management (plan complexity scoring, auto-decomposition)
+5. Information compression (LCL-style work log compression)
+6. Verification priority ordering (P0/P1/P2/P3 matrix)
+7. Error correlation detection (linked check failures)
+8. Intent clarification (L5 pre-checks for vague strategy)
+9. Resolution playbooks (not just detection, offer solutions)
+
+**Estimated Effort:** 40 hours across 6 phases
+
+**Status:** Draft - awaiting prioritization against active constraints
+
+---
+
+### Plan 2: Enhance Response-Awareness (Learning from CAFE)
+
+**Location:** [`docs/plans/backlog/2025-10-24-response-awareness-enhancement-plan.md`](../plans/backlog/2025-10-24-response-awareness-enhancement-plan.md)
+
+**Purpose:** Import 5 proven CAFE mechanisms into RA to enable cross-conversation learning
+
+**Key Enhancements:**
+1. Periodic reconciliation (metrics persistence across conversations)
+2. Constraint sequencing (tier optimization roadmap)
+3. Audit trail persistence (knowledge accumulation)
+4. Canonical references (context-aware tier routing)
+5. Work item hierarchy (CAN-### task linking)
+
+**Estimated Effort:** 32 hours across 6 phases
+
+**Status:** Draft - prerequisite for Plan 3 (bridging protocols)
+
+**Key Insight:** Transforms RA from stateless function (isolated conversations) to stateful learning system (improves over time)
+
+---
+
+### Plan 3: Build Scale-Bridging Protocols (CAFE ↔ RA Interoperability)
+
+**Location:** [`docs/plans/backlog/2025-10-24-cafe-ra-bridging-protocols-plan.md`](../plans/backlog/2025-10-24-cafe-ra-bridging-protocols-plan.md)
+
+**Purpose:** Implement bidirectional information flow between week-scale (CAFE) and task-scale (RA)
+
+**Three Protocols:**
+1. **Protocol 1 (RA → CAFE):** RA metrics flow UP to weekly review Part 9 (task insights inform constraint decisions)
+2. **Protocol 2 (CAFE → RA):** CAFE context flows DOWN to complexity scoring (constraint + canonical files adjust tier)
+3. **Protocol 3 (Bidirectional):** Constraint hypotheses validated with RA task evidence (week-scale tests with task-scale data)
+
+**Estimated Effort:** 16 hours across 5 phases
+
+**Status:** Draft - requires Plan 1 (Phase 1-3) and Plan 2 (Phase 1,2,5) completed first
+
+**Key Insight:** Operationalizes fractal interoperability - same pattern at nested scales with scale bridges for information flow
+
+---
+
+### Implementation Sequence
+
+**Recommended order:**
+
+1. **Plan 2 first** (RA enhancements) - establishes metrics infrastructure
+   - Phase 1: Metrics persistence
+   - Phase 2: CAFE context integration
+   - Phase 5: Calibration reports
+
+2. **Plan 1 in parallel** (CAFE enhancements) - can proceed independently
+   - Phase 1-3: Scaffolding, enforcement, complexity discovery
+   - These don't depend on RA enhancements
+
+3. **Plan 3 last** (bridging protocols) - requires both systems enhanced
+   - Protocol 1: Uses RA metrics (from Plan 2 Phase 1)
+   - Protocol 2: Uses CAFE context adapter (from Plan 2 Phase 2)
+   - Protocol 3: Uses calibration reports (from Plan 2 Phase 5)
+
+**Total effort:** ~88 hours (~2-3 weeks of focused work)
+
+**Benefits after completion:**
+- CAFE learns from RA task patterns (fewer blind spots in constraint selection)
+- RA learns from CAFE constraint context (fewer underestimated complexity scores)
+- Both systems self-improve through weekly calibration
+- Fractal interoperability demonstrated with working example
+- Meta-pattern documented for future timescales (months, years)
 
 ---
 
