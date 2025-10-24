@@ -968,7 +968,7 @@ export function ProgressiveFormWithController({
               </div>
             )}
 
-            /* 
+            {/* 
               ========================================
               MOBILE RESPONSIVE TESTING CHECKLIST
               ========================================
@@ -1002,68 +1002,68 @@ export function ProgressiveFormWithController({
               
               Test command: npm run dev, open DevTools, test responsive mode
               ========================================
-            */
+            */}
 
             {!isInstantCalcLoading && showInstantCalc && instantCalcResult && fieldValues.propertyType && fieldValues.propertyCategory && (() => {
-              const propertyPrice = fieldValues.priceRange || 0
-              const propertyCategory = fieldValues.propertyCategory
-              
-              // #PATH_DECISION: Property type mapping to helper function format
-              // Map form values to helper function expected format:
-              // - Form stores: 'HDB', 'Private', 'EC', 'Landed', 'Commercial'
-              // - Helper expects: 'hdb-resale', 'private-new', etc.
-              const propertyType = propertyCategory === 'resale' 
-                ? `${fieldValues.propertyType?.toLowerCase()}-resale`
-                : propertyCategory === 'bto'
-                ? 'hdb-new'
-                : propertyCategory === 'commercial'
-                ? 'commercial'
-                : `${fieldValues.propertyType?.toLowerCase()}-new`
-              
-              const combinedAge = fieldValues.combinedAge || 30
-              const isSecondHome = (fieldValues.existingProperties || 0) > 0
+              // Handle new_purchase loan type
+              if (loanType === 'new_purchase') {
+                const propertyPrice = fieldValues.priceRange || 0
+                const propertyCategory = fieldValues.propertyCategory
+                
+                // #PATH_DECISION: Property type mapping to helper function format
+                // Map form values to helper function expected format:
+                // - Form stores: 'HDB', 'Private', 'EC', 'Landed', 'Commercial'
+                // - Helper expects: 'hdb-resale', 'private-new', etc.
+                const propertyType = propertyCategory === 'resale' 
+                  ? `${fieldValues.propertyType?.toLowerCase()}-resale`
+                  : propertyCategory === 'bto'
+                  ? 'hdb-new'
+                  : propertyCategory === 'commercial'
+                  ? 'commercial'
+                  : `${fieldValues.propertyType?.toLowerCase()}-new`
+                
+                const combinedAge = fieldValues.combinedAge || 30
+                const isSecondHome = (fieldValues.existingProperties || 0) > 0
 
-              const { maxLoan, caveats } = generatePropertyCaveats(
-                propertyPrice,
-                propertyCategory,
-                propertyType,
-                combinedAge,
-                isSecondHome
-              )
+                const { maxLoan, caveats } = generatePropertyCaveats(
+                  propertyPrice,
+                  propertyCategory,
+                  propertyType,
+                  combinedAge,
+                  isSecondHome
+                )
 
-              return (
-                <div className="mt-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                  <h4 className="text-2xl font-bold text-gray-900 mb-2">
-                    ✨ You can borrow up to ${maxLoan.toLocaleString()}
-                  </h4>
-                  
-                  <p className="text-gray-600 mb-4">
-                    {isSecondHome 
-                      ? "Your loan is capped at 45% LTV since you're keeping your current property."
-                      : "Your loan is capped at 75% LTV for your first home purchase."}
-                  </p>
+                return (
+                  <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
+                    <h4 className="text-2xl font-semibold text-black mb-2">
+                      ✨ You can borrow up to ${maxLoan.toLocaleString()}
+                    </h4>
 
-                  {/* Personalized caveats */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
-                    <p className="font-semibold text-amber-900 text-sm mb-2">📋 Important details:</p>
-                    {caveats.map((caveat, idx) => (
-                      <p key={idx} className="text-sm text-amber-800">{caveat}</p>
-                    ))}
-                  </div>
-
-                  {/* CTA to detailed calculator */}
-                  <div className="mt-4 pt-4 border-t border-blue-200">
-                    <p className="text-sm text-gray-600">
-                      Want to see monthly payments and full breakdown?{' '}
-                      <a href="/calculator" className="text-blue-600 hover:text-blue-800 underline font-medium">
-                        Use our detailed calculator →
-                      </a>
+                    <p className="text-sm text-[#666666] mb-4">
+                      {isSecondHome
+                        ? "Your loan is capped at 45% LTV since you're keeping your current property."
+                        : "Your loan is capped at 75% LTV for your first home purchase."}
                     </p>
-                  </div>
-                </div>
-              )
 
-              // Refinance calculation display (unchanged - only new_purchase modified in this task)
+                    {/* Personalized caveats */}
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
+                      <p className="font-semibold text-amber-900 text-sm mb-2">📋 Important details:</p>
+                      {caveats.map((caveat, idx) => (
+                        <p key={idx} className="text-sm text-amber-800">{caveat}</p>
+                      ))}
+                    </div>
+
+                    {/* CTA to AI broker for detailed analysis */}
+                    <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
+                      <p className="text-sm text-[#666666]">
+                        Need monthly payment estimates and detailed breakdown? Flag this with our AI Mortgage Specialist in the next step for personalized calculations.
+                      </p>
+                    </div>
+                  </div>
+                )
+              }
+
+              // Handle refinance loan type
               if (loanType === 'refinance' && isRefinanceResult(instantCalcResult) && instantCalcResult.monthlySavings) {
                 // Use currentMonthlyPayment from calculateRefinanceOutlook() which handles missing rates
                 const currentMonthlyPayment = instantCalcResult.currentMonthlyPayment ?? 0
@@ -1151,81 +1151,6 @@ export function ProgressiveFormWithController({
 
               return null
             })()}
-
-            
-
-            {/* LTV Toggle for What-If Analysis */}
-            {showInstantCalc && instantCalcResult && loanType === 'new_purchase' && (
-              <div className="mt-6 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-sm font-semibold text-black">LTV Scenario Analysis</p>
-                    <p className="text-xs text-[#666666]">See how different LTV settings affect your borrowing power</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleLtvSelection(75)}
-                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                        ltvMode === 75 
-                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
-                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
-                      }`}
-                    >
-                      75% (Default)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleLtvSelection(55)}
-                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                        ltvMode === 55 
-                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
-                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
-                      }`}
-                    >
-                      55%
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-3 flex items-start gap-2 text-xs text-[#666666]">
-                  <Info className="w-4 h-4 text-[#666666]" aria-hidden="true" />
-                  <span>
-                    75% LTV matches Dr Elena&apos;s baseline persona for first-time buyers. Switch to 55% if you want a conservative investment scenario with more cash buffer.
-                  </span>
-                </div>
-                
-                {ltvComparisonData ? (
-                  <div className="grid grid-cols-2 gap-2 text-center">
-                    <div className="p-2 bg-white border border-[#E5E5E5]">
-                      <p className="text-xs text-[#666666] mb-1">Max Loan</p>
-                      <p className="text-sm font-mono font-semibold text-black">
-                        ${ltvComparisonData.maxLoan.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-[#666666] mt-1">({ltvMode}% LTV)</p>
-                    </div>
-                    <div className="p-2 bg-white border border-[#E5E5E5]">
-                      <p className="text-xs text-[#666666] mb-1">Monthly Payment</p>
-                      <p className="text-sm font-mono font-semibold text-black">
-                        ${ltvComparisonData.monthlyPayment.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-[#666666] mt-1">${ltvComparisonData.downpayment.toLocaleString()} down</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 text-center text-[#666666]">
-                    <p className="text-sm">Complete all fields to see LTV analysis</p>
-                  </div>
-                )}
-                
-                <div className="mt-2 p-2 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
-                  <p className="text-xs text-black">
-                    <span className="font-semibold">Selected: {ltvMode}% LTV</span> - Adjust to see impact on borrowing capacity
-                  </p>
-                </div>
-              </div>
-            )}
-
             {showOptionalContextToggle && (
               <div className="mt-6 border-t border-[#E5E5E5] pt-6">
                 {/* Optional Context Block */}
