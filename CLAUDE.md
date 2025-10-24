@@ -442,6 +442,11 @@ Next: Write failing test, implement per runbook
 - `/constraint-status` - Progress overview & blockers
 - `/alignment-gaps` - Drift detection & health check
 
+**Meta-Cognitive Commands (Framework Discovery):**
+- `/embody [system]` - Cognitive embodiment to discover implicit mental models
+- `/first-principles [description]` - Extract generalizable patterns from implementations
+- See `docs/META_FRAMEWORKS.md` for frameworks discovered using these commands
+
 **Runbooks (Comprehensive Workflows):**
 - **Before starting work:** `docs/runbooks/strategy/constraint-implementation-workflow.md`
 - **Weekly reviews:** `docs/runbooks/strategy/weekly-constraint-review.md`
