@@ -449,7 +449,7 @@ Next: Write failing test, implement per runbook
 - **System architecture:** `docs/runbooks/strategy/fractal-alignment-system.md`
 
 **Skill (Automatic Enforcement):**
-- `.claude/skills/fractal-alignment.md` - Auto-runs during code changes
+- `.claude/skills/fractal-alignment/` - Auto-runs during code changes
 
 ### Drift Detection
 
