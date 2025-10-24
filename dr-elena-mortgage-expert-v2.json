@@ -331,8 +331,25 @@
     "property_specific_rules": {
       "hdb": {
         "msr_applicable": true,
-        "max_tenure_hdb_loan": 25,
-        "max_tenure_bank_loan": 30,
+        "tenure_rules": {
+          "purchase_normal": {
+            "max_tenure_years": 25,
+            "age_formula": "65 - IWAA, capped at 25 years"
+          },
+          "purchase_extended_ltv_55": {
+            "max_tenure_years": 30,
+            "age_formula": "75 - IWAA, capped at 30 years",
+            "note": "Extended LTV scheme (55%) only"
+          },
+          "refinancing_normal": {
+            "max_tenure_years": 30,
+            "formula": "30 years or (original tenure - years elapsed - 1), whichever is lower"
+          },
+          "refinancing_extended": {
+            "max_tenure_years": 30,
+            "age_formula": "75 - IWAA, capped at 30 years"
+          }
+        },
         "cpf_usage": "Allowed",
         "eligibility": "Must meet HDB criteria",
         "grants": "First-timer grants available (outside scope here)",
