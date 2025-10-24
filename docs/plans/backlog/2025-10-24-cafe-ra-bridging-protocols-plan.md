@@ -138,34 +138,8 @@ Without these, the protocols have no data sources to bridge.
 ### Phase 5: Documentation & Examples (0h - updates only)
 
 - [ ] Update `docs/META_FRAMEWORKS.md` section "Practical Implementation: Fractal Interoperability"
-- [ ] Add "Status: ✅ Implemented" to each protocol
-- [ ] Add working example from real usage (after 1 constraint cycle completed)
+- [ ] Add "Status: ✅ Implemented" to each protocol with working example
 - [ ] Link to runbooks: protocol-1-ra-to-cafe.md, protocol-2-cafe-to-ra.md, protocol-3-bidirectional-testing.md
-- [ ] Add visual diagram showing information flow:
-  ```
-  Week-Scale (CAFE)           Task-Scale (RA)
-  ┌─────────────────┐        ┌──────────────────┐
-  │ Constraint A    │───────>│ Complexity +1    │  Protocol 2
-  │ (public surface)│        │ (constraint ctx) │  (downward)
-  └─────────────────┘        └──────────────────┘
-         ▲                            │
-         │ Protocol 1                 │ Metrics
-         │ (upward)                   │
-         │                            ▼
-  ┌─────────────────┐        ┌──────────────────┐
-  │ Weekly Review   │<───────│ 5x #COMPLETION   │
-  │ Part 9: RA data │        │ → Runbook gap    │
-  └─────────────────┘        └──────────────────┘
-         │                            ▲
-         │ Protocol 3                 │
-         │ (bidirectional)            │
-         ▼                            │
-  ┌─────────────────┐        ┌──────────────────┐
-  │ Hypothesis:     │───────>│ Evidence: 3/5    │
-  │ "Voice guide    │        │ tasks blocked    │
-  │  blocks copy"   │<───────│ by voice guide"  │
-  └─────────────────┘        └──────────────────┘
-  ```
 
 ## Testing Strategy
 
@@ -177,14 +151,8 @@ Without these, the protocols have no data sources to bridge.
 - Test automation: `run-weekly-review.sh` generates complete report
 
 **E2E Validation:**
-- Complete 1 full constraint cycle (4 weeks) with all protocols active:
-  - Week 1: Mark Constraint A as 🟡, formulate hypothesis
-  - Week 2-4: Complete 15+ RA tasks touching constraint domain
-  - Week 4: Run weekly review with Protocol 1 & 3, verify insights correct
-- Verify information flows:
-  - Downward: CAFE constraint → RA scores higher for related tasks ✅
-  - Upward: RA task failures → CAFE identifies runbook gap ✅
-  - Bidirectional: Hypothesis tested with RA evidence → decision made ✅
+- Complete 1 constraint cycle (4 weeks) with all protocols active
+- Verify: Downward (CAFE→RA scoring), Upward (RA→CAFE insights), Bidirectional (hypothesis testing)
 
 ## Rollback Plan
 
@@ -226,16 +194,4 @@ No risk of breaking CAFE or RA core systems.
 
 ## Notes
 
-This plan implements **fractal interoperability** - the same meta-pattern (measure → route → execute → verify → adjust) operating at nested scales with information flowing between scales.
-
-**Key Insight:** Without protocols, CAFE and RA are independent. With protocols, they form a **coherent system** where week-scale decisions inform task-scale execution, and task-scale evidence validates week-scale hypotheses.
-
-**Analogy:** Like a musician practicing (task-scale) informing concert performance (week-scale), and concert feedback (audience reaction) adjusting practice focus. Same activity, different timescales, bidirectional learning.
-
-**Post-Implementation:** Update `docs/META_FRAMEWORKS.md` to mark protocols as ✅ Implemented with working examples from real usage.
-
-## Relationship to Meta-Frameworks
-
-This plan operationalizes the fractal interoperability concept documented in META_FRAMEWORKS.md. The protocols are the **scale bridges** that convert philosophical understanding ("they're the same pattern") into practical integration ("here's how information flows between them").
-
-After this plan: CAFE and RA remain independent (can work alone) but are interoperable (work better together).
+Implements fractal interoperability from META_FRAMEWORKS.md - same meta-pattern at nested scales with bidirectional information flow. Without protocols: independent systems. With protocols: coherent learning loop across timescales. Post-implementation: Update META_FRAMEWORKS.md with working examples.
