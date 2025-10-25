@@ -11,6 +11,7 @@ import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { getEmploymentRecognitionRate, calculateInstantProfile } from '@/lib/calculations/instant-profile'
 import type { InstantCalcResult } from '@/lib/contracts/form-contracts'
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
+import { EMPLOYMENT_LABELS, EmploymentType } from '@/lib/forms/employment-types'
 
 type LiabilityKey = 'propertyLoans' | 'carLoans' | 'creditCards' | 'personalLines'
 
@@ -539,11 +540,11 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                     <SelectValue placeholder="Select employment type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="employed">Employed (salary)</SelectItem>
-                    <SelectItem value="self-employed">Self-employed</SelectItem>
-                    <SelectItem value="variable">Variable income</SelectItem>
-                    <SelectItem value="not-working">Not working</SelectItem>
-                    <SelectItem value="other">Other / mixed</SelectItem>
+                    {Object.entries(EMPLOYMENT_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {errors.employmentType && (
