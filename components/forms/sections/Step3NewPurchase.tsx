@@ -133,10 +133,6 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
 
   const recognitionRate = getEmploymentRecognitionRate(employmentType)
 
-  const variableProfileIncome = employmentType === 'variable'
-    ? ensureNumber(employmentDetails?.variable?.averagePastTwelveMonths)
-    : variableIncome
-
   const selfEmployedDeclared = employmentType === 'self-employed'
     ? ensureNumber(employmentDetails?.['self-employed']?.averageReportedIncome) || primaryIncome
     : primaryIncome
@@ -145,15 +141,15 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
     if (employmentType === 'self-employed') {
       return ensureNumber(selfEmployedDeclared) * recognitionRate
     }
-    if (employmentType === 'variable') {
-      return primaryIncome
-    }
     return primaryIncome * recognitionRate
   })()
-  const recognizedVariableIncome = ensureNumber(variableProfileIncome) * getEmploymentRecognitionRate('variable')
+
+  // Variable income recognition: 70% for employed/in-between-jobs, 0% for not-working
+  const variableRecognitionRate = employmentType === 'not-working' ? 0 : 0.7
+  const recognizedVariableIncome = ensureNumber(variableIncome) * variableRecognitionRate
 
   const recognizedIncome = Math.max(recognizedPrimaryIncome + recognizedVariableIncome, 0)
-  const effectiveIncome = recognizedIncome > 0 ? recognizedIncome : primaryIncome + variableProfileIncome
+  const effectiveIncome = recognizedIncome > 0 ? recognizedIncome : primaryIncome + variableIncome
 
   const masReadiness = useMemo(() => {
     if (!effectiveIncome || !age || !propertyValue) {
@@ -326,6 +322,54 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
     )
   }
 
+  const renderInBetweenJobsPanel = () => {
+    if (employmentType !== 'in-between-jobs') return null
+
+    return (
+      <div className="space-y-3 border border-[#E5E5E5] bg-white p-3">
+        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+          New employment details
+        </p>
+
+        <Controller
+          name="employmentDetails.in-between-jobs.monthsWithEmployer"
+          control={control}
+          render={({ field }) => (
+            <div>
+              <label htmlFor="in-between-months" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                Months with current employer (0-2)
+              </label>
+              <Input
+                {...field}
+                id="in-between-months"
+                type="number"
+                min="0"
+                max="2"
+                placeholder="1"
+                onChange={(event) => {
+                  const value = event.target.value
+                  field.onChange(value)
+                  onFieldChange('employmentDetails.in-between-jobs.monthsWithEmployer', value, {
+                    section: 'employment_panel',
+                    action: 'months_updated',
+                    metadata: { newValue: Number(value) || 0, timestamp: new Date() }
+                  })
+                }}
+              />
+            </div>
+          )}
+        />
+
+        <div className="p-3 bg-[#F8F8F8] border border-[#E5E5E5]">
+          <p className="text-xs text-[#666666]">
+            Since you&apos;re new to this job, we&apos;ll need your signed employment contract and an email from your work email to verify employment.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Legacy variable income panel - DEPRECATED (replaced by actualVariableIncomes field)
   const renderVariableIncomePanel = () => {
     if (employmentType !== 'variable') return null
 
@@ -558,6 +602,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           />
 
           {renderSelfEmployedPanel()}
+          {renderInBetweenJobsPanel()}
           {renderVariableIncomePanel()}
         </div>
 
