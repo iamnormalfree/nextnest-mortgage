@@ -205,17 +205,17 @@ export const propertyTypeOptionsByCategory: Record<
     { value: 'Landed', label: 'Landed Property' }
   ],
   resale: [
-    { value: 'HDB', label: 'HDB Flat (Resale)' },
-    { value: 'Private', label: 'Private Condo (Resale)' },
-    { value: 'Landed', label: 'Landed Property (Resale)' }
+    { value: 'HDB', label: 'HDB Flat' },
+    { value: 'Private', label: 'Private Condo' },
+    { value: 'Landed', label: 'Landed Property' }
   ],
   new_launch: [
-    { value: 'EC', label: 'Executive Condo (New Launch)' },
-    { value: 'Private', label: 'Private Condo (New Launch)' },
-    { value: 'Landed', label: 'Landed Property (New Launch)' }
+    { value: 'EC', label: 'Executive Condo' },
+    { value: 'Private', label: 'Private Condo' },
+    { value: 'Landed', label: 'Landed Property' }
   ],
   bto: [
-    { value: 'HDB', label: 'HDB Flat (BTO)' }
+    { value: 'HDB', label: 'HDB Flat' }
   ],
   commercial: [
     { value: 'Commercial', label: 'Commercial Property' }
