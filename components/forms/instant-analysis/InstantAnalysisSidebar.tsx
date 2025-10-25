@@ -9,13 +9,13 @@ import { cn, formatNumberWithCommas } from '@/lib/utils'
 import type { LoanType } from '@/lib/contracts/form-contracts'
 
 export interface InstantAnalysisCalcResult {
-  maxLoan?: number
+  maxLoanAmount?: number  // Field name from calculator (BaseInstantCalcResult)
   monthlyPayment?: number
   monthlySavings?: number
-  currentPayment?: number
-  newPayment?: number
+  currentMonthlyPayment?: number  // Field name from refinance calculator
+  newMonthlyPayment?: number      // Field name from refinance calculator
   limitingFactor?: string
-  ltvUsed?: number
+  ltvRatio?: number  // Field name from calculator (not ltvUsed)
 }
 
 interface InstantAnalysisSidebarProps {
@@ -50,7 +50,7 @@ export function InstantAnalysisSidebar({
   }
 
   // Render for new purchase
-  if (loanType === 'new_purchase' && calcResult.maxLoan) {
+  if (loanType === 'new_purchase' && calcResult.maxLoanAmount) {
     return (
       <div className="p-6 bg-white border border-[#E5E5E5] rounded-lg space-y-4">
         {/* Header */}
@@ -65,7 +65,7 @@ export function InstantAnalysisSidebar({
             You can borrow up to
           </p>
           <p className="text-3xl font-bold text-[#0F4C75]">
-            ${formatNumberWithCommas(calcResult.maxLoan.toString())}
+            ${formatNumberWithCommas(calcResult.maxLoanAmount.toString())}
           </p>
         </div>
 
@@ -102,8 +102,8 @@ export function InstantAnalysisSidebar({
 
   // Render for refinance
   if (loanType === 'refinance' && calcResult.monthlySavings) {
-    const currentPayment = calcResult.currentPayment ?? 0
-    const newPayment = currentPayment - calcResult.monthlySavings
+    const currentPayment = calcResult.currentMonthlyPayment ?? 0
+    const newPayment = calcResult.newMonthlyPayment ?? (currentPayment - calcResult.monthlySavings)
     const savingsPercent = currentPayment > 0
       ? Math.round((calcResult.monthlySavings / currentPayment) * 100)
       : 0
