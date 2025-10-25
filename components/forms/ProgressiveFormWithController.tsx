@@ -24,6 +24,9 @@ import {
 } from '@/lib/events/event-bus'
 import { Step3NewPurchase } from './sections/Step3NewPurchase'
 import { Step3Refinance } from './sections/Step3Refinance'
+import { ResponsiveFormLayout } from './layout/ResponsiveFormLayout'
+import { InstantAnalysisSidebar } from './instant-analysis/InstantAnalysisSidebar'
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout'
 import { cn, formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 import { calculateInstantProfile, roundMonthlyPayment } from '@/lib/calculations/instant-profile'
 import { generatePropertyCaveats } from '@/lib/calculations/property-loan-helpers'
@@ -99,6 +102,9 @@ export function ProgressiveFormWithController({
 
   // Ref for throttling analytics events
   const stepTrackerRef = useRef<Record<string, number>>({})
+
+  // Responsive layout detection
+  const { isMobile, isDesktop } = useResponsiveLayout()
 
   // Use the headless controller
   const controller = useProgressiveFormController({
@@ -1340,6 +1346,17 @@ export function ProgressiveFormWithController({
                 )}
               </div>
             )}
+
+            {/* Mobile: Inline instant analysis card */}
+            {currentStep === 2 && isMobile && instantCalcResult && (
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+                <InstantAnalysisSidebar
+                  calcResult={instantCalcResult}
+                  loanType={loanType}
+                  isLoading={isInstantCalcLoading}
+                />
+              </div>
+            )}
           </div>
         )
 
@@ -1469,9 +1486,19 @@ export function ProgressiveFormWithController({
   }
 
   return (
-    <div className={cn('w-full max-w-2xl mx-auto', className)}>
-      {/* Progress Indicator */}
-      <div className="mb-8">
+    <ResponsiveFormLayout
+      sidebar={
+        <InstantAnalysisSidebar
+          calcResult={instantCalcResult}
+          loanType={loanType}
+          isLoading={isInstantCalcLoading}
+        />
+      }
+      showSidebar={currentStep === 2 && Boolean(instantCalcResult)}
+    >
+      <div className={cn('w-full max-w-2xl mx-auto', className)}>
+        {/* Progress Indicator */}
+        <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-black">
             Step {currentStep + 1} of {formSteps.length}: {currentStepConfig.label}
@@ -1551,5 +1578,6 @@ export function ProgressiveFormWithController({
         </Card>
       </form>
     </div>
+    </ResponsiveFormLayout>
   )
 }
