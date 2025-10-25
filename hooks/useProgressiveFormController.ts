@@ -99,7 +99,7 @@ export function useProgressiveFormController({
   // State management
   const [currentStep, setCurrentStep] = useState(1) // Start at step 1 (loan type already selected)
   const [completedSteps, setCompletedSteps] = useState<number[]>([0])
-  const [propertyCategory, setPropertyCategory] = useState<'resale' | 'new_launch' | 'bto' | 'commercial' | null>('resale')
+  const [propertyCategory, setPropertyCategory] = useState<'resale' | 'new_launch' | 'bto' | 'commercial' | null>(null)
   const [leadScore, setLeadScore] = useState(0)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [isInstantCalcLoading, setIsInstantCalcLoading] = useState(false)

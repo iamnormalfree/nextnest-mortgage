@@ -158,6 +158,7 @@ export function ProgressiveFormWithController({
 
   const shouldShowPropertyTypeSelect =
     loanType === 'new_purchase' &&
+    propertyCategory !== null &&
     propertyCategory !== 'bto' &&
     propertyCategory !== 'commercial'
 
