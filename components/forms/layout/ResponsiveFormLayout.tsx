@@ -32,7 +32,7 @@ export function ResponsiveFormLayout({
   // Desktop (≥1024px): 2-column grid with sticky sidebar
   if (isDesktop && showSidebar && sidebar) {
     return (
-      <div className="form-layout-container">
+      <div className="form-layout-container form-layout-container--with-sidebar">
         <div className="form-content">
           {children}
         </div>
