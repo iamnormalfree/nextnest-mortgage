@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertTriangle } from 'lucide-react'
 import { calculateComplianceSnapshot, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
+import { EmploymentPanel } from './EmploymentPanel'
+import { CoApplicantPanel } from './CoApplicantPanel'
 
 interface Step3RefinanceProps {
   onFieldChange: (field: string, value: any, analytics?: any) => void
@@ -358,80 +360,21 @@ export function Step3Refinance({
             )}
           />
 
-          <Controller
-            name="employmentType"
+          <EmploymentPanel
+            applicantNumber={0}
             control={control}
-            render={({ field }) => (
-              <div>
-                <label htmlFor="employment-type-select" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                  Employment Type *
-                </label>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value)
-                    onFieldChange('employmentType', value, {
-                      section: 'refinance_demographics',
-                      action: 'updated'
-                    })
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select employment type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="employed">Employed (Full-time)</SelectItem>
-                    <SelectItem value="self-employed">Self-Employed</SelectItem>
-                    <SelectItem value="contract">Contract/Freelance</SelectItem>
-                    <SelectItem value="unemployed">Unemployed</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.employmentType && (
-                  <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.employmentType)}</p>
-                )}
-              </div>
-            )}
+            errors={errors}
+            onFieldChange={onFieldChange}
           />
         </div>
 
-        {/* Joint Applicant Fields - Only render once */}
         {showJointApplicant && (
-          <div className="space-y-4 p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-            <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-              Applicant 2 (Joint)
-            </p>
-            
-            <Controller
-              name="actualIncomes.1"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label htmlFor="monthly-income-joint" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Monthly Income
-                  </label>
-                  <Input
-                    id="monthly-income-joint"
-                    type="number"
-                    min="0"
-                    className="font-mono"
-                    placeholder="6000"
-                    name={field.name}
-                    ref={field.ref}
-                    value={field.value ?? ''}
-                    onBlur={field.onBlur}
-                    onChange={(e) => {
-                      const value = e.target.value === '' ? '' : parseInt(e.target.value)
-                      field.onChange(value)
-                      onFieldChange('actualIncomes.1', value)
-                    }}
-                  />
-                  <p className="text-xs text-[#666666] mt-1">
-                    Optional if not applicable
-                  </p>
-                </div>
-              )}
-            />
-          </div>
+          <CoApplicantPanel
+            control={control}
+            errors={errors}
+            onFieldChange={onFieldChange}
+            loanType="refinance"
+          />
         )}
       </div>
 
