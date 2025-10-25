@@ -6,12 +6,12 @@ import { useMemo, useState, useEffect } from 'react'
 import { Control, Controller, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { getEmploymentRecognitionRate, calculateInstantProfile } from '@/lib/calculations/instant-profile'
 import type { InstantCalcResult } from '@/lib/contracts/form-contracts'
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
-import { EMPLOYMENT_LABELS, EmploymentType } from '@/lib/forms/employment-types'
+import { EmploymentPanel } from './EmploymentPanel'
+import { CoApplicantPanel } from './CoApplicantPanel'
 
 type LiabilityKey = 'propertyLoans' | 'carLoans' | 'creditCards' | 'personalLines'
 
@@ -253,193 +253,6 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
     }
   }, [age, propertyValue, propertyType, effectiveIncome, totalMonthlyCommitments, loanAmount])
 
-  const renderSelfEmployedPanel = () => {
-    if (employmentType !== 'self-employed') return null
-
-    return (
-      <div className="space-y-3 border border-[#E5E5E5] bg-white p-3">
-        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-          Self-employed details
-        </p>
-
-        <Controller
-          name="employmentDetails.self-employed.businessAgeYears"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="self-employed-business-age" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                Years your business has been operating
-              </label>
-              <Input
-                {...field}
-                id="self-employed-business-age"
-                type="number"
-                min="0"
-                placeholder="5"
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.onChange(value)
-                  onFieldChange('employmentDetails.self-employed.businessAgeYears', value, {
-                    section: 'employment_panel',
-                    action: 'business_age_updated',
-                    metadata: { newValue: value, timestamp: new Date() }
-                  })
-                }}
-              />
-            </div>
-          )}
-        />
-
-        <Controller
-          name="employmentDetails.self-employed.averageReportedIncome"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="self-employed-average-profit" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                Average 12-month profit after expenses
-              </label>
-              <Input
-                {...field}
-                id="self-employed-average-profit"
-                type="number"
-                min="0"
-                placeholder="9000"
-                className="font-mono"
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.onChange(value)
-                  onFieldChange('employmentDetails.self-employed.averageReportedIncome', ensureNumber(value), {
-                    section: 'employment_panel',
-                    action: 'average_income_updated',
-                    metadata: { newValue: Number(value) || 0, timestamp: new Date() }
-                  })
-                }}
-              />
-            </div>
-          )}
-        />
-      </div>
-    )
-  }
-
-  const renderInBetweenJobsPanel = () => {
-    if (employmentType !== 'in-between-jobs') return null
-
-    return (
-      <div className="space-y-3 border border-[#E5E5E5] bg-white p-3">
-        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-          New employment details
-        </p>
-
-        <Controller
-          name="employmentDetails.in-between-jobs.monthsWithEmployer"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="in-between-months" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                Months with current employer (0-2)
-              </label>
-              <Input
-                {...field}
-                id="in-between-months"
-                type="number"
-                min="0"
-                max="2"
-                placeholder="1"
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.onChange(value)
-                  onFieldChange('employmentDetails.in-between-jobs.monthsWithEmployer', value, {
-                    section: 'employment_panel',
-                    action: 'months_updated',
-                    metadata: { newValue: Number(value) || 0, timestamp: new Date() }
-                  })
-                }}
-              />
-            </div>
-          )}
-        />
-
-        <div className="p-3 bg-[#F8F8F8] border border-[#E5E5E5]">
-          <p className="text-xs text-[#666666]">
-            Since you&apos;re new to this job, we&apos;ll need your signed employment contract and an email from your work email to verify employment.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  // Legacy variable income panel - DEPRECATED (replaced by actualVariableIncomes field)
-  const renderVariableIncomePanel = () => {
-    if (employmentType !== 'variable') return null
-
-    return (
-      <div className="space-y-3 border border-[#E5E5E5] bg-white p-3">
-        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-          Variable income averaging
-        </p>
-
-        <Controller
-          name="employmentDetails.variable.averagePastTwelveMonths"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="variable-average-income" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                Average monthly income over 12 months
-              </label>
-              <Input
-                {...field}
-                id="variable-average-income"
-                type="number"
-                min="0"
-                placeholder="8500"
-                className="font-mono"
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.onChange(value)
-                  onFieldChange('employmentDetails.variable.averagePastTwelveMonths', ensureNumber(value), {
-                    section: 'employment_panel',
-                    action: 'variable_average_updated',
-                    metadata: { newValue: Number(value) || 0, timestamp: new Date() }
-                  })
-                }}
-              />
-            </div>
-          )}
-        />
-
-        <Controller
-          name="employmentDetails.variable.lowestObservedIncome"
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor="variable-lowest-income" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                Lowest observed monthly income
-              </label>
-              <Input
-                {...field}
-                id="variable-lowest-income"
-                type="number"
-                min="0"
-                placeholder="5000"
-                className="font-mono"
-                onChange={(event) => {
-                  const value = event.target.value
-                  field.onChange(value)
-                  onFieldChange('employmentDetails.variable.lowestObservedIncome', ensureNumber(value), {
-                    section: 'employment_panel',
-                    action: 'variable_lowest_updated',
-                    metadata: { newValue: Number(value) || 0, timestamp: new Date() }
-                  })
-                }}
-              />
-            </div>
-          )}
-        />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -549,100 +362,21 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
             )}
           />
 
-          <Controller
-            name="employmentType"
+          <EmploymentPanel
+            applicantNumber={0}
             control={control}
-            render={({ field }) => (
-              <div>
-                <label
-                  id="employment-type-label"
-                  className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
-                >
-                  Employment Type *
-                </label>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value)
-                    onFieldChange('employmentType', value, {
-                      section: 'employment_panel',
-                      action: 'changed',
-                      metadata: {
-                        from: field.value || 'none',
-                        to: value,
-                        recognitionRate: getEmploymentRecognitionRate(value),
-                        timestamp: new Date()
-                      }
-                    })
-                  }}
-                >
-                  <SelectTrigger
-                    id="employment-type-select"
-                    aria-labelledby="employment-type-label"
-                    aria-label="Employment Type"
-                  >
-                    <SelectValue placeholder="Select employment type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(EMPLOYMENT_LABELS).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.employmentType && (
-                  <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.employmentType)}</p>
-                )}
-                <p className="text-xs text-[#666666] mt-1">
-                  Income recognition: {Math.round(getEmploymentRecognitionRate(field.value || 'employed') * 100)}%
-                </p>
-              </div>
-            )}
+            errors={errors}
+            onFieldChange={onFieldChange}
           />
-
-          {renderSelfEmployedPanel()}
-          {renderInBetweenJobsPanel()}
-          {renderVariableIncomePanel()}
         </div>
 
         {showJointApplicant && (
-          <div className="space-y-4 p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-            <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-              Applicant 2 (Joint)
-            </p>
-
-            <Controller
-              name="actualIncomes.1"
-              control={control}
-              render={({ field }) => (
-                <div>
-                  <label htmlFor="joint-income" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Monthly income
-                  </label>
-                  <Input
-                    {...field}
-                    id="joint-income"
-                    type="text"
-                    inputMode="numeric"
-                    className="font-mono"
-                    placeholder="6,000"
-                    value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
-                    onChange={(event) => {
-                      const parsedValue = parseFormattedNumber(event.target.value) || 0
-                      field.onChange(parsedValue)
-                      onFieldChange('actualIncomes.1', parsedValue, {
-                        section: 'income_panel',
-                        action: 'updated_joint_income',
-                        metadata: { newValue: parsedValue, timestamp: new Date() }
-                      })
-                    }}
-                  />
-                  <p className="text-xs text-[#666666] mt-1">Optional if not applicable</p>
-                </div>
-              )}
-            />
-          </div>
+          <CoApplicantPanel
+            control={control}
+            errors={errors}
+            onFieldChange={onFieldChange}
+            loanType="new_purchase"
+          />
         )}
       </div>
 
