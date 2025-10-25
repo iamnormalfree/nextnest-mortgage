@@ -14,23 +14,31 @@ export function calculateMaxLoan(propertyPrice: number, isSecondHome: boolean): 
 
 /**
  * Get maximum loan tenure for property type from Dr Elena v2 rules
+ * Based on 75% LTV (base tier) - NOT 55% LTV reduced tier
+ *
+ * Dr Elena v2 Rule: "Apply reduced LTV tier if (HDB tenure > 25y) OR (non-HDB tenure > 30y)"
+ *
+ * For 75% LTV (what we show):
+ * - HDB: Max 25 years
+ * - Private/EC/Landed/Commercial: Max 30 years
+ *
  * @param propertyType - Property type code
- * @returns Max tenure in years
+ * @returns Max tenure in years for 75% LTV
  */
 export function getPropertyTenureLimit(propertyType: string): number {
   const tenureLimits: Record<string, number> = {
-    'hdb-resale': 25,
-    'hdb-new': 25,
-    'ec-resale': 35,
-    'ec-new': 35,
-    'private-resale': 35,
-    'private-new': 35,
-    'private-uc': 35,
-    'landed-resale': 35,
-    'landed-new': 35,
-    'commercial': 35
+    'hdb-resale': 25,        // 75% LTV cap
+    'hdb-new': 25,           // 75% LTV cap
+    'ec-resale': 30,         // 75% LTV cap (CORRECTED from 35)
+    'ec-new': 30,            // 75% LTV cap (CORRECTED from 35)
+    'private-resale': 30,    // 75% LTV cap (CORRECTED from 35)
+    'private-new': 30,       // 75% LTV cap (CORRECTED from 35)
+    'private-uc': 30,        // 75% LTV cap (CORRECTED from 35)
+    'landed-resale': 30,     // 75% LTV cap (CORRECTED from 35)
+    'landed-new': 30,        // 75% LTV cap (CORRECTED from 35)
+    'commercial': 30         // 75% LTV cap (CORRECTED from 35)
   };
-  return tenureLimits[propertyType] || 35;
+  return tenureLimits[propertyType] || 30;
 }
 
 /**
@@ -47,12 +55,13 @@ export function calculateMaxTenure(combinedAge: number, propertyType: string): n
 
 /**
  * Generate user-friendly tenure message explaining the limit
+ * Shows both property cap and age limit for transparency
  * @param maxTenure - Calculated max tenure
  * @param ageLimit - Age-based limit (65 - age)
  * @param propertyLimit - Property type limit
  * @param propertyType - Property type code
  * @param combinedAge - Borrower age
- * @returns User-friendly message
+ * @returns User-friendly message showing both limits
  */
 export function getTenureMessage(
   maxTenure: number,
@@ -62,26 +71,21 @@ export function getTenureMessage(
   combinedAge: number
 ): string {
   const endAge = combinedAge + maxTenure;
+  const isHDB = propertyType.startsWith('hdb');
+  const propertyName = isHDB ? 'HDB' : 'private property';
 
-  // Both limits equal
+  // Both limits equal (age perfectly aligns with property cap)
   if (ageLimit === propertyLimit) {
-    if (propertyType.startsWith('hdb')) {
-      return `Max loan tenure: ${maxTenure} years (HDB & age limit)`;
-    }
-    return `Max loan tenure: ${maxTenure} years`;
+    return `Max tenure: ${maxTenure} years (${propertyName} cap ${propertyLimit}y, age limit ${ageLimit}y)`;
   }
 
-  // Age more restrictive
+  // Age is more restrictive (hits retirement age before property cap)
   if (ageLimit < propertyLimit) {
-    return `Max loan tenure: ${maxTenure} years (ends at age ${endAge})`;
+    return `Max tenure: ${maxTenure} years (age limit, ends at ${endAge}; ${propertyName} cap ${propertyLimit}y)`;
   }
 
-  // Property more restrictive
-  if (propertyType.startsWith('hdb')) {
-    return `Max loan tenure: ${maxTenure} years (HDB limit)`;
-  }
-
-  return `Max loan tenure: ${maxTenure} years`;
+  // Property is more restrictive (property type caps tenure before age limit)
+  return `Max tenure: ${maxTenure} years (${propertyName} cap ${propertyLimit}y; age allows ${ageLimit}y)`;
 }
 
 /**
