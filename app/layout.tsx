@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import '@/styles/progressive-form-layout.css'
 import { ConditionalNav } from '@/components/layout/ConditionalNav'
 
 export const metadata: Metadata = {
