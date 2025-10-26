@@ -77,7 +77,7 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     },
     // Step 3 fields (Your Finances)
     existingCommitments: undefined,
-    employmentType: 'employed', // Set a default value
+    employmentType: undefined, // No default - shows placeholder on load
     creditCardCount: 0,
     hasJointApplicant: false,
     // Property ownership (affects LTV tier: 1st property = 75%, 2nd = 45%, 3rd+ = 35%)

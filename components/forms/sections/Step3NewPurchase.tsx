@@ -2,15 +2,17 @@
 
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { Control, Controller, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
-import { getEmploymentRecognitionRate, calculateInstantProfile } from '@/lib/calculations/instant-profile'
+import { getEmploymentRecognitionRate } from '@/lib/calculations/instant-profile'
 import type { InstantCalcResult } from '@/lib/contracts/form-contracts'
+import type { MasReadinessResult } from '@/hooks/useMasReadiness'
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 import { EmploymentPanel } from './EmploymentPanel'
+import { EMPLOYMENT_LABELS } from '@/lib/forms/employment-types'
 import { CoApplicantPanel } from './CoApplicantPanel'
 
 type LiabilityKey = 'propertyLoans' | 'carLoans' | 'creditCards' | 'personalLines'
@@ -32,6 +34,7 @@ interface Step3NewPurchaseProps {
   getErrorMessage: (error: any) => string
   control: Control<any>
   instantCalcResult?: InstantCalcResult | null
+  masReadiness: MasReadinessResult
 }
 
 const LIABILITY_CONFIG: Array<{ key: LiabilityKey; label: string; balanceLabel: string; paymentLabel: string; analyticsKey: string }> = [
@@ -74,18 +77,34 @@ const ensureNumber = (value: unknown): number => {
   return 0
 }
 
-export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, getErrorMessage, control, instantCalcResult }: Step3NewPurchaseProps) {
-  const [hasCommitments, setHasCommitments] = useState<boolean | null>(null)
+export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, getErrorMessage, control, instantCalcResult, masReadiness }: Step3NewPurchaseProps) {
+  const [hasCommitmentsPrimary, setHasCommitmentsPrimary] = useState<boolean | null>(null)
+  const [hasCommitmentsCoApplicant, setHasCommitmentsCoApplicant] = useState<boolean | null>(null)
+  const [isPrimaryIncomeExpanded, setIsPrimaryIncomeExpanded] = useState(true)
+  const [isCoApplicantIncomeExpanded, setIsCoApplicantIncomeExpanded] = useState(true)
+  const [hasAutoCollapsedPrimary, setHasAutoCollapsedPrimary] = useState(false)
+  const [hasAutoCollapsedCoApplicant, setHasAutoCollapsedCoApplicant] = useState(false)
 
   const primaryIncome = ensureNumber(useWatch({ control, name: 'actualIncomes.0' }))
   const variableIncome = ensureNumber(useWatch({ control, name: 'actualVariableIncomes.0' }))
   const age = ensureNumber(useWatch({ control, name: 'actualAges.0' }))
-  const employmentType = (useWatch({ control, name: 'employmentType' }) as string) || 'employed'
+  
+  // Track previous values to detect actual user input (not just pre-filled values)
+  // Initialize with current values so first render doesn't trigger collapse
+  const prevPrimaryIncomeRef = useRef<number>(primaryIncome)
+  const prevAgeRef = useRef<number>(age)
+  const employmentType = (useWatch({ control, name: 'employmentType' }) as string) || ''
   const employmentDetails = useWatch({ control, name: 'employmentDetails' }) as Record<string, any> | undefined
   const liabilitiesRaw = useWatch({ control, name: 'liabilities' }) as Partial<LiabilityState> | undefined
   const propertyValue = ensureNumber(useWatch({ control, name: 'priceRange' }))
   const loanAmount = ensureNumber(instantCalcResult?.maxLoanAmount)
   const propertyType = (useWatch({ control, name: 'propertyType' }) as string) || 'Private'
+
+  // Co-applicant fields
+  const coApplicantIncome = ensureNumber(useWatch({ control, name: 'actualIncomes.1' }))
+  const coApplicantAge = ensureNumber(useWatch({ control, name: 'actualAges.1' }))
+  const prevCoIncomeRef = useRef<number>(coApplicantIncome)
+  const prevCoAgeRef = useRef<number>(coApplicantAge)
 
   const liabilities: LiabilityState = useMemo(() => {
     const base: LiabilityState = {
@@ -121,7 +140,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
 
   // Clear all commitment fields when user selects "No" to having commitments
   useEffect(() => {
-    if (hasCommitments === false) {
+    if (hasCommitmentsPrimary === false) {
       LIABILITY_CONFIG.forEach((config) => {
         onFieldChange(`liabilities.${config.key}.enabled`, false)
         onFieldChange(`liabilities.${config.key}.outstandingBalance`, '')
@@ -129,7 +148,58 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
       })
       onFieldChange('liabilities.otherCommitments', '')
     }
-  }, [hasCommitments, onFieldChange])
+  }, [hasCommitmentsPrimary, onFieldChange])
+
+  // Auto-collapse primary income panel when user fills required fields
+  useEffect(() => {
+    if (!employmentType || hasAutoCollapsedPrimary) return
+
+    // Only collapse if values changed from 0 (user input), not if they were pre-filled
+    const incomeChanged = prevPrimaryIncomeRef.current === 0 && primaryIncome > 0
+    const ageChanged = prevAgeRef.current === 0 && age > 0
+
+    // Update refs for next render
+    prevPrimaryIncomeRef.current = primaryIncome
+    prevAgeRef.current = age
+
+    let shouldCollapse = false
+
+    if (employmentType === 'employed' || employmentType === 'in-between-jobs') {
+      // Collapse when income + age both changed from empty to filled
+      shouldCollapse = (incomeChanged || ageChanged) && primaryIncome > 0 && age > 0
+    } else if (employmentType === 'self-employed') {
+      // Collapse when NOA income + business years + age filled
+      const noaIncome = ensureNumber(employmentDetails?.['self-employed']?.averageReportedIncome)
+      const businessYears = ensureNumber(employmentDetails?.['self-employed']?.businessAgeYears)
+      shouldCollapse = ageChanged && noaIncome > 0 && businessYears > 0 && age > 0
+    } else if (employmentType === 'not-working') {
+      // Collapse when age filled
+      shouldCollapse = ageChanged && age > 0
+    }
+
+    if (shouldCollapse && isPrimaryIncomeExpanded) {
+      setIsPrimaryIncomeExpanded(false)
+      setHasAutoCollapsedPrimary(true)
+    }
+  }, [employmentType, primaryIncome, age, employmentDetails, isPrimaryIncomeExpanded, hasAutoCollapsedPrimary])
+
+  // Auto-collapse co-applicant panel when user fills required fields
+  useEffect(() => {
+    if (!showJointApplicant || hasAutoCollapsedCoApplicant) return
+
+    const incomeChanged = prevCoIncomeRef.current === 0 && coApplicantIncome > 0
+    const ageChanged = prevCoAgeRef.current === 0 && coApplicantAge > 0
+
+    prevCoIncomeRef.current = coApplicantIncome
+    prevCoAgeRef.current = coApplicantAge
+
+    const shouldCollapse = (incomeChanged || ageChanged) && coApplicantIncome > 0 && coApplicantAge > 0
+
+    if (shouldCollapse && isCoApplicantIncomeExpanded) {
+      setIsCoApplicantIncomeExpanded(false)
+      setHasAutoCollapsedCoApplicant(true)
+    }
+  }, [showJointApplicant, coApplicantIncome, coApplicantAge, isCoApplicantIncomeExpanded, hasAutoCollapsedCoApplicant])
 
   const recognitionRate = getEmploymentRecognitionRate(employmentType)
 
@@ -151,232 +221,202 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
   const recognizedIncome = Math.max(recognizedPrimaryIncome + recognizedVariableIncome, 0)
   const effectiveIncome = recognizedIncome > 0 ? recognizedIncome : primaryIncome + variableIncome
 
-  const masReadiness = useMemo(() => {
-    if (!effectiveIncome || !age || !propertyValue) {
-      return {
-        isReady: false,
-        tdsr: 0,
-        tdsrLimit: 55,
-        msr: 0,
-        msrLimit: 30,
-        reasons: ['Complete income, age, and property value to check eligibility']
-      }
+  // Get display income for summary
+  const getDisplayIncome = () => {
+    if (employmentType === 'self-employed') {
+      return ensureNumber(employmentDetails?.['self-employed']?.averageReportedIncome)
     }
+    return primaryIncome
+  }
 
-    const calculatorResult = calculateInstantProfile({
-      property_price: propertyValue,
-      property_type: propertyType as any,
-      buyer_profile: 'SC',
-      existing_properties: 0,
-      income: effectiveIncome,
-      commitments: totalMonthlyCommitments,
-      rate: 3.0,
-      tenure: 30,
-      age,
-      loan_type: 'new_purchase',
-      is_owner_occupied: true
-    })
-
-    // Use persona-derived reason codes and policy references from calculator
-    // instead of hardcoded strings
-    const limitingFactor = calculatorResult.limitingFactor
-    const reasons: string[] = []
-
-    // Add persona-derived reason codes
-    if (calculatorResult.reasonCodes && calculatorResult.reasonCodes.length > 0) {
-      reasons.push(...calculatorResult.reasonCodes.map(code => {
-        // Convert snake_case reason codes to user-friendly messages
-        const codeMap: Record<string, string> = {
-          'tdsr_binding': 'TDSR ratio is above compliance threshold',
-          'msr_binding': 'MSR ratio is above the 30% cap',
-          'ltv_binding': 'Loan-to-value ceiling reached based on property price',
-          'ltv_first_loan': 'First property LTV cap applies',
-          'ltv_second_loan': 'Second property LTV cap applies',
-          'ltv_third_loan': 'Subsequent property LTV cap applies',
-          'ltv_reduced_age_trigger': 'Reduced LTV due to age or tenure',
-          'cpf_not_allowed': 'CPF usage not permitted for this property',
-          'stress_rate_quoted_applied': 'Stress test rate applied',
-          'tenure_cap_age_limit': 'Loan tenure limited by borrower age',
-          'tenure_cap_property_limit': 'Loan tenure limited by property type',
-          'absd_applies': 'Additional Buyer Stamp Duty (ABSD) applies'
-        }
-        return codeMap[code] || code
-      }))
-    }
-
-    // Add policy references if available
-    if (calculatorResult.policyRefs && calculatorResult.policyRefs.length > 0) {
-      reasons.push(`Policy references: ${calculatorResult.policyRefs.join(', ')}`)
-    }
-
-    // Fallback if no reasons provided
-    if (!reasons.length) {
-      reasons.push('Eligible for mortgage financing')
-    }
-
-    // Calculate monthly mortgage payment for the NEW loan
-    // Formula: M = P * [r(1+r)^n] / [(1+r)^n - 1]
-    // Using MAS stress test rate (4% for residential properties)
-    const stressTestRate = 4.0 // MAS stress test rate for residential
-    const monthlyRate = stressTestRate / 100 / 12
-    const tenureYears = 25 // Standard assumption for new purchase
-    const numberOfPayments = tenureYears * 12
-
-    let monthlyMortgagePayment = 0
-    if (loanAmount > 0 && monthlyRate > 0) {
-      const numerator = monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)
-      const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1
-      monthlyMortgagePayment = Math.ceil(loanAmount * (numerator / denominator))
-    }
-
-    // Calculate TDSR: (New Mortgage Payment + Existing Commitments) / Income × 100%
-    // TDSR limit is 55% of income (MAS regulation)
-    const tdsrRatio = effectiveIncome > 0
-      ? ((monthlyMortgagePayment + totalMonthlyCommitments) / effectiveIncome) * 100
-      : 0
-
-    // Calculate MSR: (New Mortgage Payment ONLY) / Income × 100%
-    // MSR limit is 30% of income (applies to HDB/EC properties only)
-    // Note: MSR does NOT include existing debts, only the new mortgage payment
-    const msrLimitAmount = calculatorResult.msrLimit ?? (effectiveIncome * 0.30)
-    const msrRatio = effectiveIncome > 0 && msrLimitAmount > 0
-      ? (monthlyMortgagePayment / effectiveIncome) * 100
-      : 0
-
-    return {
-      isReady: limitingFactor !== 'TDSR' && limitingFactor !== 'MSR',
-      tdsr: tdsrRatio,
-      tdsrLimit: 55,
-      msr: msrRatio,
-      msrLimit: 30,
-      reasons
-    }
-  }, [age, propertyValue, propertyType, effectiveIncome, totalMonthlyCommitments, loanAmount])
+  // MAS readiness now calculated in parent and passed as prop
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <h3 className="text-sm font-semibold text-black">Income Details</h3>
 
-        <div className="space-y-4 p-4 border border-[#E5E5E5]">
-          <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-            Applicant 1 (Primary)
-          </p>
+        {!isPrimaryIncomeExpanded ? (
+          // COLLAPSED SUMMARY VIEW
+          <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8] flex justify-between items-center">
+            <div>
+              <p className="text-sm font-semibold">Applicant 1 Income</p>
+              <p className="text-xs text-[#666666]">
+                {EMPLOYMENT_LABELS[employmentType as keyof typeof EMPLOYMENT_LABELS] || employmentType}
+                {' • '}
+                ${formatNumberWithCommas(getDisplayIncome())}/month
+                {' • '}
+                Age {age}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPrimaryIncomeExpanded(true)}
+              className="text-sm text-[#666666] hover:text-black transition-colors"
+            >
+              Edit
+            </button>
+          </div>
+        ) : (
+          // EXPANDED VIEW
+          <div className="space-y-4 p-4 border border-[#E5E5E5]">
+            <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+              Applicant 1 (Primary)
+            </p>
 
-          <Controller
-            name="actualIncomes.0"
-            control={control}
-            render={({ field }) => (
-              <div>
-                <label htmlFor="monthly-income-primary" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                  Monthly income *
-                </label>
-                <Input
-                  {...field}
-                  id="monthly-income-primary"
-                  type="text"
-                  inputMode="numeric"
-                  className="font-mono"
-                  placeholder="8,000"
-                  value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
-                  onChange={(event) => {
-                    const parsedValue = parseFormattedNumber(event.target.value) || 0
-                    field.onChange(parsedValue)
-                    onFieldChange('actualIncomes.0', parsedValue, {
-                      section: 'income_panel',
-                      action: 'updated_primary_income',
-                      metadata: { newValue: parsedValue, timestamp: new Date() }
-                    })
-                  }}
-                />
-                {errors['actualIncomes.0'] && (
-                  <p className="text-[#EF4444] text-xs mt-1">Monthly income is required</p>
-                )}
-              </div>
+
+            {/* EMPLOYMENT TYPE FIRST - Drives progressive disclosure */}
+            <EmploymentPanel
+              applicantNumber={0}
+              control={control}
+              errors={errors}
+              onFieldChange={onFieldChange}
+            />
+
+            {/* CONDITIONAL: Monthly income for employed/in-between-jobs only */}
+            {employmentType && (employmentType === 'employed' || employmentType === 'in-between-jobs') && (
+            <Controller
+              name="actualIncomes.0"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <label htmlFor="monthly-income-primary" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                    Monthly income *
+                  </label>
+                  <Input
+                    {...field}
+                    id="monthly-income-primary"
+                    type="text"
+                    inputMode="numeric"
+                    className="font-mono"
+                    placeholder="8,000"
+                    value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
+                    onChange={(event) => {
+                      const parsedValue = parseFormattedNumber(event.target.value) || 0
+                      field.onChange(parsedValue)
+                      onFieldChange('actualIncomes.0', parsedValue, {
+                        section: 'income_panel',
+                        action: 'updated_primary_income',
+                        metadata: { newValue: parsedValue, timestamp: new Date() }
+                      })
+                    }}
+                  />
+                  {errors['actualIncomes.0'] && (
+                    <p className="text-[#EF4444] text-xs mt-1">Monthly income is required</p>
+                  )}
+                </div>
+              )}
+            />
+
             )}
-          />
 
-          <Controller
-            name="actualVariableIncomes.0"
-            control={control}
-            render={({ field }) => (
-              <div>
-                <label htmlFor="variable-income" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                  Variable / bonus income (optional)
-                </label>
-                <Input
-                  {...field}
-                  id="variable-income"
-                  type="text"
-                  inputMode="numeric"
-                  className="font-mono"
-                  placeholder="1,500"
-                  value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
-                  onChange={(event) => {
-                    const parsedValue = parseFormattedNumber(event.target.value) || 0
-                    field.onChange(parsedValue)
-                    onFieldChange('actualVariableIncomes.0', parsedValue, {
-                      section: 'income_panel',
-                      action: 'updated_variable_income',
-                      metadata: { newValue: parsedValue, timestamp: new Date() }
-                    })
-                  }}
-                />
-                <p className="text-xs text-[#666666] mt-1">
-                  Averaged into MAS readiness for commission or bonus structures
-                </p>
-              </div>
+            {/* CONDITIONAL: Variable income for all except not-working */}
+            {employmentType && employmentType !== 'not-working' && (
+            <Controller
+              name="actualVariableIncomes.0"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <label htmlFor="variable-income" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                    Variable / bonus income (optional)
+                  </label>
+                  <Input
+                    {...field}
+                    id="variable-income"
+                    type="text"
+                    inputMode="numeric"
+                    className="font-mono"
+                    placeholder="1,500"
+                    value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
+                    onChange={(event) => {
+                      const parsedValue = parseFormattedNumber(event.target.value) || 0
+                      field.onChange(parsedValue)
+                      onFieldChange('actualVariableIncomes.0', parsedValue, {
+                        section: 'income_panel',
+                        action: 'updated_variable_income',
+                        metadata: { newValue: parsedValue, timestamp: new Date() }
+                      })
+                    }}
+                  />
+                  <p className="text-xs text-[#666666] mt-1">
+                    Averaged into MAS readiness for commission or bonus structures
+                  </p>
+                </div>
+              )}
+            />
+
             )}
-          />
 
-          <Controller
-            name="actualAges.0"
-            control={control}
-            render={({ field }) => (
-              <div>
-                <label htmlFor="age-primary" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                  Your Age *
-                </label>
-                <Input
-                  {...field}
-                  id="age-primary"
-                  type="number"
-                  min="18"
-                  max="99"
-                  step="1"
-                  placeholder="35"
-                  onChange={(event) => {
-                    const value = ensureNumber(event.target.value)
-                    field.onChange(event.target.value)
-                    onFieldChange('actualAges.0', value, {
-                      section: 'income_panel',
-                      action: 'updated_primary_age',
-                      metadata: { newValue: value, timestamp: new Date() }
-                    })
-                  }}
-                />
-                {errors['actualAges.0'] && (
-                  <p className="text-[#EF4444] text-xs mt-1">Age is required</p>
-                )}
-              </div>
+            {/* AGE - Always required */}
+            {employmentType && (
+            <Controller
+              name="actualAges.0"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <label htmlFor="age-primary" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                    Your Age *
+                  </label>
+                  <Input
+                    {...field}
+                    id="age-primary"
+                    type="number"
+                    min="18"
+                    max="99"
+                    step="1"
+                    placeholder="35"
+                    onChange={(event) => {
+                      const value = ensureNumber(event.target.value)
+                      field.onChange(event.target.value)
+                      onFieldChange('actualAges.0', value, {
+                        section: 'income_panel',
+                        action: 'updated_primary_age',
+                        metadata: { newValue: value, timestamp: new Date() }
+                      })
+                    }}
+                  />
+                  {errors['actualAges.0'] && (
+                    <p className="text-[#EF4444] text-xs mt-1">Age is required</p>
+                  )}
+                </div>
+              )}
+            />
+
+
             )}
-          />
 
-          <EmploymentPanel
-            applicantNumber={0}
-            control={control}
-            errors={errors}
-            onFieldChange={onFieldChange}
-          />
-        </div>
+
+          </div>
+        )}
 
         {showJointApplicant && (
-          <CoApplicantPanel
-            control={control}
-            errors={errors}
-            onFieldChange={onFieldChange}
-            loanType="new_purchase"
-          />
+          !isCoApplicantIncomeExpanded ? (
+            // CO-APPLICANT COLLAPSED VIEW
+            <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8] flex justify-between items-center">
+              <div>
+                <p className="text-sm font-semibold">Applicant 2 Income</p>
+                <p className="text-xs text-[#666666]">
+                  ${formatNumberWithCommas(coApplicantIncome)}/month
+                  {' • '}
+                  Age {coApplicantAge}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCoApplicantIncomeExpanded(true)}
+                className="text-sm text-[#666666] hover:text-black transition-colors"
+              >
+                Edit
+              </button>
+            </div>
+          ) : (
+            <CoApplicantPanel
+              control={control}
+              errors={errors}
+              onFieldChange={onFieldChange}
+              loanType="new_purchase"
+            />
+          )
         )}
       </div>
 
@@ -397,9 +437,9 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setHasCommitments(false)}
+                onClick={() => setHasCommitmentsPrimary(false)}
                 className={`px-6 py-2 border text-sm font-semibold ${
-                  hasCommitments === false
+                  hasCommitmentsPrimary === false
                     ? 'bg-[#000000] text-white border-[#000000]'
                     : 'bg-white text-[#666666] border-[#E5E5E5] hover:border-[#000000]'
                 }`}
@@ -408,9 +448,9 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               </button>
               <button
                 type="button"
-                onClick={() => setHasCommitments(true)}
+                onClick={() => setHasCommitmentsPrimary(true)}
                 className={`px-6 py-2 border text-sm font-semibold ${
-                  hasCommitments === true
+                  hasCommitmentsPrimary === true
                     ? 'bg-[#000000] text-white border-[#000000]'
                     : 'bg-white text-[#666666] border-[#E5E5E5] hover:border-[#000000]'
                 }`}
@@ -421,7 +461,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           </div>
 
           {/* Only show if Yes */}
-          {hasCommitments && (
+          {hasCommitmentsPrimary && (
             <div className="space-y-4 pl-4 border-l-2 border-[#E5E5E5]">
               <h5 className="font-semibold text-[#000000] text-sm">
                 Tell us about your commitments
@@ -560,58 +600,6 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               />
             </div>
           )}
-        </div>
-      </div>
-
-      <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-sm font-semibold text-black">MAS Readiness Check</h3>
-            <p className="text-xs text-[#666666]">Updated just now</p>
-          </div>
-          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-            masReadiness.isReady ? 'bg-[#10B981]' : 'bg-[#EF4444]'
-          }`}>
-            {masReadiness.isReady ? (
-              <CheckCircle className="w-4 h-4 text-white" />
-            ) : (
-              <AlertTriangle className="w-4 h-4 text-white" />
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-[#666666]">TDSR</span>
-            <span className={`text-sm font-mono ${
-              masReadiness.tdsr <= masReadiness.tdsrLimit ? 'text-[#10B981]' : 'text-[#EF4444]'
-            }`}>
-              {masReadiness.tdsr.toFixed(1)}% / {masReadiness.tdsrLimit}%
-            </span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-[#666666]">MSR</span>
-            <span className={`text-sm font-mono ${
-              masReadiness.msr <= masReadiness.msrLimit ? 'text-[#10B981]' : 'text-[#EF4444]'
-            }`}>
-              {masReadiness.msr.toFixed(1)}% / {masReadiness.msrLimit}%
-            </span>
-          </div>
-
-          <div className="pt-3 border-t border-[#E5E5E5]">
-            <p className="text-xs text-[#666666] mb-2">Requirements:</p>
-            <ul className="space-y-1">
-              {masReadiness.reasons.map((reason, index) => (
-                <li key={index} className={`text-xs flex items-start gap-2 ${
-                  reason.includes('Eligible') ? 'text-[#10B981]' : 'text-[#666666]'
-                }`}>
-                  <span className="mt-0.5">{reason.includes('Eligible') ? '✓' : '•'}</span>
-                  {reason}
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
     </div>
