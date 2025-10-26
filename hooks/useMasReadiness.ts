@@ -50,6 +50,15 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
 
     // Call the instant profile calculator to get limiting factors
     // Pass ages/incomes arrays for IWAA calculation if available
+    console.log('🔍 [MAS Readiness] Input to calculateInstantProfile:', {
+      age,
+      ages,
+      income: effectiveIncome,
+      incomes,
+      hasAges: ages && ages.length > 0,
+      hasIncomes: incomes && incomes.length > 0
+    })
+
     const calculatorResult = calculateInstantProfile({
       property_price: propertyValue,
       property_type: propertyType as any,
@@ -64,6 +73,12 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
       ages,  // Pass co-applicant ages for IWAA
       loan_type: 'new_purchase',
       is_owner_occupied: true
+    })
+
+    console.log('🔍 [MAS Readiness] Calculator result:', {
+      tenureCapYears: calculatorResult.tenureCapYears,
+      maxLoan: calculatorResult.maxLoan,
+      tenureCapSource: calculatorResult.tenureCapSource
     })
 
     // Build reason codes from calculator output
@@ -98,16 +113,20 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
 
     // Calculate monthly mortgage payment for the NEW loan
     // Using MAS stress test rate (4% for residential properties)
+    // Use IWAA-adjusted tenure from calculator result
     const stressTestRate = 4.0
     const monthlyRate = stressTestRate / 100 / 12
-    const tenureYears = 25
+    const tenureYears = calculatorResult.tenureCapYears || 25  // Use IWAA tenure, fallback to 25
     const numberOfPayments = tenureYears * 12
 
+    // Use max loan from calculator (reflects IWAA tenure), fallback to parameter
+    const effectiveLoanAmount = calculatorResult.maxLoan || loanAmount
+
     let monthlyMortgagePayment = 0
-    if (loanAmount > 0 && monthlyRate > 0) {
+    if (effectiveLoanAmount > 0 && monthlyRate > 0) {
       const numerator = monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)
       const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1
-      monthlyMortgagePayment = Math.ceil(loanAmount * (numerator / denominator))
+      monthlyMortgagePayment = Math.ceil(effectiveLoanAmount * (numerator / denominator))
     }
 
     // Calculate TDSR: (New Mortgage Payment + Existing Commitments) / Income

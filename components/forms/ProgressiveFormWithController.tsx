@@ -174,6 +174,7 @@ export function ProgressiveFormWithController({
   // Watch form values for MAS readiness calculation (Step 3)
   const primaryIncome = useWatch({ control, name: 'actualIncomes.0' }) || 0
   const variableIncome = useWatch({ control, name: 'actualVariableIncomes.0' }) || 0
+  const coApplicantIncome = useWatch({ control, name: 'actualIncomes.1' }) || 0  // Co-applicant income
   const age = useWatch({ control, name: 'actualAges.0' }) || 0
   const employmentType = useWatch({ control, name: 'employmentType' }) || 'employed'
   const employmentDetails = useWatch({ control, name: 'employmentDetails' })
@@ -181,20 +182,23 @@ export function ProgressiveFormWithController({
   const propertyValue = useWatch({ control, name: 'priceRange' }) || 0
   const propertyType = useWatch({ control, name: 'propertyType' }) || 'Private'
 
-  // Calculate effective income with employment recognition
+  // Calculate effective income with employment recognition (primary applicant)
   const recognitionRate = getEmploymentRecognitionRate(employmentType)
   const selfEmployedDeclared = employmentType === 'self-employed'
     ? employmentDetails?.['self-employed']?.averageReportedIncome || primaryIncome
     : primaryIncome
-  
+
   const recognizedPrimaryIncome = employmentType === 'self-employed'
     ? selfEmployedDeclared * recognitionRate
     : primaryIncome * recognitionRate
-  
+
   const variableRecognitionRate = employmentType === 'not-working' ? 0 : 0.7
   const recognizedVariableIncome = variableIncome * variableRecognitionRate
   const recognizedIncome = Math.max(recognizedPrimaryIncome + recognizedVariableIncome, 0)
-  const effectiveIncome = recognizedIncome > 0 ? recognizedIncome : primaryIncome + variableIncome
+
+  // Include co-applicant income in total (assumed employed, 100% recognition)
+  const totalIncome = (recognizedIncome > 0 ? recognizedIncome : primaryIncome + variableIncome) + coApplicantIncome
+  const effectiveIncome = totalIncome
 
   // Calculate total monthly commitments from both applicants' liabilities
   const liabilities2Raw = useWatch({ control, name: 'liabilities_2' })
