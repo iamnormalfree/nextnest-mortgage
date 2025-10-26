@@ -23,6 +23,24 @@ export function ConditionalNav() {
     return null
   }
 
+  // Minimal header (logo only) for form flow - maximize focus & conversion
+  if (pathname?.startsWith('/apply')) {
+    return (
+      <nav className="fixed top-0 w-full h-14 sm:h-16 bg-white border-b border-fog z-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center">
+          <a href="/" className="flex items-center">
+            <Image
+              src={Logo}
+              alt="NextNest Logo"
+              className="h-5 sm:h-10 w-auto max-w-[200px]"
+              priority
+            />
+          </a>
+        </div>
+      </nav>
+    )
+  }
+
   return (
     <nav className="fixed top-0 w-full h-14 sm:h-16 bg-white border-b border-fog z-50">
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
@@ -31,7 +49,7 @@ export function ConditionalNav() {
             <Image
               src={Logo}
               alt="NextNest Logo"
-              className="h-5 sm:h-10 w-auto"
+              className="h-5 sm:h-10 w-auto max-w-[200px]"
               priority
             />
           </a>
