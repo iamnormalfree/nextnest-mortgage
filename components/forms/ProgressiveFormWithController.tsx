@@ -26,12 +26,15 @@ import { Step3NewPurchase } from './sections/Step3NewPurchase'
 import { Step3Refinance } from './sections/Step3Refinance'
 import { ResponsiveFormLayout } from './layout/ResponsiveFormLayout'
 import { InstantAnalysisSidebar } from './instant-analysis/InstantAnalysisSidebar'
+import { MasReadinessSidebar } from './instant-analysis/MasReadinessSidebar'
+import { RefinanceOutlookSidebar } from './instant-analysis/RefinanceOutlookSidebar'
+import { useMasReadiness } from '@/hooks/useMasReadiness'
+import { useWatch } from 'react-hook-form'
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout'
 import { cn, formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
-import { calculateInstantProfile, roundMonthlyPayment } from '@/lib/calculations/instant-profile'
+import { calculateInstantProfile, roundMonthlyPayment, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
@@ -148,6 +151,155 @@ export function ProgressiveFormWithController({
     setPropertyCategory,
     calculateInstant
   } = controller
+
+
+  // Helper function to get employment recognition rate (Dr Elena v2 persona aligned)
+  const getEmploymentRecognitionRate = (employmentType: string) => {
+    switch (employmentType) {
+      case 'employed':
+        return 1.0 // 100% recognition for employed
+      case 'self-employed':
+        return 0.7 // 70% recognition for self-employed (2-year NOA requirement)
+      case 'contract':
+      case 'variable':
+        return 0.6 // 60% recognition for contract/freelance or variable income
+      case 'other':
+        return 0.5
+      case 'not-working':
+      case 'unemployed':
+      default:
+        return 0.0 // 0% recognition for unemployed
+    }
+  }
+  // Watch form values for MAS readiness calculation (Step 3)
+  const primaryIncome = useWatch({ control, name: 'actualIncomes.0' }) || 0
+  const variableIncome = useWatch({ control, name: 'actualVariableIncomes.0' }) || 0
+  const age = useWatch({ control, name: 'actualAges.0' }) || 0
+  const employmentType = useWatch({ control, name: 'employmentType' }) || 'employed'
+  const employmentDetails = useWatch({ control, name: 'employmentDetails' })
+  const liabilitiesRaw = useWatch({ control, name: 'liabilities' })
+  const propertyValue = useWatch({ control, name: 'priceRange' }) || 0
+  const propertyType = useWatch({ control, name: 'propertyType' }) || 'Private'
+
+  // Calculate effective income with employment recognition
+  const recognitionRate = getEmploymentRecognitionRate(employmentType)
+  const selfEmployedDeclared = employmentType === 'self-employed'
+    ? employmentDetails?.['self-employed']?.averageReportedIncome || primaryIncome
+    : primaryIncome
+  
+  const recognizedPrimaryIncome = employmentType === 'self-employed'
+    ? selfEmployedDeclared * recognitionRate
+    : primaryIncome * recognitionRate
+  
+  const variableRecognitionRate = employmentType === 'not-working' ? 0 : 0.7
+  const recognizedVariableIncome = variableIncome * variableRecognitionRate
+  const recognizedIncome = Math.max(recognizedPrimaryIncome + recognizedVariableIncome, 0)
+  const effectiveIncome = recognizedIncome > 0 ? recognizedIncome : primaryIncome + variableIncome
+
+  // Calculate total monthly commitments from both applicants' liabilities
+  const liabilities2Raw = useWatch({ control, name: 'liabilities_2' })
+  
+  const totalMonthlyCommitments = useMemo(() => {
+    const keys = ['propertyLoans', 'carLoans', 'creditCards', 'personalLines']
+    
+    // Applicant 1 commitments
+    const applicant1Total = !liabilitiesRaw ? 0 : keys.reduce((total, key) => {
+      const liability = liabilitiesRaw[key]
+      if (!liability?.enabled) return total
+      return total + (Number(liability.monthlyPayment) || 0)
+    }, 0)
+    
+    // Applicant 2 commitments (if joint application)
+    const applicant2Total = !liabilities2Raw ? 0 : keys.reduce((total, key) => {
+      const liability = liabilities2Raw[key]
+      if (!liability?.enabled) return total
+      return total + (Number(liability.monthlyPayment) || 0)
+    }, 0)
+    
+    return applicant1Total + applicant2Total
+  }, [liabilitiesRaw, liabilities2Raw])
+
+  // Watch co-applicant data for IWAA calculation
+  const actualAgesRaw = useWatch({ control, name: 'actualAges' })
+  const actualIncomesRaw = useWatch({ control, name: 'actualIncomes' })
+
+  // Parse and filter arrays for IWAA
+  const actualAges = Array.isArray(actualAgesRaw)
+    ? actualAgesRaw.filter((v): v is number => typeof v === 'number' && v > 0)
+    : []
+  const actualIncomes = Array.isArray(actualIncomesRaw)
+    ? actualIncomesRaw.filter((v): v is number => typeof v === 'number' && v >= 0)
+    : []
+
+  // Calculate MAS readiness using hook (with IWAA support)
+  const masReadiness = useMasReadiness({
+    effectiveIncome,
+    age: Number(age),
+    ages: actualAges.length > 0 ? actualAges : undefined,
+    incomes: actualIncomes.length > 0 ? actualIncomes : undefined,
+    propertyValue: Number(propertyValue),
+    propertyType: propertyType,
+    totalMonthlyCommitments,
+    loanAmount: instantCalcResult?.maxLoanAmount || 0
+  })
+
+  // Watch refinance fields explicitly for useMemo dependencies
+  const refinancePriceRange = useWatch({ control, name: 'priceRange' })
+  const refinanceOutstandingLoan = useWatch({ control, name: 'outstandingLoan' })
+  const refinanceCurrentRate = useWatch({ control, name: 'currentRate' })
+  const refinanceMonthsRemaining = useWatch({ control, name: 'monthsRemaining' })
+  const refinancePropertyType = useWatch({ control, name: 'propertyType' })
+  const refinanceOwnerOccupied = useWatch({ control, name: 'ownerOccupied' })
+  const refinanceGoals = useWatch({ control, name: 'refinancingGoals' })
+
+  // Calculate refinance outlook for Step 3 sidebar (refinance only)
+  const refinanceOutlookResult = useMemo(() => {
+    if (loanType !== 'refinance') return null
+
+    const propertyValue = refinancePriceRange
+    const outstandingLoan = refinanceOutstandingLoan
+
+    if (!propertyValue || !outstandingLoan) return null
+
+    const selectedGoals = Array.isArray(refinanceGoals) ? refinanceGoals : []
+    const primaryGoal = selectedGoals.find(g => g !== 'cash_out') ?? 'lower_monthly_payment'
+
+    const mapGoalToObjective = (goal: string) => {
+      switch (goal) {
+        case 'shorten_tenure': return 'shorten_tenure' as const
+        case 'rate_certainty': return 'rate_certainty' as const
+        case 'cash_out': return 'cash_out' as const
+        default: return 'lower_payment' as const
+      }
+    }
+
+    return calculateRefinanceOutlook({
+      property_value: propertyValue,
+      current_balance: outstandingLoan,
+      current_rate: refinanceCurrentRate || 0,
+      months_remaining: refinanceMonthsRemaining || 0,
+      property_type: refinancePropertyType || 'Private',
+      is_owner_occupied: refinanceOwnerOccupied !== false,
+      objective: mapGoalToObjective(primaryGoal),
+      outstanding_loan: outstandingLoan
+    })
+  }, [
+    loanType,
+    refinancePriceRange,
+    refinanceOutstandingLoan,
+    refinanceCurrentRate,
+    refinanceMonthsRemaining,
+    refinancePropertyType,
+    refinanceOwnerOccupied,
+    refinanceGoals
+  ])
+
+  // Calculate refinance data availability for sidebar loading state
+  const refinanceDataAvailable = Boolean(
+    loanType === 'refinance' &&
+    refinancePriceRange &&
+    refinanceOutstandingLoan
+  )
 
   const personaVersion = 'dr_elena_v2'
 
@@ -317,12 +469,10 @@ export function ProgressiveFormWithController({
       return
     }
 
-    if (!currentValue || !validValues.includes(currentValue)) {
-      const nextValue = validValues[0]
-      if (nextValue) {
-        setValue('propertyType', nextValue)
-        onFieldChange('propertyType', nextValue)
-      }
+    // Clear property type if invalid, but don't auto-select (user must choose)
+    if (currentValue && !validValues.includes(currentValue)) {
+      setValue('propertyType', '')
+      onFieldChange('propertyType', '')
     }
   }, [loanType, propertyCategory, propertyTypeOptions, setValue, watch, onFieldChange])
 
@@ -370,24 +520,6 @@ export function ProgressiveFormWithController({
 
   const canSubmitCurrentStep = isValid
 
-  // Helper function to get employment recognition rate (Dr Elena v2 persona aligned)
-  const getEmploymentRecognitionRate = (employmentType: string) => {
-    switch (employmentType) {
-      case 'employed':
-        return 1.0 // 100% recognition for employed
-      case 'self-employed':
-        return 0.7 // 70% recognition for self-employed (2-year NOA requirement)
-      case 'contract':
-      case 'variable':
-        return 0.6 // 60% recognition for contract/freelance or variable income
-      case 'other':
-        return 0.5
-      case 'not-working':
-      case 'unemployed':
-      default:
-        return 0.0 // 0% recognition for unemployed
-    }
-  }
 
   // Helper function to calculate liabilities total (credit_card, overdraft, guarantor formulas)
   const calculateTotalLiabilities = (creditCardCount: number, existingCommitments: number, employmentType: string, monthlyIncome?: number) => {
@@ -501,7 +633,7 @@ export function ProgressiveFormWithController({
     switch (currentStep) {
       case 1: // Who You Are
         return (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <Controller
               name="name"
               control={control}
@@ -590,7 +722,7 @@ export function ProgressiveFormWithController({
 
       case 2: // What You Need
         return (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {loanType === 'new_purchase' && (
               <Controller
                 name="propertyCategory"
@@ -958,6 +1090,36 @@ export function ProgressiveFormWithController({
                     </div>
                   )}
                 />
+
+                <Controller
+                  name="priceRange"
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                        Current Property Value *
+                      </label>
+                      <Input
+                        {...field}
+                        type="text"
+                        inputMode="numeric"
+                        className="font-mono"
+                        placeholder="800,000"
+                        value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
+                        onChange={(e) => {
+                          const parsedValue = parseFormattedNumber(e.target.value) || 0
+                          field.onChange(parsedValue)
+                          onFieldChange('priceRange', parsedValue)
+                        }}
+                      />
+                      {errors.priceRange && (
+                        <p className="text-[#EF4444] text-xs mt-1">
+                          {getErrorMessage(errors.priceRange)}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                />
               </>
             )}
 
@@ -1213,7 +1375,7 @@ export function ProgressiveFormWithController({
 
       case 3: // Your Finances
         return (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Joint Applicant Toggle */}
             <div className="flex items-center justify-between p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
               <div className="space-y-1">
@@ -1280,6 +1442,7 @@ export function ProgressiveFormWithController({
                 getErrorMessage={getErrorMessage}
                 control={control}
                 instantCalcResult={instantCalcResult}
+                masReadiness={masReadiness}
               />
             ) : (
               <Step3Refinance
@@ -1287,11 +1450,25 @@ export function ProgressiveFormWithController({
                 showJointApplicant={showJointApplicant}
                 errors={errors}
                 getErrorMessage={getErrorMessage}
-                fieldValues={fieldValues}
                 control={control}
-                setValue={setValue}
-                watch={watch}
               />
+            )}
+
+            {/* Mobile: Inline MAS readiness card */}
+            {currentStep === 3 && isMobile && loanType === 'new_purchase' && (
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+                <MasReadinessSidebar result={masReadiness} />
+              </div>
+            )}
+
+            {/* Mobile: Inline refinance outlook card */}
+            {currentStep === 3 && isMobile && loanType === 'refinance' && refinanceOutlookResult && (
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+                <RefinanceOutlookSidebar
+                  outlookResult={refinanceOutlookResult}
+                  isLoading={!refinanceDataAvailable}
+                />
+              </div>
             )}
           </div>
         )
@@ -1351,34 +1528,40 @@ export function ProgressiveFormWithController({
         <Progress value={progressPercentage} className="h-1" />
       </div>
 
-      {/* Step Description - outside grid */}
-      <div className="mb-6 w-full max-w-2xl mx-auto">
-        <h2 className="text-2xl font-light text-black mb-2">
-          {currentStepConfig.description}
-        </h2>
-        {leadScore > 0 && (
-          <div className="flex items-center gap-2 text-sm text-[#666666]">
-            <Shield className="w-4 h-4 text-[#10B981]" />
-            <span>Trust Score: {leadScore}%</span>
-          </div>
-        )}
-      </div>
+      {/* Unified container for headline + form + sidebar */}
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="rounded-lg border border-[#E5E5E5]/50 bg-white/40 backdrop-blur-sm p-8 md:p-10 shadow-sm">
+          {/* Step headline inside container */}
+          <h2 className="text-3xl md:text-4xl font-normal text-black mb-8 leading-tight text-center">
+            {currentStepConfig.description}
+          </h2>
 
-      {/* Grid with form card + sidebar */}
-      <ResponsiveFormLayout
-        sidebar={
-          <InstantAnalysisSidebar
-            calcResult={instantCalcResult}
-            loanType={loanType}
-            isLoading={isInstantCalcLoading}
-          />
-        }
-        showSidebar={currentStep === 2 && Boolean(instantCalcResult)}
-      >
-        <form onSubmit={handleStepSubmit}>
-        <Card className="border-[#E5E5E5]">
-          <CardContent className="pt-6">
-            {renderStepContent()}
+          {/* Grid with form + sidebar */}
+          <ResponsiveFormLayout
+            sidebar={
+              currentStep === 2 ? (
+                <InstantAnalysisSidebar
+                  calcResult={instantCalcResult}
+                  loanType={loanType}
+                  isLoading={isInstantCalcLoading}
+                />
+              ) : currentStep === 3 && loanType === 'new_purchase' ? (
+              <MasReadinessSidebar result={masReadiness} />
+            ) : currentStep === 3 && loanType === 'refinance' ? (
+              <RefinanceOutlookSidebar
+                outlookResult={refinanceOutlookResult}
+                isLoading={!refinanceDataAvailable}
+              />
+            ) : null
+            }
+            showSidebar={
+              (currentStep === 2 && Boolean(instantCalcResult)) ||
+              (currentStep === 3 && (loanType === 'new_purchase' || loanType === 'refinance'))
+            }
+          >
+            <form onSubmit={handleStepSubmit}>
+              <div className="space-y-6">
+                {renderStepContent()}
 
             {/* Trust Signals */}
             {trustSignalsShown.length > 0 && (
@@ -1425,10 +1608,11 @@ export function ProgressiveFormWithController({
                 {submissionError}
               </div>
             )}
-          </CardContent>
-        </Card>
-      </form>
-      </ResponsiveFormLayout>
+              </div>
+            </form>
+          </ResponsiveFormLayout>
+        </div>
+      </div>
     </div>
   )
 }

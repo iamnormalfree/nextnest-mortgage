@@ -306,9 +306,18 @@ export function calculateInstantProfile(
   // IWAA Calculation (Dr Elena v2 line 164-168)
   // If ages/incomes arrays provided, calculate Income-Weighted Average Age
   // Otherwise, fall back to single age (backwards compatibility)
+  console.log('🔍 [IWAA DEBUG] Input data:', {
+    ages,
+    incomes,
+    singleAge: age,
+    hasArrays: ages && incomes && ages.length > 0 && incomes.length > 0
+  })
+
   const effectiveAge = (ages && incomes && ages.length > 0 && incomes.length > 0)
     ? calculateIWAA(ages, incomes)
     : age;
+
+  console.log('🔍 [IWAA DEBUG] Calculated effectiveAge:', effectiveAge, effectiveAge !== age ? '(using IWAA)' : '(using single age)')
 
   // Dr Elena v2: Property-specific tenure rules (lines 630-735)
   // Different formulas for 75% LTV (base) vs 55% LTV (extended)
