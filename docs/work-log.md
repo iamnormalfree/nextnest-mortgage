@@ -554,3 +554,19 @@ experimental: {
 
 ### Questions / Follow-Ups
 - Need Brent’s view on acceptable effort split between documentation updates and hands-on code alignment.
+## 2025-10-25 - Progressive Form Full System Redesign
+
+**Plan:** docs/plans/active/2025-10-25-progressive-form-full-system-redesign.md
+**Status:** active
+**Constraint:** C1 - Public Surface Readiness
+**CAN Tasks:** CAN-016 (Form UX), CAN-017 (Progressive disclosure), CAN-020 (Mobile responsiveness)
+**Estimated Hours:** 24-32 hours
+**Phase:** Foundation - Employment Types & Validation
+
+**Objectives:**
+- Unified employment type system (4 types with Dr Elena v2 rates)
+- 3-level progressive disclosure for Step 2
+- Co-applicant field parity
+- Responsive layout (mobile/tablet/desktop)
+- Clean labels (remove redundant suffixes)
+

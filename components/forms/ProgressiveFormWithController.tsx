@@ -1337,19 +1337,9 @@ export function ProgressiveFormWithController({
   }
 
   return (
-    <ResponsiveFormLayout
-      sidebar={
-        <InstantAnalysisSidebar
-          calcResult={instantCalcResult}
-          loanType={loanType}
-          isLoading={isInstantCalcLoading}
-        />
-      }
-      showSidebar={currentStep === 2 && Boolean(instantCalcResult)}
-    >
-      <div className={cn('w-full max-w-2xl mx-auto', className)}>
-        {/* Progress Indicator */}
-        <div className="mb-8">
+    <div className="w-full">
+      {/* Progress Indicator - outside grid */}
+      <div className={cn('mb-8 w-full max-w-2xl mx-auto', className)}>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-black">
             Step {currentStep + 1} of {formSteps.length}: {currentStepConfig.label}
@@ -1361,8 +1351,8 @@ export function ProgressiveFormWithController({
         <Progress value={progressPercentage} className="h-1" />
       </div>
 
-      {/* Step Description */}
-      <div className="mb-6">
+      {/* Step Description - outside grid */}
+      <div className="mb-6 w-full max-w-2xl mx-auto">
         <h2 className="text-2xl font-light text-black mb-2">
           {currentStepConfig.description}
         </h2>
@@ -1374,8 +1364,18 @@ export function ProgressiveFormWithController({
         )}
       </div>
 
-      {/* Form Content */}
-      <form onSubmit={handleStepSubmit}>
+      {/* Grid with form card + sidebar */}
+      <ResponsiveFormLayout
+        sidebar={
+          <InstantAnalysisSidebar
+            calcResult={instantCalcResult}
+            loanType={loanType}
+            isLoading={isInstantCalcLoading}
+          />
+        }
+        showSidebar={currentStep === 2 && Boolean(instantCalcResult)}
+      >
+        <form onSubmit={handleStepSubmit}>
         <Card className="border-[#E5E5E5]">
           <CardContent className="pt-6">
             {renderStepContent()}
@@ -1428,7 +1428,7 @@ export function ProgressiveFormWithController({
           </CardContent>
         </Card>
       </form>
+      </ResponsiveFormLayout>
     </div>
-    </ResponsiveFormLayout>
   )
 }

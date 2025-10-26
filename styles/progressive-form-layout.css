@@ -78,9 +78,9 @@
     display: block;
     position: sticky;
     top: 2rem; /* Spacing from viewport top when scrolling */
-    align-self: start; /* Align to grid row start (form card level) */
+    align-self: start; /* Align to grid row start */
     height: fit-content;
-    max-height: calc(100vh - 4rem);
+    max-height: calc(100vh - 4rem); /* Account for top position */
     overflow-y: auto;
   }
 }
