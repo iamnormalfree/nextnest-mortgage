@@ -463,10 +463,50 @@ export function useProgressiveFormController({
 
       const buyerProfile = (formData.buyerProfile as 'SC' | 'PR' | 'Foreigner') || 'SC'
       const existingProperties = parseNumber(formData.existingProperties, 0)
+
+      // ========================================================================
+      // CO-APPLICANT DATA EXTRACTION FOR IWAA
+      // ========================================================================
+      //
+      // For joint applications, extract ages and incomes arrays from form data
+      // to calculate IWAA (Income-Weighted Average Age) for accurate tenure caps.
+      //
+      // Form fields:
+      // - actualAges: [number, number?] - Ages of applicant 1 and 2
+      // - actualIncomes: [number, number?] - Incomes of applicant 1 and 2
+      //
+      // These are passed to calculateInstantProfile which handles IWAA calculation
+      // and applies appropriate tenure formulas per Dr Elena v2 spec.
+      //
+      // Fallback: If arrays not available, uses single 'age' parameter (backwards compat)
+      // ========================================================================
+
+      // Extract co-applicant data for IWAA calculation
+      const actualAges = formData.actualAges
+      const actualIncomes = formData.actualIncomes
+
+      // Parse arrays, filtering out undefined/null/zero values
+      const parsedAges = Array.isArray(actualAges)
+        ? actualAges.filter((v): v is number => typeof v === 'number' && v > 0)
+        : []
+
+      const parsedIncomes = Array.isArray(actualIncomes)
+        ? actualIncomes.filter((v): v is number => typeof v === 'number' && v >= 0)
+        : []
+
       const age = parseNumber(formData.combinedAge, 35)
       const tenure = Math.max(parseNumber(formData.requestedTenure, 25), 1)
       const commitments = Math.max(parseNumber(formData.existingCommitments, 0), 0)
       const rateAssumption = getPlaceholderRate(personaPropertyType, mappedLoanType)
+
+      console.log('🔍 Step 3+: IWAA data for calculation:', {
+        actualAges,
+        actualIncomes,
+        parsedAges,
+        parsedIncomes,
+        hasCoApplicant: parsedAges.length > 1,
+        fallbackAge: age
+      })
 
       console.log('🔍 Step 3+: Calling calculateInstantProfile with:', {
         property_price: propertyPrice,
@@ -474,6 +514,8 @@ export function useProgressiveFormController({
         buyer_profile: buyerProfile,
         existing_properties: existingProperties,
         income: actualIncome, // ← ACTUAL income, NOT hardcoded
+        incomes: parsedIncomes.length > 0 ? parsedIncomes : undefined,
+        ages: parsedAges.length > 0 ? parsedAges : undefined,
         commitments,
         rate: rateAssumption,
         tenure,
@@ -487,10 +529,12 @@ export function useProgressiveFormController({
         buyer_profile: buyerProfile,
         existing_properties: existingProperties,
         income: actualIncome, // ← ACTUAL income, NOT hardcoded
+        incomes: parsedIncomes.length > 0 ? parsedIncomes : undefined,  // ← NEW: for IWAA
         commitments,
         rate: rateAssumption,
         tenure,
         age,
+        ages: parsedAges.length > 0 ? parsedAges : undefined,  // ← NEW: for IWAA
         loan_type: 'new_purchase',
         is_owner_occupied: true
       }, ltvModeValue)
