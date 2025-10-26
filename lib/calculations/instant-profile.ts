@@ -15,11 +15,19 @@ export interface InstantProfileInput {
   property_type: 'HDB' | 'Private' | 'EC' | 'Commercial';
   buyer_profile: 'SC' | 'PR' | 'Foreigner';
   existing_properties: number;
-  income: number;
+
+  // Income (backwards compatible)
+  income: number;  // Total recognized income
+  incomes?: number[];  // Individual applicant incomes for IWAA calculation (optional)
+
   commitments: number;
   rate: number;
   tenure: number;
-  age: number;
+
+  // Age (backwards compatible)
+  age: number;  // Primary applicant age (or single applicant)
+  ages?: number[];  // Individual applicant ages for IWAA calculation (optional)
+
   loan_type?: 'new_purchase' | 'refinance';
   is_owner_occupied?: boolean;
 }
@@ -851,7 +859,7 @@ export function calculateIWAA(ages: number[], incomes: number[]): number {
   if (totalIncome === 0) return ages[0] || 0
 
   const weightedSum = ages.reduce((sum, age, i) => sum + age * (incomes[i] / totalIncome), 0)
-  return Math.round(weightedSum)
+  return Math.ceil(weightedSum) // Dr Elena v2: Round UP to nearest integer
 }
 
 /**
