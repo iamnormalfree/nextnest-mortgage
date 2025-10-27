@@ -1610,13 +1610,19 @@ export function ProgressiveFormWithController({
           {/* Grid with form + sidebar */}
           <ResponsiveFormLayout
             sidebar={
-              currentStep === 2 ? (
+              currentStep === 2 && loanType === 'new_purchase' ? (
                 <InstantAnalysisSidebar
                   calcResult={instantCalcResult}
                   loanType={loanType}
                   isLoading={isInstantCalcLoading}
                 />
-              ) : currentStep === 3 && loanType === 'new_purchase' ? (
+              ) : currentStep === 2 && loanType === 'refinance' ? (
+              <RefinanceOutlookSidebar
+                outlookResult={refinanceOutlookResult}
+                isLoading={!refinanceDataAvailable}
+                  currentRate={refinanceCurrentRate || 3.0}
+              />
+            ) : currentStep === 3 && loanType === 'new_purchase' ? (
               <MasReadinessSidebar
                 result={masReadiness}
                 propertyType={propertyType}
@@ -1624,17 +1630,12 @@ export function ProgressiveFormWithController({
                 onUnlock={() => setShowMasReadiness(true)}
                 onContinue={handleStepSubmit}
               />
-            ) : currentStep === 3 && loanType === 'refinance' ? (
-              <RefinanceOutlookSidebar
-                outlookResult={refinanceOutlookResult}
-                isLoading={!refinanceDataAvailable}
-                  currentRate={refinanceCurrentRate || 3.0}
-              />
             ) : null
             }
             showSidebar={
-              (currentStep === 2 && Boolean(instantCalcResult)) ||
-              (currentStep === 3 && (loanType === 'new_purchase' || loanType === 'refinance'))
+              (currentStep === 2 && loanType === 'new_purchase' && Boolean(instantCalcResult)) ||
+              (currentStep === 2 && loanType === 'refinance' && Boolean(refinanceOutlookResult)) ||
+              (currentStep === 3 && loanType === 'new_purchase')
             }
           >
             <form onSubmit={handleStepSubmit}>
