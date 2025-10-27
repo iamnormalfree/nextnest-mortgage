@@ -1001,12 +1001,21 @@ export function ProgressiveFormWithController({
 
                     return (
                       <div>
-                        <label
-                          htmlFor="combined-age"
-                          className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
-                        >
-                          Combined Age *
-                        </label>
+                        <div className="flex items-center gap-2 mb-2">
+                          <label
+                            htmlFor="combined-age"
+                            className="text-xs uppercase tracking-wider text-[#666666] font-semibold"
+                          >
+                            Combined Age *
+                          </label>
+                          <div className="relative group">
+                            <Info className="w-3.5 h-3.5 text-[#999999] cursor-help" />
+                            <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-[#000000] text-white text-xs rounded shadow-lg z-10">
+                              Your age affects maximum loan tenure and eligibility calculations under MAS guidelines.
+                              <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#000000]"></div>
+                            </div>
+                          </div>
+                        </div>
                         <Input
                           name={field.name}
                           ref={field.ref}

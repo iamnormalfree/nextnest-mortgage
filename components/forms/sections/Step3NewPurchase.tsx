@@ -388,7 +388,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, to
                     <div className="relative group">
                       <Info className="w-3.5 h-3.5 text-[#999999] cursor-help" />
                       <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-[#000000] text-white text-xs rounded shadow-lg z-10">
-                        Your age affects maximum loan tenure and eligibility calculations under MAS guidelines.
+                        We use individual ages for precise income-weighted calculations that determine your maximum loan tenure.
                         <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#000000]"></div>
                       </div>
                     </div>
