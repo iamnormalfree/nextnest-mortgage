@@ -4,6 +4,7 @@
 'use client'
 
 import React from 'react'
+import { FileText } from 'lucide-react'
 import type { SavingsScenario } from '@/lib/calculations/refinance-savings'
 
 interface SavingsDisplayProps {
@@ -67,7 +68,7 @@ export function SavingsDisplay({ scenarios, outstandingLoan }: SavingsDisplayPro
 
         {/* Legal Disclaimer */}
         <div className="flex gap-1.5">
-          <span className="text-nn-blue text-xs mt-0.5">ℹ️</span>
+          <FileText className="w-3.5 h-3.5 text-[#666666] shrink-0" strokeWidth={2} aria-label="Legal disclaimer" />
           <p className="text-[10px] text-[#666666]/80 italic leading-snug">
             Estimated savings based on market rates as of {currentDate}. Actual savings depend on your approved package, loan tenure, and fees. This is not a guarantee. Terms apply.
           </p>

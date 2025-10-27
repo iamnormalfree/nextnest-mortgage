@@ -4,6 +4,7 @@
 'use client'
 
 import React from 'react'
+import { TrendingDown, TrendingUp } from 'lucide-react'
 import type { MarketRateSnapshot } from '@/lib/types/market-rates'
 
 interface MarketRateDisplayProps {
@@ -29,8 +30,12 @@ export function MarketRateDisplay({ marketRates, currentRate }: MarketRateDispla
     return min < currentRate ? 'text-nn-green' : 'text-nn-red';
   };
 
-  const getRateIndicator = (min: number): string => {
-    return min < currentRate ? '🟢' : '🔴';
+  const getRateIndicator = (min: number) => {
+    const Icon = min < currentRate ? TrendingDown : TrendingUp;
+    const colorClass = min < currentRate ? 'text-nn-green' : 'text-nn-red';
+    const label = min < currentRate ? 'Better than current rate' : 'Higher than current rate';
+
+    return <Icon className={`w-4 h-4 ${colorClass}`} strokeWidth={2.5} aria-label={label} />;
   };
 
   return (
@@ -49,7 +54,7 @@ export function MarketRateDisplay({ marketRates, currentRate }: MarketRateDispla
           </p>
           <div className="flex items-center justify-between mt-0.5">
             <p className="text-[10px] text-[#666666]/80">{marketRates.fixed_packages.two_year.bank_count} banks</p>
-            <span className="text-lg">{getRateIndicator(marketRates.fixed_packages.two_year.min)}</span>
+            {getRateIndicator(marketRates.fixed_packages.two_year.min)}
           </div>
         </div>
 
@@ -61,7 +66,7 @@ export function MarketRateDisplay({ marketRates, currentRate }: MarketRateDispla
           </p>
           <div className="flex items-center justify-between mt-0.5">
             <p className="text-[10px] text-[#666666]/80">{marketRates.fixed_packages.three_year.bank_count} banks</p>
-            <span className="text-lg">{getRateIndicator(marketRates.fixed_packages.three_year.min)}</span>
+            {getRateIndicator(marketRates.fixed_packages.three_year.min)}
           </div>
         </div>
 
@@ -73,7 +78,7 @@ export function MarketRateDisplay({ marketRates, currentRate }: MarketRateDispla
           </p>
           <div className="flex items-center justify-between mt-0.5">
             <p className="text-[10px] text-[#666666]/80">{marketRates.floating_packages.three_month_sora.bank_count} banks</p>
-            <span className="text-lg">{getRateIndicator(marketRates.floating_packages.three_month_sora.min)}</span>
+            {getRateIndicator(marketRates.floating_packages.three_month_sora.min)}
           </div>
         </div>
 
@@ -83,9 +88,10 @@ export function MarketRateDisplay({ marketRates, currentRate }: MarketRateDispla
         {/* Your Current Rate */}
         <div data-testid="current-rate" className="text-nn-red">
           <p className="text-xs font-medium">Your Current Rate</p>
-          <p className="text-base font-bold flex items-center gap-2 leading-tight">
-            {currentRate.toFixed(2)}% <span className="text-lg">🔴</span>
-          </p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-base font-bold leading-tight">{currentRate.toFixed(2)}%</p>
+            <TrendingUp className="w-4 h-4 text-nn-red" strokeWidth={2.5} aria-label="Current rate" />
+          </div>
         </div>
       </div>
     </div>

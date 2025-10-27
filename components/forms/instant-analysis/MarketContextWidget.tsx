@@ -4,6 +4,7 @@
 'use client'
 
 import React from 'react'
+import { TrendingUp } from 'lucide-react'
 
 interface MarketContextWidgetProps {
   soraBenchmarks: {
@@ -46,7 +47,8 @@ export function MarketContextWidget({ soraBenchmarks, updatedAt }: MarketContext
 
   return (
     <div className="border border-[#E5E5E5]/30 bg-white/60 backdrop-blur-md p-3 shadow-sm rounded-lg">
-      <div className="mb-2.5">
+      <div className="mb-2.5 flex items-center gap-2">
+        <TrendingUp className="w-4 h-4 text-[#666666]" strokeWidth={2} aria-label="Market benchmarks" />
         <h3 className="text-xs font-semibold text-black/90 uppercase tracking-wide">SORA Benchmarks</h3>
       </div>
 
