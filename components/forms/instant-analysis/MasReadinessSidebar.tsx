@@ -10,9 +10,10 @@ interface MasReadinessSidebarProps {
   result: MasReadinessResult
   propertyType?: string
   isBlurred?: boolean
+  onUnlock?: () => void
 }
 
-export function MasReadinessSidebar({ result, propertyType, isBlurred = false }: MasReadinessSidebarProps) {
+export function MasReadinessSidebar({ result, propertyType, isBlurred = false, onUnlock }: MasReadinessSidebarProps) {
   const { isReady, tdsr, tdsrLimit, msr, msrLimit, reasons } = result
 
   // MSR only applies to HDB and EC properties
@@ -76,11 +77,23 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false }:
       </div>
       </div>
 
-      {/* Blur overlay when locked */}
-      {isBlurred && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/5 pointer-events-none">
-          <div className="bg-white/90 px-4 py-2 rounded shadow-lg">
-            <p className="text-xs font-semibold text-[#000000]">Complete form to unlock</p>
+      {/* Blur overlay when locked with unlock button */}
+      {isBlurred && onUnlock && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10">
+          <div className="bg-white/95 px-6 py-4 rounded-lg shadow-xl text-center space-y-3 max-w-[90%]">
+            <p className="text-sm font-semibold text-[#000000]">
+              Ready to see your MAS readiness score?
+            </p>
+            <p className="text-xs text-[#666666]">
+              Unlock your precise snapshot
+            </p>
+            <button
+              type="button"
+              onClick={onUnlock}
+              className="w-full px-6 py-3 bg-[#000000] text-white text-sm font-semibold hover:bg-[#333333] transition-colors rounded"
+            >
+              Unlock My Score
+            </button>
           </div>
         </div>
       )}

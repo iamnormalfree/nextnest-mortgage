@@ -1506,8 +1506,6 @@ export function ProgressiveFormWithController({
                 control={control}
                 instantCalcResult={instantCalcResult}
                 masReadiness={masReadiness}
-                onCheckMasReadiness={() => setShowMasReadiness(true)}
-                showMasReadiness={showMasReadiness}
               />
             ) : (
               <Step3Refinance
@@ -1522,7 +1520,12 @@ export function ProgressiveFormWithController({
             {/* Mobile: Inline MAS readiness card */}
             {currentStep === 3 && isMobile && loanType === 'new_purchase' && (
               <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
-                <MasReadinessSidebar result={masReadiness} propertyType={propertyType} isBlurred={!showMasReadiness} />
+                <MasReadinessSidebar
+                  result={masReadiness}
+                  propertyType={propertyType}
+                  isBlurred={!showMasReadiness}
+                  onUnlock={() => setShowMasReadiness(true)}
+                />
               </div>
             )}
 
@@ -1611,7 +1614,12 @@ export function ProgressiveFormWithController({
                   isLoading={isInstantCalcLoading}
                 />
               ) : currentStep === 3 && loanType === 'new_purchase' ? (
-              <MasReadinessSidebar result={masReadiness} propertyType={propertyType} isBlurred={!showMasReadiness} />
+              <MasReadinessSidebar
+                result={masReadiness}
+                propertyType={propertyType}
+                isBlurred={!showMasReadiness}
+                onUnlock={() => setShowMasReadiness(true)}
+              />
             ) : currentStep === 3 && loanType === 'refinance' ? (
               <RefinanceOutlookSidebar
                 outlookResult={refinanceOutlookResult}
