@@ -36,6 +36,36 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
   } = input
 
   return useMemo(() => {
+    // Validate age ranges (21-75 for primary applicant)
+    const MIN_AGE = 21
+    const MAX_AGE = 75
+
+    if (age < MIN_AGE || age > MAX_AGE) {
+      return {
+        isReady: false,
+        tdsr: 0,
+        tdsrLimit: 55,
+        msr: 0,
+        msrLimit: 30,
+        reasons: [`Applicant age must be between ${MIN_AGE} and ${MAX_AGE} years`]
+      }
+    }
+
+    // Validate co-applicant ages if present
+    if (ages && ages.length > 0) {
+      const invalidAges = ages.filter(a => a < MIN_AGE || a > MAX_AGE)
+      if (invalidAges.length > 0) {
+        return {
+          isReady: false,
+          tdsr: 0,
+          tdsrLimit: 55,
+          msr: 0,
+          msrLimit: 30,
+          reasons: [`All applicants must be between ${MIN_AGE} and ${MAX_AGE} years old`]
+        }
+      }
+    }
+
     // Return not ready if required data is missing
     if (!effectiveIncome || !age || !propertyValue) {
       return {
@@ -152,5 +182,14 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
       msrLimit: 30,
       reasons
     }
-  }, [effectiveIncome, age, ages, incomes, propertyValue, propertyType, totalMonthlyCommitments, loanAmount])
+  }, [
+    effectiveIncome,
+    age,
+    ages?.[0], ages?.[1],  // Track individual array elements, not array reference
+    incomes?.[0], incomes?.[1],
+    propertyValue,
+    propertyType,
+    totalMonthlyCommitments,
+    loanAmount
+  ])
 }
