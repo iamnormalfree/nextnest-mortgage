@@ -66,6 +66,7 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@jest/globals": "^30.2.0",
     "@next/bundle-analyzer": "^15.5.0",
     "@playwright/test": "^1.56.1",
     "@testing-library/jest-dom": "^6.9.1",

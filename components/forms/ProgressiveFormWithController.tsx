@@ -24,12 +24,20 @@ import {
 } from '@/lib/events/event-bus'
 import { Step3NewPurchase } from './sections/Step3NewPurchase'
 import { Step3Refinance } from './sections/Step3Refinance'
+import { ResponsiveFormLayout } from './layout/ResponsiveFormLayout'
+import { InstantAnalysisSidebar } from './instant-analysis/InstantAnalysisSidebar'
+import { MasReadinessSidebar } from './instant-analysis/MasReadinessSidebar'
+import { RefinanceOutlookSidebar } from './instant-analysis/RefinanceOutlookSidebar'
+import { MarketContextSidebar } from './instant-analysis/MarketContextSidebar'
+import { RefinanceSavingsSidebar } from './instant-analysis/RefinanceSavingsSidebar'
+import { useMasReadiness } from '@/hooks/useMasReadiness'
+import { useWatch } from 'react-hook-form'
+import { useResponsiveLayout } from '@/hooks/useResponsiveLayout'
 import { cn, formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
-import { calculateInstantProfile, roundMonthlyPayment } from '@/lib/calculations/instant-profile'
-import { generatePropertyCaveats } from '@/lib/calculations/property-loan-helpers'
+import { calculateInstantProfile, roundMonthlyPayment, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
+import { getPlaceholderRates } from '@/lib/types/market-rates'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
@@ -57,6 +65,19 @@ const getErrorMessage = (error: any): string => {
   if (typeof error === 'string') return error
   if (typeof error === 'object' && 'message' in error) return error.message
   return 'This field is required'
+}
+
+// Helper function to check if error should be displayed (only show if field has been touched)
+const shouldShowError = (errors: any, touchedFields: any, fieldName: string): boolean => {
+  // Get nested field support (e.g., "actualIncomes.0")
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => current?.[key], obj)
+  }
+
+  const hasError = getNestedValue(errors, fieldName)
+  const isTouched = getNestedValue(touchedFields, fieldName)
+
+  return Boolean(hasError && isTouched)
 }
 
 // ============================================================================
@@ -96,9 +117,13 @@ export function ProgressiveFormWithController({
   const [showJointApplicant, setShowJointApplicant] = useState(false)
   const [ltvMode, setLtvMode] = useState(75) // Default LTV mode (75% with 55% option)
   const [showAnalysisDetails, setShowAnalysisDetails] = useState(false)
+  const [showMasReadiness, setShowMasReadiness] = useState(false) // Gate for MAS Readiness calculation
 
   // Ref for throttling analytics events
   const stepTrackerRef = useRef<Record<string, number>>({})
+
+  // Responsive layout detection
+  const { isMobile, isDesktop } = useResponsiveLayout()
 
   // Use the headless controller
   const controller = useProgressiveFormController({
@@ -120,6 +145,7 @@ export function ProgressiveFormWithController({
     currentStep,
     completedSteps,
     errors,
+    touchedFields,
     isValid,
     isAnalyzing,
     isInstantCalcLoading,
@@ -143,6 +169,206 @@ export function ProgressiveFormWithController({
     setPropertyCategory,
     calculateInstant
   } = controller
+
+
+  // Helper function to get employment recognition rate (Dr Elena v2 persona aligned)
+  const getEmploymentRecognitionRate = (employmentType: string) => {
+    switch (employmentType) {
+      case 'employed':
+        return 1.0 // 100% recognition for employed
+      case 'self-employed':
+        return 0.7 // 70% recognition for self-employed (2-year NOA requirement)
+      case 'contract':
+      case 'variable':
+        return 0.6 // 60% recognition for contract/freelance or variable income
+      case 'other':
+        return 0.5
+      case 'not-working':
+      case 'unemployed':
+      default:
+        return 0.0 // 0% recognition for unemployed
+    }
+  }
+  // Watch form values for MAS readiness calculation (Step 3)
+  const primaryIncome = useWatch({ control, name: 'actualIncomes.0' }) || 0
+  const variableIncome = useWatch({ control, name: 'actualVariableIncomes.0' }) || 0
+  const coApplicantIncome = useWatch({ control, name: 'actualIncomes.1' }) || 0  // Co-applicant income
+  const age = useWatch({ control, name: 'actualAges.0' }) || 0
+  const employmentType = useWatch({ control, name: 'employmentType' }) || 'employed'
+  const employmentDetails = useWatch({ control, name: 'employmentDetails' })
+  const liabilitiesRaw = useWatch({ control, name: 'liabilities' })
+  const propertyValue = useWatch({ control, name: 'priceRange' }) || 0
+  const propertyType = useWatch({ control, name: 'propertyType' }) || 'Private'
+
+  // Co-applicant fields for re-blur tracking
+  const coApplicantAge = useWatch({ control, name: 'actualAges.1' })
+  const coApplicantVariableIncome = useWatch({ control, name: 'actualVariableIncomes.1' })
+  const employmentType_1 = useWatch({ control, name: 'employmentType_1' })
+  const employmentDetails_1 = useWatch({ control, name: 'employmentDetails_1' })
+  const liabilities2Raw = useWatch({ control, name: 'liabilities_2' })
+
+  // Re-blur MAS Readiness when any relevant field changes after unlock
+  useEffect(() => {
+    // Only re-blur if currently unlocked
+    if (showMasReadiness && currentStep === 3 && loanType === 'new_purchase') {
+      setShowMasReadiness(false)
+    }
+    // Watch all fields that affect MAS calculation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    primaryIncome,
+    variableIncome,
+    coApplicantIncome,
+    coApplicantVariableIncome,
+    age,
+    coApplicantAge,
+    employmentType,
+    employmentType_1,
+    JSON.stringify(employmentDetails),
+    JSON.stringify(employmentDetails_1),
+    JSON.stringify(liabilitiesRaw),
+    JSON.stringify(liabilities2Raw)
+  ])
+
+  // Calculate effective income with employment recognition (primary applicant)
+  const recognitionRate = getEmploymentRecognitionRate(employmentType)
+  const selfEmployedDeclared = employmentType === 'self-employed'
+    ? employmentDetails?.['self-employed']?.averageReportedIncome || primaryIncome
+    : primaryIncome
+
+  const recognizedPrimaryIncome = employmentType === 'self-employed'
+    ? selfEmployedDeclared * recognitionRate
+    : primaryIncome * recognitionRate
+
+  const variableRecognitionRate = employmentType === 'not-working' ? 0 : 0.7
+  const recognizedVariableIncome = variableIncome * variableRecognitionRate
+  const recognizedIncome = Math.max(recognizedPrimaryIncome + recognizedVariableIncome, 0)
+
+  // Include co-applicant income in total (assumed employed, 100% recognition)
+  const totalIncome = (recognizedIncome > 0 ? recognizedIncome : primaryIncome + variableIncome) + coApplicantIncome
+  const effectiveIncome = totalIncome
+
+  // Calculate total monthly commitments from both applicants' liabilities
+  const totalMonthlyCommitments = useMemo(() => {
+    const keys = ['propertyLoans', 'carLoans', 'creditCards', 'personalLines']
+    
+    // Applicant 1 commitments
+    const applicant1Total = !liabilitiesRaw ? 0 : keys.reduce((total, key) => {
+      const liability = liabilitiesRaw[key]
+      if (!liability?.enabled) return total
+      return total + (Number(liability.monthlyPayment) || 0)
+    }, 0)
+    
+    // Applicant 2 commitments (if joint application)
+    const applicant2Total = !liabilities2Raw ? 0 : keys.reduce((total, key) => {
+      const liability = liabilities2Raw[key]
+      if (!liability?.enabled) return total
+      return total + (Number(liability.monthlyPayment) || 0)
+    }, 0)
+    
+    return applicant1Total + applicant2Total
+  }, [liabilitiesRaw, liabilities2Raw])
+
+  // Watch co-applicant data for IWAA calculation
+  const actualAgesRaw = useWatch({ control, name: 'actualAges' })
+  const actualIncomesRaw = useWatch({ control, name: 'actualIncomes' })
+
+  // Parse and filter arrays for IWAA
+  // React Hook Form may return objects {0: val1, 1: val2} instead of arrays
+  const parseFormArray = (data: any, minValue = 0, maxValue = Infinity): number[] => {
+    if (!data) return []
+
+    const filterValid = (v: any): v is number =>
+      typeof v === 'number' && v > minValue && v <= maxValue
+
+    // If it's already an array, filter it
+    if (Array.isArray(data)) {
+      return data.filter(filterValid)
+    }
+
+    // If it's an object, convert to array using Object.values()
+    if (typeof data === 'object') {
+      return Object.values(data).filter(filterValid)
+    }
+
+    return []
+  }
+
+  const actualAges = parseFormArray(actualAgesRaw, 17, 100)  // Ages 18-100 (>17 means >=18)
+  const actualIncomes = parseFormArray(actualIncomesRaw, 0, Infinity)  // Any positive income
+
+  // Calculate MAS readiness using hook (with IWAA support)
+  const masReadiness = useMasReadiness({
+    effectiveIncome,
+    age: Number(age),
+    ages: actualAges.length > 0 ? actualAges : undefined,
+    incomes: actualIncomes.length > 0 ? actualIncomes : undefined,
+    propertyValue: Number(propertyValue),
+    propertyType: propertyType,
+    totalMonthlyCommitments,
+    loanAmount: instantCalcResult?.maxLoanAmount || 0
+  })
+
+  // Watch refinance fields explicitly for useMemo dependencies
+  const refinancePriceRange = useWatch({ control, name: 'priceRange' })
+  const refinanceOutstandingLoan = useWatch({ control, name: 'outstandingLoan' })
+  const refinanceCurrentRate = useWatch({ control, name: 'currentRate' })
+  const refinanceMonthsRemaining = useWatch({ control, name: 'monthsRemaining' })
+  const refinancePropertyType = useWatch({ control, name: 'propertyType' })
+  const refinanceOwnerOccupied = useWatch({ control, name: 'ownerOccupied' })
+  const refinanceGoals = useWatch({ control, name: 'refinancingGoals' })
+
+  // Calculate refinance outlook for Step 3 sidebar (refinance only)
+  const refinanceOutlookResult = useMemo(() => {
+    if (loanType !== 'refinance') return null
+
+    const propertyValue = refinancePriceRange
+    const outstandingLoan = refinanceOutstandingLoan
+
+    if (!propertyValue || !outstandingLoan) return null
+
+    const selectedGoals = Array.isArray(refinanceGoals) ? refinanceGoals : []
+    const primaryGoal = selectedGoals.find(g => g !== 'cash_out') ?? 'lower_monthly_payment'
+
+    const mapGoalToObjective = (goal: string) => {
+      switch (goal) {
+        case 'shorten_tenure': return 'shorten_tenure' as const
+        case 'rate_certainty': return 'rate_certainty' as const
+        case 'cash_out': return 'cash_out' as const
+        default: return 'lower_payment' as const
+      }
+    }
+
+    return calculateRefinanceOutlook({
+      property_value: propertyValue,
+      current_balance: outstandingLoan,
+      current_rate: refinanceCurrentRate || 0,
+      months_remaining: refinanceMonthsRemaining || 0,
+      property_type: refinancePropertyType || 'Private',
+      is_owner_occupied: refinanceOwnerOccupied !== false,
+      objective: mapGoalToObjective(primaryGoal),
+      outstanding_loan: outstandingLoan
+    }, {
+      includeSavingsScenarios: true,
+      marketRates: getPlaceholderRates()
+    })
+  }, [
+    loanType,
+    refinancePriceRange,
+    refinanceOutstandingLoan,
+    refinanceCurrentRate,
+    refinanceMonthsRemaining,
+    refinancePropertyType,
+    refinanceOwnerOccupied,
+    refinanceGoals
+  ])
+
+  // Calculate refinance data availability for sidebar loading state
+  const refinanceDataAvailable = Boolean(
+    loanType === 'refinance' &&
+    refinancePriceRange &&
+    refinanceOutstandingLoan
+  )
 
   const personaVersion = 'dr_elena_v2'
 
@@ -312,12 +538,10 @@ export function ProgressiveFormWithController({
       return
     }
 
-    if (!currentValue || !validValues.includes(currentValue)) {
-      const nextValue = validValues[0]
-      if (nextValue) {
-        setValue('propertyType', nextValue)
-        onFieldChange('propertyType', nextValue)
-      }
+    // Clear property type if invalid, but don't auto-select (user must choose)
+    if (currentValue && !validValues.includes(currentValue)) {
+      setValue('propertyType', '')
+      onFieldChange('propertyType', '')
     }
   }, [loanType, propertyCategory, propertyTypeOptions, setValue, watch, onFieldChange])
 
@@ -365,24 +589,6 @@ export function ProgressiveFormWithController({
 
   const canSubmitCurrentStep = isValid
 
-  // Helper function to get employment recognition rate (Dr Elena v2 persona aligned)
-  const getEmploymentRecognitionRate = (employmentType: string) => {
-    switch (employmentType) {
-      case 'employed':
-        return 1.0 // 100% recognition for employed
-      case 'self-employed':
-        return 0.7 // 70% recognition for self-employed (2-year NOA requirement)
-      case 'contract':
-      case 'variable':
-        return 0.6 // 60% recognition for contract/freelance or variable income
-      case 'other':
-        return 0.5
-      case 'not-working':
-      case 'unemployed':
-      default:
-        return 0.0 // 0% recognition for unemployed
-    }
-  }
 
   // Helper function to calculate liabilities total (credit_card, overdraft, guarantor formulas)
   const calculateTotalLiabilities = (creditCardCount: number, existingCommitments: number, employmentType: string, monthlyIncome?: number) => {
@@ -496,7 +702,7 @@ export function ProgressiveFormWithController({
     switch (currentStep) {
       case 1: // Who You Are
         return (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <Controller
               name="name"
               control={control}
@@ -518,7 +724,7 @@ export function ProgressiveFormWithController({
                       onFieldChange('name', e.target.value)
                     }}
                   />
-                  {errors.name && (
+                  {shouldShowError(errors, touchedFields, 'name') && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.name)}</p>
                   )}
                 </div>
@@ -546,7 +752,7 @@ export function ProgressiveFormWithController({
                       onFieldChange('email', e.target.value)
                     }}
                   />
-                  {errors.email && (
+                  {shouldShowError(errors, touchedFields, 'email') && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.email)}</p>
                   )}
                 </div>
@@ -574,7 +780,7 @@ export function ProgressiveFormWithController({
                       onFieldChange('phone', e.target.value)
                     }}
                   />
-                  {errors.phone && (
+                  {shouldShowError(errors, touchedFields, 'phone') && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.phone)}</p>
                   )}
                 </div>
@@ -585,7 +791,7 @@ export function ProgressiveFormWithController({
 
       case 2: // What You Need
         return (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {loanType === 'new_purchase' && (
               <Controller
                 name="propertyCategory"
@@ -617,7 +823,7 @@ export function ProgressiveFormWithController({
                         ))}
                       </SelectContent>
                     </Select>
-                    {errors.propertyCategory && (
+                    {shouldShowError(errors, touchedFields, 'propertyCategory') && (
                       <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyCategory)}</p>
                     )}
                   </div>
@@ -666,7 +872,7 @@ export function ProgressiveFormWithController({
                           ))}
                         </SelectContent>
                       </Select>
-                      {errors.propertyType && (
+                      {shouldShowError(errors, touchedFields, 'propertyType') && (
                         <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
                       )}
                     </div>
@@ -682,7 +888,7 @@ export function ProgressiveFormWithController({
                 control={control}
                 render={({ field }) => (
                   <div>
-                    <label 
+                    <label
                       htmlFor="property-type"
                       className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
                     >
@@ -711,7 +917,7 @@ export function ProgressiveFormWithController({
                         ))}
                       </SelectContent>
                     </Select>
-                    {errors.propertyType && (
+                    {shouldShowError(errors, touchedFields, 'propertyType') && (
                       <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
                     )}
                   </div>
@@ -779,7 +985,7 @@ export function ProgressiveFormWithController({
                           onFieldChange('priceRange', parsedValue)
                         }}
                       />
-                      {errors.priceRange && (
+                      {shouldShowError(errors, touchedFields, 'priceRange') && (
                         <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.priceRange)}</p>
                       )}
                     </div>
@@ -801,12 +1007,21 @@ export function ProgressiveFormWithController({
 
                     return (
                       <div>
-                        <label
-                          htmlFor="combined-age"
-                          className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
-                        >
-                          Combined Age *
-                        </label>
+                        <div className="flex items-center gap-2 mb-2">
+                          <label
+                            htmlFor="combined-age"
+                            className="text-xs uppercase tracking-wider text-[#666666] font-semibold"
+                          >
+                            Combined Age *
+                          </label>
+                          <div className="relative group">
+                            <Info className="w-3.5 h-3.5 text-[#999999] cursor-help" />
+                            <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-[#000000] text-white text-xs rounded shadow-lg z-10">
+                              Your age affects maximum loan tenure and eligibility calculations under MAS guidelines.
+                              <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#000000]"></div>
+                            </div>
+                          </div>
+                        </div>
                         <Input
                           name={field.name}
                           ref={field.ref}
@@ -825,7 +1040,7 @@ export function ProgressiveFormWithController({
                           }}
                           onBlur={field.onBlur}
                         />
-                        {errors.combinedAge && (
+                        {shouldShowError(errors, touchedFields, 'combinedAge') && (
                           <p className="text-[#EF4444] text-xs mt-1">
                             {getErrorMessage(errors.combinedAge)}
                           </p>
@@ -839,6 +1054,13 @@ export function ProgressiveFormWithController({
 
             {loanType === 'refinance' && (
               <>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-base">💡</span>
+                    <span>Suggested estimates provided in placeholders - update with your actual numbers for precise calculations</span>
+                  </p>
+                </div>
+
                 <Controller
                   name="currentRate"
                   control={control}
@@ -870,7 +1092,7 @@ export function ProgressiveFormWithController({
                             field.onChange(value)
                           }}
                         />
-                        {errors.currentRate && (
+                        {shouldShowError(errors, touchedFields, 'currentRate') && (
                           <p className="text-[#EF4444] text-xs mt-1">
                             {getErrorMessage(errors.currentRate)}
                           </p>
@@ -911,7 +1133,7 @@ export function ProgressiveFormWithController({
                             field.onChange(parsedValue)
                           }}
                         />
-                        {errors.outstandingLoan && (
+                        {shouldShowError(errors, touchedFields, 'outstandingLoan') && (
                           <p className="text-[#EF4444] text-xs mt-1">
                             {getErrorMessage(errors.outstandingLoan)}
                           </p>
@@ -947,8 +1169,38 @@ export function ProgressiveFormWithController({
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                      {errors.currentBank && (
+                      {shouldShowError(errors, touchedFields, 'currentBank') && (
                         <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.currentBank)}</p>
+                      )}
+                    </div>
+                  )}
+                />
+
+                <Controller
+                  name="priceRange"
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <label className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+                        Current Property Value *
+                      </label>
+                      <Input
+                        {...field}
+                        type="text"
+                        inputMode="numeric"
+                        className="font-mono"
+                        placeholder="800,000"
+                        value={field.value ? formatNumberWithCommas(field.value.toString()) : ''}
+                        onChange={(e) => {
+                          const parsedValue = parseFormattedNumber(e.target.value) || 0
+                          field.onChange(parsedValue)
+                          onFieldChange('priceRange', parsedValue)
+                        }}
+                      />
+                      {shouldShowError(errors, touchedFields, 'priceRange') && (
+                        <p className="text-[#EF4444] text-xs mt-1">
+                          {getErrorMessage(errors.priceRange)}
+                        </p>
                       )}
                     </div>
                   )}
@@ -956,20 +1208,7 @@ export function ProgressiveFormWithController({
               </>
             )}
 
-            {/* Show instant calculation result if available */}
-            {isInstantCalcLoading && (
-              <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5] animate-pulse">
-                <div className="flex items-center gap-2 text-sm font-semibold text-black">
-                  <Sparkles className="w-4 h-4 text-[#F59E0B]" />
-                  <span>Analyzing...</span>
-                </div>
-                <p className="text-xs text-[#666666] mt-2">
-                  Dr Elena is calibrating your persona-aligned loan estimate. This takes about a second.
-                </p>
-              </div>
-            )}
-
-            {/* 
+            {/*
               ========================================
               MOBILE RESPONSIVE TESTING CHECKLIST
               ========================================
@@ -1004,233 +1243,6 @@ export function ProgressiveFormWithController({
               Test command: npm run dev, open DevTools, test responsive mode
               ========================================
             */}
-
-            {!isInstantCalcLoading && showInstantCalc && instantCalcResult && fieldValues.propertyType && fieldValues.propertyCategory && (() => {
-              // Handle new_purchase loan type
-              if (loanType === 'new_purchase') {
-                const propertyPrice = fieldValues.priceRange || 0
-                const propertyCategory = fieldValues.propertyCategory
-                
-                // #PATH_DECISION: Property type mapping to helper function format
-                // Map form values to helper function expected format:
-                // - Form stores: 'HDB', 'Private', 'EC', 'Landed', 'Commercial'
-                // - Helper expects: 'hdb-resale', 'private-new', etc.
-                const propertyType = propertyCategory === 'resale' 
-                  ? `${fieldValues.propertyType?.toLowerCase()}-resale`
-                  : propertyCategory === 'bto'
-                  ? 'hdb-new'
-                  : propertyCategory === 'commercial'
-                  ? 'commercial'
-                  : `${fieldValues.propertyType?.toLowerCase()}-new`
-                
-                const combinedAge = fieldValues.combinedAge || 30
-                const isSecondHome = (fieldValues.existingProperties || 0) > 0
-
-                const { maxLoan, caveats } = generatePropertyCaveats(
-                  propertyPrice,
-                  propertyCategory,
-                  propertyType,
-                  combinedAge,
-                  isSecondHome
-                )
-
-                return (
-                  <div className="mt-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                    <h4 className="text-2xl font-bold text-gray-900 mb-2">
-                      ✨ You can borrow up to ${maxLoan.toLocaleString()}
-                    </h4>
-                    
-                    <p className="text-gray-600 mb-4">
-                      {isSecondHome 
-                        ? "Your loan is capped at 45% LTV since you're keeping your current property."
-                        : "Your loan is capped at 75% LTV for your first home purchase."}
-                    </p>
-
-                    {/* Personalized caveats */}
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-2">
-                      <p className="font-semibold text-amber-900 text-sm mb-2">📋 Important details:</p>
-                      {caveats.map((caveat, idx) => (
-                        <p key={idx} className="text-sm text-amber-800">{caveat}</p>
-                      ))}
-                    </div>
-
-                    {/* CTA to detailed calculator */}
-                    <div className="mt-4 pt-4 border-t border-blue-200">
-                      <p className="text-sm text-gray-600">
-                        Want to see monthly payments and full breakdown?{' '}
-                        <a href="/calculator" className="text-blue-600 hover:text-blue-800 underline font-medium">
-                          Use our detailed calculator →
-                        </a>
-                      </p>
-                    </div>
-                  </div>
-                )
-              }
-
-              // Handle refinance loan type
-              if (loanType === 'refinance' && isRefinanceResult(instantCalcResult) && instantCalcResult.monthlySavings) {
-                // Use currentMonthlyPayment from calculateRefinanceOutlook() which handles missing rates
-                const currentMonthlyPayment = instantCalcResult.currentMonthlyPayment ?? 0
-                const newMonthlyPayment = currentMonthlyPayment - instantCalcResult.monthlySavings
-                const lifetimeSavings = instantCalcResult.monthlySavings * 12 * 20 // Over 20 years
-                const breakEvenMonths = 0 // Would be calculated based on refinancing costs
-
-                return (
-                  <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5]">
-                    <h4 className="text-sm font-semibold text-black mb-4">
-                      <Sparkles className="inline-block w-4 h-4 mr-2" />
-                      Your Refinancing Opportunity
-                    </h4>
-                    
-                    <div className="grid grid-cols-1 gap-4">
-                      {/* Current vs New Payment */}
-                      <div className="border-b border-[#E5E5E5] pb-3">
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
-                          Current Monthly Payment
-                        </p>
-                        <p className="text-lg font-mono text-black">
-                          ${currentMonthlyPayment.toLocaleString()}/mo
-                          <span className="text-sm text-[#666666] ml-2">[@ {instantCalcResult.currentRate || 3.5}% interest]</span>
-                        </p>
-                      </div>
-
-                      <div className="border-b border-[#E5E5E5] pb-3">
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-1">
-                          New Monthly Payment (est.)
-                        </p>
-                        <p className="text-lg font-mono font-semibold text-black">
-                          ${newMonthlyPayment.toLocaleString()}/mo
-                          <span className="text-sm text-[#666666] ml-2">[@ 2.6% interest]</span>
-                        </p>
-                      </div>
-
-                      {/* Monthly Savings */}
-                      <div className="border-b border-[#E5E5E5] pb-3">
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
-                          Monthly Savings
-                        </p>
-                        <p className="text-xl font-mono font-semibold text-[#10B981]">
-                          ${instantCalcResult.monthlySavings.toLocaleString()}/mo
-                          <span className="text-sm text-[#10B981] ml-2">[🔥 {Math.round((instantCalcResult.monthlySavings / currentMonthlyPayment) * 100)}% reduction]</span>
-                        </p>
-                      </div>
-
-                      {/* Lifetime Savings */}
-                      <div className="border-b border-[#E5E5E5] pb-3">
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
-                          Lifetime Savings
-                        </p>
-                        <p className="text-lg font-mono font-semibold text-black">
-                          ${lifetimeSavings.toLocaleString()}
-                          <span className="text-sm text-[#666666] ml-2">[over 20 years]</span>
-                        </p>
-                      </div>
-
-                      {/* Break-even Period */}
-                      <div>
-                        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
-                          Break-even Period
-                        </p>
-                        <p className="text-lg font-mono font-semibold text-black">
-                          9 months 
-                          <span className="text-sm text-[#666666] ml-2">[recover refinancing cost]</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Urgency Message */}
-                    <div className="mt-4 pt-4 border-t border-[#E5E5E5]">
-                      <div className="flex items-center gap-2 p-3 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
-                        <AlertTriangle className="w-4 h-4 text-[#FCD34D]" />
-                        <div>
-                          <p className="text-sm font-semibold text-black">Highly recommended</p>
-                          <p className="text-xs text-[#666666]">Savings over $300/mo justify refinancing</p>
-                          <p className="text-xs text-[#666666]">⏰ Complete Step 3 now to lock in current rates</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              }
-
-              return null
-            })()}
-
-
-            
-
-            {/* LTV Toggle for What-If Analysis */}
-            {showInstantCalc && instantCalcResult && loanType === 'new_purchase' && (
-              <div className="mt-6 p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-sm font-semibold text-black">LTV Scenario Analysis</p>
-                    <p className="text-xs text-[#666666]">See how different LTV settings affect your borrowing power</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleLtvSelection(75)}
-                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                        ltvMode === 75 
-                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
-                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
-                      }`}
-                    >
-                      75% (Default)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleLtvSelection(55)}
-                      className={`px-3 py-1 text-xs font-mono rounded transition-colors ${
-                        ltvMode === 55 
-                          ? 'bg-[#FCD34D] text-black border border-[#FCD34D]' 
-                          : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'
-                      }`}
-                    >
-                      55%
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-3 flex items-start gap-2 text-xs text-[#666666]">
-                  <Info className="w-4 h-4 text-[#666666]" aria-hidden="true" />
-                  <span>
-                    75% LTV matches Dr Elena&apos;s baseline persona for first-time buyers. Switch to 55% if you want a conservative investment scenario with more cash buffer.
-                  </span>
-                </div>
-                
-                {ltvComparisonData ? (
-                  <div className="grid grid-cols-2 gap-2 text-center">
-                    <div className="p-2 bg-white border border-[#E5E5E5]">
-                      <p className="text-xs text-[#666666] mb-1">Max Loan</p>
-                      <p className="text-sm font-mono font-semibold text-black">
-                        ${ltvComparisonData.maxLoan.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-[#666666] mt-1">({ltvMode}% LTV)</p>
-                    </div>
-                    <div className="p-2 bg-white border border-[#E5E5E5]">
-                      <p className="text-xs text-[#666666] mb-1">Monthly Payment</p>
-                      <p className="text-sm font-mono font-semibold text-black">
-                        ${ltvComparisonData.monthlyPayment.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-[#666666] mt-1">${ltvComparisonData.downpayment.toLocaleString()} down</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 text-center text-[#666666]">
-                    <p className="text-sm">Complete all fields to see LTV analysis</p>
-                  </div>
-                )}
-                
-                <div className="mt-2 p-2 bg-[#FCD34D]/10 border border-[#FCD34D]/20">
-                  <p className="text-xs text-black">
-                    <span className="font-semibold">Selected: {ltvMode}% LTV</span> - Adjust to see impact on borrowing capacity
-                  </p>
-                </div>
-              </div>
-            )}
-
             {showOptionalContextToggle && (
               <div className="mt-6 border-t border-[#E5E5E5] pt-6">
                 {/* Optional Context Block */}
@@ -1419,12 +1431,23 @@ export function ProgressiveFormWithController({
                 )}
               </div>
             )}
+
+            {/* Mobile: Inline instant analysis card */}
+            {currentStep === 2 && isMobile && instantCalcResult && (
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+                <InstantAnalysisSidebar
+                  calcResult={instantCalcResult}
+                  loanType={loanType}
+                  isLoading={isInstantCalcLoading}
+                />
+              </div>
+            )}
           </div>
         )
 
       case 3: // Your Finances
         return (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* Joint Applicant Toggle */}
             <div className="flex items-center justify-between p-4 bg-[#F8F8F8] border border-[#E5E5E5]">
               <div className="space-y-1">
@@ -1488,9 +1511,11 @@ export function ProgressiveFormWithController({
                 onFieldChange={onFieldChange}
                 showJointApplicant={showJointApplicant}
                 errors={errors}
+                touchedFields={touchedFields}
                 getErrorMessage={getErrorMessage}
                 control={control}
                 instantCalcResult={instantCalcResult}
+                masReadiness={masReadiness}
               />
             ) : (
               <Step3Refinance
@@ -1498,11 +1523,32 @@ export function ProgressiveFormWithController({
                 showJointApplicant={showJointApplicant}
                 errors={errors}
                 getErrorMessage={getErrorMessage}
-                fieldValues={fieldValues}
                 control={control}
-                setValue={setValue}
-                watch={watch}
               />
+            )}
+
+            {/* Mobile: Inline MAS readiness card */}
+            {currentStep === 3 && isMobile && loanType === 'new_purchase' && (
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+                <MasReadinessSidebar
+                  result={masReadiness}
+                  propertyType={propertyType}
+                  isBlurred={!showMasReadiness}
+                  onUnlock={() => setShowMasReadiness(true)}
+                  onContinue={handleStepSubmit}
+                />
+              </div>
+            )}
+
+            {/* Mobile: Inline refinance outlook card */}
+            {currentStep === 3 && isMobile && loanType === 'refinance' && refinanceOutlookResult && (
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+                <RefinanceOutlookSidebar
+                  outlookResult={refinanceOutlookResult}
+                  isLoading={!refinanceDataAvailable}
+                  currentRate={refinanceCurrentRate || 3.0}
+                />
+              </div>
             )}
           </div>
         )
@@ -1548,9 +1594,9 @@ export function ProgressiveFormWithController({
   }
 
   return (
-    <div className={cn('w-full max-w-2xl mx-auto', className)}>
-      {/* Progress Indicator */}
-      <div className="mb-8">
+    <div className="w-full">
+      {/* Progress Indicator - outside grid */}
+      <div className={cn('mb-8 w-full max-w-2xl mx-auto', className)}>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-black">
             Step {currentStep + 1} of {formSteps.length}: {currentStepConfig.label}
@@ -1562,24 +1608,53 @@ export function ProgressiveFormWithController({
         <Progress value={progressPercentage} className="h-1" />
       </div>
 
-      {/* Step Description */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-light text-black mb-2">
-          {currentStepConfig.description}
-        </h2>
-        {leadScore > 0 && (
-          <div className="flex items-center gap-2 text-sm text-[#666666]">
-            <Shield className="w-4 h-4 text-[#10B981]" />
-            <span>Trust Score: {leadScore}%</span>
-          </div>
-        )}
-      </div>
+      {/* Unified container for headline + form + sidebar */}
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="rounded-lg border border-[#E5E5E5]/50 bg-white/40 backdrop-blur-sm p-8 md:p-10 shadow-sm">
+          {/* Step headline inside container */}
+          <h2 className="text-3xl md:text-4xl font-normal text-black mb-8 leading-tight text-center">
+            {currentStepConfig.description}
+          </h2>
 
-      {/* Form Content */}
-      <form onSubmit={handleStepSubmit}>
-        <Card className="border-[#E5E5E5]">
-          <CardContent className="pt-6">
-            {renderStepContent()}
+          {/* Grid with form + sidebar */}
+          <ResponsiveFormLayout
+            sidebar={
+              currentStep === 2 && loanType === 'new_purchase' ? (
+                <InstantAnalysisSidebar
+                  calcResult={instantCalcResult}
+                  loanType={loanType}
+                  isLoading={isInstantCalcLoading}
+                />
+              ) : currentStep === 2 && loanType === 'refinance' ? (
+              <MarketContextSidebar
+                currentRate={refinanceCurrentRate || 3.0}
+                isLoading={!refinanceCurrentRate || refinanceCurrentRate === 0}
+              />
+            ) : currentStep === 3 && loanType === 'new_purchase' ? (
+              <MasReadinessSidebar
+                result={masReadiness}
+                propertyType={propertyType}
+                isBlurred={!showMasReadiness}
+                onUnlock={() => setShowMasReadiness(true)}
+                onContinue={handleStepSubmit}
+              />
+            ) : currentStep === 3 && loanType === 'refinance' ? (
+              <RefinanceSavingsSidebar
+                outlookResult={refinanceOutlookResult}
+                isLoading={!refinanceDataAvailable}
+              />
+            ) : null
+            }
+            showSidebar={
+              (currentStep === 2 && loanType === 'new_purchase' && Boolean(instantCalcResult)) ||
+              (currentStep === 2 && loanType === 'refinance' && refinanceCurrentRate > 0) ||
+              (currentStep === 3 && loanType === 'new_purchase') ||
+              (currentStep === 3 && loanType === 'refinance' && Boolean(refinanceOutlookResult))
+            }
+          >
+            <form onSubmit={handleStepSubmit}>
+              <div className="space-y-6">
+                {renderStepContent()}
 
             {/* Trust Signals */}
             {trustSignalsShown.length > 0 && (
@@ -1604,15 +1679,38 @@ export function ProgressiveFormWithController({
                 </Button>
               )}
 
+              {/* DEBUG: Log button state */}
+              {(() => {
+                console.log(`🔴 BUTTON DEBUG (Step ${currentStep}):`, {
+                  canSubmitCurrentStep,
+                  isSubmitting,
+                  isExternallySubmitting,
+                  isValid,
+                  buttonWillBeDisabled: !canSubmitCurrentStep || isSubmitting || isExternallySubmitting,
+                  formErrors: errors,
+                  formValues: watch()
+                })
+                return null
+              })()}
+
               <Button
                 type="submit"
-                className="h-12 px-8 bg-[#FCD34D] text-black hover:bg-[#FBB614] flex-1 ml-auto"
+                className="h-14 px-8 bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg flex-1 ml-auto font-semibold"
                 disabled={!canSubmitCurrentStep || isSubmitting || isExternallySubmitting}
               >
                 {isSubmitting || isExternallySubmitting ? (
                   <span className="flex items-center gap-2">
                     <span className="animate-pulse">Processing...</span>
                   </span>
+                ) : currentStep === 3 && loanType === 'new_purchase' ? (
+                  // Step 3 new purchase: Mirror sidebar state
+                  !showMasReadiness ? (
+                    'Unlock to Continue →'
+                  ) : masReadiness.isReady ? (
+                    'Get Your Loan Package →'
+                  ) : (
+                    'Explore Your Options →'
+                  )
                 ) : (
                   currentStepConfig.ctaText
                 )}
@@ -1626,9 +1724,11 @@ export function ProgressiveFormWithController({
                 {submissionError}
               </div>
             )}
-          </CardContent>
-        </Card>
-      </form>
+              </div>
+            </form>
+          </ResponsiveFormLayout>
+        </div>
+      </div>
     </div>
   )
 }

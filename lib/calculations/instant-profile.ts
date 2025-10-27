@@ -9,17 +9,28 @@ import {
   DR_ELENA_POLICY_REFERENCES,
   DR_ELENA_STRESS_TEST_FLOORS
 } from './dr-elena-constants';
+import type { SavingsScenario } from './refinance-savings';
+import type { MarketRateSnapshot } from '../types/market-rates';
+import { generateSavingsScenarios } from './refinance-savings';
 
 export interface InstantProfileInput {
   property_price: number;
   property_type: 'HDB' | 'Private' | 'EC' | 'Commercial';
   buyer_profile: 'SC' | 'PR' | 'Foreigner';
   existing_properties: number;
-  income: number;
+
+  // Income (backwards compatible)
+  income: number;  // Total recognized income
+  incomes?: number[];  // Individual applicant incomes for IWAA calculation (optional)
+
   commitments: number;
   rate: number;
   tenure: number;
-  age: number;
+
+  // Age (backwards compatible)
+  age: number;  // Primary applicant age (or single applicant)
+  ages?: number[];  // Individual applicant ages for IWAA calculation (optional)
+
   loan_type?: 'new_purchase' | 'refinance';
   is_owner_occupied?: boolean;
 }
@@ -97,6 +108,7 @@ export interface RefinanceOutlookResult {
   policyRefs: string[];
   ltvCapApplied: number;
   cpfRedemptionAmount: number;
+  savingsScenarios?: SavingsScenario[];
 }
 
 /**
@@ -116,10 +128,12 @@ export function calculateInstantProfile(
     buyer_profile,
     existing_properties,
     income,
+    incomes,  // For IWAA calculation
     commitments,
     rate,
     tenure,
     age,
+    ages,  // For IWAA calculation
     loan_type = 'new_purchase'
   } = inputs;
 
@@ -262,12 +276,101 @@ export function calculateInstantProfile(
     return DR_ELENA_ABSD_RATES.singleBuyers.foreigner.allProperties;
   })();
 
-  const regulatoryTenureCap = property_type === 'Commercial'
-    ? 35
-    : (property_type === 'HDB' || property_type === 'EC')
-      ? 25
-      : 30;
-  const ageBasedCap = Math.max(65 - age, 1);
+  // ========================================================================
+  // TENURE CALCULATION - Dr Elena v2 Compliance
+  // ========================================================================
+  //
+  // Singapore MAS regulations cap loan tenure based on:
+  // 1. Borrower age: Older borrowers get shorter tenure
+  // 2. Property type: HDB/EC/Private/Commercial have different caps
+  // 3. LTV tier: 55% LTV gets extended tenure vs 75% LTV
+  //
+  // For joint applicants, use IWAA (Income-Weighted Average Age):
+  //   IWAA = (Age1 × Income1 + Age2 × Income2) / (Income1 + Income2)
+  //   Round UP to nearest integer (Math.ceil)
+  //
+  // Dr Elena v2 References:
+  // - IWAA formula: dr-elena-mortgage-expert-v2.json lines 164-168
+  // - HDB tenure rules: lines 633-642
+  // - EC tenure rules: lines 664-674
+  // - Private tenure rules: lines 681-690
+  // - Commercial tenure rules: lines 703-712
+  //
+  // Key Rules:
+  // - HDB 75% LTV: MIN(65 - IWAA, 25 years)
+  // - HDB 55% LTV: MIN(75 - IWAA, 30 years) ← Extended!
+  // - EC/Private/Landed 75% LTV: MIN(65 - IWAA, 30 years)
+  // - EC/Private/Landed 55% LTV: MIN(65 - IWAA, 35 years) ← Extended!
+  // - Commercial 75% LTV: MIN(65 - IWAA, 30 years)
+  // - Commercial 55% LTV: MIN(65 - IWAA, 35 years) ← Extended!
+  //
+  // Updated: 2025-10-26 to fix IWAA and extended tenure bugs
+  // ========================================================================
+
+  // IWAA Calculation (Dr Elena v2 line 164-168)
+  // If ages/incomes arrays provided, calculate Income-Weighted Average Age
+  // Otherwise, fall back to single age (backwards compatibility)
+  const effectiveAge = (ages && incomes && ages.length > 0 && incomes.length > 0)
+    ? calculateIWAA(ages, incomes)
+    : age;
+
+  // Dr Elena v2: Property-specific tenure rules (lines 630-735)
+  // Different formulas for 75% LTV (base) vs 55% LTV (extended)
+  let regulatoryTenureCap: number;
+  let ageLimitBase: number;
+
+  if (property_type === 'HDB') {
+    if (ltvMode === 55) {
+      // HDB 55% LTV Extended: MIN(75 - IWAA, 30) [line 638-640]
+      regulatoryTenureCap = 30;
+      ageLimitBase = 75;
+    } else {
+      // HDB 75% LTV: MIN(65 - IWAA, 25) [line 634-636]
+      regulatoryTenureCap = 25;
+      ageLimitBase = 65;
+    }
+  } else if (property_type === 'EC') {
+    if (ltvMode === 55) {
+      // EC 55% LTV Extended: MIN(65 - IWAA, 35) [line 670-672]
+      regulatoryTenureCap = 35;
+      ageLimitBase = 65;
+    } else {
+      // EC 75% LTV: MIN(65 - IWAA, 30) [line 665-667]
+      regulatoryTenureCap = 30;
+      ageLimitBase = 65;
+    }
+  } else if (property_type === 'Private') {
+    if (ltvMode === 55) {
+      // Private 55% LTV Extended: MIN(65 - IWAA, 35) [line 687-689]
+      regulatoryTenureCap = 35;
+      ageLimitBase = 65;
+    } else {
+      // Private 75% LTV: MIN(65 - IWAA, 30) [line 682-684]
+      regulatoryTenureCap = 30;
+      ageLimitBase = 65;
+    }
+  } else if (property_type === 'Commercial') {
+    if (ltvMode === 55) {
+      // Commercial 55% LTV Extended: MIN(65 - IWAA, 35) [line 709-711]
+      regulatoryTenureCap = 35;
+      ageLimitBase = 65;
+    } else {
+      // Commercial 75% LTV: MIN(65 - IWAA, 30) [line 704-706]
+      regulatoryTenureCap = 30;
+      ageLimitBase = 65;
+    }
+  } else {
+    // Fallback (shouldn't happen)
+    regulatoryTenureCap = 30;
+    ageLimitBase = 65;
+  }
+
+  // Apply age-based cap
+  // Standard formula: 65 - effectiveAge
+  // Extended formula (HDB 55% only): 75 - effectiveAge
+  const ageBasedCap = Math.max(ageLimitBase - effectiveAge, 1);
+
+  // Take minimum of regulatory cap and age-based cap
   const tenureCapYears = Math.max(1, Math.min(regulatoryTenureCap, ageBasedCap));
   const tenureCapSource: TenureCapSource = ageBasedCap < regulatoryTenureCap ? 'age' : 'regulation';
 
@@ -512,7 +615,11 @@ export function calculateComplianceSnapshot(
  * Aligned with Dr Elena v2persona specialized calculators
  */
 export function calculateRefinanceOutlook(
-  inputs: RefinanceOutlookInput
+  inputs: RefinanceOutlookInput,
+  options?: {
+    includeSavingsScenarios?: boolean;
+    marketRates?: MarketRateSnapshot;
+  }
 ): RefinanceOutlookResult {
   const {
     property_value,
@@ -708,6 +815,17 @@ export function calculateRefinanceOutlook(
 
   reasonCodeSet.add('mas_compliant_calculation');
 
+
+  // Generate savings scenarios if requested
+  let savingsScenarios: SavingsScenario[] | undefined;
+  if (options?.includeSavingsScenarios && options?.marketRates && effectiveBalance > 0) {
+    savingsScenarios = generateSavingsScenarios(
+      effectiveBalance,
+      effectiveCurrentRate / 100, // Convert percentage to decimal
+      options.marketRates
+    );
+  }
+
   return {
     projectedMonthlySavings,
     currentMonthlyPayment,
@@ -717,7 +835,8 @@ export function calculateRefinanceOutlook(
     reasonCodes: Array.from(reasonCodeSet),
     policyRefs: Array.from(policyRefSet),
     ltvCapApplied: Math.round(ltvCap * 100),
-    cpfRedemptionAmount
+    cpfRedemptionAmount,
+    savingsScenarios
   };
 }
 
@@ -852,7 +971,7 @@ export function calculateIWAA(ages: number[], incomes: number[]): number {
   if (totalIncome === 0) return ages[0] || 0
 
   const weightedSum = ages.reduce((sum, age, i) => sum + age * (incomes[i] / totalIncome), 0)
-  return Math.round(weightedSum)
+  return Math.ceil(weightedSum) // Dr Elena v2: Round UP to nearest integer
 }
 
 /**

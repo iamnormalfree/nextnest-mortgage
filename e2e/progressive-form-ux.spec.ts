@@ -140,19 +140,14 @@ test.describe('Progressive Form - Comprehensive UX', () => {
   });
 
   test.afterAll(async () => {
-    console.log('
-' + '='.repeat(60));
+    console.log('\n' + '='.repeat(60));
     console.log('STEP 2 UX REPORT');
     console.log('='.repeat(60));
-    
+
     if (issues.length === 0) {
-      console.log('
-✅ NO ISSUES FOUND
-');
+      console.log('\n✅ NO ISSUES FOUND\n');
     } else {
-      console.log(`
-Total: ${issues.length}
-`);
+      console.log(`\nTotal: ${issues.length}\n`);
       
       const bySev = {
         Critical: issues.filter(i => i.severity === 'Critical'),
@@ -172,7 +167,6 @@ ${sev}: ${bySev[sev].length}`);
         }
       });
     }
-    console.log('
-' + '='.repeat(60));
+    console.log('\n' + '='.repeat(60));
   });
 });

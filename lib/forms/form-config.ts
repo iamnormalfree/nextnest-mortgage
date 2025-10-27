@@ -77,7 +77,7 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
     },
     // Step 3 fields (Your Finances)
     existingCommitments: undefined,
-    employmentType: 'employed', // Set a default value
+    employmentType: undefined, // No default - shows placeholder on load
     creditCardCount: 0,
     hasJointApplicant: false,
     // Property ownership (affects LTV tier: 1st property = 75%, 2nd = 45%, 3rd+ = 35%)
@@ -118,8 +118,8 @@ export function getDefaultValues(loanType: LoanType): Record<string, any> {
 
   // Add loan-type specific defaults
   if (loanType === 'new_purchase') {
-    defaults.propertyCategory = 'resale' // Default category
-    defaults.propertyType = 'HDB' // Default property type
+    defaults.propertyCategory = undefined // No default - progressive disclosure starts with category selection
+    defaults.propertyType = undefined // No default - shows after category selected
     defaults.priceRange = undefined // No default to avoid test/UX issues with default values
     defaults.combinedAge = undefined // User must enter their age (no default to prevent concatenation bug)
     defaults.developmentName = undefined // Optional field
@@ -205,17 +205,17 @@ export const propertyTypeOptionsByCategory: Record<
     { value: 'Landed', label: 'Landed Property' }
   ],
   resale: [
-    { value: 'HDB', label: 'HDB Flat (Resale)' },
-    { value: 'Private', label: 'Private Condo (Resale)' },
-    { value: 'Landed', label: 'Landed Property (Resale)' }
+    { value: 'HDB', label: 'HDB Flat' },
+    { value: 'Private', label: 'Private Condo' },
+    { value: 'Landed', label: 'Landed Property' }
   ],
   new_launch: [
-    { value: 'EC', label: 'Executive Condo (New Launch)' },
-    { value: 'Private', label: 'Private Condo (New Launch)' },
-    { value: 'Landed', label: 'Landed Property (New Launch)' }
+    { value: 'EC', label: 'Executive Condo' },
+    { value: 'Private', label: 'Private Condo' },
+    { value: 'Landed', label: 'Landed Property' }
   ],
   bto: [
-    { value: 'HDB', label: 'HDB Flat (BTO)' }
+    { value: 'HDB', label: 'HDB Flat' }
   ],
   commercial: [
     { value: 'Commercial', label: 'Commercial Property' }

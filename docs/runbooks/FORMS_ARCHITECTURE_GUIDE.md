@@ -1,6 +1,6 @@
 # Forms Architecture Guide
 
-**Last Updated:** 2025-10-18
+**Last Updated:** 2025-10-26
 
 ## Production Forms Status
 
@@ -314,8 +314,339 @@ const ComplexForm = dynamic(() => import('./ComplexForm'), {
 
 ---
 
+---
+
+## Progressive Disclosure System V2 (2025-10-25)
+
+### Overview
+
+Complete redesign implementing 3-level progressive disclosure, unified employment types across loan paths, mobile-first responsive layout, and brand canon compliance.
+
+**Implementation Plan:** `docs/plans/active/2025-10-25-progressive-form-full-system-redesign.md`
+
+**Key Improvements:**
+- **Deeper Step 2 Disclosure**: Category → Type → Price/Age (3-level reveal)
+- **Unified Employment**: 4 employment types with income recognition rates
+- **Co-Applicant Parity**: Full field mirror (income, age, employment)
+- **Responsive Layout**: Floating sidebar (desktop), inline card (mobile)
+- **Clean Labels**: Removed redundant property type suffixes
+- **Brand Canon**: Part04 design principles (typography, spacing, conversational copy)
+
+---
+
+### Employment Types (Unified Across All Loan Paths)
+
+**4 Employment Types** (Dr Elena v2 compliant):
+
+| Type | Recognition Rate | Documentation Required | Component |
+|------|------------------|------------------------|-----------|
+| **Employed** (≥3 months) | 100% base + 70% variable | 3 months payslips + employment letter | EmploymentPanel |
+| **Self-Employed** | 70% on 2-year NOA | 2 years Notice of Assessment (NOA) | EmploymentPanel |
+| **In-Between-Jobs** (<3 months) | 100% base + 70% variable | Employment contract + work email | EmploymentPanel |
+| **Not Working** | 0% | None | EmploymentPanel |
+
+**Source:** `dr-elena-mortgage-expert-v2.json` lines 190-215
+
+**Income Recognition:**
+- Fixed income (base salary): 100%
+- Variable income (bonuses/commissions): 70%
+- Self-employed (NOA average): 70%
+
+**Shared Components:**
+- `EmploymentPanel.tsx` - Reusable for Applicant 1 and Co-Applicant
+- `CoApplicantPanel.tsx` - Wraps EmploymentPanel with income/age fields
+
+**Implementation:**
+- `lib/forms/employment-types.ts` - Type definitions and rates
+- `components/forms/sections/EmploymentPanel.tsx` - Progressive disclosure component
+- Used in: Step3NewPurchase.tsx, Step3Refinance.tsx
+
+**Example Usage:**
+```tsx
+<EmploymentPanel
+  applicantNumber={0}  // 0 for primary, 1 for co-applicant
+  control={control}
+  errors={errors}
+  onFieldChange={onFieldChange}
+/>
+```
+
+---
+
+### Step 2 Progressive Disclosure (3-Level Reveal)
+
+**New Behavior:** Fields reveal incrementally to reduce cognitive load.
+
+**Level 1: Category** (Always visible)
+- Property category dropdown
+- Only for new_purchase (refinance skips progressive disclosure)
+
+**Level 2: Type** (After category selected)
+- Property type dropdown
+- Options filtered by category (resale → HDB/Private/Landed, new_launch → EC/Private/Landed)
+
+**Level 3: Price + Age** (After type selected) ← **NEW**
+- Price range input
+- Combined age input
+- Existing properties checkbox (Private/EC/Landed only)
+
+**Implementation:**
+- `lib/forms/field-visibility-rules.ts` - Centralized visibility logic
+- `getStep2VisibleFields()` - Returns array of visible field names
+- `shouldShowField()` - Helper for conditional rendering
+- Transitions: 200ms ease-out, respects `prefers-reduced-motion`
+
+**Clean Labels:**
+- Removed redundant suffixes: "HDB Flat (Resale)" → "HDB Flat"
+- Context provided by progressive disclosure (user already knows category)
+
+**Example:**
+```tsx
+const visibleFields = getStep2VisibleFields({
+  loanType: 'new_purchase',
+  propertyCategory: 'resale',
+  propertyType: 'Private'
+})
+// Returns: ['propertyCategory', 'propertyType', 'priceRange', 'combinedAge', 'existingProperties']
+```
+
+---
+
+### Responsive Layout System
+
+**Mobile-First Architecture** - Code prioritizes mobile, desktop as enhancement layer
+
+**Breakpoints:**
+- **Mobile:** <768px (inline instant analysis)
+- **Tablet:** 768-1023px (single column, no sidebar)
+- **Desktop:** ≥1024px (CSS Grid 2-column with sticky sidebar)
+
+**Components:**
+
+| Component | Purpose | File |
+|-----------|---------|------|
+| `useResponsiveLayout` | Viewport detection hook | `hooks/useResponsiveLayout.ts` |
+| `ResponsiveFormLayout` | Layout container | `components/forms/layout/ResponsiveFormLayout.tsx` |
+| `progressive-form-layout.css` | Mobile-first CSS Grid | `styles/progressive-form-layout.css` |
+
+**Desktop Layout (≥1024px):**
+```css
+.form-layout-container {
+  display: grid;
+  grid-template-columns: minmax(450px, 1fr) 380px;
+  gap: 0; /* Using padding + divider instead */
+}
+
+.form-content {
+  border-right: 1px solid #E5E5E5; /* Vertical divider */
+  padding-right: 2rem;
+}
+
+.form-sidebar {
+  position: sticky;
+  top: 2rem;
+  padding-left: 2rem;
+}
+```
+
+**Mobile Layout (<768px):**
+```css
+.form-layout-container {
+  display: block;
+  padding: 1rem;
+}
+
+.form-sidebar {
+  display: none; /* Hidden on mobile */
+}
+```
+
+**Example Usage:**
+```tsx
+<ResponsiveFormLayout
+  sidebar={<InstantAnalysisSidebar />}
+  showSidebar={hasCalculated}
+>
+  <form>{/* Form fields */}</form>
+</ResponsiveFormLayout>
+```
+
+---
+
+### Brand Canon Compliance (Part04)
+
+**Typography:**
+- Font: Inter (already in use)
+- Headline: `font-normal text-center` (3xl/4xl)
+- Labels: `text-xs uppercase tracking-wider font-semibold`
+- Body: 14px minimum for readability
+
+**Spacing (8px System):**
+- `spacing-xs`: 0.5rem (8px)
+- `spacing-sm`: 1rem (16px)
+- `spacing-md`: 2rem (32px)
+- `spacing-lg`: 4rem (64px)
+
+**Colors:**
+- Primary text: `#000000` (black)
+- Secondary text: `#666666` (gray)
+- Borders: `#E5E5E5` (light gray)
+- Background: `#F8F8F8` (off-white)
+- Accent: `#FFD700` (gold)
+
+**Conversational Copy:**
+- Help text explains "why" not just "what"
+- Example: "We recognize 70% of your average monthly income from your latest 2-year NOA"
+- Avoid jargon, use plain language
+
+**Accessibility:**
+- All labels have `htmlFor` or `aria-label`
+- Error messages have `role="alert"`
+- Color contrast ≥4.5:1
+- Touch targets ≥48px on mobile
+- Respects `prefers-reduced-motion`
+
+---
+
+### Testing Strategy
+
+**Unit Tests:**
+- `employment-types.test.ts` - Income recognition rates, documentation requirements
+- `field-visibility-rules.test.ts` - Progressive disclosure logic
+- `EmploymentPanel.test.tsx` - Component rendering, conditional panels
+- `CoApplicantPanel.test.tsx` - Field parity, integration
+- `ResponsiveFormLayout.test.tsx` - Viewport-based rendering
+- `useResponsiveLayout.test.ts` - Breakpoint detection
+
+**E2E Tests:**
+- `complete-progressive-form-journey.spec.ts` - Full user journeys
+  - New purchase: 3-level progressive disclosure
+  - Refinance: Employment progressive disclosure parity
+  - Property type labels: Clean (no suffixes)
+  - All employment types: Correct conditional panels
+
+**Test Coverage Target:** 80%+ for new components
+
+**Running Tests:**
+```bash
+npm run test                  # Unit tests
+npm run test:e2e             # E2E tests
+npm run test:watch           # Watch mode
+```
+
+---
+
+### File Reference
+
+**Core Libraries:**
+- `lib/forms/employment-types.ts` - Employment type system
+- `lib/forms/field-visibility-rules.ts` - Progressive disclosure logic
+- `lib/forms/form-config.ts` - Property type options (clean labels)
+
+**Shared Components:**
+- `components/forms/sections/EmploymentPanel.tsx` - Employment fields
+- `components/forms/sections/CoApplicantPanel.tsx` - Co-applicant wrapper
+- `components/forms/layout/ResponsiveFormLayout.tsx` - Layout container
+
+**Step Components:**
+- `components/forms/sections/Step3NewPurchase.tsx` - New purchase path
+- `components/forms/sections/Step3Refinance.tsx` - Refinance path
+
+**Hooks:**
+- `hooks/useResponsiveLayout.ts` - Viewport detection
+
+**Styles:**
+- `styles/progressive-form-layout.css` - Mobile-first CSS Grid
+
+**Tests:**
+- `tests/forms/employment-types.test.ts`
+- `tests/forms/field-visibility-rules.test.ts`
+- `tests/forms/property-type-validation.test.ts`
+- `tests/components/EmploymentPanel.test.tsx`
+- `tests/components/CoApplicantPanel.test.tsx`
+- `tests/components/ResponsiveFormLayout.test.tsx`
+- `tests/hooks/useResponsiveLayout.test.ts`
+- `tests/e2e/complete-progressive-form-journey.spec.ts`
+
+---
+
+### Migration Guide
+
+**If You're Working With Forms:**
+
+1. **Employment Fields** - Don't duplicate, use `<EmploymentPanel>`
+   ```tsx
+   // Before: 200+ lines of employment field code
+   // After:
+   <EmploymentPanel applicantNumber={0} control={control} errors={errors} onFieldChange={onFieldChange} />
+   ```
+
+2. **Co-Applicant Fields** - Don't duplicate, use `<CoApplicantPanel>`
+   ```tsx
+   // Before: Separate income/age/employment fields
+   // After:
+   {showJointApplicant && <CoApplicantPanel loanType="new_purchase" control={control} errors={errors} onFieldChange={onFieldChange} />}
+   ```
+
+3. **Property Type Labels** - Use clean labels (no suffixes)
+   ```tsx
+   // Before: "HDB Flat (Resale)"
+   // After: "HDB Flat"
+   ```
+
+4. **Step 2 Progressive Disclosure** - Use `getStep2VisibleFields()`
+   ```tsx
+   const visibleFields = getStep2VisibleFields({ loanType, propertyCategory, propertyType })
+   const showField = (name: string) => visibleFields.includes(name)
+   ```
+
+5. **Responsive Layout** - Wrap form content
+   ```tsx
+   <ResponsiveFormLayout sidebar={<InstantAnalysisSidebar />} showSidebar={hasCalculated}>
+     {/* Form fields */}
+   </ResponsiveFormLayout>
+   ```
+
+---
+
+### Known Issues & Limitations
+
+**Current State:**
+- Tablet (768-1023px) hides sidebar (can be customized to show inline card)
+- Mobile shows inline instant analysis card (implementation pending in plan)
+- Slide-in drawer pattern not yet implemented (future enhancement)
+
+**Performance:**
+- CSS Grid has excellent browser support (96%+)
+- Sticky positioning works in all modern browsers
+- `prefers-reduced-motion` respected for accessibility
+
+---
+
+### Performance
+
+**Bundle Impact:**
+- Employment types library: ~2KB
+- Field visibility rules: ~1KB
+- EmploymentPanel component: ~4KB
+- ResponsiveFormLayout: ~3KB
+- **Total new code: ~10KB** (minimal impact)
+
+**Removed Code:**
+- Duplicate employment fields: ~200 lines per step component
+- Duplicate co-applicant fields: ~100 lines per step component
+- **Net reduction: ~400 lines** across codebase
+
+**Runtime Performance:**
+- Progressive disclosure: O(1) field visibility checks
+- Responsive layout: Uses CSS Grid (hardware accelerated)
+- Employment panels: Lazy rendering (only visible type's panel mounts)
+
+---
+
 ## Related Documentation
 - [Tech Stack Guide](./TECH_STACK_GUIDE.md) - Overall architecture
 - [Migration Guide](../MIGRATION_GUIDE.md) - Component migration patterns
 - [Session Context](../Session_Context/shadcn_implementation_complete.md) - Recent optimization session
 - [AI Broker Guide](./AI_BROKER_COMPLETE_GUIDE.md) - AI insights and broker system
+- [Progressive Form Redesign Plan](../plans/active/2025-10-25-progressive-form-full-system-redesign.md) - V2 implementation plan

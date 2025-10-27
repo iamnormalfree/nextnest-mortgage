@@ -3,29 +3,68 @@
   "version": "2.1.0",
   "computational_precision": true,
   "last_regulatory_update": "2025-10-01",
-
   "profile_metadata": {
     "subject": "Dr. Elena Tan Wei Ming",
     "epithet": "The Singapore Property Finance Architect | 新加坡房产金融架构师",
     "archetype": "regulatory_specialist",
     "focus": "Singapore Mortgage Advisory, MAS Compliance, Property Finance Optimization | 新加坡房贷顾问・金管局合规・房产金融优化",
     "profile_type": "Singapore Property Finance Expert & Regulatory Compliance Specialist",
-    "aliases": ["Dr. Elena Tan", "Elena Tan", "Singapore Mortgage Expert"],
-    "tags": ["singapore_mortgage", "mas_regulations", "property_finance", "cfa", "cpa", "regulatory_compliance"],
+    "aliases": [
+      "Dr. Elena Tan",
+      "Elena Tan",
+      "Singapore Mortgage Expert"
+    ],
+    "tags": [
+      "singapore_mortgage",
+      "mas_regulations",
+      "property_finance",
+      "cfa",
+      "cpa",
+      "regulatory_compliance"
+    ],
     "links": [
-      { "title": "MAS Notice 632 (Residential Property Loans)", "url": "https://www.mas.gov.sg/regulation/notices/notice-632" },
-      { "title": "MAS Notice 645 (TDSR)", "url": "https://www.mas.gov.sg/regulation/notices/notice-645" },
-      { "title": "MAS Explainer: Rules for New Housing Loans", "url": "https://www.mas.gov.sg/regulation/explainers/new-housing-loans" },
-      { "title": "MAS Explainer: Loan Tenure & LTV", "url": "https://www.mas.gov.sg/regulation/explainers/new-housing-loans/loan-tenure-and-loan-to-value-limits" },
-      { "title": "MAS Explainer: Calculating TDSR", "url": "https://www.mas.gov.sg/regulation/explainers/tdsr-for-property-loans/calculating-tdsr" },
-      { "title": "MAS: Medium-term Interest Rate Floors (Sep 29, 2022)", "url": "https://www.mas.gov.sg/news/media-releases/2022/measures-to-promote-sustainable-conditions-in-the-property-market-by-ensuring-prudent-borrowing-and-moderating-demand" },
-      { "title": "MAS Explainer: MSR & TDSR Rules", "url": "https://www.mas.gov.sg/regulation/explainers/new-housing-loans/msr-and-tdsr-rules" },
-      { "title": "IRAS: Buyer’s Stamp Duty (BSD)", "url": "https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/buyer%27s-stamp-duty-%28bsd%29" },
-      { "title": "IRAS: Additional Buyer’s Stamp Duty (ABSD)", "url": "https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/additional-buyer%27s-stamp-duty-%28absd%29" },
-      { "title": "MOF press release on BSD hike (Feb 14, 2023)", "url": "https://www.mof.gov.sg/news-publications/press-releases/buyer-s-stamp-duty-%28bsd%29-rates-to-be-raised-for-higher-value-properties" }
+      {
+        "title": "MAS Notice 632 (Residential Property Loans)",
+        "url": "https://www.mas.gov.sg/regulation/notices/notice-632"
+      },
+      {
+        "title": "MAS Notice 645 (TDSR)",
+        "url": "https://www.mas.gov.sg/regulation/notices/notice-645"
+      },
+      {
+        "title": "MAS Explainer: Rules for New Housing Loans",
+        "url": "https://www.mas.gov.sg/regulation/explainers/new-housing-loans"
+      },
+      {
+        "title": "MAS Explainer: Loan Tenure & LTV",
+        "url": "https://www.mas.gov.sg/regulation/explainers/new-housing-loans/loan-tenure-and-loan-to-value-limits"
+      },
+      {
+        "title": "MAS Explainer: Calculating TDSR",
+        "url": "https://www.mas.gov.sg/regulation/explainers/tdsr-for-property-loans/calculating-tdsr"
+      },
+      {
+        "title": "MAS: Medium-term Interest Rate Floors (Sep 29, 2022)",
+        "url": "https://www.mas.gov.sg/news/media-releases/2022/measures-to-promote-sustainable-conditions-in-the-property-market-by-ensuring-prudent-borrowing-and-moderating-demand"
+      },
+      {
+        "title": "MAS Explainer: MSR & TDSR Rules",
+        "url": "https://www.mas.gov.sg/regulation/explainers/new-housing-loans/msr-and-tdsr-rules"
+      },
+      {
+        "title": "IRAS: Buyer’s Stamp Duty (BSD)",
+        "url": "https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/buyer%27s-stamp-duty-%28bsd%29"
+      },
+      {
+        "title": "IRAS: Additional Buyer’s Stamp Duty (ABSD)",
+        "url": "https://www.iras.gov.sg/taxes/stamp-duty/for-property/buying-or-acquiring-property/additional-buyer%27s-stamp-duty-%28absd%29"
+      },
+      {
+        "title": "MOF press release on BSD hike (Feb 14, 2023)",
+        "url": "https://www.mof.gov.sg/news-publications/press-releases/buyer-s-stamp-duty-%28bsd%29-rates-to-be-raised-for-higher-value-properties"
+      }
     ]
   },
-
   "computational_modules": {
     "rounding_rules": {
       "description": "Client protection rounding rules for all calculations",
@@ -33,40 +72,69 @@
         "rule": "ROUND DOWN to nearest thousand",
         "reason": "Protect clients from over-borrowing",
         "formula": "Math.floor(value / 1000) * 1000",
-        "applies_to": ["max_loan_amount", "tdsr_limit", "msr_limit", "ltv_loan_amount"]
+        "applies_to": [
+          "max_loan_amount",
+          "tdsr_limit",
+          "msr_limit",
+          "ltv_loan_amount"
+        ]
       },
       "funds_required": {
         "rule": "ROUND UP to nearest thousand",
         "reason": "Ensure clients have sufficient funds",
         "formula": "Math.ceil(value / 1000) * 1000",
-        "applies_to": ["pledge_fund", "show_fund", "downpayment", "stamp_duty", "cpf_refund"]
+        "applies_to": [
+          "pledge_fund",
+          "show_fund",
+          "downpayment",
+          "stamp_duty",
+          "cpf_refund"
+        ]
       },
       "monthly_payments": {
         "rule": "ROUND UP to nearest dollar",
         "reason": "Conservative payment estimation",
         "formula": "Math.ceil(value)",
-        "applies_to": ["monthly_installment", "tdsr_commitment", "msr_payment"]
+        "applies_to": [
+          "monthly_installment",
+          "tdsr_commitment",
+          "msr_payment"
+        ]
       },
       "percentages": {
         "rule": "2 decimal places",
         "formula": "Math.round(value * 100) / 100",
-        "applies_to": ["interest_rates", "absd_rates", "roi_percentages"]
+        "applies_to": [
+          "interest_rates",
+          "absd_rates",
+          "roi_percentages"
+        ]
       }
     },
-
     "core_formulas": {
       "monthly_payment": {
         "description": "Calculate monthly mortgage installment",
         "standard_formula": "P × [r(1+r)^n]/[(1+r)^n-1]",
-        "parameters": { "P": "Principal", "r": "annual_rate/12", "n": "years×12" },
+        "parameters": {
+          "P": "Principal",
+          "r": "annual_rate/12",
+          "n": "years×12"
+        },
         "exact_calculation": "loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1)",
         "client_display": "Math.ceil(exact_calculation)",
-        "edge_cases": { "zero_interest": "P / n", "variable_rates": "Weighted-average across periods" }
+        "edge_cases": {
+          "zero_interest": "P / n",
+          "variable_rates": "Weighted-average across periods"
+        }
       },
       "loan_from_payment": {
         "description": "Inverse of monthly_payment",
         "formula": "P = M × [(1+r)^n - 1] / [r(1+r)^n]",
-        "parameters": { "M": "Monthly payment", "r": "Monthly rate", "n": "Total payments" },
+        "parameters": {
+          "M": "Monthly payment",
+          "r": "Monthly rate",
+          "n": "Total payments"
+        },
         "exact_calculation": "monthlyPayment * (Math.pow(1 + monthlyRate, numberOfPayments) - 1) / (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments))",
         "client_display": "Math.floor(exact_calculation / 1000) * 1000",
         "rounding_note": "Round DOWN to nearest thousand for eligibility"
@@ -87,7 +155,10 @@
         "formula": "MSR_Limit = Recognized_Income × 0.30",
         "exact_calculation": "income * 0.30",
         "client_display": "Math.floor(exact_calculation)",
-        "applies_to": ["HDB", "EC_developer_sale"],
+        "applies_to": [
+          "HDB",
+          "EC_developer_sale"
+        ],
         "note": "MSR applies in addition to TDSR; use whichever is more restrictive"
       },
       "iwaa_calculation": {
@@ -100,124 +171,343 @@
         "description": "CPF accrued interest",
         "compound_formula": "Principal × (1 + rate/12)^months - Principal",
         "annuity_formula": "PMT × [((1 + r)^n - 1) / r] - (PMT × n)",
-        "parameters": { "rate": "CPF OA 2.5% (assumption)", "compounding": "Monthly" }
+        "parameters": {
+          "rate": "CPF OA 2.5% (assumption)",
+          "compounding": "Monthly"
+        }
       },
       "outstanding_loan_balance": {
         "description": "Remaining balance after p payments",
         "formula": "Balance = P × [(1+r)^n - (1+r)^p] / [(1+r)^n - 1]",
-        "parameters": { "P": "Original principal", "r": "Monthly rate", "n": "Total payments", "p": "Payments made" }
+        "parameters": {
+          "P": "Original principal",
+          "r": "Monthly rate",
+          "n": "Total payments",
+          "p": "Payments made"
+        }
       }
     },
-
     "income_recognition": {
-      "fixed_income": { "recognition_rate": 1.0, "description": "Base salary, guaranteed components", "documentation": "Latest 3 months payslips + employment letter" },
-      "variable_income": { "default_recognition_rate": 0.7, "configurable": true, "description": "Commissions/OT/bonuses", "documentation": "2 years NOA or 12 months payslips" },
-      "rental_income": { "recognition_rate": 0.7, "requirements": "≥6 months tenancy", "description": "70% of gross rent" },
-      "self_employed_income": { "recognition_rate": 0.7, "documentation": "Latest 2 years NOA", "description": "70% of declared income" },
+      "fixed_income": {
+        "recognition_rate": 1.0,
+        "description": "Base salary, guaranteed components",
+        "documentation": "Latest 3 months payslips + employment letter"
+      },
+      "variable_income": {
+        "default_recognition_rate": 0.7,
+        "configurable": true,
+        "description": "Commissions/OT/bonuses",
+        "documentation": "2 years NOA or 12 months payslips"
+      },
+      "rental_income": {
+        "recognition_rate": 0.7,
+        "requirements": "≥6 months tenancy",
+        "description": "70% of gross rent"
+      },
+      "self_employed_income": {
+        "recognition_rate": 0.7,
+        "documentation": "Latest 2 years NOA",
+        "description": "70% of declared income"
+      },
       "asset_based_income": {
         "pledged_assets": "Configurable haircut; amortise over 48 months",
         "unpledged_assets": "Configurable by liquidity"
       }
     },
-
     "commitment_calculations": {
-      "credit_cards": { "formula": "MAX(Outstanding_Balance × 0.03, 50)", "description": "Per-card minimum (configurable; bank policy)" },
-      "overdraft_facilities": { "formula": "Facility_Limit × 0.05", "description": "Monthly commitment (configurable)" },
-      "guarantor_obligations": { "formula": "Guaranteed_Amount × 0.20", "description": "Exposure proxy (configurable)" },
-      "existing_mortgages": { "formula": "Actual monthly payment at stress test rate", "stress_test": "4% resi / 5% non-resi floors" }
+      "credit_cards": {
+        "formula": "MAX(Outstanding_Balance × 0.03, 50)",
+        "description": "Per-card minimum (configurable; bank policy)"
+      },
+      "overdraft_facilities": {
+        "formula": "Facility_Limit × 0.05",
+        "description": "Monthly commitment (configurable)"
+      },
+      "guarantor_obligations": {
+        "formula": "Guaranteed_Amount × 0.20",
+        "description": "Exposure proxy (configurable)"
+      },
+      "existing_mortgages": {
+        "formula": "Actual monthly payment at stress test rate",
+        "stress_test": "4% resi / 5% non-resi floors"
+      }
     },
-
     "ltv_limits": {
       "individual_borrowers": {
-        "first_loan":   { "max_ltv_base": 75, "max_ltv_reduced": 55, "min_cash_base": 5,  "min_cash_reduced": 10 },
-        "second_loan":  { "max_ltv_base": 45, "max_ltv_reduced": 25, "min_cash": 25 },
-        "third_plus_loan": { "max_ltv_base": 35, "max_ltv_reduced": 15, "min_cash": 25 }
+        "first_loan": {
+          "max_ltv_base": 75,
+          "max_ltv_reduced": 55,
+          "min_cash_base": 5,
+          "min_cash_reduced": 10
+        },
+        "second_loan": {
+          "max_ltv_base": 45,
+          "max_ltv_reduced": 25,
+          "min_cash": 25
+        },
+        "third_plus_loan": {
+          "max_ltv_base": 35,
+          "max_ltv_reduced": 15,
+          "min_cash": 25
+        }
       },
-      "corporate_buyers": { "max_ltv": 15, "description": "Entities buying residential" },
+      "corporate_buyers": {
+        "max_ltv": 15,
+        "description": "Entities buying residential"
+      },
       "tenure_or_age_triggers": {
         "rule": "Apply reduced LTV tier if (HDB flat tenure > 25y) OR (non-HDB tenure > 30y) OR (loan end age > 65)."
       }
     },
-
     "stamp_duty_rates": {
       "bsd_residential": {
         "description": "Buyer’s Stamp Duty (residential)",
         "tiers": [
-          { "max": 180000, "rate": 0.01 },
-          { "max": 360000, "rate": 0.02 },
-          { "max": 1000000, "rate": 0.03 },
-          { "max": 1500000, "rate": 0.04 },
-          { "max": 3000000, "rate": 0.05 },
-          { "above": 3000000, "rate": 0.06 }
+          {
+            "max": 180000,
+            "rate": 0.01
+          },
+          {
+            "max": 360000,
+            "rate": 0.02
+          },
+          {
+            "max": 1000000,
+            "rate": 0.03
+          },
+          {
+            "max": 1500000,
+            "rate": 0.04
+          },
+          {
+            "max": 3000000,
+            "rate": 0.05
+          },
+          {
+            "above": 3000000,
+            "rate": 0.06
+          }
         ],
         "effective_from": "2023-02-15"
       },
       "bsd_commercial": {
         "description": "Buyer’s Stamp Duty (non-residential)",
         "tiers": [
-          { "max": 180000, "rate": 0.01 },
-          { "max": 360000, "rate": 0.02 },
-          { "max": 1000000, "rate": 0.03 },
-          { "max": 1500000, "rate": 0.04 },
-          { "above": 1500000, "rate": 0.05 }
+          {
+            "max": 180000,
+            "rate": 0.01
+          },
+          {
+            "max": 360000,
+            "rate": 0.02
+          },
+          {
+            "max": 1000000,
+            "rate": 0.03
+          },
+          {
+            "max": 1500000,
+            "rate": 0.04
+          },
+          {
+            "above": 1500000,
+            "rate": 0.05
+          }
         ],
         "effective_from": "2023-02-15"
       },
       "absd_rates": {
         "description": "Additional Buyer’s Stamp Duty (as of 2023-04-27)",
         "single_buyers": {
-          "singapore_citizen": { "first_property": 0, "second_property": 20, "third_plus": 30 },
-          "permanent_resident": { "first_property": 5, "second_property": 30, "third_plus": 35 },
-          "foreigner": { "all_properties": 60 },
-          "entity": { "all_properties": 65 }
+          "singapore_citizen": {
+            "first_property": 0,
+            "second_property": 20,
+            "third_plus": 30
+          },
+          "permanent_resident": {
+            "first_property": 5,
+            "second_property": 30,
+            "third_plus": 35
+          },
+          "foreigner": {
+            "all_properties": 60
+          },
+          "entity": {
+            "all_properties": 65
+          }
         },
         "married_couples": {
-          "sc_sc": { "first": 0, "second": 20, "third_plus": 30 },
-          "sc_pr": { "first": 0, "second": 30, "third_plus": 35, "note": "First-home ABSD remission possible if conditions met" },
-          "sc_foreigner": { "first": 0, "second_plus": 60, "note": "First-home ABSD remission possible if conditions met" },
-          "pr_pr": { "first": 5, "second": 30, "third_plus": 35 },
-          "pr_foreigner": { "all": 60 },
-          "foreigner_foreigner": { "all": 60 }
+          "sc_sc": {
+            "first": 0,
+            "second": 20,
+            "third_plus": 30
+          },
+          "sc_pr": {
+            "first": 0,
+            "second": 30,
+            "third_plus": 35,
+            "note": "First-home ABSD remission possible if conditions met"
+          },
+          "sc_foreigner": {
+            "first": 0,
+            "second_plus": 60,
+            "note": "First-home ABSD remission possible if conditions met"
+          },
+          "pr_pr": {
+            "first": 5,
+            "second": 30,
+            "third_plus": 35
+          },
+          "pr_foreigner": {
+            "all": 60
+          },
+          "foreigner_foreigner": {
+            "all": 60
+          }
         },
-        "joint_purchase_non_married": { "rule": "Highest applicable individual rate applies" }
+        "joint_purchase_non_married": {
+          "rule": "Highest applicable individual rate applies"
+        }
       },
       "ssd_rates": {
         "description": "Seller’s Stamp Duty (post-2017-03-11)",
-        "post_2017_03_11": { "year_1": 12, "year_2": 8, "year_3": 4, "year_4_plus": 0 },
-        "2011_01_14_to_2017_03_10": { "year_1": 16, "year_2": 12, "year_3": 8, "year_4": 4, "year_5_plus": 0 },
+        "post_2017_03_11": {
+          "year_1": 12,
+          "year_2": 8,
+          "year_3": 4,
+          "year_4_plus": 0
+        },
+        "2011_01_14_to_2017_03_10": {
+          "year_1": 16,
+          "year_2": 12,
+          "year_3": 8,
+          "year_4": 4,
+          "year_5_plus": 0
+        },
         "pre_2011_01_14": 0
       }
     },
-
     "specialized_calculators": {
       "bridging_financing": {
         "description": "Short-term financing bridging purchase and sale",
         "max_tenure_months": 6,
         "repayment_mode": "Cash only; CPF not allowed for instalments",
         "documentation": {
-          "application": ["Granted Option to Purchase for sale property"],
-          "disbursement": ["Exercised Option to Purchase for sale property"]
+          "application": [
+            "Granted Option to Purchase for sale property"
+          ],
+          "disbursement": [
+            "Exercised Option to Purchase for sale property"
+          ]
         }
       },
-
       "progressive_payment_buc": {
         "description": "BUC progressive payment schedule (template; project S&P prevails)",
         "stages": [
-          { "stage": "booking", "percentage": 5, "timing": "On Option Exercise", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "signing", "percentage": 15, "timing": "Within 8 weeks of Option", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "foundation", "percentage": 10, "timing": "Foundation", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "reinforced_concrete", "percentage": 10, "timing": "Reinforced Concrete", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "brick_walls", "percentage": 5, "timing": "Brick Walls", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "roofing", "percentage": 5, "timing": "Roofing/Ceiling", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "electrical", "percentage": 5, "timing": "Electrical Wiring", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "carpark", "percentage": 5, "timing": "Carpark/Roads/Drains", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "top", "percentage": 25, "timing": "TOP", "payment_order": ["cash", "cpf", "loan"] },
-          { "stage": "csc", "percentage": 15, "timing": "CSC", "payment_order": ["cash", "cpf", "loan"] }
+          {
+            "stage": "booking",
+            "percentage": 5,
+            "timing": "On Option Exercise",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "signing",
+            "percentage": 15,
+            "timing": "Within 8 weeks of Option",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "foundation",
+            "percentage": 10,
+            "timing": "Foundation",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "reinforced_concrete",
+            "percentage": 10,
+            "timing": "Reinforced Concrete",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "brick_walls",
+            "percentage": 5,
+            "timing": "Brick Walls",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "roofing",
+            "percentage": 5,
+            "timing": "Roofing/Ceiling",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "electrical",
+            "percentage": 5,
+            "timing": "Electrical Wiring",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "carpark",
+            "percentage": 5,
+            "timing": "Carpark/Roads/Drains",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "top",
+            "percentage": 25,
+            "timing": "TOP",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          },
+          {
+            "stage": "csc",
+            "percentage": 15,
+            "timing": "CSC",
+            "payment_order": [
+              "cash",
+              "cpf",
+              "loan"
+            ]
+          }
         ],
         "payment_priority": "Cash first, then CPF, then Loan",
         "interest_calculation": "Amortise on progressively disbursed amounts"
       },
-
       "equity_term_loan": {
         "description": "Cash-out/equity term on private property",
         "max_equity_formula": "(Market_Value × LTV%) - Outstanding_Loan - CPF_Used(inc. accrued)",
@@ -234,7 +524,6 @@
           "5th: Equity term loan"
         ]
       },
-
       "roi_calculator": {
         "description": "Investment property return metrics",
         "metrics": {
@@ -245,21 +534,28 @@
           "annualized_roi": "[(1 + Total_ROI)^(1/years) - 1] × 100"
         },
         "expenses_to_consider": [
-          "Mortgage interest","Property tax","Maintenance fees","Property management",
-          "Insurance","Vacancy allowance"
+          "Mortgage interest",
+          "Property tax",
+          "Maintenance fees",
+          "Property management",
+          "Insurance",
+          "Vacancy allowance"
         ]
       },
-
       "nipp_calculator": {
         "description": "Variable rate projection / stepped-rate amortisation",
         "features": {
           "variable_rates": "Custom rates for years 1–N and thereafter",
-          "calculation_modes": ["loan_amount", "tenure", "interest_rate", "monthly_payment"],
+          "calculation_modes": [
+            "loan_amount",
+            "tenure",
+            "interest_rate",
+            "monthly_payment"
+          ],
           "amortization_table": "Year-by-year with cumulative totals"
         }
       }
     },
-
     "cpf_usage_rules": {
       "limits": {
         "valuation_limit_description": "Lower of property valuation or purchase price at time of purchase",
@@ -286,20 +582,22 @@
         "Equity term loan / overdraft"
       ]
     },
-
     "efa_modeling": {
       "description": "Eligible Financial Assets (pledge/show) modelling",
       "pledge_fund_calculation": {
         "formula": "(Monthly_Deficit / Limiting_Ratio) × 48",
         "exact_calculation": "(monthlyDeficit / limitingRatio) * 48",
         "client_display": "Math.ceil(exact_calculation / 1000) * 1000",
-        "limiting_ratio": { "tdsr_limited": 0.55, "msr_limited": 0.30 },
+        "limiting_ratio": {
+          "tdsr_limited": 0.55,
+          "msr_limited": 0.3
+        },
         "note": "Recognise over 48 months; haircuts configurable by asset class"
       },
       "haircut_defaults": {
-        "show_fund_haircut": 0.70,
-        "pledged_assets_haircut": 0.30,
-        "pledged_sgd_deposits_haircut": 0.00
+        "show_fund_haircut": 0.7,
+        "pledged_assets_haircut": 0.3,
+        "pledged_sgd_deposits_haircut": 0.0
       },
       "show_fund_calculation": {
         "formula": "Pledge_Fund / 0.30",
@@ -314,7 +612,6 @@
         "limiting_factor": "MIN(TDSR_Limit, MSR_Limit) for HDB/EC; TDSR_Limit for others"
       }
     },
-
     "multi_owner_calculations": {
       "combined_assessment": {
         "income": "Sum of recognised incomes",
@@ -325,9 +622,11 @@
         "purpose": "Understand each owner’s carrying power",
         "calculation": "Assess individually, then combine"
       },
-      "income_proportion": { "formula": "Owner_Income / Total_Income", "usage": "Allocation for individual mode" }
+      "income_proportion": {
+        "formula": "Owner_Income / Total_Income",
+        "usage": "Allocation for individual mode"
+      }
     },
-
     "property_specific_rules": {
       "hdb": {
         "msr_applicable": true,
@@ -362,46 +661,142 @@
       },
       "ec": {
         "msr_applicable": "Yes for EC from developer (initial period); not for resale/privatised ECs",
-        "max_tenure": 35,
+        "tenure_rules": {
+          "purchase_normal_75_ltv": {
+            "max_tenure_years": 30,
+            "age_formula": "65 - IWAA, capped at 30 years",
+            "note": "Standard 75% LTV tier"
+          },
+          "purchase_extended_55_ltv": {
+            "max_tenure_years": 35,
+            "age_formula": "65 - IWAA, capped at 35 years",
+            "note": "Reduced 55% LTV tier (extended tenure)"
+          }
+        },
         "cpf_usage": "Allowed",
         "privatization": "After 10 years"
       },
       "private": {
         "msr_applicable": false,
-        "max_tenure": 35,
+        "tenure_rules": {
+          "purchase_normal_75_ltv": {
+            "max_tenure_years": 30,
+            "age_formula": "65 - IWAA, capped at 30 years",
+            "note": "Standard 75% LTV tier"
+          },
+          "purchase_extended_55_ltv": {
+            "max_tenure_years": 35,
+            "age_formula": "65 - IWAA, capped at 35 years",
+            "note": "Reduced 55% LTV tier (extended tenure)"
+          },
+          "refinancing_normal": {
+            "max_tenure_years": 30,
+            "formula": "30 years or (original tenure - years elapsed - 1), whichever is lower",
+            "note": "Standard refinancing tenure"
+          }
+        },
         "cpf_usage": "Allowed",
         "foreign_ownership": "Allowed for condos/apartments (landed restrictions apply)"
       },
       "commercial": {
         "msr_applicable": false,
-        "max_tenure": 35,
+        "tenure_rules": {
+          "purchase_normal_75_ltv": {
+            "max_tenure_years": 30,
+            "age_formula": "65 - IWAA, capped at 30 years",
+            "note": "Standard tier (bank policy for LTV%)"
+          },
+          "purchase_extended_55_ltv": {
+            "max_tenure_years": 35,
+            "age_formula": "65 - IWAA, capped at 35 years",
+            "note": "Extended tier (bank policy for LTV%)"
+          }
+        },
         "cpf_usage": "Not allowed",
         "stress_test_rate": 5.0,
         "ltv": "Bank policy (no single MAS %); keep configurable"
+      },
+      "landed": {
+        "msr_applicable": false,
+        "tenure_rules": {
+          "purchase_normal_75_ltv": {
+            "max_tenure_years": 30,
+            "age_formula": "65 - IWAA, capped at 30 years",
+            "note": "Standard 75% LTV tier"
+          },
+          "purchase_extended_55_ltv": {
+            "max_tenure_years": 35,
+            "age_formula": "65 - IWAA, capped at 35 years",
+            "note": "Reduced 55% LTV tier (extended tenure)"
+          }
+        },
+        "cpf_usage": "Allowed",
+        "foreign_ownership": "Restricted (approval required for foreign buyers)"
       }
     }
   },
-
   "test_scenarios": {
     "scenario_1": {
       "description": "Single citizen, first private property",
-      "inputs": { "property_price": 1000000, "property_type": "Private", "buyer_profile": "SC", "existing_properties": 0, "income": 10000, "commitments": 500, "rate": 3.6, "tenure": 25, "age": 35 },
-      "expected_outputs": { "max_ltv": 75, "absd_rate": 0, "tdsr_available": 5000, "max_loan": "Compute via TDSR floor (≥4% if higher than quoted thereafter)" }
+      "inputs": {
+        "property_price": 1000000,
+        "property_type": "Private",
+        "buyer_profile": "SC",
+        "existing_properties": 0,
+        "income": 10000,
+        "commitments": 500,
+        "rate": 3.6,
+        "tenure": 25,
+        "age": 35
+      },
+      "expected_outputs": {
+        "max_ltv": 75,
+        "absd_rate": 0,
+        "tdsr_available": 5000,
+        "max_loan": "Compute via TDSR floor (≥4% if higher than quoted thereafter)"
+      }
     },
     "scenario_2": {
       "description": "HDB purchase where MSR binds",
-      "inputs": { "property_price": 600000, "property_type": "HDB", "income": 8000, "commitments": 200, "rate": 2.8, "tenure": 25, "age": 35 },
-      "expected_outputs": { "msr_limit": 2400, "tdsr_limit": 4200, "limiting_factor": "MSR", "max_loan": "Based on MSR limit at ≥4% MTI floor" }
+      "inputs": {
+        "property_price": 600000,
+        "property_type": "HDB",
+        "income": 8000,
+        "commitments": 200,
+        "rate": 2.8,
+        "tenure": 25,
+        "age": 35
+      },
+      "expected_outputs": {
+        "msr_limit": 2400,
+        "tdsr_limit": 4200,
+        "limiting_factor": "MSR",
+        "max_loan": "Based on MSR limit at ≥4% MTI floor"
+      }
     }
   },
-
   "validation_rules": {
     "input_validation": {
-      "property_price": { "min": 0, "max": 99999999 },
-      "income": { "min": 0, "max": 9999999 },
-      "interest_rate": { "min": 0, "max": 20 },
-      "tenure": { "min": 1, "max": 35 },
-      "age": { "min": 21, "max": 100 }
+      "property_price": {
+        "min": 0,
+        "max": 99999999
+      },
+      "income": {
+        "min": 0,
+        "max": 9999999
+      },
+      "interest_rate": {
+        "min": 0,
+        "max": 20
+      },
+      "tenure": {
+        "min": 1,
+        "max": 35
+      },
+      "age": {
+        "min": 21,
+        "max": 100
+      }
     },
     "cross_field_validation": {
       "tenure_age": "If (IWAA + tenure) > 65, flag 'reduced LTV applied' (not invalid).",
@@ -409,7 +804,6 @@
       "msr_property_type": "MSR applies only to HDB flats and ECs (developer sale)."
     }
   },
-
   "regulatory_compliance": {
     "last_update": "2025-08-20",
     "update_sources": [
@@ -419,12 +813,36 @@
       "IRAS tax guidelines (BSD/ABSD/MOF press releases)"
     ],
     "change_log": [
-      { "date": "2023-02-15", "changes": "BSD top tiers raised to 6% (res) / 5% (non-res)", "authority": "MOF/IRAS" },
-      { "date": "2023-04-27", "changes": "ABSD raised; foreigners 60%, entities 65%", "authority": "MND/MOF/IRAS" },
-      { "date": "2022-09-29", "changes": "Medium-term interest rate floors lifted to 4% (res) / 5% (non-res) for TDSR/MSR", "authority": "MAS" },
-      { "date": "2025-02-26", "changes": "Macroprudential Policies in Singapore publication outlines current LTV and debt-servicing safeguards", "authority": "MAS" },
-      { "date": "2025-04-28", "changes": "Housing Loan from HDB guidance details eligibility criteria and loan tenure limits", "authority": "HDB" },
-      { "date": "2025-08-20", "changes": "Foreign ownership of property guidance enumerates restrictions and approvals for landed housing", "authority": "SLA" }
+      {
+        "date": "2023-02-15",
+        "changes": "BSD top tiers raised to 6% (res) / 5% (non-res)",
+        "authority": "MOF/IRAS"
+      },
+      {
+        "date": "2023-04-27",
+        "changes": "ABSD raised; foreigners 60%, entities 65%",
+        "authority": "MND/MOF/IRAS"
+      },
+      {
+        "date": "2022-09-29",
+        "changes": "Medium-term interest rate floors lifted to 4% (res) / 5% (non-res) for TDSR/MSR",
+        "authority": "MAS"
+      },
+      {
+        "date": "2025-02-26",
+        "changes": "Macroprudential Policies in Singapore publication outlines current LTV and debt-servicing safeguards",
+        "authority": "MAS"
+      },
+      {
+        "date": "2025-04-28",
+        "changes": "Housing Loan from HDB guidance details eligibility criteria and loan tenure limits",
+        "authority": "HDB"
+      },
+      {
+        "date": "2025-08-20",
+        "changes": "Foreign ownership of property guidance enumerates restrictions and approvals for landed housing",
+        "authority": "SLA"
+      }
     ]
   }
 }

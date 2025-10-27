@@ -6,7 +6,7 @@
  * Provides a typed interface for any UI implementation
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useForm, useWatch, Control, UseFormRegister, UseFormHandleSubmit, UseFormWatch, UseFormSetValue, UseFormTrigger } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LeadForm } from '@/lib/domains/forms/entities/LeadForm'
@@ -32,6 +32,7 @@ export interface ProgressiveFormController {
   currentStep: number
   completedSteps: number[]
   errors: any
+  touchedFields: any
   isValid: boolean
   isAnalyzing: boolean
   isInstantCalcLoading: boolean
@@ -122,19 +123,29 @@ export function useProgressiveFormController({
   const prevFieldValuesRef = useRef<string>('')
   const prevScoreFieldsRef = useRef<string>('')
 
+  // CRITICAL FIX: Manual validation state to override stale React Hook Form isValid
+  const [manualIsValid, setManualIsValid] = useState(false)
+
   // Event publishing
   const publishEvent = useEventPublisher()
   const createEvent = useCreateEvent(sessionId)
 
   // React Hook Form setup
   const mappedLoanType = (loanType as any) === 'new' ? 'new_purchase' : loanType
-  const currentSchema = createStepSchema(mappedLoanType, currentStep)
+
+  // CRITICAL: Memoize schema to prevent React Hook Form from resetting validation state
+  // Without memoization, schema recreated every render → new resolver → isValid reset to false
+  const currentSchema = useMemo(
+    () => createStepSchema(mappedLoanType, currentStep),
+    [mappedLoanType, currentStep]
+  )
+
   const defaultValues = getDefaultValues(mappedLoanType as LoanType)
 
   const form = useForm<Record<string, any>>({
     resolver: zodResolver(currentSchema) as any,
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',  // Prevent validation on every keystroke after first error
+    mode: 'onChange',  // Changed from 'onBlur' to validate immediately
+    reValidateMode: 'onChange',  // Re-validate on every change to catch restored values
     defaultValues
   })
 
@@ -144,13 +155,68 @@ export function useProgressiveFormController({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, touchedFields, isValid, isSubmitting },
     trigger,
     reset
   } = form
 
   const watchedFields = watch()
 
+  // ============================================================================
+  // SCHEMA UPDATE FIX
+  // When step changes, schema changes. Re-validate to update isValid.
+  // This ensures the button enabled state reflects the current schema.
+  // ============================================================================
+  // Add immediate log to verify useEffect runs
+  console.log(`🚀 useProgressiveFormController render: currentStep=${currentStep}, isValid=${isValid}, manualIsValid=${manualIsValid}`)
+
+  useEffect(() => {
+    console.log(`⚡ useEffect triggered for step ${currentStep}`)
+
+    // Trigger validation whenever step changes to update isValid with new schema
+    const validateWithNewSchema = async () => {
+      console.log(`🔄 Step changed to ${currentStep}, re-validating with new Gate ${currentStep} schema`)
+      const result = await trigger()
+      const currentValues = watch()
+      console.log(`✅ Validation result for Gate ${currentStep}:`, result)
+      console.log(`📋 Current form values:`, {
+        name: currentValues.name,
+        email: currentValues.email,
+        phone: currentValues.phone,
+        loanType: currentValues.loanType,
+        hasChangedJobsPrimary: currentValues.hasChangedJobsPrimary,
+        lockInPeriodTimeframe: currentValues.lockInPeriodTimeframe
+      })
+
+      // CRITICAL: Update manual validation state with actual validation result
+      setManualIsValid(result)
+      console.log(`✅ Set manualIsValid to:`, result)
+    }
+
+    // Small delay to ensure values are restored first
+    const timer = setTimeout(() => {
+      validateWithNewSchema()
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [currentStep, trigger]) // Only re-run when step changes, not on every render
+
+  // CRITICAL FIX: Also update manual validation when form values change
+  useEffect(() => {
+    const subscription = watch(async (value, { name, type }) => {
+      // Re-validate whenever user changes a field
+      const result = await trigger()
+      setManualIsValid(result)
+      console.log(`🔄 Field changed (${name}), validation result:`, result)
+
+      // If validation fails, log the specific errors
+      if (!result) {
+        console.error(`❌ VALIDATION FAILED! Errors:`, errors)
+        console.log(`📋 Form values at failure:`, value)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, trigger, errors])
 
   // Lead scoring logic - FIXED: use ref to avoid infinite loops
   useEffect(() => {
@@ -463,10 +529,50 @@ export function useProgressiveFormController({
 
       const buyerProfile = (formData.buyerProfile as 'SC' | 'PR' | 'Foreigner') || 'SC'
       const existingProperties = parseNumber(formData.existingProperties, 0)
+
+      // ========================================================================
+      // CO-APPLICANT DATA EXTRACTION FOR IWAA
+      // ========================================================================
+      //
+      // For joint applications, extract ages and incomes arrays from form data
+      // to calculate IWAA (Income-Weighted Average Age) for accurate tenure caps.
+      //
+      // Form fields:
+      // - actualAges: [number, number?] - Ages of applicant 1 and 2
+      // - actualIncomes: [number, number?] - Incomes of applicant 1 and 2
+      //
+      // These are passed to calculateInstantProfile which handles IWAA calculation
+      // and applies appropriate tenure formulas per Dr Elena v2 spec.
+      //
+      // Fallback: If arrays not available, uses single 'age' parameter (backwards compat)
+      // ========================================================================
+
+      // Extract co-applicant data for IWAA calculation
+      const actualAges = formData.actualAges
+      const actualIncomes = formData.actualIncomes
+
+      // Parse arrays, filtering out undefined/null/zero values
+      const parsedAges = Array.isArray(actualAges)
+        ? actualAges.filter((v): v is number => typeof v === 'number' && v > 0)
+        : []
+
+      const parsedIncomes = Array.isArray(actualIncomes)
+        ? actualIncomes.filter((v): v is number => typeof v === 'number' && v >= 0)
+        : []
+
       const age = parseNumber(formData.combinedAge, 35)
       const tenure = Math.max(parseNumber(formData.requestedTenure, 25), 1)
       const commitments = Math.max(parseNumber(formData.existingCommitments, 0), 0)
       const rateAssumption = getPlaceholderRate(personaPropertyType, mappedLoanType)
+
+      console.log('🔍 Step 3+: IWAA data for calculation:', {
+        actualAges,
+        actualIncomes,
+        parsedAges,
+        parsedIncomes,
+        hasCoApplicant: parsedAges.length > 1,
+        fallbackAge: age
+      })
 
       console.log('🔍 Step 3+: Calling calculateInstantProfile with:', {
         property_price: propertyPrice,
@@ -474,6 +580,8 @@ export function useProgressiveFormController({
         buyer_profile: buyerProfile,
         existing_properties: existingProperties,
         income: actualIncome, // ← ACTUAL income, NOT hardcoded
+        incomes: parsedIncomes.length > 0 ? parsedIncomes : undefined,
+        ages: parsedAges.length > 0 ? parsedAges : undefined,
         commitments,
         rate: rateAssumption,
         tenure,
@@ -487,10 +595,12 @@ export function useProgressiveFormController({
         buyer_profile: buyerProfile,
         existing_properties: existingProperties,
         income: actualIncome, // ← ACTUAL income, NOT hardcoded
+        incomes: parsedIncomes.length > 0 ? parsedIncomes : undefined,  // ← NEW: for IWAA
         commitments,
         rate: rateAssumption,
         tenure,
         age,
+        ages: parsedAges.length > 0 ? parsedAges : undefined,  // ← NEW: for IWAA
         loan_type: 'new_purchase',
         is_owner_occupied: true
       }, ltvModeValue)
@@ -849,21 +959,48 @@ export function useProgressiveFormController({
         setCurrentStep(nextStep)
         leadForm.progressToStep(nextStep)
 
+        // ============================================================================
+        // FORM STATE PERSISTENCE FIX
+        // Restore all previous step data into React Hook Form for validation
+        // Gate 3 schema requires name/email/phone from Step 1 - must be in form state
+        // ============================================================================
+        const allFormData = leadForm.formData
+        const restoredFields: string[] = []
+        Object.entries(allFormData).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            // Only restore non-empty values to avoid overwriting current step's inputs
+            setValue(key, value, { shouldValidate: false })
+            restoredFields.push(key)
+          }
+        })
+        console.log(`✅ Form state persistence: Restored ${restoredFields.length} fields to step ${nextStep}:`, {
+          fields: restoredFields,
+          criticalFields: {
+            name: allFormData.name,
+            email: allFormData.email,
+            phone: allFormData.phone
+          }
+        })
+
+        // Note: Validation will be triggered by the useEffect that watches currentStep
+        // This happens 100ms after step change to ensure all values are restored first
+
         // Pre-fill age in Step 4 from Step 2 combinedAge
         if (nextStep === 3) { // Moving to Step 4 (Your Finances)
           const combinedAge = leadForm.formData.combinedAge
 
-          if (combinedAge && !leadForm.formData.actualAges?.[0]) {
-            // Pre-fill primary applicant age from Step 2 combinedAge
-            // For single applicants, use full combinedAge
-            // For joint applicants, divide by 2 as reasonable estimate
-            const hasJointApplicant = leadForm.formData.hasJointApplicant
-            const estimatedAge = hasJointApplicant
-              ? Math.round(combinedAge / 2)
-              : combinedAge
+          // REMOVED: Auto-fill of actualAges.0 from combinedAge
+          // User feedback: Let users enter their actual age fresh in Step 3
+          // Age tooltip now explains this is for estimation purposes
+          // Previous behavior was confusing - combinedAge from Step 2 != individual age
 
-            setValue('actualAges.0', estimatedAge, { shouldValidate: false })
-          }
+          // if (combinedAge && !leadForm.formData.actualAges?.[0]) {
+          //   const hasJointApplicant = leadForm.formData.hasJointApplicant
+          //   const estimatedAge = hasJointApplicant
+          //     ? Math.round(combinedAge / 2)
+          //     : combinedAge
+          //   setValue('actualAges.0', estimatedAge, { shouldValidate: false })
+          // }
         }
 
       }
@@ -932,7 +1069,8 @@ export function useProgressiveFormController({
     currentStep,
     completedSteps,
     errors,
-    isValid,
+    touchedFields,
+    isValid: manualIsValid, // CRITICAL FIX: Use manual validation state instead of stale React Hook Form isValid
     isAnalyzing,
     isInstantCalcLoading,
     isSubmitting,

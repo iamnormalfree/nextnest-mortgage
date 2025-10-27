@@ -1,0 +1,104 @@
+/* ABOUTME: Mobile-first CSS Grid layout for progressive form with responsive breakpoints */
+
+/* ========================================
+   Global Box Sizing & Overflow Prevention
+   ======================================== */
+.form-layout-container *,
+.form-layout-container *::before,
+.form-layout-container *::after {
+  box-sizing: border-box;
+}
+
+/* ========================================
+   Mobile Base (default, <768px)
+   ======================================== */
+.form-layout-container {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  padding-top: 4.5rem; /* Account for fixed nav: 3.5rem (h-14) + 1rem spacing */
+  background-color: #F8F8F8;
+  box-sizing: border-box;
+}
+
+.form-content {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.form-sidebar {
+  display: none; /* Hidden on mobile */
+}
+
+/* ========================================
+   Tablet (768px - 1023px)
+   ======================================== */
+@media (min-width: 768px) {
+  .form-layout-container {
+    padding: 2rem;
+    padding-top: 6rem; /* Account for larger fixed nav: 4rem (h-16) + 2rem spacing */
+  }
+
+  .form-content {
+    /* Still single column, but more padding */
+  }
+
+  /* Sidebar still hidden on tablet (can be customized later) */
+}
+
+/* ========================================
+   Desktop (≥1024px)
+   ======================================== */
+@media (min-width: 1024px) {
+  .form-layout-container {
+    /* Base desktop styles - single column by default */
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 2rem 4rem;
+    padding-top: 6rem; /* Account for fixed nav: 4rem (h-16) + 2rem spacing */
+  }
+
+  /* Grid only when sidebar is present */
+  .form-layout-container--with-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+  }
+
+  .form-content {
+    max-width: 720px;
+    margin: 0 auto; /* Center when no grid (Steps 1, 3, etc.) */
+  }
+
+  .form-sidebar {
+    display: block;
+    position: sticky;
+    top: 2rem; /* Spacing from viewport top when scrolling */
+    align-self: start; /* Align to grid row start */
+    height: fit-content;
+    max-height: calc(100vh - 4rem); /* Account for top position */
+    overflow-y: auto;
+  }
+}
+
+/* ========================================
+   Accessibility: Reduced Motion
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ========================================
+   8px Spacing System (Brand Canon)
+   ======================================== */
+.spacing-xs { margin: 0.5rem; }   /* 8px */
+.spacing-sm { margin: 1rem; }     /* 16px */
+.spacing-md { margin: 2rem; }     /* 32px */
+.spacing-lg { margin: 4rem; }     /* 64px */
