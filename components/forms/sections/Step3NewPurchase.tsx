@@ -434,10 +434,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                    setHasCommitmentsPrimary(true)
-                    setIsPrimaryIncomeExpanded(false)
-                  }}
+                    onClick={() => setHasCommitmentsPrimary(true)}
                     className={`px-6 py-2 border text-sm font-semibold ${
                       hasCommitmentsPrimary === true
                         ? 'bg-[#000000] text-white border-[#000000]'
@@ -651,10 +648,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
-                    setHasCommitmentsCoApplicant(true)
-                    setIsCoApplicantIncomeExpanded(false)
-                  }}
+                        onClick={() => setHasCommitmentsCoApplicant(true)}
                         className={`px-6 py-2 border text-sm font-semibold ${
                           hasCommitmentsCoApplicant === true
                             ? 'bg-[#000000] text-white border-[#000000]'
