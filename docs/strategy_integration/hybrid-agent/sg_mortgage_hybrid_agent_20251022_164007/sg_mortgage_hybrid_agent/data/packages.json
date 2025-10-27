@@ -1,0 +1,59 @@
+{
+  "packages": [
+    {
+      "bank": "DBS",
+      "name": "2Y Fixed (illus)",
+      "type": "fixed",
+      "apr": 0.0298,
+      "lockin_months": 24,
+      "eligible_purposes": [
+        "refinance",
+        "new_purchase"
+      ],
+      "notes": "Illustrative; confirm deviated rates with banker."
+    },
+    {
+      "bank": "OCBC",
+      "name": "3Y Fixed (illus)",
+      "type": "fixed",
+      "apr": 0.0305,
+      "lockin_months": 36,
+      "eligible_purposes": [
+        "refinance",
+        "new_purchase"
+      ]
+    },
+    {
+      "bank": "UOB",
+      "name": "SORA+0.65 (illus)",
+      "type": "floating",
+      "apr": 0.0285,
+      "lockin_months": 24,
+      "eligible_purposes": [
+        "refinance",
+        "new_purchase"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "name": "2Y Fixed (illus)",
+      "type": "fixed",
+      "apr": 0.03,
+      "lockin_months": 24,
+      "eligible_purposes": [
+        "refinance"
+      ]
+    },
+    {
+      "bank": "Standard Chartered",
+      "name": "SORA+0.60 (illus)",
+      "type": "floating",
+      "apr": 0.028,
+      "lockin_months": 24,
+      "eligible_purposes": [
+        "refinance",
+        "new_purchase"
+      ]
+    }
+  ]
+}

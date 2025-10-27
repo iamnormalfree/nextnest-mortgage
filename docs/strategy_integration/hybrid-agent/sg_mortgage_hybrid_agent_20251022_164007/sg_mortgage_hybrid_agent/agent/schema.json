@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "final_answer",
+        "clarification_request"
+      ]
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tool_call": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "recommend_packages",
+            "mortgage_math",
+            "macro_view",
+            "none"
+          ]
+        },
+        "arguments": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "arguments"
+      ]
+    },
+    "answer": {
+      "type": "string"
+    },
+    "structured": {
+      "type": "object",
+      "properties": {
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "math": {
+          "type": "object"
+        },
+        "macro": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "required": [
+    "kind",
+    "citations",
+    "tool_call"
+  ]
+}

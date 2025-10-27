@@ -1,0 +1,38 @@
+{
+  "testSuite": "Production-like SLA Smoke Tests",
+  "timestamp": "2025-10-22T13:47:51.420Z",
+  "environment": "development",
+  "samples": [
+    {
+      "sampleId": 1,
+      "conversationId": 1001,
+      "timestamp": "2025-10-22T13:47:12.036Z",
+      "userMessage": "Hi, I need help with a mortgage application",
+      "queueAddTimestamp": 1761140830920,
+      "phaseBreakdown": {
+        "queueToWorker": 0,
+        "workerProcessing": 0,
+        "workerToChatwoot": 0
+      }
+    }
+  ],
+  "statistics": {
+    "totalSamples": 1,
+    "completeSamples": 0,
+    "partialSamples": 1,
+    "meanLatency": 0,
+    "medianLatency": 0,
+    "p95Latency": 0,
+    "p99Latency": 0,
+    "minLatency": 0,
+    "maxLatency": 0,
+    "slaCompliant": 0,
+    "slaComplianceRate": 0
+  },
+  "phaseBreakdown": {
+    "queueToWorker": 0,
+    "workerProcessing": 0,
+    "workerToChatwoot": 0
+  },
+  "conclusion": "❌ FAILED: No complete timing data collected. Check system configuration."
+}
