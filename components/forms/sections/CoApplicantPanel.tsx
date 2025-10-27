@@ -2,7 +2,7 @@
 
 'use client'
 
-import { Control, Controller } from 'react-hook-form'
+import { Control, Controller, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { EmploymentPanel } from './EmploymentPanel'
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
@@ -20,13 +20,25 @@ export function CoApplicantPanel({
   onFieldChange,
   loanType
 }: CoApplicantPanelProps) {
+  // Watch employment type for progressive disclosure
+  const employmentType_1 = (useWatch({ control, name: 'employmentType_1' }) as string) || ''
+
   return (
     <div className="space-y-4 p-4 border border-[#E5E5E5] border-l-4 border-l-purple-500 bg-[#F8F8F8]">
       <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
         👥 Applicant 2 (Joint)
       </p>
 
-      {/* Monthly Income */}
+      {/* EMPLOYMENT TYPE FIRST - Drives progressive disclosure */}
+      <EmploymentPanel
+        applicantNumber={1}
+        control={control}
+        errors={errors}
+        onFieldChange={onFieldChange}
+      />
+
+      {/* CONDITIONAL: Monthly income for employed/in-between-jobs only */}
+      {employmentType_1 && (employmentType_1 === 'employed' || employmentType_1 === 'in-between-jobs') && (
       <Controller
         name="actualIncomes.1"
         control={control}
@@ -61,8 +73,10 @@ export function CoApplicantPanel({
           </div>
         )}
       />
+      )}
 
-      {/* Variable Income (Optional) */}
+      {/* CONDITIONAL: Variable income for all except not-working and self-employed */}
+      {employmentType_1 && employmentType_1 !== 'not-working' && employmentType_1 !== 'self-employed' && (
       <Controller
         name="actualVariableIncomes.1"
         control={control}
@@ -95,8 +109,10 @@ export function CoApplicantPanel({
           </div>
         )}
       />
+      )}
 
-      {/* Age */}
+      {/* AGE - Always required when employment type is selected */}
+      {employmentType_1 && (
       <Controller
         name="actualAges.1"
         control={control}
@@ -131,14 +147,7 @@ export function CoApplicantPanel({
           </div>
         )}
       />
-
-      {/* Employment Panel (Reused!) */}
-      <EmploymentPanel
-        applicantNumber={1}
-        control={control}
-        errors={errors}
-        onFieldChange={onFieldChange}
-      />
+      )}
     </div>
   )
 }
