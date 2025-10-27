@@ -227,13 +227,6 @@ export function ProgressiveFormWithController({
   const actualAgesRaw = useWatch({ control, name: 'actualAges' })
   const actualIncomesRaw = useWatch({ control, name: 'actualIncomes' })
 
-  console.log('🔍 [Controller] Raw form data:', {
-    actualAgesRaw,
-    actualIncomesRaw,
-    isAgesArray: Array.isArray(actualAgesRaw),
-    isIncomesArray: Array.isArray(actualIncomesRaw)
-  })
-
   // Parse and filter arrays for IWAA
   // React Hook Form may return objects {0: val1, 1: val2} instead of arrays
   const parseFormArray = (data: any, minValue = 0, maxValue = Infinity): number[] => {
@@ -257,15 +250,6 @@ export function ProgressiveFormWithController({
 
   const actualAges = parseFormArray(actualAgesRaw, 0, 100)  // Ages 1-100
   const actualIncomes = parseFormArray(actualIncomesRaw, 0, Infinity)  // Any positive income
-
-  console.log('🔍 [Controller] Parsed arrays:', {
-    actualAges,
-    actualIncomes,
-    willPassToMasReadiness: {
-      ages: actualAges.length > 0 ? actualAges : undefined,
-      incomes: actualIncomes.length > 0 ? actualIncomes : undefined
-    }
-  })
 
   // Calculate MAS readiness using hook (with IWAA support)
   const masReadiness = useMasReadiness({

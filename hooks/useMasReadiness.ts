@@ -80,15 +80,6 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
 
     // Call the instant profile calculator to get limiting factors
     // Pass ages/incomes arrays for IWAA calculation if available
-    console.log('🔍 [MAS Readiness] Input to calculateInstantProfile:', {
-      age,
-      ages,
-      income: effectiveIncome,
-      incomes,
-      hasAges: ages && ages.length > 0,
-      hasIncomes: incomes && incomes.length > 0
-    })
-
     const calculatorResult = calculateInstantProfile({
       property_price: propertyValue,
       property_type: propertyType as any,
@@ -103,12 +94,6 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
       ages,  // Pass co-applicant ages for IWAA
       loan_type: 'new_purchase',
       is_owner_occupied: true
-    })
-
-    console.log('🔍 [MAS Readiness] Calculator result:', {
-      tenureCapYears: calculatorResult.tenureCapYears,
-      maxLoan: calculatorResult.maxLoan,
-      tenureCapSource: calculatorResult.tenureCapSource
     })
 
     // Build reason codes from calculator output
