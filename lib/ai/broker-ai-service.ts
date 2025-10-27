@@ -17,6 +17,7 @@ import { BrokerPersona } from '@/lib/calculations/broker-persona';
 import { ProcessedLeadData } from '@/lib/integrations/chatwoot-client';
 import { intentRouter, IntentClassification } from '@/lib/ai/intent-router';
 import { drElenaService } from '@/lib/ai/dr-elena-integration-service';
+import { MessageTimingData } from '@/lib/queue/broker-queue';
 
 /**
  * Input parameters for AI response generation
@@ -26,7 +27,10 @@ interface GenerateBrokerResponseInput {
   persona: BrokerPersona;
   leadData: ProcessedLeadData;
   conversationId: number;
-  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
+  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>;
+
+  // Phase 1 Day 1: SLA timing data for hop-by-hop measurement
+  timingData?: MessageTimingData;
 }
 
 
@@ -102,8 +106,17 @@ export async function generateBrokerResponse(
     // Create system prompt from existing persona properties
     const systemPrompt = createSystemPromptFromPersona(persona, leadData);
 
-    // Select provider based on model name (Week 4 Phase 2)
-    const model = selectModelProvider(intent.suggestedModel);
+    // Phase 2 Task 2.5: Optimization - default to gpt-4o-mini for short messages
+    let optimizedModel = intent.suggestedModel;
+
+    // Override with faster model for short messages (< 100 chars) to improve latency
+    if (message.length < 100 && intent.suggestedModel !== 'gpt-4o-mini') {
+      console.log(`⚡ Optimization: Using gpt-4o-mini for short message (${message.length} chars) instead of ${intent.suggestedModel}`);
+      optimizedModel = 'gpt-4o-mini';
+    }
+
+    // Select provider based on optimized model name
+    const model = selectModelProvider(optimizedModel);
 
     // Generate response with Vercel AI SDK
     const { text } = await generateText({

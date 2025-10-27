@@ -100,28 +100,29 @@ The math favors maximum tenure here."
 
 ### **Homepage Hero Section**
 
-#### **Primary Headline** (Steve Jobs Simplicity)
+#### **Primary Headline**
 ```
-Your Personal Mortgage Brain - The Only Analysis That Thinks Like You Do
+Evidence-based mortgage advisory. Built on real Singapore scenarios.
 ```
 
-#### **Sub-headline** (Personalized Intelligence + Dr. Elena Expertise)
+#### **Sub-headline**
 ```
-Sophisticated mortgage intelligence that understands your unique situation.
-Get personalized analysis with mathematical precision and Singapore expertise.
+Run the numbers on staying, repricing, and refinancing before you decide.
 ```
 
 #### **Primary CTA** 
 ```
-[Get My Personalized Analysis - Free]
+Start Free Analysis
 ```
 
-#### **Trust Building Sub-text**
+#### **Secondary CTA**
 ```
-✓ Analysis of all 286 Singapore bank packages
-✓ Complete transparency about our compensation  
-✓ MAS-compliant calculations with client-protective rounding
-✓ 24-hour response guarantee
+View Demo
+```
+
+#### **Trust Statement**
+```
+We evaluate staying, repricing, and refinancing. Referral fees only when you switch banks.
 ```
 
 ### **Value Proposition Stack (Progressive Disclosure)**

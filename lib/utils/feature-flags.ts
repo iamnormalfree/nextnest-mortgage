@@ -16,6 +16,12 @@ import { AIFeatureFlags } from '@/lib/contracts/ai-conversation-contracts';
  * Week 1-2: Foundation features enabled
  * Week 3+: Advanced features will be enabled progressively
  */
+/**
+ * Phase 1 Day 1: SLA Timing System (Timestamp Injection)
+ * Hop-by-hop measurement for 128+ second SLA breach remediation
+ */
+export const ENABLE_SLA_TIMING = process.env.ENABLE_SLA_TIMING === "true" || process.env.ENABLE_SLA_TIMING === "1";
+
 export const AI_FEATURE_FLAGS: AIFeatureFlags = {
   // Week 1-2: Foundation Layer (ENABLED)
   enableIntentClassification: true,

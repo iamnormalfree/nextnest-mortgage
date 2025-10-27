@@ -43,6 +43,10 @@ context: Align Step 2/Step 3 UX and instant analysis math with Dr Elena v2 g
 - **Timing guidance**: input “How many months remain on your current package?” (integer). Calculator translates into recommended notice period and surfaces message (“Start paperwork in X weeks to avoid higher spread overlap”). Background assumption: borrowers honour lock-in to avoid penalties.
 - **Advisory preview**: live card summarising projected monthly savings, tenure adjustment, and timing warning. Integrates objectives, property use, and calculator output.
 
+## Constraint Alignment
+
+- Constraint A – Public Surfaces Ready (`docs/plans/re-strategy/strategy-alignment-matrix.md`, C1): This specification governs the progressive form UX and calculation accuracy required for Stage 0 readiness and ensures implementation plans trace back to the launch gate checklist.
+
 ## Calculation & Data Model
 - **Calculator module**: create `lib/calculations/instant-profile.ts` (or extend existing) exporting:
   - `calculateInstantProfile(step2State, ltvMode)`

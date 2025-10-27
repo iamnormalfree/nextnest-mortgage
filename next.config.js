@@ -5,7 +5,8 @@ const nextConfig = {
 
   // Enable static generation for marketing pages
   experimental: {
-    optimizePackageImports: ['react-hook-form', 'date-fns']
+    optimizePackageImports: ['react-hook-form', 'date-fns'],
+    serverComponentsExternalPackages: ['bullmq', 'ioredis']
   },
 
   // Image optimization

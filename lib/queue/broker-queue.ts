@@ -38,6 +38,12 @@ export interface BrokerConversationJob {
   isConversationReopen?: boolean;
   skipGreeting?: boolean;
 
+  // SLA Timing Data (Phase 1 Day 1)
+  timingData?: {
+    messageId: string;
+    queueAddTimestamp: number;
+  };
+
   // Metadata
   timestamp?: number;
 }
@@ -63,6 +69,7 @@ export function getBrokerQueue(): Queue<BrokerConversationJob> {
       'broker-conversations',
       {
         connection: getRedisConnection(),
+        // Note: High-throughput timing operations use pooled connections for better performance
         defaultJobOptions: {
           attempts: 3,
           backoff: {
@@ -91,6 +98,7 @@ let _brokerQueueEvents: QueueEvents | null = null;
 export function getBrokerQueueEvents(): QueueEvents {
   if (!_brokerQueueEvents) {
     _brokerQueueEvents = new QueueEvents('broker-conversations', {
+      // Note: Queue events use standard connection; timing ops use pooled connections
       connection: getRedisConnection(),
     });
 
@@ -128,9 +136,13 @@ export async function queueNewConversation(data: {
   skipGreeting?: boolean;
 }) {
   try {
-    // Create unique job ID for deduplication
+    // Create unique job ID for deduplication and timing
     const timestamp = Date.now();
+    const messageId = `conv-${data.conversationId}-${timestamp}`;
     const jobId = `new-conversation-${data.conversationId}-${timestamp}`;
+    
+    // Add timing data for SLA monitoring
+    await addTimingDataToJob(data.conversationId, messageId, timestamp);
 
     // Determine priority based on lead score
     const priority = data.processedLeadData.leadScore > 75 ? 1 : 5;
@@ -157,6 +169,10 @@ export async function queueNewConversation(data: {
         isConversationReopen: data.isConversationReopen || false,
         skipGreeting: data.skipGreeting || false,
         timestamp,
+        timingData: {
+          messageId,
+          queueAddTimestamp: timestamp,
+        },
       },
       {
         jobId,
@@ -195,9 +211,12 @@ export async function queueIncomingMessage(data: {
   messageId?: number;
 }) {
   try {
-    // Create unique job ID for deduplication
+    // Create unique job ID for deduplication and timing
     const timestamp = Date.now();
+    const messageId = `conv-${data.conversationId}-${timestamp}`;
     const jobId = `incoming-message-${data.conversationId}-${data.messageId || timestamp}`;
+    // Add timing data for SLA monitoring
+    await addTimingDataToJob(data.conversationId, messageId, timestamp);
 
     console.log(`📋 Queueing incoming message:`, {
       jobId,
@@ -219,6 +238,10 @@ export async function queueIncomingMessage(data: {
         userMessage: data.userMessage,
         skipGreeting: true, // Never greet on incoming messages
         timestamp,
+        timingData: {
+          messageId,
+          queueAddTimestamp: timestamp,
+        },
       },
       {
         jobId,
@@ -299,4 +322,222 @@ export async function resumeQueue() {
 export async function drainQueue() {
   await getBrokerQueue().drain();
   console.log('🚰 Queue drained');
+}
+
+// ============================================================================
+// SLA TIMING TRACKING (Phase 1 Day 1 Integration)
+// ============================================================================
+
+/**
+ * Timing data structure for SLA monitoring
+ * Tracks hop-by-hop timing through the queue system
+ */
+export interface MessageTimingData {
+  messageId: string;
+  conversationId: number;
+  queueAddTimestamp?: number;
+  workerStartTimestamp?: number;
+  workerCompleteTimestamp?: number;
+  chatwootSendTimestamp?: number;
+  totalDuration?: number;
+  // AI Segment Instrumentation (Phase 2 Task 2.5)
+  aiSegment?: {
+    model?: string;
+    promptLength?: number;
+    responseLength?: number;
+    orchestratorPath?: string; // 'dr-elena', 'direct-ai', 'fallback'
+    aiStartTimestamp?: number;
+    aiCompleteTimestamp?: number;
+    aiProcessingTime?: number;
+  };
+}
+
+/**
+ * In-memory timing data store with Redis persistence
+ */
+const TIMING_DATA_KEY_PREFIX = 'timing:';
+const TIMING_TTL = 3600; // 1 hour TTL
+
+/**
+ * Update timing data for SLA monitoring
+ * Called by worker to track progress through the system
+ */
+export async function updateTimingData(
+  conversationId: number,
+  messageId: string,
+  updates: Partial<MessageTimingData>
+): Promise<void> {
+  try {
+    const Redis = require('ioredis');
+    const redis = new Redis(getRedisConnection());
+    const key = `${TIMING_DATA_KEY_PREFIX}${conversationId}:${messageId}`;
+
+    // Get existing timing data
+    const existing = await redis.hgetall(key);
+    const timingData: MessageTimingData = {
+      messageId,
+      conversationId,
+      queueAddTimestamp: existing.queueAddTimestamp ? parseInt(existing.queueAddTimestamp) : undefined,
+      workerStartTimestamp: existing.workerStartTimestamp ? parseInt(existing.workerStartTimestamp) : undefined,
+      workerCompleteTimestamp: existing.workerCompleteTimestamp ? parseInt(existing.workerCompleteTimestamp) : undefined,
+      chatwootSendTimestamp: existing.chatwootSendTimestamp ? parseInt(existing.chatwootSendTimestamp) : undefined,
+      totalDuration: existing.totalDuration ? parseInt(existing.totalDuration) : undefined,
+    };
+
+    // Apply updates
+    Object.assign(timingData, updates);
+
+    // Calculate total duration - prioritize end-to-end delivery time when available
+    if (timingData.queueAddTimestamp) {
+      if (timingData.chatwootSendTimestamp) {
+        // Full end-to-end: queue → Chatwoot delivered
+        timingData.totalDuration = timingData.chatwootSendTimestamp - timingData.queueAddTimestamp;
+      } else if (timingData.workerCompleteTimestamp) {
+        // Partial: queue → worker finished (fallback while Chatwoot pending)
+        timingData.totalDuration = timingData.workerCompleteTimestamp - timingData.queueAddTimestamp;
+      }
+    }
+
+    // Store updated data
+    const pipeline = redis.pipeline();
+    pipeline.hset(key, timingData as any);
+    pipeline.expire(key, TIMING_TTL);
+    await pipeline.exec();
+
+    await redis.quit();
+    
+    console.log(`⏱️ Timing data updated for ${conversationId}:${messageId}`, {
+      phase: Object.keys(updates)[0],
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Failed to update timing data:', error);
+    // Non-critical - don't throw errors
+  }
+}
+
+/**
+ * Get timing data for monitoring and SLA analysis
+ */
+export async function getTimingData(
+  conversationId: number,
+  messageId: string
+): Promise<MessageTimingData | null> {
+  try {
+    const Redis = require('ioredis');
+    const redis = new Redis(getRedisConnection());
+    const key = `${TIMING_DATA_KEY_PREFIX}${conversationId}:${messageId}`;
+
+    const data = await redis.hgetall(key);
+    await redis.quit();
+
+    if (!data || Object.keys(data).length === 0) {
+      return null;
+    }
+
+    return {
+      messageId,
+      conversationId,
+      queueAddTimestamp: data.queueAddTimestamp ? parseInt(data.queueAddTimestamp) : undefined,
+      workerStartTimestamp: data.workerStartTimestamp ? parseInt(data.workerStartTimestamp) : undefined,
+      workerCompleteTimestamp: data.workerCompleteTimestamp ? parseInt(data.workerCompleteTimestamp) : undefined,
+      chatwootSendTimestamp: data.chatwootSendTimestamp ? parseInt(data.chatwootSendTimestamp) : undefined,
+      totalDuration: data.totalDuration ? parseInt(data.totalDuration) : undefined,
+    };
+  } catch (error) {
+    console.error('❌ Failed to get timing data:', error);
+    return null;
+  }
+}
+
+/**
+ * Get SLA timing data for multiple conversations (for analysis endpoint)
+ */
+export async function getSLATimingData(
+  conversationId?: number
+): Promise<MessageTimingData[]> {
+  try {
+    const Redis = require('ioredis');
+    const redis = new Redis(getRedisConnection());
+
+    const timingDataList: MessageTimingData[] = [];
+    let keys: string[] = [];
+    let cursor = '0';
+
+    // Use SCAN instead of KEYS to avoid blocking Redis event loop
+    const scanPattern = conversationId
+      ? `${TIMING_DATA_KEY_PREFIX}${conversationId}:*`
+      : `${TIMING_DATA_KEY_PREFIX}*`;
+
+    do {
+      try {
+        const result = await redis.scan(cursor, 'MATCH', scanPattern, 'COUNT', 100);
+        cursor = result[0];
+        keys = result[1];
+
+        for (const key of keys) {
+          try {
+            const data = await redis.hgetall(key);
+            if (data && Object.keys(data).length > 0) {
+              const [convId, msgId] = key.replace(TIMING_DATA_KEY_PREFIX, '').split(':');
+              timingDataList.push({
+                messageId: msgId,
+                conversationId: parseInt(convId),
+                queueAddTimestamp: data.queueAddTimestamp ? parseInt(data.queueAddTimestamp) : undefined,
+                workerStartTimestamp: data.workerStartTimestamp ? parseInt(data.workerStartTimestamp) : undefined,
+                workerCompleteTimestamp: data.workerCompleteTimestamp ? parseInt(data.workerCompleteTimestamp) : undefined,
+                chatwootSendTimestamp: data.chatwootSendTimestamp ? parseInt(data.chatwootSendTimestamp) : undefined,
+                totalDuration: data.totalDuration ? parseInt(data.totalDuration) : undefined,
+              });
+            }
+          } catch (dataError) {
+            console.error(`❌ Error processing timing key ${key}:`, dataError);
+            // Continue processing other keys
+          }
+        }
+
+        // Limit results to prevent memory issues
+        if (timingDataList.length >= 100) {
+          console.log(`⚠️ Limiting timing data to 100 entries for performance`);
+          break;
+        }
+
+      } catch (scanError) {
+        console.error('❌ Redis SCAN error:', scanError);
+        break;
+      }
+    } while (cursor !== '0');
+
+    await redis.quit();
+    return timingDataList;
+  } catch (error) {
+    console.error('❌ Failed to get SLA timing data:', error);
+    return [];
+  }
+}
+
+/**
+ * Add timing data to job when queueing
+ */
+async function addTimingDataToJob(
+  conversationId: number,
+  messageId: string,
+  queueAddTimestamp: number
+): Promise<void> {
+  try {
+    const Redis = require('ioredis');
+    const redis = new Redis(getRedisConnection());
+    const key = `${TIMING_DATA_KEY_PREFIX}${conversationId}:${messageId}`;
+
+    await redis.hset(key, {
+      messageId,
+      conversationId: conversationId.toString(),
+      queueAddTimestamp: queueAddTimestamp.toString(),
+    });
+    await redis.expire(key, TIMING_TTL);
+    await redis.quit();
+  } catch (error) {
+    console.error('❌ Failed to add timing data to job:', error);
+    // Non-critical
+  }
 }

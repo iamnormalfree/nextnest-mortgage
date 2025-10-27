@@ -283,6 +283,19 @@ describe('Instant Profile Calculator - Dr Elena v2 Alignment', () => {
       expect(result.recognizedIncome).toBe(10500); // 15000 * 0.70
     });
 
+    it('should align getEmploymentRecognitionRate with Dr Elena v2 persona', () => {
+      const { getEmploymentRecognitionRate } = require('../../lib/calculations/instant-profile');
+
+      // Dr Elena v2 persona rates from dr-elena-mortgage-expert-v2.json
+      expect(getEmploymentRecognitionRate('employed')).toBe(1.0);
+      expect(getEmploymentRecognitionRate('self-employed')).toBe(0.7);
+      expect(getEmploymentRecognitionRate('contract')).toBe(0.7); // Should be 0.7, not 0.6
+      expect(getEmploymentRecognitionRate('variable')).toBe(0.7); // Should be 0.7, not 0.6
+      expect(getEmploymentRecognitionRate('other')).toBe(1.0); // Should be 1.0 (fixed income default), not 0.5
+      expect(getEmploymentRecognitionRate('not-working')).toBe(0.0);
+      expect(getEmploymentRecognitionRate('unemployed')).toBe(0.0);
+    });
+
     it('should handle employment type switching correctly', () => {
       const baseInputs = {
         gross_income: 10000,

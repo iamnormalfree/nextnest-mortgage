@@ -25,6 +25,7 @@ import { generateBrokerResponse } from '@/lib/ai/broker-ai-service';
 
 // AI Orchestrator (Week 5 - Full Intelligence Integration)
 import { getAIOrchestrator } from '@/lib/ai/ai-orchestrator';
+import { updateTimingData } from "./broker-queue";
 import { isFullAIIntelligenceEnabled } from '@/lib/utils/feature-flags';
 
 // ============================================================================
@@ -60,6 +61,20 @@ import { isFullAIIntelligenceEnabled } from '@/lib/utils/feature-flags';
 async function processConversationJob(job: Job<BrokerConversationJob>) {
   const { data } = job;
   const startTime = Date.now();
+// Phase 1 Day 1: Capture worker start timestamp for SLA measurement
+  if (data.timingData && data.timingData.messageId) {
+    try {
+      await updateTimingData(
+        data.conversationId,
+        data.timingData.messageId,
+        { workerStartTimestamp: startTime }
+      );
+      console.log(`⏱️ Worker start timestamp captured: ${new Date(startTime).toISOString()}`);
+    } catch (timingError) {
+      console.error("❌ Failed to capture worker start timestamp:", timingError);
+      // Non-critical - do not fail the job
+    }
+  }
 
   console.log(`\n${'='.repeat(60)}`);
   console.log(`🤖 Processing ${data.type} for conversation ${data.conversationId}`);
@@ -76,8 +91,24 @@ async function processConversationJob(job: Job<BrokerConversationJob>) {
       throw new Error(`Unknown job type: ${(data as any).type}`);
     }
 
-    const duration = Date.now() - startTime;
+    const completionTime = Date.now();
+    const duration = completionTime - startTime;
     console.log(`\n✅ Job completed successfully in ${duration}ms\n`);
+
+    // Phase 1 Day 1: Capture worker completion timestamp for SLA measurement
+    if (data.timingData && data.timingData.messageId) {
+      try {
+        await updateTimingData(
+          data.conversationId,
+          data.timingData.messageId,
+          { workerCompleteTimestamp: completionTime }
+        );
+        console.log(`⏱️ Worker completion timestamp captured: ${new Date(completionTime).toISOString()}`);
+      } catch (timingError) {
+        console.error("❌ Failed to capture worker completion timestamp:", timingError);
+        // Non-critical - do not fail the job
+      }
+    }
 
     return {
       status: 'completed',
@@ -300,6 +331,11 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
   if (isFullAIIntelligenceEnabled()) {
     console.log('🎯 Using AI Orchestrator (full intelligence enabled)');
 
+    // Phase 2 Task 2.5: AI Segment Instrumentation
+    const aiStartTime = Date.now();
+    const promptLength = data.userMessage?.length || 0;
+    let orchestratorPath = 'ai-orchestrator';
+
     // NEW PATH: Full AI Intelligence with Orchestrator
     const orchestrator = getAIOrchestrator();
     const orchestratorResponse = await orchestrator.processMessage({
@@ -310,17 +346,58 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
       brokerPersona: persona
     });
 
+    const aiCompleteTime = Date.now();
+    const aiProcessingTime = aiCompleteTime - aiStartTime;
+
     aiResponse = orchestratorResponse.content;
     shouldHandoffFromAI = orchestratorResponse.shouldHandoff;
     handoffReasonFromAI = orchestratorResponse.handoffReason;
 
-    console.log(`✅ AI Orchestrator response generated (${aiResponse.length} chars)`);
+    // Detect if Dr. Elena path was taken
+    if (orchestratorResponse.intent?.toLowerCase().includes('elena') ||
+        orchestratorResponse.model?.toLowerCase().includes('elena')) {
+      orchestratorPath = 'dr-elena';
+    }
+
+    // Phase 2 Task 2.5: Capture AI segment timing data
+    if (data.timingData && data.timingData.messageId) {
+      try {
+        await updateTimingData(
+          data.conversationId,
+          data.timingData.messageId,
+          {
+            aiSegment: {
+              model: orchestratorResponse.model || 'unknown',
+              promptLength,
+              responseLength: aiResponse.length,
+              orchestratorPath,
+              aiStartTimestamp: aiStartTime,
+              aiCompleteTimestamp: aiCompleteTime,
+              aiProcessingTime
+            }
+          }
+        );
+        console.log(`🤖 AI segment timing captured: ${aiProcessingTime}ms (model: ${orchestratorResponse.model}, path: ${orchestratorPath})`);
+      } catch (timingError) {
+        console.error("❌ Failed to capture AI segment timing:", timingError);
+        // Non-critical - do not fail the job
+      }
+    }
+
+    console.log(`✅ AI Orchestrator response generated (${aiResponse.length} chars in ${aiProcessingTime}ms)`);
     console.log(`   Model: ${orchestratorResponse.model}`);
     console.log(`   Intent: ${orchestratorResponse.intent}`);
     console.log(`   Tokens: ${orchestratorResponse.tokensUsed}`);
+    console.log(`   Path: ${orchestratorPath}`);
 
   } else {
     console.log('💬 Using legacy AI service (orchestrator disabled)');
+
+    // Phase 2 Task 2.5: AI Segment Instrumentation
+    const aiStartTime = Date.now();
+    const promptLength = data.userMessage?.length || 0;
+    let model = 'gpt-4o-mini'; // Default model
+    let orchestratorPath = 'direct-ai';
 
     // LEGACY PATH: Direct AI generation
     aiResponse = await generateBrokerResponse({
@@ -331,7 +408,35 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
       conversationHistory: [], // TODO: Fetch from Chatwoot in future enhancement
     });
 
-    console.log(`✅ Legacy AI response generated (${aiResponse.length} chars)`);
+    const aiCompleteTime = Date.now();
+    const aiProcessingTime = aiCompleteTime - aiStartTime;
+
+    // Phase 2 Task 2.5: Capture AI segment timing data
+    if (data.timingData && data.timingData.messageId) {
+      try {
+        await updateTimingData(
+          data.conversationId,
+          data.timingData.messageId,
+          {
+            aiSegment: {
+              model,
+              promptLength,
+              responseLength: aiResponse.length,
+              orchestratorPath,
+              aiStartTimestamp: aiStartTime,
+              aiCompleteTimestamp: aiCompleteTime,
+              aiProcessingTime
+            }
+          }
+        );
+        console.log(`🤖 AI segment timing captured: ${aiProcessingTime}ms (model: ${model}, path: ${orchestratorPath})`);
+      } catch (timingError) {
+        console.error("❌ Failed to capture AI segment timing:", timingError);
+        // Non-critical - do not fail the job
+      }
+    }
+
+    console.log(`✅ Legacy AI response generated (${aiResponse.length} chars in ${aiProcessingTime}ms)`);
   }
 
   // STEP 6: Send response to Chatwoot (NEW METHOD - Phase 2)
@@ -340,7 +445,12 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
   const chatwootClient = new ChatwootClient();
   const result = await chatwootClient.sendMessage(
     data.conversationId,
-    aiResponse
+    aiResponse,
+    // Construct full MessageTimingData for Chatwoot send timestamp capture
+    data.timingData ? {
+      ...data.timingData,
+      conversationId: data.conversationId
+    } : undefined
   );
   console.log('✅ Message sent to Chatwoot, message_id:', result.message_id);
 
@@ -435,9 +545,9 @@ export function getBrokerWorker(): Worker<BrokerConversationJob> {
       processConversationJob,
       {
         connection: getRedisConnection(),
-        concurrency: parseInt(process.env.WORKER_CONCURRENCY || '3'),
+        concurrency: parseInt(process.env.WORKER_CONCURRENCY || '10'),
         limiter: {
-          max: parseInt(process.env.QUEUE_RATE_LIMIT || '10'),
+          max: parseInt(process.env.QUEUE_RATE_LIMIT || '30'),
           duration: 1000,
         },
       }
@@ -468,8 +578,8 @@ export function getBrokerWorker(): Worker<BrokerConversationJob> {
     process.on('SIGINT', () => shutdown('SIGINT'));
 
     console.log('🚀 BullMQ worker initialized and ready to process jobs');
-    console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 3}`);
-    console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 10}/second`);
+    console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 10}`);
+    console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 30}/second`);
     console.log(`   Environment: ${process.env.NODE_ENV}`);
   }
   return _brokerWorker;

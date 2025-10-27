@@ -28,6 +28,7 @@ import { generateBrokerResponse } from '@/lib/ai/broker-ai-service';
 import { BrokerPersona } from '@/lib/calculations/broker-persona';
 import { ProcessedLeadData } from '@/lib/integrations/chatwoot-client';
 import { ConversationState, ConversationContext, UserIntent } from '@/lib/contracts/ai-conversation-contracts';
+import { updateTimingData, MessageTimingData } from "@/lib/queue/broker-queue";
 
 /**
  * Input parameters for message processing
@@ -38,6 +39,9 @@ export interface MessageProcessingInput {
   userMessage: string;
   leadData: ProcessedLeadData;
   brokerPersona: BrokerPersona;
+  
+  // Phase 1 Day 1: SLA timing data for hop-by-hop measurement
+  timingData?: MessageTimingData;
 }
 
 /**
@@ -133,7 +137,8 @@ export class AIOrchestrator {
           persona: brokerPersona,
           leadData,
           conversationId,
-          conversationHistory: this.buildConversationHistory(state)
+          conversationHistory: this.buildConversationHistory(state),
+          timingData: input.timingData
         });
 
         modelUsed = intent.suggestedModel;

@@ -135,6 +135,10 @@ See [Mobile-First Architecture Runbook](../../runbooks/ai-broker/MOBILE_FIRST_AR
 - [Component Placement Decision Tree](../../CLAUDE.md#component-placement-decision-tree)
 - [CANONICAL_REFERENCES.md](../../CANONICAL_REFERENCES.md) - Tier 1 files
 
+## Constraint Alignment
+
+- Constraint A – Public Surfaces Ready (`docs/plans/re-strategy/strategy-alignment-matrix.md`, C1): Rebuilding the mobile chat experience ensures Stage 0 surfaces meet accessibility, mobile parity, and SLA guardrails before launch.
+
 ## Notes
 
 **Field Testing Summary (September 2025):**

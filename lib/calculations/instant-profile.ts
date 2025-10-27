@@ -799,17 +799,18 @@ export function calculateOverdraftCommitment(facilityLimit: number): number {
 }
 
 // Helper function to get employment recognition rate (Dr Elena v2 persona aligned)
+// Source: dr-elena-mortgage-expert-v2.json -> computational_modules.income_recognition
 export function getEmploymentRecognitionRate(employmentType: string): number {
   switch (employmentType) {
     case 'employed':
-      return 1.0 // 100% recognition for employed
+      return 1.0 // 100% recognition for fixed income
     case 'self-employed':
       return 0.7 // 70% recognition for self-employed (2-year NOA requirement)
     case 'contract':
     case 'variable':
-      return 0.6 // 60% recognition for commission or contractual income
+      return 0.7 // 70% recognition for variable/commission income (aligned with persona)
     case 'other':
-      return 0.5 // 50% recognition for mixed or fringe sources
+      return 1.0 // Default to fixed income rate (100%) for undefined types
     case 'not-working':
     case 'unemployed':
     default:

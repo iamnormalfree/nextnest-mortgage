@@ -14,6 +14,11 @@ Audit and refine the three-step loan application flow for mobile while preservin
 - Updated UI components under `components/forms/` and `components/ui/`.
 - Validation notes with screenshots documenting before/after mobile states.
 - Lint report confirming no regressions before handoff.
+
+## Constraint Alignment
+
+- Constraint A – Public Surfaces Ready (`docs/plans/re-strategy/strategy-alignment-matrix.md`, C1): Optimising the loan form for mobile preserves Stage 0 usability and accessibility benchmarks on the primary lead funnel before launch.
+
 ## Follow-up Issues (2025-09-20)
 - Instant analysis card still overflows on small widths; metrics and the gold alert drift outside the card container.
 - Property category cards in Step 2 appear staggered on desktop after the mobile layout tweaks.

@@ -82,27 +82,46 @@ test.describe('Production E2E - Manual Form, Automated Chat', () => {
     const messageVisible = await messages.first().isVisible({ timeout: 5000 }).catch(() => false);
 
     if (messageVisible) {
-      const messageCount = await messages.count();
+      var messageCount = await messages.count();
       console.log(`✓ Messages displayed: ${messageCount}`);
     } else {
       console.log('⚠ Could not find message elements - checking if text is on page...');
       const textFound = await page.locator(`text=${testMessage}`).isVisible().catch(() => false);
       if (textFound) {
         console.log('✓ Message text found on page (different structure than expected)');
+        var messageCount = 1; // At least our message is there
       } else {
         console.log('✗ Message not found on page');
+        var messageCount = 0;
       }
     }
 
-    // TEST 4: Wait for broker response (BullMQ processing)
-    console.log('⏳ Waiting for broker response (up to 15 seconds)...');
-    await page.waitForTimeout(15000);
+    // TEST 4: Wait for broker response (BullMQ processing) and measure SLA
+    console.log('⏳ Waiting for broker response (measuring 5-second SLA)...');
+    const startTime = Date.now();
+
+    // Wait up to 15 seconds but check every 500ms for quicker response detection
+    let brokerResponded = false;
+    let responseTime = 0;
+
+    for (let i = 0; i < 30; i++) { // 30 * 500ms = 15 seconds max
+      await page.waitForTimeout(500);
+      const currentCount = await messages.count();
+      if (currentCount > messageCount) {
+        brokerResponded = true;
+        responseTime = Date.now() - startTime;
+        break;
+      }
+    }
 
     const updatedCount = await messages.count();
     if (updatedCount > messageCount) {
-      console.log(`✓ Broker responded! New message count: ${updatedCount}`);
+      const slaMet = responseTime <= 5000; // 5 second SLA
+      console.log(`✓ Broker responded! Response time: ${responseTime}ms (${slaMet ? 'SLA MET' : 'SLA EXCEEDED'})`);
+      console.log(`✓ New message count: ${updatedCount}`);
     } else {
-      console.log(`⚠ No new messages yet (count still: ${updatedCount})`);
+      console.log(`⚠ No broker response within 15 seconds`);
+      console.log(`✗ SLA NOT MET - No response detected`);
     }
 
     // TEST 5: Check for typing indicator

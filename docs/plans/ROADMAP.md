@@ -24,10 +24,10 @@ Use this roadmap with `docs/plans/re-strategy/strategy-alignment-matrix.md` duri
 ### Constraint A – Public Surfaces Ready (🟡)
 - **Bottleneck:** Stage 0 launch gate unmet; homepage, progressive form, and chat UI not yet aligned with brand canon or accessibility.  
 - **Goal:** Ship a polished, accessible public experience that can accept production traffic.  
-- **Critical Work Packages:**  
-  - Homepage hero/trust strip rewrite (CAN-001, CAN-020) with updated voice guide (CAN-036).  
-  - Progressive form UX + instant calc audit (active plan `2025-10-30-progressive-form-experience-implementation-plan.md`).  
-  - Broker chat UX throughput and SLA verification (`mobile-ai-broker-ui-rebuild-plan.md`, SLA tests).  
+- **Critical Work Packages:**
+  - Homepage hero/trust strip rewrite (CAN-001, CAN-020) with updated voice guide (CAN-036).
+  - ✅ Progressive form UX + instant calc audit (completed, archived 2025-10-24).
+  - Broker chat UX throughput and SLA verification (`mobile-ai-broker-ui-rebuild-plan.md`, SLA tests).
   - Accessibility runbook + token cleanup (CAN-016, CAN-037).  
 - **Dependencies:** Brand canon (Part 04), Stage 0 checklist, existing E2E suites.  
 - **Exit Criteria:**  
@@ -89,10 +89,16 @@ Use this roadmap with `docs/plans/re-strategy/strategy-alignment-matrix.md` duri
 
 ## Active Plans
 
-- `2025-10-30-progressive-form-experience-implementation-plan.md` → Constraint A  
-- `mobile-ai-broker-ui-rebuild-plan.md` → Constraint A  
-- `2025-10-31-parser-crm-integration-plan.md` → Constraint B (Stage A audit)  
+- `mobile-ai-broker-ui-rebuild-plan.md` → Constraint A
+- `2025-10-31-parser-crm-integration-plan.md` → Constraint B (Stage A audit)
 - Additional plans must name their constraint row before approval.
+
+## Recently Completed
+
+- ✅ `2025-10-30-progressive-form-experience-implementation-plan.md` (archived 2025-10-24) → Constraint A
+  - Income recognition alignment with Dr Elena v2 persona
+  - Eliminated handcrafted UI copy (now 100% persona-derived)
+  - All calculator tests passing (28/28)
 
 ---
 

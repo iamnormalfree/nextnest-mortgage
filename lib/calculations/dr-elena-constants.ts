@@ -43,6 +43,41 @@ export const DR_ELENA_INCOME_RECOGNITION = Object.freeze({
   rentalIncome: number;
 }>;
 
+// Source: computational_modules.income_recognition - UI descriptions for help text
+export const DR_ELENA_INCOME_DESCRIPTIONS = Object.freeze({
+  employed: {
+    rate: modules.income_recognition.fixed_income.recognition_rate,
+    description: modules.income_recognition.fixed_income.description,
+    documentation: modules.income_recognition.fixed_income.documentation
+  },
+  'self-employed': {
+    rate: modules.income_recognition.self_employed_income.recognition_rate,
+    description: modules.income_recognition.self_employed_income.description,
+    documentation: modules.income_recognition.self_employed_income.documentation
+  },
+  variable: {
+    rate: modules.income_recognition.variable_income.default_recognition_rate,
+    description: modules.income_recognition.variable_income.description,
+    documentation: modules.income_recognition.variable_income.documentation
+  },
+  other: {
+    rate: modules.income_recognition.fixed_income.recognition_rate,
+    description: 'Mixed or other income sources',
+    documentation: 'Varies by source type'
+  },
+  'not-working': {
+    rate: 0,
+    description: 'No employment or income',
+    documentation: 'Not applicable'
+  }
+}) as Readonly<{
+  employed: { rate: number; description: string; documentation: string };
+  'self-employed': { rate: number; description: string; documentation: string };
+  variable: { rate: number; description: string; documentation: string };
+  other: { rate: number; description: string; documentation: string };
+  'not-working': { rate: number; description: string; documentation: string };
+}>;
+
 const creditCardRateMatch = modules.commitment_calculations.credit_cards.formula.match(/0\.0?3/);
 const overdraftRateMatch = modules.commitment_calculations.overdraft_facilities.formula.match(/0\.0?5/);
 const guarantorRateMatch = modules.commitment_calculations.guarantor_obligations.formula.match(/0\.\d+/);
@@ -145,3 +180,21 @@ export const DR_ELENA_POLICY_REFERENCES = Object.freeze({
   cpfAccruedInterest: string;
   saleProceedsOrder: string;
 }>;
+
+// UI reason code descriptions for calculator outputs
+// NOTE: These are currently handcrafted as persona JSON doesn't include them yet
+// TODO: Extract from persona when available
+export const DR_ELENA_REASON_CODE_MESSAGES = Object.freeze({
+  'tdsr_binding': 'TDSR ratio is above compliance threshold',
+  'msr_binding': 'MSR ratio is above the 30% cap',
+  'ltv_binding': 'Loan-to-value ceiling reached based on property price',
+  'ltv_first_loan': 'First property LTV cap applies',
+  'ltv_second_loan': 'Second property LTV cap applies',
+  'ltv_third_loan': 'Subsequent property LTV cap applies',
+  'ltv_reduced_age_trigger': 'Reduced LTV due to age or tenure',
+  'cpf_not_allowed': 'CPF usage not permitted for this property',
+  'stress_rate_quoted_applied': 'Stress test rate applied',
+  'tenure_cap_age_limit': 'Loan tenure limited by borrower age',
+  'tenure_cap_property_limit': 'Loan tenure limited by property type',
+  'absd_applies': 'Additional Buyer Stamp Duty (ABSD) applies'
+}) as Readonly<Record<string, string>>;

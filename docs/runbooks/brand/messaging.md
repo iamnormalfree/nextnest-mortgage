@@ -8,20 +8,20 @@
 
 ## Core Brand Promise
 
-**"Your Personal Mortgage Brain - The Only Analysis That Thinks Like You Do"**
+**"Evidence-based mortgage advisory. Built on every real Singapore scenario."**
 
 ### Supporting Tagline
-"Personalized mortgage intelligence with sophisticated analysis"
+"Real-time analysis of 286 packages. Mathematical precision. Complete transparency."
 
 ---
 
 ## Brand Positioning Framework
 
 ### Primary Position
-**Your Personal Mortgage Brain** - Not a traditional broker, but a personalized intelligence system that combines:
-- AI analysis that thinks like you do
-- Sophisticated understanding of your unique situation
-- Personal advisory relationship that protects your interests
+**Evidence-based mortgage advisory built on documented scenarios** – guidance that combines:
+- AI-driven analysis of every published package and repricing path
+- Human brokers who translate the math into clear decisions
+- Transparent recommendation of staying, repricing, or switching based on net benefit
 
 ### Competitive Differentiation
 
@@ -86,19 +86,18 @@
 ## Website Copy Framework
 
 ### Homepage Headlines
-- **Primary**: "Your Personal Mortgage Brain - The Only Analysis That Thinks Like You Do"
-- **Alternative 1**: "Singapore's Smartest Mortgage Advisor"  
-- **Alternative 2**: "The Mortgage Advisor Who Understands Your Situation"
-- **Alternative 3**: "Your Personal Mortgage Intelligence System"
+- **Primary**: "Evidence-based mortgage advisory. Built on real Singapore scenarios."
+- **Alternative 1**: "Real-time analysis of every repricing and refinancing path."
+- **Alternative 2**: "See the math on staying, repricing, and refinancing before you decide."
 
 ### Subheadlines
 - "Personalized analysis that understands your unique situation. See all your options with sophisticated intelligence that works for you."
 - "The mortgage advisor that thinks like you do - with mathematical precision and personal understanding."
 
 ### Call-to-Action Variations
-- **Primary**: "Get Your Complete Mortgage Analysis - Free"
-- **Alternative 1**: "See ALL Your Options - Free Analysis"
-- **Alternative 2**: "Get Transparent Mortgage Analysis"
+- **Primary**: "Start Free Analysis"
+- **Alternative 1**: "View Demo"
+- **Alternative 2**: "See ALL Your Options"
 
 ### Value Statements
 - **Efficiency**: "Get comprehensive analysis in hours, not weeks"

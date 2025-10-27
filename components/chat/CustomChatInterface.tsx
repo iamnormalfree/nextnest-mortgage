@@ -47,6 +47,7 @@ export default function CustomChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const lastMessageIdRef = useRef<number>(0)
+  const isInitializingRef = useRef<boolean>(false)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const hiddenActivityPatterns = [
     /conversation was reopened/i,
@@ -111,6 +112,13 @@ export default function CustomChatInterface({
   // Fetch messages for the conversation
   const fetchMessages = async () => {
     try {
+      // Prevent concurrent initialization
+      if (isInitializingRef.current) {
+        console.log('🔄 Fetch already in progress, skipping...')
+        return
+      }
+
+      isInitializingRef.current = true
       const response = await fetch(`/api/chat/messages?conversation_id=${conversationId}`)
       
       if (!response.ok) {
@@ -164,14 +172,15 @@ export default function CustomChatInterface({
       setError('Failed to load messages')
     } finally {
       setIsLoading(false)
+      isInitializingRef.current = false
     }
   }
 
   // Poll for new messages
   const pollNewMessages = async () => {
     try {
-      // If we don't have a baseline, fetch all messages
-      if (lastMessageIdRef.current === 0) {
+      // If we don't have a baseline and we're not already initializing, fetch all messages
+      if (lastMessageIdRef.current === 0 && !isInitializingRef.current) {
         await fetchMessages()
         return
       }

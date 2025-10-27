@@ -20,7 +20,16 @@
     "monitor:alerts": "curl http://localhost:3000/api/monitoring/alerts",
     "monitor:alerts:prod": "curl https://nextnest-production.up.railway.app/api/monitoring/alerts",
     "monitor:health": "curl http://localhost:3000/api/health",
-    "monitor:queue": "curl http://localhost:3000/api/admin/migration-status"
+    "monitor:queue": "curl http://localhost:3000/api/admin/migration-status",
+    "monitor:performance": "tsx scripts/monitor-performance.ts",
+    "monitor:performance:continuous": "tsx scripts/monitor-performance.ts --continuous",
+    "monitor:performance:prod": "tsx scripts/monitor-performance.ts",
+    "monitor:performance:prod:continuous": "tsx scripts/monitor-performance.ts --continuous",
+    "test:performance": "tsx scripts/test-performance-endpoint.ts",
+    "test:sla-smoke": "tsx scripts/run-sla-smoke-tests.ts",
+    "test:sla-validation": "tsx scripts/validate-sla-timing.ts",
+    "test:timing-injection": "tsx scripts/validate-timing-injection.ts",
+    "profile:sla-timing": "tsx scripts/profile-sla-timing.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.27",
@@ -72,6 +81,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "playwright": "^1.56.1",
     "redis-memory-server": "^0.13.0",
+    "tsx": "^4.20.6",
     "vitest": "^3.2.4"
   }
 }

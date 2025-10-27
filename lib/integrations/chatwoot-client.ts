@@ -6,6 +6,7 @@
 import { BrokerPersona } from '@/lib/calculations/broker-persona'
 import { normalizeSingaporePhone } from '@/lib/utils/phone-utils'
 import { trackBotMessage } from '@/lib/utils/message-tracking'
+import { MessageTimingData } from '@/lib/queue/broker-queue'
 
 export interface ChatwootContact {
   id: number
@@ -781,7 +782,7 @@ Feel free to ask me anything - even questions you think might be "basic." That's
    * This is a simpler version of sendInitialMessage for regular AI responses.
    * Returns message_id for echo detection tracking.
    */
-  async sendMessage(conversationId: number, content: string): Promise<{ message_id?: string }> {
+  async sendMessage(conversationId: number, content: string, timingData?: MessageTimingData): Promise<{ message_id?: string }> {
     try {
       console.log(`📤 Sending message to conversation ${conversationId}`);
 
@@ -814,6 +815,23 @@ Feel free to ask me anything - even questions you think might be "basic." That's
 
       // Extract message ID from Chatwoot response
       const messageId = sentMessage.id?.toString() || `fallback-${conversationId}-${Date.now()}`;
+      const chatwootSendTime = Date.now();
+
+      // Phase 1 Day 1: Capture Chatwoot send timestamp for SLA measurement
+      if (timingData && timingData.messageId) {
+        try {
+          const { updateTimingData } = await import('@/lib/queue/broker-queue');
+          await updateTimingData(
+            conversationId,
+            timingData.messageId,
+            { chatwootSendTimestamp: chatwootSendTime }
+          );
+          console.log(`⏱️ Chatwoot send timestamp captured: ${new Date(chatwootSendTime).toISOString()}`);
+        } catch (timingError) {
+          console.error("❌ Failed to capture Chatwoot send timestamp:", timingError);
+          // Non-critical - do not fail the send
+        }
+      }
 
       // Track for echo detection (non-blocking)
       try {

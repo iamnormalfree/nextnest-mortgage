@@ -18,6 +18,11 @@ export interface AlertThresholds {
   maxAIResponseTime: number; // milliseconds
   minThroughput: number; // jobs per minute
 
+  // SLA thresholds (Phase 1 Day 2)
+  maxSLADurationWarning: number; // milliseconds
+  maxSLADurationCritical: number; // milliseconds
+  maxQueueWaitTime: number; // milliseconds
+  
   // Worker thresholds
   workerDownTime: number; // minutes before alerting
 }
@@ -30,12 +35,15 @@ export const DEFAULT_THRESHOLDS: AlertThresholds = {
   maxAvgProcessingTime: 15000, // 15 seconds
   maxAIResponseTime: 8000, // 8 seconds
   minThroughput: 5, // 5 jobs/min minimum
+  maxSLADurationWarning: 10000, // 10 seconds warning
+  maxSLADurationCritical: 30000, // 30 seconds critical
+  maxQueueWaitTime: 5000, // 5 seconds max queue wait
   workerDownTime: 5, // 5 minutes
 };
 
 export interface Alert {
   severity: 'critical' | 'warning' | 'info';
-  category: 'queue' | 'worker' | 'performance' | 'system';
+  category: 'queue' | 'worker' | 'performance' | 'sla' | 'system';
   message: string;
   metric: string;
   value: number | boolean;
@@ -367,4 +375,59 @@ export function formatAlertSummary(alerts: Alert[]): {
     ),
     recent: alerts.slice(0, 5), // Last 5 alerts
   };
+}
+// SLA Monitoring Functions
+export async function checkSLACompliance(thresholds: any = { maxQueueWaitTime: 5000 }): Promise<any[]> {
+  const alerts: any[] = [];
+  try {
+    const { getQueueMetrics } = await import("@/lib/queue/broker-queue");
+    const queueMetrics = await getQueueMetrics();
+    
+    if (!queueMetrics) {
+      alerts.push({
+        severity: "critical",
+        category: "sla",
+        message: "Unable to retrieve queue metrics for SLA monitoring",
+        metric: "sla_monitoring_status",
+        value: false,
+        threshold: true,
+        timestamp: new Date(),
+        resolved: false,
+      });
+      return alerts;
+    }
+
+    if (queueMetrics.waiting > 0) {
+      const rateLimit = parseInt(process.env.QUEUE_RATE_LIMIT || "30");
+      const estimatedWaitTime = (queueMetrics.waiting / rateLimit) * 1000;
+      
+      if (estimatedWaitTime > thresholds.maxQueueWaitTime) {
+        alerts.push({
+          severity: "warning",
+          category: "sla",
+          message: "Queue wait time exceeds threshold",
+          details: queueMetrics.waiting + " jobs waiting",
+          metric: "queue_wait_time",
+          value: estimatedWaitTime,
+          threshold: thresholds.maxQueueWaitTime,
+          timestamp: new Date(),
+          resolved: false,
+        });
+      }
+    }
+
+    return alerts;
+  } catch (error) {
+    console.error("SLA check failed:", error);
+    return [{
+      severity: "critical",
+      category: "sla",
+      message: "SLA monitoring failed",
+      metric: "sla_monitoring_status",
+      value: false,
+      threshold: true,
+      timestamp: new Date(),
+      resolved: false,
+    }];
+  }
 }

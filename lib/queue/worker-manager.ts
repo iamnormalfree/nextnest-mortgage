@@ -56,8 +56,8 @@ export async function initializeWorker() {
     workerInitialized = true;
 
     console.log('✅ BullMQ worker initialized successfully');
-    console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 3}`);
-    console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 10}/second`);
+    console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 10}`);
+    console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 30}/second`);
     console.log(`   Environment: ${process.env.NODE_ENV}`);
 
     return worker;
@@ -130,4 +130,60 @@ if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
     // Don't throw - allow the app to continue without worker
     // Worker will be retried on next API call
   });
+}
+export async function getWorkerPerformanceMetrics() {
+  try {
+    const basicStatus = getWorkerStatus();
+    const { getQueueMetrics } = await import("./broker-queue");
+    const queueMetrics = await getQueueMetrics();
+    
+    const concurrency = parseInt(process.env.WORKER_CONCURRENCY || "10");
+    const rateLimit = parseInt(process.env.QUEUE_RATE_LIMIT || "30");
+    
+    const utilizationRate = queueMetrics ? queueMetrics.active / concurrency : 0;
+    const estimatedThroughput = Math.min(queueMetrics ? queueMetrics.active : 0, rateLimit);
+    
+    let slaCompliance = "healthy";
+    const alerts = [];
+    
+    if (queueMetrics) {
+      if (queueMetrics.waiting > 20) {
+        slaCompliance = "critical";
+        alerts.push("Queue backup: " + queueMetrics.waiting + " jobs waiting");
+      } else if (queueMetrics.waiting > 10) {
+        slaCompliance = "warning";
+        alerts.push("Queue growing: " + queueMetrics.waiting + " jobs waiting");
+      }
+      
+      if (utilizationRate > 0.9) {
+        alerts.push("High worker utilization: " + Math.round(utilizationRate * 100) + "%");
+      }
+    }
+    
+    return {
+      basicStatus,
+      optimization: {
+        concurrency,
+        rateLimit,
+        utilizationRate,
+        estimatedThroughput,
+        queueDepth: queueMetrics ? queueMetrics.waiting : 0,
+        slaCompliance,
+      },
+      alerts,
+    };
+  } catch (error) {
+    return {
+      basicStatus: getWorkerStatus(),
+      optimization: {
+        concurrency: parseInt(process.env.WORKER_CONCURRENCY || "10"),
+        rateLimit: parseInt(process.env.QUEUE_RATE_LIMIT || "30"),
+        utilizationRate: 0,
+        estimatedThroughput: 0,
+        queueDepth: 0,
+        slaCompliance: "critical",
+      },
+      alerts: ["Metrics retrieval failed"],
+    };
+  }
 }

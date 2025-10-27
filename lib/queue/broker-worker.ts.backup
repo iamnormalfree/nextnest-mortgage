@@ -23,6 +23,11 @@ import { ChatwootClient } from '@/lib/integrations/chatwoot-client';
 // AI response generation (NEW - Phase 2)
 import { generateBrokerResponse } from '@/lib/ai/broker-ai-service';
 
+// AI Orchestrator (Week 5 - Full Intelligence Integration)
+import { getAIOrchestrator } from '@/lib/ai/ai-orchestrator';
+import { updateTimingData } from "./broker-queue";
+import { isFullAIIntelligenceEnabled } from '@/lib/utils/feature-flags';
+
 // ============================================================================
 // WORKER IMPLEMENTATION
 // ============================================================================
@@ -56,6 +61,7 @@ import { generateBrokerResponse } from '@/lib/ai/broker-ai-service';
 async function processConversationJob(job: Job<BrokerConversationJob>) {
   const { data } = job;
   const startTime = Date.now();
+// Phase 1 Day 1: Capture worker start timestamp for SLA measurement  if (data.timingData && data.timingData.messageId) {    try {      await updateTimingData(        data.conversationId,        data.timingData.messageId,        { workerStartTimestamp: startTime }      );      console.log(`⏱️ Worker start timestamp captured: ${new Date(startTime).toISOString()}`);    } catch (timingError) {      console.error("❌ Failed to capture worker start timestamp:", timingError);      // Non-critical - do not fail the job    }  }
 
   console.log(`\n${'='.repeat(60)}`);
   console.log(`🤖 Processing ${data.type} for conversation ${data.conversationId}`);
@@ -285,17 +291,50 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
   await delay(urgency.responseTime);
   console.log('✅ Wait complete');
 
-  // STEP 5: Generate AI response (NEW - Phase 2)
-  // Uses Vercel AI SDK via generateBrokerResponse from broker-ai-service.ts
+  // STEP 5: Generate AI response
+  // Week 5: Route through AI Orchestrator if feature flag enabled
   console.log('🧠 Step 5: Generating AI response...');
-  const aiResponse = await generateBrokerResponse({
-    message: data.userMessage || '',
-    persona,
-    leadData: data.processedLeadData,
-    conversationId: data.conversationId,
-    conversationHistory: [], // TODO: Fetch from Chatwoot in future enhancement
-  });
-  console.log(`✅ AI response generated (${aiResponse.length} chars)`);
+
+  let aiResponse: string;
+  let shouldHandoffFromAI = false;
+  let handoffReasonFromAI: string | undefined;
+
+  if (isFullAIIntelligenceEnabled()) {
+    console.log('🎯 Using AI Orchestrator (full intelligence enabled)');
+
+    // NEW PATH: Full AI Intelligence with Orchestrator
+    const orchestrator = getAIOrchestrator();
+    const orchestratorResponse = await orchestrator.processMessage({
+      conversationId: data.conversationId,
+      contactId: data.contactId,
+      userMessage: data.userMessage || '',
+      leadData: data.processedLeadData,
+      brokerPersona: persona
+    });
+
+    aiResponse = orchestratorResponse.content;
+    shouldHandoffFromAI = orchestratorResponse.shouldHandoff;
+    handoffReasonFromAI = orchestratorResponse.handoffReason;
+
+    console.log(`✅ AI Orchestrator response generated (${aiResponse.length} chars)`);
+    console.log(`   Model: ${orchestratorResponse.model}`);
+    console.log(`   Intent: ${orchestratorResponse.intent}`);
+    console.log(`   Tokens: ${orchestratorResponse.tokensUsed}`);
+
+  } else {
+    console.log('💬 Using legacy AI service (orchestrator disabled)');
+
+    // LEGACY PATH: Direct AI generation
+    aiResponse = await generateBrokerResponse({
+      message: data.userMessage || '',
+      persona,
+      leadData: data.processedLeadData,
+      conversationId: data.conversationId,
+      conversationHistory: [], // TODO: Fetch from Chatwoot in future enhancement
+    });
+
+    console.log(`✅ Legacy AI response generated (${aiResponse.length} chars)`);
+  }
 
   // STEP 6: Send response to Chatwoot (NEW METHOD - Phase 2)
   // Uses new sendMessage() method added to ChatwootClient
@@ -307,9 +346,16 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
   );
   console.log('✅ Message sent to Chatwoot, message_id:', result.message_id);
 
-  // STEP 7: Check for handoff (EXISTING LOGIC from urgency analysis)
-  if (urgency.escalate) {
+  // STEP 7: Check for handoff
+  // Week 5: Check both urgency analysis AND AI Orchestrator recommendation
+  const needsHandoff = urgency.escalate || shouldHandoffFromAI;
+
+  if (needsHandoff) {
+    const handoffReason = handoffReasonFromAI ||
+                          (urgency.escalate ? 'Customer requested escalation' : 'Complex question');
+
     console.log('🚨 Step 7: Escalation needed, triggering handoff...');
+    console.log(`   Reason: ${handoffReason}`);
 
     // Post activity message
     await chatwootClient.createActivityMessage(
@@ -322,7 +368,7 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
       data.conversationId,
       {
         ai_status: 'handoff_requested',
-        handoff_reason: urgency.escalate ? 'Customer requested escalation' : 'Complex question',
+        handoff_reason: handoffReason,
         handoff_at: new Date().toISOString(),
       }
     );
@@ -337,7 +383,7 @@ async function processIncomingMessage(job: Job<BrokerConversationJob>) {
       broker.id,
       1, // message_count
       true, // handoffTriggered
-      'Customer requested escalation'
+      handoffReason
     );
 
     console.log('✅ Handoff completed');
@@ -367,7 +413,10 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
- * Create BullMQ worker
+ * Lazy initialization for BullMQ worker
+ *
+ * IMPORTANT: Uses lazy initialization to prevent build-time execution.
+ * Environment variables (REDIS_URL) are only available at runtime in Docker builds.
  *
  * CONFIGURATION:
  * - Concurrency: Set via WORKER_CONCURRENCY env var (default: 3)
@@ -379,44 +428,51 @@ function delay(ms: number): Promise<void> {
  * - Runs in server environment only (not client-side)
  * - Gracefully shuts down on SIGTERM/SIGINT
  */
-export const brokerWorker = new Worker<BrokerConversationJob>(
-  'broker-conversations',
-  processConversationJob,
-  {
-    connection: getRedisConnection(),
-    concurrency: parseInt(process.env.WORKER_CONCURRENCY || '3'),
-    limiter: {
-      max: parseInt(process.env.QUEUE_RATE_LIMIT || '10'),
-      duration: 1000,
-    },
+let _brokerWorker: Worker<BrokerConversationJob> | null = null;
+
+export function getBrokerWorker(): Worker<BrokerConversationJob> {
+  if (!_brokerWorker) {
+    _brokerWorker = new Worker<BrokerConversationJob>(
+      'broker-conversations',
+      processConversationJob,
+      {
+        connection: getRedisConnection(),
+        concurrency: parseInt(process.env.WORKER_CONCURRENCY || '3'),
+        limiter: {
+          max: parseInt(process.env.QUEUE_RATE_LIMIT || '10'),
+          duration: 1000,
+        },
+      }
+    );
+
+    // Set up event handlers once
+    _brokerWorker.on('completed', (job) => {
+      console.log(`✅ Worker completed job ${job.id}`);
+    });
+
+    _brokerWorker.on('failed', (job, err) => {
+      console.error(`❌ Worker failed job ${job?.id}:`, err.message);
+    });
+
+    _brokerWorker.on('error', (err) => {
+      console.error('❌ Worker error:', err);
+    });
+
+    // Graceful shutdown handlers
+    const shutdown = async (signal: string) => {
+      console.log(`\n⚠️ ${signal} received, gracefully shutting down worker...`);
+      await _brokerWorker!.close();
+      console.log('✅ Worker closed successfully');
+      process.exit(0);
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
+
+    console.log('🚀 BullMQ worker initialized and ready to process jobs');
+    console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 3}`);
+    console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 10}/second`);
+    console.log(`   Environment: ${process.env.NODE_ENV}`);
   }
-);
-
-// Worker event handlers
-brokerWorker.on('completed', (job) => {
-  console.log(`✅ Worker completed job ${job.id}`);
-});
-
-brokerWorker.on('failed', (job, err) => {
-  console.error(`❌ Worker failed job ${job?.id}:`, err.message);
-});
-
-brokerWorker.on('error', (err) => {
-  console.error('❌ Worker error:', err);
-});
-
-// Graceful shutdown
-const shutdown = async (signal: string) => {
-  console.log(`\n⚠️ ${signal} received, gracefully shutting down worker...`);
-  await brokerWorker.close();
-  console.log('✅ Worker closed successfully');
-  process.exit(0);
-};
-
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
-
-console.log('🚀 BullMQ worker initialized and ready to process jobs');
-console.log(`   Concurrency: ${process.env.WORKER_CONCURRENCY || 3}`);
-console.log(`   Rate limit: ${process.env.QUEUE_RATE_LIMIT || 10}/second`);
-console.log(`   Environment: ${process.env.NODE_ENV}`);
+  return _brokerWorker;
+}

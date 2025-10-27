@@ -131,6 +131,16 @@
 
 ---
 
+## Brand & Design Canon (Tier 2)
+
+- `docs/runbooks/brand/visual-identity.md` – points to the active canon in `docs/plans/re-strategy/Part04-brand-ux-canon.md`.
+- `docs/runbooks/brand/messaging.md` – approved positioning, headline language, and CTA set.
+- `docs/runbooks/brand/copywriting-guide.md` – tone of voice, trust statements, and copy examples aligned with the canon.
+
+Legacy design references are stored under `docs/design/archive/` for historical context only and must not drive new work.
+
+---
+
 ### Legacy Calculators (NOT Canonical)
 
 **File:** `lib/calculations/archive/2025-10/dr-elena-mortgage.ts`
@@ -411,7 +421,7 @@
 **Status:** ✅ PRODUCTION
 
 **Color Systems:**
-- **NextNest Brand:** nn-gold, nn-blue, nn-purple, nn-red, nn-green (11 colors)
+- **NextNest Brand:** nn-gold, nn-blue, nn-red, nn-green (purple tokens deprecated per Part 04 canon)
 - **Bloomberg:** ink, charcoal, graphite, silver, pearl, fog, mist, gold×3, emerald, ruby (12 colors)
 
 **Allowed Changes:**

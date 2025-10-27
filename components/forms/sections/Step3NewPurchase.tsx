@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { getEmploymentRecognitionRate, calculateInstantProfile } from '@/lib/calculations/instant-profile'
+import { DR_ELENA_INCOME_DESCRIPTIONS, DR_ELENA_REASON_CODE_MESSAGES } from '@/lib/calculations/dr-elena-constants'
 import type { InstantCalcResult } from '@/lib/contracts/form-contracts'
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 
@@ -188,22 +189,8 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
     // Add persona-derived reason codes
     if (calculatorResult.reasonCodes && calculatorResult.reasonCodes.length > 0) {
       reasons.push(...calculatorResult.reasonCodes.map(code => {
-        // Convert snake_case reason codes to user-friendly messages
-        const codeMap: Record<string, string> = {
-          'tdsr_binding': 'TDSR ratio is above compliance threshold',
-          'msr_binding': 'MSR ratio is above the 30% cap',
-          'ltv_binding': 'Loan-to-value ceiling reached based on property price',
-          'ltv_first_loan': 'First property LTV cap applies',
-          'ltv_second_loan': 'Second property LTV cap applies',
-          'ltv_third_loan': 'Subsequent property LTV cap applies',
-          'ltv_reduced_age_trigger': 'Reduced LTV due to age or tenure',
-          'cpf_not_allowed': 'CPF usage not permitted for this property',
-          'stress_rate_quoted_applied': 'Stress test rate applied',
-          'tenure_cap_age_limit': 'Loan tenure limited by borrower age',
-          'tenure_cap_property_limit': 'Loan tenure limited by property type',
-          'absd_applies': 'Additional Buyer Stamp Duty (ABSD) applies'
-        }
-        return codeMap[code] || code
+        // Convert snake_case reason codes to user-friendly messages using persona constants
+        return DR_ELENA_REASON_CODE_MESSAGES[code] || code
       }))
     }
 
@@ -550,7 +537,21 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                   <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.employmentType)}</p>
                 )}
                 <p className="text-xs text-[#666666] mt-1">
-                  Income recognition: {Math.round(getEmploymentRecognitionRate(field.value || 'employed') * 100)}%
+                  {(() => {
+                    const empType = field.value || 'employed'
+                    const rate = Math.round(getEmploymentRecognitionRate(empType) * 100)
+                    const persona = DR_ELENA_INCOME_DESCRIPTIONS[empType as keyof typeof DR_ELENA_INCOME_DESCRIPTIONS]
+
+                    if (!persona) {
+                      return `Income recognition: ${rate}%`
+                    }
+
+                    // Build message from persona data
+                    const description = persona.description
+                    const documentation = persona.documentation
+
+                    return `MAS recognizes ${rate}% of ${description.toLowerCase()} (${documentation})`
+                  })()}
                 </p>
               </div>
             )}
