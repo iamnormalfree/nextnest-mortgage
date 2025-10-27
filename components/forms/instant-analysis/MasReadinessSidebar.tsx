@@ -43,18 +43,18 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
     }
 
     if (isReady) {
-      return 'You meet all lending requirements'
+      return 'Your income supports this purchase'
     }
 
     if (mainBlocker === 'TDSR') {
-      return 'Your debt ratio is too high'
+      return 'There are ways to bridge the gap'
     }
 
     if (mainBlocker === 'MSR') {
-      return 'Your mortgage payment exceeds income limits'
+      return 'There are ways to bridge the gap'
     }
 
-    return 'Some requirements need attention'
+    return 'Complete all fields to check eligibility'
   }
 
   return (
@@ -73,7 +73,7 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
           )}
         </div>
         <h3 className="text-lg font-bold text-black mb-1">
-          {isReady ? "You're MAS Ready!" : "Let's Find a Solution"}
+          {isReady ? "You Can Afford This Property!" : "Let's Make This Work"}
         </h3>
       </div>
 
@@ -132,20 +132,7 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
           </p>
         </div>
 
-        {/* AI Specialist CTA */}
-        <button
-          type="button"
-          onClick={() => {
-            // TODO: Integrate with AI broker navigation
-            console.log('Navigate to AI specialist with context:', { isReady, tdsr, msr, reasons })
-          }}
-          className="w-full px-4 py-3 bg-[#000000] text-white text-sm font-semibold hover:bg-[#333333] transition-colors rounded flex items-center justify-center gap-2"
-        >
-          {isReady ? 'Get Your Personalized Loan Package' : 'Explore Solutions with Specialist'}
-          <span>→</span>
-        </button>
-
-        {/* Technical Details - Progressive Disclosure */}
+        {/* Calculation Details - Progressive Disclosure */}
         {technicalReasons.length > 0 && (
           <div className="pt-3 border-t border-[#E5E5E5]">
             <button
@@ -153,7 +140,7 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
               onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
               className="w-full flex items-center justify-between text-xs text-[#666666] hover:text-[#000000] transition-colors"
             >
-              <span>Technical details</span>
+              <span>Calculation details</span>
               {showTechnicalDetails ? (
                 <ChevronUp className="w-4 h-4" />
               ) : (
@@ -181,22 +168,39 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
       </div>
       </div>
 
+      {/* AI Specialist CTA - Only show when unlocked */}
+      {!isBlurred && (
+        <div className="p-4 pt-0">
+          <button
+            type="button"
+            onClick={() => {
+              // TODO: Integrate with AI broker navigation
+              console.log('Navigate to AI specialist with context:', { isReady, tdsr, msr, reasons })
+            }}
+            className="w-full px-4 py-3 bg-[#F7B32B] text-black text-sm font-semibold hover:bg-[#E5A01F] transition-colors rounded flex items-center justify-center gap-2"
+          >
+            {isReady ? 'Get Your Loan Package' : 'Explore Your Options'}
+            <span>→</span>
+          </button>
+        </div>
+      )}
+
       {/* Blur overlay when locked with unlock button */}
       {isBlurred && onUnlock && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10">
           <div className="bg-white/95 px-6 py-4 rounded-lg shadow-xl text-center space-y-3 max-w-[90%]">
             <p className="text-sm font-semibold text-[#000000]">
-              Ready to see your MAS readiness score?
+              Ready to check your eligibility?
             </p>
             <p className="text-xs text-[#666666]">
-              Unlock your precise snapshot
+              See if you can afford this property
             </p>
             <button
               type="button"
               onClick={onUnlock}
               className="w-full px-6 py-3 bg-[#000000] text-white text-sm font-semibold hover:bg-[#333333] transition-colors rounded"
             >
-              Unlock My Score
+              Unlock My Eligibility
             </button>
           </div>
         </div>

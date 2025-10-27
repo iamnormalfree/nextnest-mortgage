@@ -1659,15 +1659,38 @@ export function ProgressiveFormWithController({
                 </Button>
               )}
 
+              {/* DEBUG: Log button state */}
+              {(() => {
+                console.log(`🔴 BUTTON DEBUG (Step ${currentStep}):`, {
+                  canSubmitCurrentStep,
+                  isSubmitting,
+                  isExternallySubmitting,
+                  isValid,
+                  buttonWillBeDisabled: !canSubmitCurrentStep || isSubmitting || isExternallySubmitting,
+                  formErrors: errors,
+                  formValues: watch()
+                })
+                return null
+              })()}
+
               <Button
                 type="submit"
-                className="h-12 px-8 bg-[#FCD34D] text-black hover:bg-[#FBB614] flex-1 ml-auto"
+                className="h-12 px-8 bg-[#F7B32B] text-black hover:bg-[#E5A01F] flex-1 ml-auto"
                 disabled={!canSubmitCurrentStep || isSubmitting || isExternallySubmitting}
               >
                 {isSubmitting || isExternallySubmitting ? (
                   <span className="flex items-center gap-2">
                     <span className="animate-pulse">Processing...</span>
                   </span>
+                ) : currentStep === 3 && loanType === 'new_purchase' ? (
+                  // Step 3 new purchase: Mirror sidebar state
+                  !showMasReadiness ? (
+                    'Unlock to Continue →'
+                  ) : masReadiness.isReady ? (
+                    'Get Your Loan Package →'
+                  ) : (
+                    'Explore Your Options →'
+                  )
                 ) : (
                   currentStepConfig.ctaText
                 )}
