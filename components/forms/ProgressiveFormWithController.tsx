@@ -1621,7 +1621,7 @@ export function ProgressiveFormWithController({
               ) : currentStep === 2 && loanType === 'refinance' ? (
               <MarketContextSidebar
                 currentRate={refinanceCurrentRate || 3.0}
-                isLoading={!refinanceDataAvailable}
+                isLoading={!refinanceCurrentRate || refinanceCurrentRate === 0}
               />
             ) : currentStep === 3 && loanType === 'new_purchase' ? (
               <MasReadinessSidebar
