@@ -1522,6 +1522,7 @@ export function ProgressiveFormWithController({
                   propertyType={propertyType}
                   isBlurred={!showMasReadiness}
                   onUnlock={() => setShowMasReadiness(true)}
+                  onContinue={handleStepSubmit}
                 />
               </div>
             )}
@@ -1616,6 +1617,7 @@ export function ProgressiveFormWithController({
                 propertyType={propertyType}
                 isBlurred={!showMasReadiness}
                 onUnlock={() => setShowMasReadiness(true)}
+                onContinue={handleStepSubmit}
               />
             ) : currentStep === 3 && loanType === 'refinance' ? (
               <RefinanceOutlookSidebar

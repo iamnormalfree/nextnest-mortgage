@@ -11,9 +11,10 @@ interface MasReadinessSidebarProps {
   propertyType?: string
   isBlurred?: boolean
   onUnlock?: () => void
+  onContinue?: () => void
 }
 
-export function MasReadinessSidebar({ result, propertyType, isBlurred = false, onUnlock }: MasReadinessSidebarProps) {
+export function MasReadinessSidebar({ result, propertyType, isBlurred = false, onUnlock, onContinue }: MasReadinessSidebarProps) {
   const { isReady, tdsr, tdsrLimit, msr, msrLimit, reasons } = result
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false)
 
@@ -164,14 +165,11 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
       </div>
 
       {/* AI Specialist CTA - Only show when unlocked */}
-      {!isBlurred && (
+      {!isBlurred && onContinue && (
         <div className="p-4 pt-3">
           <button
             type="button"
-            onClick={() => {
-              // TODO: Integrate with AI broker navigation
-              console.log('Navigate to AI specialist with context:', { isReady, tdsr, msr, reasons })
-            }}
+            onClick={onContinue}
             className="w-full px-4 py-3 bg-[#F7B32B] text-black text-sm font-semibold hover:bg-[#E5A01F] transition-colors rounded flex items-center justify-center gap-2"
           >
             {isReady ? 'Get Your Loan Package' : 'Explore Your Options'}
