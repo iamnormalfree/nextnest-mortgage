@@ -32,6 +32,7 @@ export interface ProgressiveFormController {
   currentStep: number
   completedSteps: number[]
   errors: any
+  touchedFields: any
   isValid: boolean
   isAnalyzing: boolean
   isInstantCalcLoading: boolean
@@ -144,13 +145,42 @@ export function useProgressiveFormController({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, touchedFields, isValid, isSubmitting },
     trigger,
     reset
   } = form
 
   const watchedFields = watch()
 
+  // ============================================================================
+  // SCHEMA UPDATE FIX
+  // When step changes, schema changes. Re-validate to update isValid.
+  // This ensures the button enabled state reflects the current schema.
+  // ============================================================================
+  useEffect(() => {
+    // Trigger validation whenever step changes to update isValid with new schema
+    const validateWithNewSchema = async () => {
+      console.log(`🔄 Step changed to ${currentStep}, re-validating with new Gate ${currentStep} schema`)
+      const result = await trigger()
+      const currentValues = watch()
+      console.log(`✅ Validation result for Gate ${currentStep}:`, result)
+      console.log(`📋 Current form values:`, {
+        name: currentValues.name,
+        email: currentValues.email,
+        phone: currentValues.phone,
+        loanType: currentValues.loanType,
+        hasChangedJobsPrimary: currentValues.hasChangedJobsPrimary,
+        lockInPeriodTimeframe: currentValues.lockInPeriodTimeframe
+      })
+    }
+
+    // Small delay to ensure values are restored first
+    const timer = setTimeout(() => {
+      validateWithNewSchema()
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [currentStep, trigger, watch]) // Re-run when step changes
 
   // Lead scoring logic - FIXED: use ref to avoid infinite loops
   useEffect(() => {
@@ -893,6 +923,32 @@ export function useProgressiveFormController({
         setCurrentStep(nextStep)
         leadForm.progressToStep(nextStep)
 
+        // ============================================================================
+        // FORM STATE PERSISTENCE FIX
+        // Restore all previous step data into React Hook Form for validation
+        // Gate 3 schema requires name/email/phone from Step 1 - must be in form state
+        // ============================================================================
+        const allFormData = leadForm.formData
+        const restoredFields: string[] = []
+        Object.entries(allFormData).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            // Only restore non-empty values to avoid overwriting current step's inputs
+            setValue(key, value, { shouldValidate: false })
+            restoredFields.push(key)
+          }
+        })
+        console.log(`✅ Form state persistence: Restored ${restoredFields.length} fields to step ${nextStep}:`, {
+          fields: restoredFields,
+          criticalFields: {
+            name: allFormData.name,
+            email: allFormData.email,
+            phone: allFormData.phone
+          }
+        })
+
+        // Note: Validation is triggered by the useEffect that watches currentStep
+        // (lines 159-182). No need to manually trigger here.
+
         // Pre-fill age in Step 4 from Step 2 combinedAge
         if (nextStep === 3) { // Moving to Step 4 (Your Finances)
           const combinedAge = leadForm.formData.combinedAge
@@ -976,6 +1032,7 @@ export function useProgressiveFormController({
     currentStep,
     completedSteps,
     errors,
+    touchedFields,
     isValid,
     isAnalyzing,
     isInstantCalcLoading,

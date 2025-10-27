@@ -64,6 +64,19 @@ const getErrorMessage = (error: any): string => {
   return 'This field is required'
 }
 
+// Helper function to check if error should be displayed (only show if field has been touched)
+const shouldShowError = (errors: any, touchedFields: any, fieldName: string): boolean => {
+  // Get nested field support (e.g., "actualIncomes.0")
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => current?.[key], obj)
+  }
+
+  const hasError = getNestedValue(errors, fieldName)
+  const isTouched = getNestedValue(touchedFields, fieldName)
+
+  return Boolean(hasError && isTouched)
+}
+
 // ============================================================================
 // COMPONENT PROPS
 // ============================================================================
@@ -128,6 +141,7 @@ export function ProgressiveFormWithController({
     currentStep,
     completedSteps,
     errors,
+    touchedFields,
     isValid,
     isAnalyzing,
     isInstantCalcLoading,
@@ -248,7 +262,7 @@ export function ProgressiveFormWithController({
     return []
   }
 
-  const actualAges = parseFormArray(actualAgesRaw, 0, 100)  // Ages 1-100
+  const actualAges = parseFormArray(actualAgesRaw, 17, 100)  // Ages 18-100 (>17 means >=18)
   const actualIncomes = parseFormArray(actualIncomesRaw, 0, Infinity)  // Any positive income
 
   // Calculate MAS readiness using hook (with IWAA support)
@@ -675,7 +689,7 @@ export function ProgressiveFormWithController({
                       onFieldChange('name', e.target.value)
                     }}
                   />
-                  {errors.name && (
+                  {shouldShowError(errors, touchedFields, 'name') && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.name)}</p>
                   )}
                 </div>
@@ -703,7 +717,7 @@ export function ProgressiveFormWithController({
                       onFieldChange('email', e.target.value)
                     }}
                   />
-                  {errors.email && (
+                  {shouldShowError(errors, touchedFields, 'email') && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.email)}</p>
                   )}
                 </div>
@@ -731,7 +745,7 @@ export function ProgressiveFormWithController({
                       onFieldChange('phone', e.target.value)
                     }}
                   />
-                  {errors.phone && (
+                  {shouldShowError(errors, touchedFields, 'phone') && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.phone)}</p>
                   )}
                 </div>
@@ -774,7 +788,7 @@ export function ProgressiveFormWithController({
                         ))}
                       </SelectContent>
                     </Select>
-                    {errors.propertyCategory && (
+                    {shouldShowError(errors, touchedFields, 'propertyCategory') && (
                       <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyCategory)}</p>
                     )}
                   </div>
@@ -823,7 +837,7 @@ export function ProgressiveFormWithController({
                           ))}
                         </SelectContent>
                       </Select>
-                      {errors.propertyType && (
+                      {shouldShowError(errors, touchedFields, 'propertyType') && (
                         <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
                       )}
                     </div>
@@ -839,7 +853,7 @@ export function ProgressiveFormWithController({
                 control={control}
                 render={({ field }) => (
                   <div>
-                    <label 
+                    <label
                       htmlFor="property-type"
                       className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
                     >
@@ -868,7 +882,7 @@ export function ProgressiveFormWithController({
                         ))}
                       </SelectContent>
                     </Select>
-                    {errors.propertyType && (
+                    {shouldShowError(errors, touchedFields, 'propertyType') && (
                       <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.propertyType)}</p>
                     )}
                   </div>
@@ -936,7 +950,7 @@ export function ProgressiveFormWithController({
                           onFieldChange('priceRange', parsedValue)
                         }}
                       />
-                      {errors.priceRange && (
+                      {shouldShowError(errors, touchedFields, 'priceRange') && (
                         <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.priceRange)}</p>
                       )}
                     </div>
@@ -982,7 +996,7 @@ export function ProgressiveFormWithController({
                           }}
                           onBlur={field.onBlur}
                         />
-                        {errors.combinedAge && (
+                        {shouldShowError(errors, touchedFields, 'combinedAge') && (
                           <p className="text-[#EF4444] text-xs mt-1">
                             {getErrorMessage(errors.combinedAge)}
                           </p>
@@ -1027,7 +1041,7 @@ export function ProgressiveFormWithController({
                             field.onChange(value)
                           }}
                         />
-                        {errors.currentRate && (
+                        {shouldShowError(errors, touchedFields, 'currentRate') && (
                           <p className="text-[#EF4444] text-xs mt-1">
                             {getErrorMessage(errors.currentRate)}
                           </p>
@@ -1068,7 +1082,7 @@ export function ProgressiveFormWithController({
                             field.onChange(parsedValue)
                           }}
                         />
-                        {errors.outstandingLoan && (
+                        {shouldShowError(errors, touchedFields, 'outstandingLoan') && (
                           <p className="text-[#EF4444] text-xs mt-1">
                             {getErrorMessage(errors.outstandingLoan)}
                           </p>
@@ -1104,7 +1118,7 @@ export function ProgressiveFormWithController({
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                      {errors.currentBank && (
+                      {shouldShowError(errors, touchedFields, 'currentBank') && (
                         <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.currentBank)}</p>
                       )}
                     </div>
@@ -1132,7 +1146,7 @@ export function ProgressiveFormWithController({
                           onFieldChange('priceRange', parsedValue)
                         }}
                       />
-                      {errors.priceRange && (
+                      {shouldShowError(errors, touchedFields, 'priceRange') && (
                         <p className="text-[#EF4444] text-xs mt-1">
                           {getErrorMessage(errors.priceRange)}
                         </p>
