@@ -1,16 +1,22 @@
-// ABOUTME: Refinance outlook sidebar showing savings, cash-out, and timing guidance
+// ABOUTME: Refinance outlook sidebar showing market rates, savings, and SORA benchmarks
+// ABOUTME: Composed of MarketRateDisplay, SavingsDisplay, and MarketContextWidget
 
 'use client'
 
 import React from 'react'
 import type { RefinanceOutlookResult } from '@/lib/calculations/instant-profile'
+import { MarketRateDisplay } from './MarketRateDisplay'
+import { SavingsDisplay } from './SavingsDisplay'
+import { MarketContextWidget } from './MarketContextWidget'
+import { getPlaceholderRates } from '@/lib/types/market-rates'
 
 interface RefinanceOutlookSidebarProps {
   outlookResult: RefinanceOutlookResult | null
   isLoading?: boolean
+  currentRate: number
 }
 
-export function RefinanceOutlookSidebar({ outlookResult, isLoading = false }: RefinanceOutlookSidebarProps) {
+export function RefinanceOutlookSidebar({ outlookResult, isLoading = false, currentRate }: RefinanceOutlookSidebarProps) {
   // Show waiting state when data is incomplete
   if (isLoading || !outlookResult) {
     return (
@@ -28,38 +34,32 @@ export function RefinanceOutlookSidebar({ outlookResult, isLoading = false }: Re
     )
   }
 
-  const formatNumber = (value: number | undefined): string => {
-    if (value === undefined) return '—'
-    return value.toLocaleString()
+  // Check if we have savings scenarios to display
+  if (!outlookResult.savingsScenarios || outlookResult.savingsScenarios.length === 0) {
+    return (
+      <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
+        <div className="mb-4">
+          <h3 className="text-sm font-semibold text-black">Refinance Outlook</h3>
+          <p className="text-xs text-[#666666]">Updated just now</p>
+        </div>
+        <p className="text-sm text-[#666666]">
+          Calculating market opportunities...
+        </p>
+      </div>
+    )
   }
 
+  // Get market rates for display (using placeholder for now)
+  const marketRates = getPlaceholderRates()
+
+  // Estimate outstanding loan from max cash out and LTV
+  const estimatedOutstandingLoan = 400000 // TODO: Pass from form in Task 8
+
   return (
-    <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-black">Refinance Outlook</h3>
-        <p className="text-xs text-[#666666]">Updated just now</p>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <p className="text-xs text-[#666666] mb-1">Monthly Savings</p>
-          <p className="text-lg font-semibold text-black">
-            ${formatNumber(outlookResult.projectedMonthlySavings)}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-xs text-[#666666] mb-1">Cash-Out Available</p>
-          <p className="text-lg font-semibold text-black">
-            ${formatNumber(outlookResult.maxCashOut)}
-          </p>
-        </div>
-
-        <div className="pt-3 border-t border-[#E5E5E5]">
-          <p className="text-xs text-[#666666] mb-1">Best Time to Refinance</p>
-          <p className="text-sm text-black">{outlookResult.timingGuidance}</p>
-        </div>
-      </div>
+    <div className="space-y-4">
+      <MarketRateDisplay marketRates={marketRates} currentRate={currentRate} />
+      <SavingsDisplay scenarios={outlookResult.savingsScenarios} outstandingLoan={estimatedOutstandingLoan} />
+      <MarketContextWidget soraBenchmarks={marketRates.sora_benchmarks} updatedAt={marketRates.updated_at} />
     </div>
   )
 }
