@@ -405,8 +405,8 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           </div>
         )}
 
-        {/* APPLICANT 1 FINANCIAL COMMITMENTS */}
-        {employmentType && (
+        {/* APPLICANT 1 FINANCIAL COMMITMENTS - Only show after employment, income, and age filled */}
+        {employmentType && primaryIncome > 0 && age > 0 && (
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-black">Financial Commitments</h3>
             <div className="space-y-6 p-4 border border-[#E5E5E5] border-l-4 border-l-blue-500">

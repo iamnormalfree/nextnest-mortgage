@@ -156,11 +156,6 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
                     <span>{reason}</span>
                   </p>
                 ))}
-                {policyReason && (
-                  <p className="text-xs text-[#999999] mt-2 italic">
-                    {policyReason}
-                  </p>
-                )}
               </div>
             )}
           </div>
@@ -170,7 +165,7 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
 
       {/* AI Specialist CTA - Only show when unlocked */}
       {!isBlurred && (
-        <div className="p-4 pt-0">
+        <div className="p-4 pt-3">
           <button
             type="button"
             onClick={() => {
