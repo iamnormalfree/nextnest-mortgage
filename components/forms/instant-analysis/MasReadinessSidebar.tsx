@@ -132,26 +132,26 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
           </p>
         </div>
 
-        {/* Calculation Details - Progressive Disclosure */}
+        {/* Calculation Details - Progressive Disclosure (minimized, non-factor) */}
         {technicalReasons.length > 0 && (
-          <div className="pt-3 border-t border-[#E5E5E5]">
+          <div className="pt-3 border-t border-[#E5E5E5] opacity-40 hover:opacity-60 transition-opacity">
             <button
               type="button"
               onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-              className="w-full flex items-center justify-between text-xs text-[#666666] hover:text-[#000000] transition-colors"
+              className="w-full flex items-center justify-between text-[10px] text-[#999999] hover:text-[#666666] transition-colors"
             >
               <span>Calculation details</span>
               {showTechnicalDetails ? (
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUp className="w-3 h-3" />
               ) : (
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3" />
               )}
             </button>
 
             {showTechnicalDetails && (
-              <div className="mt-3 space-y-1">
+              <div className="mt-2 space-y-1">
                 {technicalReasons.map((reason, index) => (
-                  <p key={index} className="text-xs text-[#666666] flex items-start gap-2">
+                  <p key={index} className="text-[10px] text-[#999999] flex items-start gap-1">
                     <span className="mt-0.5">•</span>
                     <span>{reason}</span>
                   </p>

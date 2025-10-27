@@ -6,7 +6,7 @@ import { useMemo, useState, useEffect, useRef } from 'react'
 import { Control, Controller, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { AlertTriangle, CheckCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Info } from 'lucide-react'
 import { getEmploymentRecognitionRate } from '@/lib/calculations/instant-profile'
 import type { InstantCalcResult } from '@/lib/contracts/form-contracts'
 import type { MasReadinessResult } from '@/hooks/useMasReadiness'
@@ -379,9 +379,18 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               control={control}
               render={({ field }) => (
                 <div>
-                  <label htmlFor="age-primary" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                    Your Age *
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label htmlFor="age-primary" className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+                      Your Age *
+                    </label>
+                    <div className="relative group">
+                      <Info className="w-3.5 h-3.5 text-[#999999] cursor-help" />
+                      <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-[#000000] text-white text-xs rounded shadow-lg z-10">
+                        This is just to quickly check for max loan based on estimations. Next step with income declaration will be more precise.
+                        <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#000000]"></div>
+                      </div>
+                    </div>
+                  </div>
                   <Input
                     {...field}
                     id="age-primary"

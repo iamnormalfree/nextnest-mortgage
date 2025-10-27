@@ -4,6 +4,7 @@
 
 import { Control, Controller, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
+import { Info } from 'lucide-react'
 import { EmploymentPanel } from './EmploymentPanel'
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 
@@ -118,9 +119,18 @@ export function CoApplicantPanel({
         control={control}
         render={({ field }) => (
           <div>
-            <label htmlFor="age-joint" className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-              Age *
-            </label>
+            <div className="flex items-center gap-2 mb-2">
+              <label htmlFor="age-joint" className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+                Age *
+              </label>
+              <div className="relative group">
+                <Info className="w-3.5 h-3.5 text-[#999999] cursor-help" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-[#000000] text-white text-xs rounded shadow-lg z-10">
+                  This is just to quickly check for max loan based on estimations. Next step with income declaration will be more precise.
+                  <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#000000]"></div>
+                </div>
+              </div>
+            </div>
             <Input
               {...field}
               id="age-joint"
