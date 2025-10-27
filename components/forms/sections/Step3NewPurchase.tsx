@@ -256,9 +256,9 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
 
         {!isPrimaryIncomeExpanded ? (
           // COLLAPSED SUMMARY VIEW
-          <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8] flex justify-between items-center">
+          <div className="p-4 border border-[#E5E5E5] border-l-4 border-l-blue-500 bg-[#F8F8F8] flex justify-between items-center">
             <div>
-              <p className="text-sm font-semibold">Applicant 1 Income</p>
+              <p className="text-sm font-semibold">👤 Applicant 1 Income</p>
               <p className="text-xs text-[#666666]">
                 {EMPLOYMENT_LABELS[employmentType as keyof typeof EMPLOYMENT_LABELS] || employmentType}
                 {' • '}
@@ -277,9 +277,9 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           </div>
         ) : (
           // EXPANDED VIEW
-          <div className="space-y-4 p-4 border border-[#E5E5E5]">
+          <div className="space-y-4 p-4 border border-[#E5E5E5] border-l-4 border-l-blue-500">
             <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-              Applicant 1 (Primary)
+              👤 Applicant 1 (Primary)
             </p>
 
 
@@ -411,12 +411,12 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
         {employmentType && (
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-black">Financial Commitments</h3>
-            <div className="space-y-6 p-4 border border-[#E5E5E5]">
+            <div className="space-y-6 p-4 border border-[#E5E5E5] border-l-4 border-l-blue-500">
               {/* Single gate question */}
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-semibold text-[#000000] text-sm">
-                    Do you have any existing loans or commitments?
+                    👤 Do you have any existing loans or commitments?
                   </h4>
                   <p className="text-xs text-[#666666] mt-1">
                     Property loans, car loans, credit cards, etc.
@@ -596,9 +596,9 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           <>
             {!isCoApplicantIncomeExpanded ? (
               // CO-APPLICANT COLLAPSED VIEW
-              <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8] flex justify-between items-center">
+              <div className="p-4 border border-[#E5E5E5] border-l-4 border-l-purple-500 bg-[#F8F8F8] flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-semibold">Applicant 2 Income</p>
+                  <p className="text-sm font-semibold">👥 Applicant 2 Income</p>
                   <p className="text-xs text-[#666666]">
                     ${formatNumberWithCommas(coApplicantIncome)}/month
                     {' • '}
@@ -625,12 +625,12 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
             {/* CO-APPLICANT FINANCIAL COMMITMENTS */}
             {showJointApplicant && (
               <div className="space-y-4">
-                <div className="space-y-6 p-4 border border-[#E5E5E5]">
+                <div className="space-y-6 p-4 border border-[#E5E5E5] border-l-4 border-l-purple-500">
                   {/* Single gate question */}
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold text-[#000000] text-sm">
-                        Does co-applicant have any existing loans or commitments?
+                        👥 Does co-applicant have any existing loans or commitments?
                       </h4>
                       <p className="text-xs text-[#666666] mt-1">
                         Property loans, car loans, credit cards, etc.

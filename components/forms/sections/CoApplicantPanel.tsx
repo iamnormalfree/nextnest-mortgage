@@ -21,9 +21,9 @@ export function CoApplicantPanel({
   loanType
 }: CoApplicantPanelProps) {
   return (
-    <div className="space-y-4 p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
+    <div className="space-y-4 p-4 border border-[#E5E5E5] border-l-4 border-l-purple-500 bg-[#F8F8F8]">
       <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-        Applicant 2 (Joint)
+        👥 Applicant 2 (Joint)
       </p>
 
       {/* Monthly Income */}
