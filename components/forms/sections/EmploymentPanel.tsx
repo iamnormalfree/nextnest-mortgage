@@ -15,6 +15,7 @@ interface EmploymentPanelProps {
   applicantNumber: 0 | 1
   control: Control<any>
   errors: any
+  touchedFields?: any
   onFieldChange: (field: string, value: any, analytics?: any) => void
   showEmploymentDetails?: boolean
   compact?: boolean
@@ -24,6 +25,7 @@ export function EmploymentPanel({
   applicantNumber,
   control,
   errors,
+  touchedFields,
   onFieldChange,
   showEmploymentDetails = true,
   compact = false
@@ -40,6 +42,20 @@ export function EmploymentPanel({
   // Helper to generate field names based on applicantNumber
   const getFieldName = (baseName: string) =>
     applicantNumber === 0 ? baseName : `${baseName}_1`
+
+  // Helper to check if error should be displayed (only show if field has been touched)
+  const shouldShowError = (fieldName: string): boolean => {
+    if (!touchedFields) return true // If touchedFields not provided, show errors (backward compat)
+
+    const getNestedValue = (obj: any, path: string) => {
+      return path.split('.').reduce((current, key) => current?.[key], obj)
+    }
+
+    const hasError = getNestedValue(errors, fieldName)
+    const isTouched = getNestedValue(touchedFields, fieldName)
+
+    return Boolean(hasError && isTouched)
+  }
 
   // Self-employed conditional panel
   const renderSelfEmployedPanel = () => {
@@ -112,52 +128,52 @@ export function EmploymentPanel({
     )
   }
 
-  // In-between-jobs conditional panel
-  const renderInBetweenJobsPanel = () => {
-    if (!showEmploymentDetails || employmentType !== 'in-between-jobs') return null
-
-    return (
-      <div className="space-y-3 border border-[#E5E5E5] bg-white p-3 mt-3">
-        <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-          New employment details
-        </p>
-
-        <Controller
-          name={`employmentDetails${fieldPrefix}.in-between-jobs.monthsWithEmployer`}
-          control={control}
-          render={({ field }) => (
-            <div>
-              <label htmlFor={`in-between-months-${applicantNumber}`} className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
-                Months with current employer (0-2)
-              </label>
-              <Input
-                {...field}
-                id={`in-between-months-${applicantNumber}`}
-                type="number"
-                min="0"
-                max="2"
-                placeholder="1"
-                onChange={(e) => {
-                  field.onChange(e.target.value)
-                  onFieldChange(`employmentDetails${fieldPrefix}.in-between-jobs.monthsWithEmployer`, e.target.value, {
-                    section: 'employment_panel',
-                    action: 'months_updated',
-                    applicant: applicantNumber
-                  })
-                }}
-              />
-            </div>
-          )}
-        />
-
-        <div className="p-3 bg-[#F8F8F8] border border-[#E5E5E5]">
-          <p className="text-xs text-[#666666]">
-            Since you&apos;re new to this job, we&apos;ll need your signed employment contract and an email from your work email to verify employment.
-          </p>
-        </div>
-      </div>
-    )
-  }
+  //   // In-between-jobs conditional panel
+  //   const renderInBetweenJobsPanel = () => {
+  //     if (!showEmploymentDetails || employmentType !== 'in-between-jobs') return null
+  // 
+  //     return (
+  //       <div className="space-y-3 border border-[#E5E5E5] bg-white p-3 mt-3">
+  //         <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
+  //           New employment details
+  //         </p>
+  // 
+  //         <Controller
+  //           name={`employmentDetails${fieldPrefix}.in-between-jobs.monthsWithEmployer`}
+  //           control={control}
+  //           render={({ field }) => (
+  //             <div>
+  //               <label htmlFor={`in-between-months-${applicantNumber}`} className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block">
+  //                 Months with current employer (0-2)
+  //               </label>
+  //               <Input
+  //                 {...field}
+  //                 id={`in-between-months-${applicantNumber}`}
+  //                 type="number"
+  //                 min="0"
+  //                 max="2"
+  //                 placeholder="1"
+  //                 onChange={(e) => {
+  //                   field.onChange(e.target.value)
+  //                   onFieldChange(`employmentDetails${fieldPrefix}.in-between-jobs.monthsWithEmployer`, e.target.value, {
+  //                     section: 'employment_panel',
+  //                     action: 'months_updated',
+  //                     applicant: applicantNumber
+  //                   })
+  //                 }}
+  //               />
+  //             </div>
+  //           )}
+  //         />
+  // 
+  //         <div className="p-3 bg-[#F8F8F8] border border-[#E5E5E5]">
+  //           <p className="text-xs text-[#666666]">
+  //             Since you&apos;re new to this job, we&apos;ll need your signed employment contract and an email from your work email to verify employment.
+  //           </p>
+  //         </div>
+  //       </div>
+  //     )
+  //   }
 
   return (
     <div className="space-y-4">
@@ -173,7 +189,7 @@ export function EmploymentPanel({
               Employment Type *
             </label>
             <Select
-              value={field.value || 'employed'}
+              value={field.value || ''}
               onValueChange={(value) => {
                 field.onChange(value)
                 onFieldChange(getFieldName('employmentType'), value, {
@@ -202,20 +218,22 @@ export function EmploymentPanel({
                 ))}
               </SelectContent>
             </Select>
-            {errors[getFieldName('employmentType')] && (
+            {shouldShowError(getFieldName('employmentType')) && (
               <p className="text-[#DC2626] text-xs mt-1" role="alert">
                 Employment type is required
               </p>
             )}
-            <p className="text-xs text-[#666666] mt-1">
-              Income recognition: {Math.round(recognitionRate * 100)}%
-            </p>
+            {employmentType && (
+              <p className="text-xs text-[#666666] mt-1">
+                Income recognition: {Math.round(recognitionRate * 100)}%
+              </p>
+            )}
           </div>
         )}
       />
 
       {renderSelfEmployedPanel()}
-      {renderInBetweenJobsPanel()}
+      {/* {renderInBetweenJobsPanel()} */}
     </div>
   )
 }

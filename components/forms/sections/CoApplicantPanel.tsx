@@ -11,6 +11,7 @@ import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 interface CoApplicantPanelProps {
   control: Control<any>
   errors: any
+  touchedFields?: any
   onFieldChange: (field: string, value: any, analytics?: any) => void
   loanType: 'new_purchase' | 'refinance'
 }
@@ -18,6 +19,7 @@ interface CoApplicantPanelProps {
 export function CoApplicantPanel({
   control,
   errors,
+  touchedFields,
   onFieldChange,
   loanType
 }: CoApplicantPanelProps) {
@@ -35,6 +37,7 @@ export function CoApplicantPanel({
         applicantNumber={1}
         control={control}
         errors={errors}
+        touchedFields={touchedFields}
         onFieldChange={onFieldChange}
       />
 

@@ -183,21 +183,13 @@ export function MasReadinessSidebar({ result, propertyType, isBlurred = false, o
       {/* Blur overlay when locked with unlock button */}
       {isBlurred && onUnlock && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10">
-          <div className="bg-white/95 px-6 py-4 rounded-lg shadow-xl text-center space-y-3 max-w-[90%]">
-            <p className="text-sm font-semibold text-[#000000]">
-              Ready to check your eligibility?
-            </p>
-            <p className="text-xs text-[#666666]">
-              See if you can afford this property
-            </p>
-            <button
-              type="button"
-              onClick={onUnlock}
-              className="w-full px-6 py-3 bg-[#000000] text-white text-sm font-semibold hover:bg-[#333333] transition-colors rounded"
-            >
-              Unlock My Eligibility
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onUnlock}
+            className="px-4 py-2 bg-[#F7B32B] text-black text-xs font-semibold hover:bg-[#E5A01F] transition-colors rounded shadow-lg"
+          >
+            Unlock My Eligibility
+          </button>
         </div>
       )}
     </div>

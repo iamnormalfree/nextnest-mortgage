@@ -1186,20 +1186,7 @@ export function ProgressiveFormWithController({
               </>
             )}
 
-            {/* Show instant calculation result if available */}
-            {isInstantCalcLoading && (
-              <div className="mt-6 p-6 bg-[#F8F8F8] border border-[#E5E5E5] animate-pulse">
-                <div className="flex items-center gap-2 text-sm font-semibold text-black">
-                  <Sparkles className="w-4 h-4 text-[#F59E0B]" />
-                  <span>Analyzing...</span>
-                </div>
-                <p className="text-xs text-[#666666] mt-2">
-                  Dr Elena is calibrating your persona-aligned loan estimate. This takes about a second.
-                </p>
-              </div>
-            )}
-
-            {/* 
+            {/*
               ========================================
               MOBILE RESPONSIVE TESTING CHECKLIST
               ========================================
@@ -1502,6 +1489,7 @@ export function ProgressiveFormWithController({
                 onFieldChange={onFieldChange}
                 showJointApplicant={showJointApplicant}
                 errors={errors}
+                touchedFields={touchedFields}
                 getErrorMessage={getErrorMessage}
                 control={control}
                 instantCalcResult={instantCalcResult}

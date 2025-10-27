@@ -31,6 +31,7 @@ interface Step3NewPurchaseProps {
   onFieldChange: (field: string, value: any, analytics?: any) => void
   showJointApplicant: boolean
   errors: any
+  touchedFields?: any
   getErrorMessage: (error: any) => string
   control: Control<any>
   instantCalcResult?: InstantCalcResult | null
@@ -77,7 +78,7 @@ const ensureNumber = (value: unknown): number => {
   return 0
 }
 
-export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, getErrorMessage, control, instantCalcResult, masReadiness }: Step3NewPurchaseProps) {
+export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, touchedFields, getErrorMessage, control, instantCalcResult, masReadiness }: Step3NewPurchaseProps) {
   const [hasCommitmentsPrimary, setHasCommitmentsPrimary] = useState<boolean | null>(null)
   const [hasCommitmentsCoApplicant, setHasCommitmentsCoApplicant] = useState<boolean | null>(null)
   const [isPrimaryIncomeExpanded, setIsPrimaryIncomeExpanded] = useState(true)
@@ -295,6 +296,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               applicantNumber={0}
               control={control}
               errors={errors}
+              touchedFields={touchedFields}
               onFieldChange={onFieldChange}
             />
 
@@ -641,6 +643,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               <CoApplicantPanel
                 control={control}
                 errors={errors}
+                touchedFields={touchedFields}
                 onFieldChange={onFieldChange}
                 loanType="new_purchase"
               />
