@@ -420,7 +420,7 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
       }),
       employmentType: z.enum(['employed', 'self-employed', 'variable', 'not-working', 'other', 'contract'], {
         message: 'Please select your employment type'
-      }),
+      }).optional(),
       actualVariableIncomes: variableIncomesSchema.optional(),
       employmentDetails: employmentDetailsSchema.optional(),
       liabilities: liabilitiesSchema.optional(),
@@ -436,6 +436,10 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
     switch (loanType) {
       case 'new_purchase':
         return baseGate3Schema.extend({
+          // Override to make employmentType required for new purchase
+          employmentType: z.enum(['employed', 'self-employed', 'variable', 'not-working', 'other', 'contract'], {
+            message: 'Please select your employment type'
+          }),
           // Step 2 fields (carry forward)
           propertyCategory: z.enum(['resale', 'new_launch', 'bto', 'commercial']),
           propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
