@@ -1688,7 +1688,7 @@ export function ProgressiveFormWithController({
 
               <Button
                 type="submit"
-                className="h-12 px-8 bg-[#F7B32B] text-black hover:bg-[#E5A01F] flex-1 ml-auto"
+                className="h-14 px-8 bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg flex-1 ml-auto font-semibold"
                 disabled={!canSubmitCurrentStep || isSubmitting || isExternallySubmitting}
               >
                 {isSubmitting || isExternallySubmitting ? (
