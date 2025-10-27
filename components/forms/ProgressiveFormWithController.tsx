@@ -197,6 +197,36 @@ export function ProgressiveFormWithController({
   const propertyValue = useWatch({ control, name: 'priceRange' }) || 0
   const propertyType = useWatch({ control, name: 'propertyType' }) || 'Private'
 
+  // Co-applicant fields for re-blur tracking
+  const coApplicantAge = useWatch({ control, name: 'actualAges.1' })
+  const coApplicantVariableIncome = useWatch({ control, name: 'actualVariableIncomes.1' })
+  const employmentType_1 = useWatch({ control, name: 'employmentType_1' })
+  const employmentDetails_1 = useWatch({ control, name: 'employmentDetails_1' })
+  const liabilities2Raw = useWatch({ control, name: 'liabilities_2' })
+
+  // Re-blur MAS Readiness when any relevant field changes after unlock
+  useEffect(() => {
+    // Only re-blur if currently unlocked
+    if (showMasReadiness && currentStep === 3 && loanType === 'new_purchase') {
+      setShowMasReadiness(false)
+    }
+    // Watch all fields that affect MAS calculation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    primaryIncome,
+    variableIncome,
+    coApplicantIncome,
+    coApplicantVariableIncome,
+    age,
+    coApplicantAge,
+    employmentType,
+    employmentType_1,
+    JSON.stringify(employmentDetails),
+    JSON.stringify(employmentDetails_1),
+    JSON.stringify(liabilitiesRaw),
+    JSON.stringify(liabilities2Raw)
+  ])
+
   // Calculate effective income with employment recognition (primary applicant)
   const recognitionRate = getEmploymentRecognitionRate(employmentType)
   const selfEmployedDeclared = employmentType === 'self-employed'
@@ -216,8 +246,6 @@ export function ProgressiveFormWithController({
   const effectiveIncome = totalIncome
 
   // Calculate total monthly commitments from both applicants' liabilities
-  const liabilities2Raw = useWatch({ control, name: 'liabilities_2' })
-  
   const totalMonthlyCommitments = useMemo(() => {
     const keys = ['propertyLoans', 'carLoans', 'creditCards', 'personalLines']
     
