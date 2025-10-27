@@ -36,18 +36,23 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
   } = input
 
   return useMemo(() => {
-    // Validate age ranges (21-75 for primary applicant)
-    const MIN_AGE = 21
+    // Validate age ranges
+    // Min: 18 (legal adult in Singapore)
+    // Max: 75 (55% LTV uses 75-IWAA formula; 75% LTV practically limited to 65)
+    const MIN_AGE = 18
     const MAX_AGE = 75
 
-    if (age < MIN_AGE || age > MAX_AGE) {
+    // If age is missing or invalid, show dash (not ready)
+    if (!age || age < MIN_AGE || age > MAX_AGE) {
       return {
         isReady: false,
         tdsr: 0,
         tdsrLimit: 55,
         msr: 0,
         msrLimit: 30,
-        reasons: [`Applicant age must be between ${MIN_AGE} and ${MAX_AGE} years`]
+        reasons: age && (age < MIN_AGE || age > MAX_AGE)
+          ? [`Applicant age must be between ${MIN_AGE} and ${MAX_AGE} years`]
+          : ['Enter applicant age to calculate eligibility']
       }
     }
 
@@ -155,9 +160,13 @@ export function useMasReadiness(input: MasReadinessInput): MasReadinessResult {
       ? (monthlyMortgagePayment / effectiveIncome) * 100
       : 0
 
-    // Determine readiness based on limiting factors
-    const limitingFactor = calculatorResult.limitingFactor
-    const isReady = limitingFactor !== 'TDSR' && limitingFactor !== 'MSR'
+    // Determine readiness based on actual TDSR/MSR ratios against limits
+    // For HDB/EC: Both TDSR and MSR must be within limits
+    // For Private/Landed: Only TDSR must be within limits (MSR doesn't apply)
+    const tdsrCompliant = tdsrRatio <= 55
+    const msrApplies = propertyType === 'HDB' || propertyType === 'EC'
+    const msrCompliant = msrApplies ? msrRatio <= 30 : true
+    const isReady = tdsrCompliant && msrCompliant
 
     return {
       isReady,
