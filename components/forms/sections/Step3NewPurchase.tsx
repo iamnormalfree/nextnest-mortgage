@@ -35,6 +35,8 @@ interface Step3NewPurchaseProps {
   control: Control<any>
   instantCalcResult?: InstantCalcResult | null
   masReadiness: MasReadinessResult
+  onCheckMasReadiness?: () => void
+  showMasReadiness?: boolean
 }
 
 const LIABILITY_CONFIG: Array<{ key: LiabilityKey; label: string; balanceLabel: string; paymentLabel: string; analyticsKey: string }> = [
@@ -77,7 +79,7 @@ const ensureNumber = (value: unknown): number => {
   return 0
 }
 
-export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, getErrorMessage, control, instantCalcResult, masReadiness }: Step3NewPurchaseProps) {
+export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, getErrorMessage, control, instantCalcResult, masReadiness, onCheckMasReadiness, showMasReadiness }: Step3NewPurchaseProps) {
   const [hasCommitmentsPrimary, setHasCommitmentsPrimary] = useState<boolean | null>(null)
   const [hasCommitmentsCoApplicant, setHasCommitmentsCoApplicant] = useState<boolean | null>(null)
   const [isPrimaryIncomeExpanded, setIsPrimaryIncomeExpanded] = useState(true)
@@ -804,6 +806,29 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               </div>
             )}
           </>
+        )}
+
+        {/* MAS Readiness Check Button - only show if not already calculated */}
+        {onCheckMasReadiness && !showMasReadiness && (
+          <div className="mt-6 p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
+            <div className="flex flex-col gap-3">
+              <div>
+                <h4 className="font-semibold text-[#000000] text-sm">
+                  Ready to check your MAS readiness?
+                </h4>
+                <p className="text-xs text-[#666666] mt-1">
+                  See if your income and commitments meet MAS eligibility requirements (TDSR/MSR).
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onCheckMasReadiness}
+                className="px-6 py-3 bg-[#000000] text-white text-sm font-semibold hover:bg-[#333333] transition-colors"
+              >
+                Check My MAS Readiness
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

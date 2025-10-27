@@ -114,6 +114,7 @@ export function ProgressiveFormWithController({
   const [showJointApplicant, setShowJointApplicant] = useState(false)
   const [ltvMode, setLtvMode] = useState(75) // Default LTV mode (75% with 55% option)
   const [showAnalysisDetails, setShowAnalysisDetails] = useState(false)
+  const [showMasReadiness, setShowMasReadiness] = useState(false) // Gate for MAS Readiness calculation
 
   // Ref for throttling analytics events
   const stepTrackerRef = useRef<Record<string, number>>({})
@@ -1477,6 +1478,8 @@ export function ProgressiveFormWithController({
                 control={control}
                 instantCalcResult={instantCalcResult}
                 masReadiness={masReadiness}
+                onCheckMasReadiness={() => setShowMasReadiness(true)}
+                showMasReadiness={showMasReadiness}
               />
             ) : (
               <Step3Refinance
@@ -1489,7 +1492,7 @@ export function ProgressiveFormWithController({
             )}
 
             {/* Mobile: Inline MAS readiness card */}
-            {currentStep === 3 && isMobile && loanType === 'new_purchase' && (
+            {currentStep === 3 && isMobile && loanType === 'new_purchase' && showMasReadiness && (
               <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
                 <MasReadinessSidebar result={masReadiness} />
               </div>
@@ -1579,7 +1582,7 @@ export function ProgressiveFormWithController({
                   loanType={loanType}
                   isLoading={isInstantCalcLoading}
                 />
-              ) : currentStep === 3 && loanType === 'new_purchase' ? (
+              ) : currentStep === 3 && loanType === 'new_purchase' && showMasReadiness ? (
               <MasReadinessSidebar result={masReadiness} />
             ) : currentStep === 3 && loanType === 'refinance' ? (
               <RefinanceOutlookSidebar
