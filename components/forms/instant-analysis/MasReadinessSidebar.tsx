@@ -9,16 +9,18 @@ import type { MasReadinessResult } from '@/hooks/useMasReadiness'
 interface MasReadinessSidebarProps {
   result: MasReadinessResult
   propertyType?: string
+  isBlurred?: boolean
 }
 
-export function MasReadinessSidebar({ result, propertyType }: MasReadinessSidebarProps) {
+export function MasReadinessSidebar({ result, propertyType, isBlurred = false }: MasReadinessSidebarProps) {
   const { isReady, tdsr, tdsrLimit, msr, msrLimit, reasons } = result
 
   // MSR only applies to HDB and EC properties
   const shouldShowMsr = propertyType === 'HDB' || propertyType === 'EC'
 
   return (
-    <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
+    <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8] relative overflow-hidden">
+      <div className={isBlurred ? 'blur-sm' : ''}>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-black">MAS Readiness Check</h3>
@@ -72,6 +74,16 @@ export function MasReadinessSidebar({ result, propertyType }: MasReadinessSideba
           </ul>
         </div>
       </div>
+      </div>
+
+      {/* Blur overlay when locked */}
+      {isBlurred && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/5 pointer-events-none">
+          <div className="bg-white/90 px-4 py-2 rounded shadow-lg">
+            <p className="text-xs font-semibold text-[#000000]">Complete form to unlock</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

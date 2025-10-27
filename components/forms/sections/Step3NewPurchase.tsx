@@ -808,16 +808,16 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           </>
         )}
 
-        {/* MAS Readiness Check Button - only show if not already calculated */}
+        {/* MAS Readiness Unlock Button - only show if not already unlocked */}
         {onCheckMasReadiness && !showMasReadiness && (
           <div className="mt-6 p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
             <div className="flex flex-col gap-3">
               <div>
                 <h4 className="font-semibold text-[#000000] text-sm">
-                  Ready to check your MAS readiness?
+                  Ready to see your MAS readiness score?
                 </h4>
                 <p className="text-xs text-[#666666] mt-1">
-                  See if your income and commitments meet MAS eligibility requirements (TDSR/MSR).
+                  Unlock your precise snapshot to see if you meet MAS eligibility requirements (TDSR/MSR).
                 </p>
               </div>
               <button
@@ -825,7 +825,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
                 onClick={onCheckMasReadiness}
                 className="px-6 py-3 bg-[#000000] text-white text-sm font-semibold hover:bg-[#333333] transition-colors"
               >
-                Check My MAS Readiness
+                Unlock My MAS Readiness Score
               </button>
             </div>
           </div>
