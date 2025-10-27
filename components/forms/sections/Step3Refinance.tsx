@@ -76,18 +76,18 @@ export function Step3Refinance({
     return fallback
   }
 
-  const propertyValueNumeric = toNumber(propertyValue ?? fieldValues?.propertyValue)
-  const outstandingLoanNumeric = toNumber(outstandingLoan ?? fieldValues?.outstandingLoan)
-  const currentRateNumeric = toNumber(currentRateForm ?? fieldValues?.currentRate)
-  const monthsRemainingNumeric = toNumber(monthsRemainingForm ?? fieldValues?.monthsRemaining)
+  const propertyValueNumeric = toNumber(propertyValue ?? fieldValues.propertyValue)
+  const outstandingLoanNumeric = toNumber(outstandingLoan ?? fieldValues.outstandingLoan)
+  const currentRateNumeric = toNumber(currentRateForm ?? fieldValues.currentRate)
+  const monthsRemainingNumeric = toNumber(monthsRemainingForm ?? fieldValues.monthsRemaining)
   const ownerOccupiedValue = typeof ownerOccupiedForm === 'boolean'
     ? ownerOccupiedForm
-    : (typeof fieldValues?.ownerOccupied === 'boolean' ? fieldValues?.ownerOccupied : true)
-  const propertyTypeValue = (propertyTypeForm as string) || fieldValues?.propertyType || 'Private'
+    : (typeof fieldValues.ownerOccupied === 'boolean' ? fieldValues.ownerOccupied : true)
+  const propertyTypeValue = (propertyTypeForm as string) || fieldValues.propertyType || 'Private'
   const refinancingGoalsValue: string[] = Array.isArray(refinancingGoalsForm) && refinancingGoalsForm.length > 0
     ? refinancingGoalsForm as string[]
-    : Array.isArray(fieldValues?.refinancingGoals)
-      ? fieldValues?.refinancingGoals
+    : Array.isArray(fieldValues.refinancingGoals)
+      ? fieldValues.refinancingGoals
       : []
 
   // Calculate MAS readiness metrics using real compliance calculators
@@ -391,25 +391,25 @@ export function Step3Refinance({
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#666666]">Property Value:</span>
               <span className="font-mono font-semibold text-black">
-                ${fieldValues?.propertyValue?.toLocaleString() || 'N/A'}
+                ${fieldValues.propertyValue?.toLocaleString() || 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#666666]">Outstanding Loan:</span>
               <span className="font-mono font-semibold text-black">
-                ${fieldValues?.outstandingLoan?.toLocaleString() || 'N/A'}
+                ${fieldValues.outstandingLoan?.toLocaleString() || 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#666666]">Current Rate:</span>
               <span className="font-mono font-semibold text-black">
-                {fieldValues?.currentRate ? `${fieldValues?.currentRate}%` : 'N/A'}
+                {fieldValues.currentRate ? `${fieldValues.currentRate}%` : 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#666666]">Bank:</span>
               <span className="font-semibold text-black">
-                {fieldValues?.currentBank || 'N/A'}
+                {fieldValues.currentBank || 'N/A'}
               </span>
             </div>
           </div>
