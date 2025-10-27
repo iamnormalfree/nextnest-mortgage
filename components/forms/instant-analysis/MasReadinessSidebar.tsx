@@ -2,8 +2,8 @@
 
 'use client'
 
-import React from 'react'
-import { CheckCircle, AlertTriangle } from 'lucide-react'
+import React, { useState } from 'react'
+import { CheckCircle, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react'
 import type { MasReadinessResult } from '@/hooks/useMasReadiness'
 
 interface MasReadinessSidebarProps {
@@ -15,65 +15,169 @@ interface MasReadinessSidebarProps {
 
 export function MasReadinessSidebar({ result, propertyType, isBlurred = false, onUnlock }: MasReadinessSidebarProps) {
   const { isReady, tdsr, tdsrLimit, msr, msrLimit, reasons } = result
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false)
 
   // MSR only applies to HDB and EC properties
   const shouldShowMsr = propertyType === 'HDB' || propertyType === 'EC'
 
+  // Calculate gaps for over-limit scenarios
+  const tdsrGap = tdsr > tdsrLimit ? tdsr - tdsrLimit : 0
+  const msrGap = msr > msrLimit ? msr - msrLimit : 0
+
+  // Determine main blocker for plain English messaging
+  const mainBlocker = tdsrGap > 0 ? 'TDSR' : msrGap > 0 ? 'MSR' : null
+
+  // Filter reasons into user-facing and technical
+  const policyReason = reasons.find(r => r.startsWith('Policy references:'))
+  const technicalReasons = reasons.filter(r =>
+    !r.includes('Eligible') &&
+    !r.startsWith('Policy references:') &&
+    !r.includes('Complete income') &&
+    !r.includes('Enter applicant')
+  )
+
+  // Generate plain English summary
+  const getPlainEnglishSummary = () => {
+    if (reasons.some(r => r.includes('Complete income') || r.includes('Enter applicant'))) {
+      return 'Complete all required fields to check eligibility'
+    }
+
+    if (isReady) {
+      return 'You meet all lending requirements'
+    }
+
+    if (mainBlocker === 'TDSR') {
+      return 'Your debt ratio is too high'
+    }
+
+    if (mainBlocker === 'MSR') {
+      return 'Your mortgage payment exceeds income limits'
+    }
+
+    return 'Some requirements need attention'
+  }
+
   return (
     <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8] relative overflow-hidden">
       <div className={isBlurred ? 'blur-sm' : ''}>
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-sm font-semibold text-black">MAS Readiness Check</h3>
-          <p className="text-xs text-[#666666]">Updated just now</p>
-        </div>
+      {/* Hero Status */}
+      <div className="flex flex-col items-center mb-6 text-center">
         <div
-          className={'w-6 h-6 rounded-full flex items-center justify-center ' + (isReady ? 'bg-[#10B981]' : 'bg-[#EF4444]')}
+          className={'w-12 h-12 rounded-full flex items-center justify-center mb-3 ' + (isReady ? 'bg-[#10B981]' : 'bg-[#EF4444]')}
           data-testid={isReady ? 'mas-ready-icon' : 'mas-not-ready-icon'}
         >
           {isReady ? (
-            <CheckCircle className="w-4 h-4 text-white" />
+            <CheckCircle className="w-7 h-7 text-white" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-white" />
+            <AlertTriangle className="w-7 h-7 text-white" />
           )}
         </div>
+        <h3 className="text-lg font-bold text-black mb-1">
+          {isReady ? "You're MAS Ready!" : "Let's Find a Solution"}
+        </h3>
       </div>
 
-      <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-[#666666]">TDSR</span>
-          <span
-            className={'text-sm font-mono ' + (tdsr === 0 ? 'text-gray-400' : tdsr <= tdsrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}
-          >
-            {tdsr === 0 ? '–' : `${tdsr.toFixed(1)}%`} / {tdsrLimit}%
-          </span>
+      <div className="space-y-4">
+        {/* Ratio Display with Hierarchy */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-baseline">
+            <span className="text-xs text-[#666666] uppercase tracking-wider">TDSR</span>
+            <div className="flex items-baseline gap-2">
+              <span
+                className={'text-base font-bold font-mono ' + (tdsr === 0 ? 'text-gray-400' : tdsr <= tdsrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}
+              >
+                {tdsr === 0 ? '–' : `${tdsr.toFixed(1)}%`}
+              </span>
+              <span className="text-xs text-[#999999] font-mono">/ {tdsrLimit}%</span>
+              <span className={'text-base ' + (tdsr === 0 ? 'text-gray-400' : tdsr <= tdsrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}>
+                {tdsr === 0 ? '' : tdsr <= tdsrLimit ? '✓' : '✗'}
+              </span>
+            </div>
+          </div>
+          {tdsrGap > 0 && (
+            <p className="text-xs text-[#EF4444] text-right">
+              {tdsrGap.toFixed(1)}% over limit
+            </p>
+          )}
+
+          {shouldShowMsr && (
+            <>
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs text-[#666666] uppercase tracking-wider">MSR</span>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className={'text-base font-bold font-mono ' + (msr === 0 ? 'text-gray-400' : msr <= msrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}
+                  >
+                    {msr === 0 ? '–' : `${msr.toFixed(1)}%`}
+                  </span>
+                  <span className="text-xs text-[#999999] font-mono">/ {msrLimit}%</span>
+                  <span className={'text-base ' + (msr === 0 ? 'text-gray-400' : msr <= msrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}>
+                    {msr === 0 ? '' : msr <= msrLimit ? '✓' : '✗'}
+                  </span>
+                </div>
+              </div>
+              {msrGap > 0 && (
+                <p className="text-xs text-[#EF4444] text-right">
+                  {msrGap.toFixed(1)}% over limit
+                </p>
+              )}
+            </>
+          )}
         </div>
 
-        {shouldShowMsr && (
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-[#666666]">MSR</span>
-            <span
-              className={'text-sm font-mono ' + (msr === 0 ? 'text-gray-400' : msr <= msrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}
+        {/* Plain English Summary */}
+        <div className="pt-3 border-t border-[#E5E5E5]">
+          <p className={'text-sm ' + (isReady ? 'text-[#10B981]' : 'text-[#666666]')}>
+            {getPlainEnglishSummary()}
+          </p>
+        </div>
+
+        {/* AI Specialist CTA */}
+        <button
+          type="button"
+          onClick={() => {
+            // TODO: Integrate with AI broker navigation
+            console.log('Navigate to AI specialist with context:', { isReady, tdsr, msr, reasons })
+          }}
+          className="w-full px-4 py-3 bg-[#000000] text-white text-sm font-semibold hover:bg-[#333333] transition-colors rounded flex items-center justify-center gap-2"
+        >
+          {isReady ? 'Get Your Personalized Loan Package' : 'Explore Solutions with Specialist'}
+          <span>→</span>
+        </button>
+
+        {/* Technical Details - Progressive Disclosure */}
+        {technicalReasons.length > 0 && (
+          <div className="pt-3 border-t border-[#E5E5E5]">
+            <button
+              type="button"
+              onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+              className="w-full flex items-center justify-between text-xs text-[#666666] hover:text-[#000000] transition-colors"
             >
-              {msr === 0 ? '–' : `${msr.toFixed(1)}%`} / {msrLimit}%
-            </span>
+              <span>Technical details</span>
+              {showTechnicalDetails ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
+
+            {showTechnicalDetails && (
+              <div className="mt-3 space-y-1">
+                {technicalReasons.map((reason, index) => (
+                  <p key={index} className="text-xs text-[#666666] flex items-start gap-2">
+                    <span className="mt-0.5">•</span>
+                    <span>{reason}</span>
+                  </p>
+                ))}
+                {policyReason && (
+                  <p className="text-xs text-[#999999] mt-2 italic">
+                    {policyReason}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
-
-        <div className="pt-3 border-t border-[#E5E5E5]">
-          <p className="text-xs text-[#666666] mb-2">Requirements:</p>
-          <ul className="space-y-1">
-            {reasons.map((reason, index) => (
-              <li
-                key={index}
-                className={'text-xs flex items-start gap-2 ' + (reason.includes('Eligible') ? 'text-[#10B981]' : 'text-[#666666]')}
-              >
-                <span className="mt-0.5">{reason.includes('Eligible') ? '✓' : '•'}</span>
-                {reason}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
       </div>
 
