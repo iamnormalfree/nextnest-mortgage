@@ -9,6 +9,9 @@ import {
   DR_ELENA_POLICY_REFERENCES,
   DR_ELENA_STRESS_TEST_FLOORS
 } from './dr-elena-constants';
+import type { SavingsScenario } from './refinance-savings';
+import type { MarketRateSnapshot } from '../types/market-rates';
+import { generateSavingsScenarios } from './refinance-savings';
 
 export interface InstantProfileInput {
   property_price: number;
@@ -105,6 +108,7 @@ export interface RefinanceOutlookResult {
   policyRefs: string[];
   ltvCapApplied: number;
   cpfRedemptionAmount: number;
+  savingsScenarios?: SavingsScenario[];
 }
 
 /**
@@ -611,7 +615,11 @@ export function calculateComplianceSnapshot(
  * Aligned with Dr Elena v2persona specialized calculators
  */
 export function calculateRefinanceOutlook(
-  inputs: RefinanceOutlookInput
+  inputs: RefinanceOutlookInput,
+  options?: {
+    includeSavingsScenarios?: boolean;
+    marketRates?: MarketRateSnapshot;
+  }
 ): RefinanceOutlookResult {
   const {
     property_value,
@@ -807,6 +815,17 @@ export function calculateRefinanceOutlook(
 
   reasonCodeSet.add('mas_compliant_calculation');
 
+
+  // Generate savings scenarios if requested
+  let savingsScenarios: SavingsScenario[] | undefined;
+  if (options?.includeSavingsScenarios && options?.marketRates && effectiveBalance > 0) {
+    savingsScenarios = generateSavingsScenarios(
+      effectiveBalance,
+      effectiveCurrentRate / 100, // Convert percentage to decimal
+      options.marketRates
+    );
+  }
+
   return {
     projectedMonthlySavings,
     currentMonthlyPayment,
@@ -816,7 +835,8 @@ export function calculateRefinanceOutlook(
     reasonCodes: Array.from(reasonCodeSet),
     policyRefs: Array.from(policyRefSet),
     ltvCapApplied: Math.round(ltvCap * 100),
-    cpfRedemptionAmount
+    cpfRedemptionAmount,
+    savingsScenarios
   };
 }
 

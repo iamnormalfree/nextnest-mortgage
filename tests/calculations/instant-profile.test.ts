@@ -438,3 +438,39 @@ describe('Instant Profile Calculator - Dr Elena v2 Alignment', () => {
     );
   });
 });
+
+// Task 4: Add tests for savingsScenarios in RefinanceOutlookResult
+import { getPlaceholderRates } from '@/lib/types/market-rates';
+
+describe('calculateRefinanceOutlook with savingsScenarios', () => {
+  it('should include savings scenarios when requested', () => {
+    const input: RefinanceOutlookInput = {
+      property_value: 900000,
+      outstanding_loan: 400000,
+      current_rate: 3.0,
+      property_type: 'Private',
+    };
+
+    const marketRates = getPlaceholderRates();
+    const result = calculateRefinanceOutlook(input, {
+      includeSavingsScenarios: true,
+      marketRates,
+    });
+
+    expect(result.savingsScenarios).toBeDefined();
+    expect(result.savingsScenarios).toHaveLength(3);
+  });
+
+  it('should maintain backward compatibility without options', () => {
+    const input: RefinanceOutlookInput = {
+      property_value: 900000,
+      outstanding_loan: 400000,
+      current_rate: 3.0,
+    };
+
+    const result = calculateRefinanceOutlook(input);
+
+    expect(result.savingsScenarios).toBeUndefined();
+    expect(result.maxCashOut).toBeDefined(); // Existing fields still work
+  });
+});
