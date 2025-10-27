@@ -8,10 +8,14 @@ import type { MasReadinessResult } from '@/hooks/useMasReadiness'
 
 interface MasReadinessSidebarProps {
   result: MasReadinessResult
+  propertyType?: string
 }
 
-export function MasReadinessSidebar({ result }: MasReadinessSidebarProps) {
+export function MasReadinessSidebar({ result, propertyType }: MasReadinessSidebarProps) {
   const { isReady, tdsr, tdsrLimit, msr, msrLimit, reasons } = result
+
+  // MSR only applies to HDB and EC properties
+  const shouldShowMsr = propertyType === 'HDB' || propertyType === 'EC'
 
   return (
     <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
@@ -42,14 +46,16 @@ export function MasReadinessSidebar({ result }: MasReadinessSidebarProps) {
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-[#666666]">MSR</span>
-          <span
-            className={'text-sm font-mono ' + (msr === 0 ? 'text-gray-400' : msr <= msrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}
-          >
-            {msr === 0 ? '–' : `${msr.toFixed(1)}%`} / {msrLimit}%
-          </span>
-        </div>
+        {shouldShowMsr && (
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-[#666666]">MSR</span>
+            <span
+              className={'text-sm font-mono ' + (msr === 0 ? 'text-gray-400' : msr <= msrLimit ? 'text-[#10B981]' : 'text-[#EF4444]')}
+            >
+              {msr === 0 ? '–' : `${msr.toFixed(1)}%`} / {msrLimit}%
+            </span>
+          </div>
+        )}
 
         <div className="pt-3 border-t border-[#E5E5E5]">
           <p className="text-xs text-[#666666] mb-2">Requirements:</p>

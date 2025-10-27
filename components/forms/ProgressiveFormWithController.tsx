@@ -1494,7 +1494,7 @@ export function ProgressiveFormWithController({
             {/* Mobile: Inline MAS readiness card */}
             {currentStep === 3 && isMobile && loanType === 'new_purchase' && showMasReadiness && (
               <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
-                <MasReadinessSidebar result={masReadiness} />
+                <MasReadinessSidebar result={masReadiness} propertyType={propertyType} />
               </div>
             )}
 
@@ -1583,7 +1583,7 @@ export function ProgressiveFormWithController({
                   isLoading={isInstantCalcLoading}
                 />
               ) : currentStep === 3 && loanType === 'new_purchase' && showMasReadiness ? (
-              <MasReadinessSidebar result={masReadiness} />
+              <MasReadinessSidebar result={masReadiness} propertyType={propertyType} />
             ) : currentStep === 3 && loanType === 'refinance' ? (
               <RefinanceOutlookSidebar
                 outlookResult={refinanceOutlookResult}
