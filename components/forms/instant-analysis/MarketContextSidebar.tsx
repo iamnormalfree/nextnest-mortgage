@@ -17,12 +17,12 @@ export function MarketContextSidebar({ currentRate, isLoading = false }: MarketC
   // Show waiting state when loading
   if (isLoading) {
     return (
-      <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-black">Market Context</h3>
-          <p className="text-xs text-[#666666] mt-1">Loading market data...</p>
+      <div className="border border-[#E5E5E5]/30 bg-white/60 backdrop-blur-md p-3 shadow-sm rounded-lg">
+        <div className="mb-3">
+          <h3 className="text-xs font-semibold text-black/90 uppercase tracking-wide">Market Context</h3>
+          <p className="text-[10px] text-[#666666]/80 mt-0.5">Loading market data...</p>
         </div>
-        <p className="text-sm text-[#666666]">
+        <p className="text-xs text-[#666666]/80">
           Fill in your current rate to see market comparison.
         </p>
       </div>

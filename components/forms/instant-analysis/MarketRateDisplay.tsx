@@ -34,57 +34,57 @@ export function MarketRateDisplay({ marketRates, currentRate }: MarketRateDispla
   };
 
   return (
-    <div className="border border-[#E5E5E5] bg-[#F8F8F8] p-4">
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-black">Market Snapshot</h3>
-        <p className="text-xs text-[#666666]">Updated: {formatRelativeDate(marketRates.updated_at)}</p>
+    <div className="border border-[#E5E5E5]/30 bg-white/60 backdrop-blur-md p-3 shadow-sm rounded-lg">
+      <div className="mb-3">
+        <h3 className="text-xs font-semibold text-black/90 uppercase tracking-wide">Market Snapshot</h3>
+        <p className="text-[10px] text-[#666666]/80 mt-0.5">Updated: {formatRelativeDate(marketRates.updated_at)}</p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {/* 2-Year Fixed */}
         <div data-testid="rate-2yr" className={getRateColor(marketRates.fixed_packages.two_year.min)}>
-          <p className="text-sm font-medium">2-Year Fixed</p>
-          <p className="text-lg font-bold">
+          <p className="text-xs font-medium">2-Year Fixed</p>
+          <p className="text-base font-bold leading-tight">
             {marketRates.fixed_packages.two_year.min.toFixed(2)}% - {marketRates.fixed_packages.two_year.max.toFixed(2)}%
           </p>
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-[#666666]">{marketRates.fixed_packages.two_year.bank_count} banks offering</p>
-            <span className="text-xl">{getRateIndicator(marketRates.fixed_packages.two_year.min)}</span>
+          <div className="flex items-center justify-between mt-0.5">
+            <p className="text-[10px] text-[#666666]/80">{marketRates.fixed_packages.two_year.bank_count} banks</p>
+            <span className="text-lg">{getRateIndicator(marketRates.fixed_packages.two_year.min)}</span>
           </div>
         </div>
 
         {/* 3-Year Fixed */}
         <div data-testid="rate-3yr" className={getRateColor(marketRates.fixed_packages.three_year.min)}>
-          <p className="text-sm font-medium">3-Year Fixed</p>
-          <p className="text-lg font-bold">
+          <p className="text-xs font-medium">3-Year Fixed</p>
+          <p className="text-base font-bold leading-tight">
             {marketRates.fixed_packages.three_year.min.toFixed(2)}% - {marketRates.fixed_packages.three_year.max.toFixed(2)}%
           </p>
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-[#666666]">{marketRates.fixed_packages.three_year.bank_count} banks offering</p>
-            <span className="text-xl">{getRateIndicator(marketRates.fixed_packages.three_year.min)}</span>
+          <div className="flex items-center justify-between mt-0.5">
+            <p className="text-[10px] text-[#666666]/80">{marketRates.fixed_packages.three_year.bank_count} banks</p>
+            <span className="text-lg">{getRateIndicator(marketRates.fixed_packages.three_year.min)}</span>
           </div>
         </div>
 
         {/* Floating SORA */}
         <div data-testid="rate-floating" className={getRateColor(marketRates.floating_packages.three_month_sora.min)}>
-          <p className="text-sm font-medium">Floating SORA (3M)</p>
-          <p className="text-lg font-bold">
+          <p className="text-xs font-medium">Floating SORA (3M)</p>
+          <p className="text-base font-bold leading-tight">
             {marketRates.floating_packages.three_month_sora.min.toFixed(2)}% - {marketRates.floating_packages.three_month_sora.max.toFixed(2)}%
           </p>
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-[#666666]">{marketRates.floating_packages.three_month_sora.bank_count} banks offering</p>
-            <span className="text-xl">{getRateIndicator(marketRates.floating_packages.three_month_sora.min)}</span>
+          <div className="flex items-center justify-between mt-0.5">
+            <p className="text-[10px] text-[#666666]/80">{marketRates.floating_packages.three_month_sora.bank_count} banks</p>
+            <span className="text-lg">{getRateIndicator(marketRates.floating_packages.three_month_sora.min)}</span>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-[#E5E5E5] pt-3" />
+        <div className="border-t border-[#E5E5E5]/40 pt-2.5 mt-0.5" />
 
         {/* Your Current Rate */}
         <div data-testid="current-rate" className="text-nn-red">
-          <p className="text-sm font-medium">Your Current Rate</p>
-          <p className="text-lg font-bold flex items-center gap-2">
-            {currentRate.toFixed(2)}% <span className="text-xl">🔴</span>
+          <p className="text-xs font-medium">Your Current Rate</p>
+          <p className="text-base font-bold flex items-center gap-2 leading-tight">
+            {currentRate.toFixed(2)}% <span className="text-lg">🔴</span>
           </p>
         </div>
       </div>

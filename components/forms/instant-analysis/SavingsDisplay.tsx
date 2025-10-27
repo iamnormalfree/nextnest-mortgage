@@ -33,42 +33,42 @@ export function SavingsDisplay({ scenarios, outstandingLoan }: SavingsDisplayPro
   });
 
   return (
-    <div className="border border-[#E5E5E5] bg-[#F8F8F8] p-4">
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-black">Potential Savings</h3>
+    <div className="border border-[#E5E5E5]/30 bg-white/60 backdrop-blur-md p-3 shadow-sm rounded-lg">
+      <div className="mb-3">
+        <h3 className="text-xs font-semibold text-black/90 uppercase tracking-wide">Potential Savings</h3>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {/* Best Rate Package */}
         <div>
-          <p className="text-sm text-[#666666] mb-1">
+          <p className="text-xs text-[#666666]/80">
             Best Rate: {bestScenario.rate.toFixed(2)}% ({bestScenario.packageType})
           </p>
         </div>
 
         {/* 2-Year Savings */}
         <div>
-          <p className="text-2xl font-bold text-nn-gold">
+          <p className="text-xl font-bold text-nn-gold leading-tight">
             ~{formatCurrency(bestScenario.savingsTwoYear)}
           </p>
-          <p className="text-sm text-[#666666]">over 2 years</p>
+          <p className="text-[10px] text-[#666666]/80 mt-0.5">over 2 years</p>
         </div>
 
         {/* 3-Year Savings */}
         <div>
-          <p className="text-2xl font-bold text-nn-gold">
+          <p className="text-xl font-bold text-nn-gold leading-tight">
             ~{formatCurrency(bestScenario.savingsThreeYear)}
           </p>
-          <p className="text-sm text-[#666666]">over 3 years</p>
+          <p className="text-[10px] text-[#666666]/80 mt-0.5">over 3 years</p>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-[#E5E5E5] pt-3" />
+        <div className="border-t border-[#E5E5E5]/40 pt-2.5 mt-0.5" />
 
         {/* Legal Disclaimer */}
-        <div className="flex gap-2">
-          <span className="text-nn-blue text-sm">ℹ️</span>
-          <p className="text-xs text-[#666666] italic">
+        <div className="flex gap-1.5">
+          <span className="text-nn-blue text-xs mt-0.5">ℹ️</span>
+          <p className="text-[10px] text-[#666666]/80 italic leading-snug">
             Estimated savings based on market rates as of {currentDate}. Actual savings depend on your approved package, loan tenure, and fees. This is not a guarantee. Terms apply.
           </p>
         </div>

@@ -45,23 +45,23 @@ export function MarketContextWidget({ soraBenchmarks, updatedAt }: MarketContext
   };
 
   return (
-    <div className="border border-[#E5E5E5] bg-[#F8F8F8] p-4">
-      <div className="mb-3">
-        <h3 className="text-sm font-semibold text-black">SORA Benchmarks</h3>
+    <div className="border border-[#E5E5E5]/30 bg-white/60 backdrop-blur-md p-3 shadow-sm rounded-lg">
+      <div className="mb-2.5">
+        <h3 className="text-xs font-semibold text-black/90 uppercase tracking-wide">SORA Benchmarks</h3>
       </div>
 
-      <div className="flex justify-between mb-3">
+      <div className="flex justify-between mb-2.5">
         <div>
-          <p className="text-xs text-[#666666]">1-Month</p>
-          <p className="text-lg font-bold text-black">{soraBenchmarks.one_month.toFixed(2)}%</p>
+          <p className="text-[10px] text-[#666666]/80">1-Month</p>
+          <p className="text-base font-bold text-black/90 leading-tight">{soraBenchmarks.one_month.toFixed(2)}%</p>
         </div>
         <div>
-          <p className="text-xs text-[#666666]">3-Month</p>
-          <p className="text-lg font-bold text-black">{soraBenchmarks.three_month.toFixed(2)}%</p>
+          <p className="text-[10px] text-[#666666]/80">3-Month</p>
+          <p className="text-base font-bold text-black/90 leading-tight">{soraBenchmarks.three_month.toFixed(2)}%</p>
         </div>
       </div>
 
-      <p className="text-xs text-[#666666]">Last updated: {formatRelativeDate(updatedAt)}</p>
+      <p className="text-[10px] text-[#666666]/80">Last updated: {formatRelativeDate(updatedAt)}</p>
     </div>
   );
 }

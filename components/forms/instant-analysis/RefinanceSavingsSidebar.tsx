@@ -16,12 +16,12 @@ export function RefinanceSavingsSidebar({ outlookResult, isLoading = false }: Re
   // Show waiting state when data is incomplete
   if (isLoading || !outlookResult) {
     return (
-      <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-black">Potential Savings</h3>
-          <p className="text-xs text-[#666666] mt-1">Calculating your savings...</p>
+      <div className="border border-[#E5E5E5]/30 bg-white/60 backdrop-blur-md p-3 shadow-sm rounded-lg">
+        <div className="mb-3">
+          <h3 className="text-xs font-semibold text-black/90 uppercase tracking-wide">Potential Savings</h3>
+          <p className="text-[10px] text-[#666666]/80 mt-0.5">Calculating your savings...</p>
         </div>
-        <p className="text-sm text-[#666666]">
+        <p className="text-xs text-[#666666]/80">
           Complete Step 2 to see your personalized savings estimate.
         </p>
       </div>
@@ -31,12 +31,12 @@ export function RefinanceSavingsSidebar({ outlookResult, isLoading = false }: Re
   // Check if we have savings scenarios to display
   if (!outlookResult.savingsScenarios || outlookResult.savingsScenarios.length === 0) {
     return (
-      <div className="p-4 border border-[#E5E5E5] bg-[#F8F8F8]">
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-black">Potential Savings</h3>
-          <p className="text-xs text-[#666666]">Updated just now</p>
+      <div className="border border-[#E5E5E5]/30 bg-white/60 backdrop-blur-md p-3 shadow-sm rounded-lg">
+        <div className="mb-3">
+          <h3 className="text-xs font-semibold text-black/90 uppercase tracking-wide">Potential Savings</h3>
+          <p className="text-[10px] text-[#666666]/80">Updated just now</p>
         </div>
-        <p className="text-sm text-[#666666]">
+        <p className="text-xs text-[#666666]/80">
           Calculating savings scenarios...
         </p>
       </div>
