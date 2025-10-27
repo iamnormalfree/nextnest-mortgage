@@ -104,6 +104,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
   // Co-applicant fields
   const coApplicantIncome = ensureNumber(useWatch({ control, name: 'actualIncomes.1' }))
   const coApplicantAge = ensureNumber(useWatch({ control, name: 'actualAges.1' }))
+  const employmentType_1 = (useWatch({ control, name: 'employmentType_1' }) as string) || ''
   const prevCoIncomeRef = useRef<number>(coApplicantIncome)
   const prevCoAgeRef = useRef<number>(coApplicantAge)
 
@@ -249,6 +250,14 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
 
   return (
     <div className="space-y-6">
+      {/* PRIMARY APPLICANT SECTION HEADER */}
+      <div className="py-4 px-6 bg-blue-50 border-l-4 border-l-blue-600 -mx-4 sm:mx-0">
+        <div className="flex items-center justify-center gap-3">
+          <span className="text-2xl">👤</span>
+          <h2 className="text-lg font-bold text-blue-900 uppercase tracking-wide">Primary Applicant</h2>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <h3 className="text-sm font-semibold text-black">Income Details</h3>
 
@@ -256,7 +265,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           // COLLAPSED SUMMARY VIEW
           <div className="p-4 border border-[#E5E5E5] border-l-4 border-l-blue-500 bg-[#F8F8F8] flex justify-between items-center">
             <div>
-              <p className="text-sm font-semibold">👤 Applicant 1 Income</p>
+              <p className="text-sm font-semibold">Income</p>
               <p className="text-xs text-[#666666]">
                 {EMPLOYMENT_LABELS[employmentType as keyof typeof EMPLOYMENT_LABELS] || employmentType}
                 {' • '}
@@ -277,7 +286,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
           // EXPANDED VIEW
           <div className="space-y-4 p-4 border border-[#E5E5E5] border-l-4 border-l-blue-500">
             <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
-              👤 Applicant 1 (Primary)
+              Income Details
             </p>
 
 
@@ -414,7 +423,7 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-semibold text-[#000000] text-sm">
-                    👤 Do you have any existing loans or commitments?
+                    Do you have any existing loans or commitments?
                   </h4>
                   <p className="text-xs text-[#666666] mt-1">
                     Property loans, car loans, credit cards, etc.
@@ -592,11 +601,19 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
 
         {showJointApplicant && (
           <>
+            {/* CO-APPLICANT SECTION HEADER */}
+            <div className="py-4 px-6 bg-purple-50 border-l-4 border-l-purple-600 -mx-4 sm:mx-0 mt-12">
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-2xl">👥</span>
+                <h2 className="text-lg font-bold text-purple-900 uppercase tracking-wide">Co-Applicant</h2>
+              </div>
+            </div>
+
             {!isCoApplicantIncomeExpanded ? (
               // CO-APPLICANT COLLAPSED VIEW
               <div className="p-4 border border-[#E5E5E5] border-l-4 border-l-purple-500 bg-[#F8F8F8] flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-semibold">👥 Applicant 2 Income</p>
+                  <p className="text-sm font-semibold">Income</p>
                   <p className="text-xs text-[#666666]">
                     ${formatNumberWithCommas(coApplicantIncome)}/month
                     {' • '}
@@ -620,15 +637,15 @@ export function Step3NewPurchase({ onFieldChange, showJointApplicant, errors, ge
               />
             )}
 
-            {/* CO-APPLICANT FINANCIAL COMMITMENTS */}
-            {showJointApplicant && (
+            {/* CO-APPLICANT FINANCIAL COMMITMENTS - Only show after employment, income, and age filled */}
+            {showJointApplicant && employmentType_1 && coApplicantIncome > 0 && coApplicantAge > 0 && (
               <div className="space-y-4">
                 <div className="space-y-6 p-4 border border-[#E5E5E5] border-l-4 border-l-purple-500">
                   {/* Single gate question */}
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold text-[#000000] text-sm">
-                        👥 Does co-applicant have any existing loans or commitments?
+                        Does co-applicant have any existing loans or commitments?
                       </h4>
                       <p className="text-xs text-[#666666] mt-1">
                         Property loans, car loans, credit cards, etc.
