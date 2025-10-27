@@ -26,289 +26,113 @@ Current Step 2 refinance display shows "$41/mo savings" without knowing user's l
 5. **Test coverage:** 100% of new calculation functions, 90%+ component coverage
 6. **Mobile responsive:** Sidebar displays correctly on mobile as inline card
 
-## Pre-Flight Validation
+## Pre-Implementation
 
-**REQUIRED: Run validation script BEFORE starting Task 1:**
+**REQUIRED before Task 1:** `bash scripts/validate-market-opportunity-setup.sh` (validates dependencies, config, files)
 
-```bash
-bash scripts/validate-market-opportunity-setup.sh
-```
-
-This validates all dependencies, configurations, and file states. **If validation fails, fix errors before proceeding.**
-
-## Pre-Implementation Checklist
-
-- [ ] ✅ Pre-flight validation passed (see above)
-- [ ] Read implementation guide: `docs/runbooks/forms/refinance-market-opportunity-implementation-guide.md`
-  - **Critical:** Read "Rate Conversion Pattern" section (percentages vs decimals)
-  - **Critical:** Read "Visual Design Specifications" section (mockups + legal disclaimer)
-  - **Critical:** Read "Common Pitfalls" section (avoid 100x calculation errors)
-- [ ] Read common mistakes guide: `docs/runbooks/forms/refinance-market-opportunity-common-mistakes.md`
-  - Quick reference for the 10 most common implementation mistakes
-  - Recovery commands if you make a mistake
-  - Pre-flight/mid-flight/post-flight checklists
-- [ ] Read `CANONICAL_REFERENCES.md`:
-  - Section "Primary Calculator - Dr Elena v2" (find line with: `grep -n "Primary Calculator" CANONICAL_REFERENCES.md`)
-  - Section "ProgressiveFormWithController.tsx" (find line with: `grep -n "ProgressiveFormWithController" CANONICAL_REFERENCES.md`)
-  - **Note:** Line numbers may drift - always use grep to find current location
-- [ ] Review existing patterns:
-  - `calculateInstantProfile()` in instant-profile.ts (calculation structure)
-  - `InstantAnalysisSidebar.tsx` (component loading states)
-  - `RefinanceOutlookSidebar.tsx` (current implementation - may be untracked, check git status)
-- [ ] Verify tools:
-  - TypeScript 5.x: `npx tsc --version`
-  - Test runner: `npm test -- --version`
-  - Git working directory: `git status`
+**Read these docs:**
+- [ ] `docs/runbooks/forms/refinance-market-opportunity-implementation-guide.md` (code examples, patterns, tests)
+- [ ] `docs/runbooks/forms/refinance-market-opportunity-common-mistakes.md` (10 common pitfalls, recovery commands)
+- [ ] `CANONICAL_REFERENCES.md` sections on instant-profile.ts and ProgressiveFormWithController.tsx (Tier 1 rules)
 
 ## Tasks
 
 ### Task 1: Create Market Rate Data Structure (2h)
-
-**New files (EXPLICIT PATHS):**
-- `lib/types/market-rates.ts` (interface + placeholder factory)
-- `lib/types/__tests__/market-rates.test.ts` (unit tests, co-located)
-
-**What to build:**
-- `MarketRateSnapshot` interface (fixed/floating/hybrid packages, SORA benchmarks)
-- `RateRange` interface (min/max/bank_count)
-- `getPlaceholderRates()` factory function returning hardcoded placeholder data
-- **Note:** Rates stored as PERCENTAGES (2.15 = 2.15%), not decimals
-
-**Test cases:**
-- Valid structure (all required fields)
-- Rates 0-10% (percentage range)
-- Positive bank counts
-- Valid ISO timestamp
-
+**Files:** `lib/types/market-rates.ts`, `lib/types/__tests__/market-rates.test.ts`
+**Build:** `MarketRateSnapshot` interface, `RateRange` interface, `getPlaceholderRates()` factory
+**Note:** Rates as PERCENTAGES (2.15 = 2.15%)
 **Commit:** `feat(types): add MarketRateSnapshot interface with placeholder factory`
-
-**Details:** See implementation guide section "Task 1" for complete interface definition and test patterns.
+**Details:** Implementation guide Task 1
 
 ---
 
 ### Task 2: Create Interest Savings Calculator (3h)
-
-**New files (EXPLICIT PATHS):**
-- `lib/calculations/refinance-savings.ts` (calculator functions)
-- `lib/calculations/__tests__/refinance-savings.test.ts` (unit tests, co-located)
-
-**What to build:**
-- `InterestSavingsResult` interface
-- `calculateInterestSavings(outstandingLoan, currentRate, targetRate, years)` using simple interest formula
-- Returns `{ savings, currentInterest, newInterest }` with savings rounded DOWN to $100
-- **CRITICAL:** Function expects rates as DECIMALS (use 0.0215 for 2.15%)
-
-**Test cases:**
-- $400k at 3% vs 2.15% = $6,800 (2yr) / $10,200 (3yr)
-- Zero outstanding loan handling
-- Negative savings clamped to zero (target rate > current rate)
-- Rounding down to nearest $100
-
+**Files:** `lib/calculations/refinance-savings.ts`, `lib/calculations/__tests__/refinance-savings.test.ts`
+**Build:** `InterestSavingsResult` interface, `calculateInterestSavings()` with simple interest, rounds DOWN to $100
+**CRITICAL:** Function expects DECIMALS (use 0.0215 for 2.15%)
+**Test:** $400k at 3% vs 2.15% = $6,800 (2yr) / $10,200 (3yr), zero handling, negative clamping
 **Commit:** `feat(calculations): add interest savings calculator with conservative rounding`
-
-**Details:** See implementation guide "Task 2" for formula, rounding rules, TDD approach.
+**Details:** Implementation guide Task 2
 
 ---
 
 ### Task 3: Add Multi-Scenario Comparison (2h)
-
-**Update files:**
-- `lib/calculations/refinance-savings.ts` (add functions)
-- `lib/calculations/__tests__/refinance-savings.test.ts` (add test cases)
-
-**What to build:**
-- `SavingsScenario` interface
-- `percentageToDecimal(rate)` helper function (converts MarketRateSnapshot percentages to decimals)
-- `generateSavingsScenarios(outstandingLoan, currentRate, marketRates)` returning array of 3 scenarios
-- **CRITICAL:** Add `import type { MarketRateSnapshot } from '../types/market-rates';` at top of file
-- Uses MIN rate from each package type (most attractive), sorted by 2yr savings descending
-
-**Test cases:**
-- 3 scenarios generated (2yr fixed, 3yr fixed, floating)
-- MIN rates used from MarketRateSnapshot
-- Non-negative savings for all scenarios
-- Correct sorting (best savings first)
-
+**Files:** Update `lib/calculations/refinance-savings.ts` and tests
+**Build:** `SavingsScenario` interface, `percentageToDecimal()` helper, `generateSavingsScenarios()` for 3 scenarios
+**CRITICAL:** Add `import type { MarketRateSnapshot }` from ../types/market-rates
+**Test:** 3 scenarios (2yr/3yr fixed, floating), MIN rates, non-negative, sorted by savings
 **Commit:** `feat(calculations): add multi-scenario savings comparison`
-
-**Details:** See implementation guide "Task 3" for scenario structure, helper function, and logic.
+**Details:** Implementation guide Task 3
 
 ---
 
 ### Task 4: Update RefinanceOutlookResult Interface (1h)
-**Update files:** `lib/calculations/instant-profile.ts` (line 98), `tests/calculations/instant-profile.test.ts`
-
-**What to change:**
-- Add optional field `savingsScenarios?: SavingsScenario[]` to interface
-- Update `calculateRefinanceOutlook()` to accept options: `{ includeSavingsScenarios?: boolean, marketRates?: MarketRateSnapshot }`
-- Generate scenarios when flag enabled
-
-**Test cases:** Backward compatibility (existing tests pass), new field when requested, structure validation
-
+**Files:** Update `lib/calculations/instant-profile.ts` (line ~98) and tests
+**Change:** Add `savingsScenarios?: SavingsScenario[]` field, update `calculateRefinanceOutlook()` options
+**Test:** Backward compatibility, new field when requested
 **Commit:** `feat(calculations): add savingsScenarios to RefinanceOutlookResult`
-
-**Note:** Tier 1 file - check CANONICAL_REFERENCES.md lines 76-108 before modifying.
-
-**Details:** See implementation guide "Task 4" for signature changes and test updates.
+**Note:** Tier 1 file - check CANONICAL_REFERENCES.md before modifying
+**Details:** Implementation guide Task 4
 
 ---
 
 ### Task 5: Create MarketRateDisplay Component (3h)
-
-**New files (EXPLICIT PATHS):**
-- `components/forms/instant-analysis/MarketRateDisplay.tsx` (component)
-- `components/forms/instant-analysis/__tests__/MarketRateDisplay.test.tsx` (tests, co-located)
-
-**What to build:**
-- Presentational component showing rate ranges (2yr/3yr fixed, floating SORA)
-- Props: `{ marketRates: MarketRateSnapshot, currentRate: number }`
-- Red/green indicator based on rate competitiveness (rate < current = green, rate >= current = red)
-- Shows bank counts for competition signal
-- **Design:** See "MarketRateDisplay Layout" in implementation guide for ASCII mockup
-
-**Test cases:**
-- Renders all packages (2yr/3yr fixed, floating)
-- Correct indicator colors (green for lower rates, red for higher)
-- Bank counts displayed
-- Handles missing data gracefully
-
+**Files:** `components/forms/instant-analysis/MarketRateDisplay.tsx`, `__tests__/MarketRateDisplay.test.tsx`
+**Build:** Rate ranges display with red/green indicators, bank counts
+**Props:** `{ marketRates: MarketRateSnapshot, currentRate: number }`
+**Test:** Renders all packages, correct colors, bank counts, missing data handling
 **Commit:** `feat(components): add MarketRateDisplay component`
-
-**Details:** See implementation guide "Visual Design Specifications" for mockups, colors, spacing, and typography.
+**Details:** Implementation guide Task 5 + Visual Design Specifications
 
 ---
 
 ### Task 6: Create SavingsDisplay Component (2h)
-
-**New files (EXPLICIT PATHS):**
-- `components/forms/instant-analysis/SavingsDisplay.tsx` (component)
-- `components/forms/instant-analysis/__tests__/SavingsDisplay.test.tsx` (tests, co-located)
-
-**What to build:**
-- Component showing 2yr/3yr savings for best rate scenario
-- Props: `{ scenarios: SavingsScenario[], outstandingLoan: number }`
-- Copy uses "~" prefix (e.g., "~$6,800"), "could save" language, NEVER "will save"
-- **CRITICAL:** Must include exact legal disclaimer (see implementation guide "Legal Disclaimer")
-- **Design:** See "SavingsDisplay Layout" in implementation guide for ASCII mockup
-
-**Required disclaimer (EXACT TEXT):**
-```
-Estimated savings based on market rates as of {date}. Actual savings depend on your approved package, loan tenure, and fees. This is not a guarantee. Terms apply.
-```
-
-**Test cases:**
-- Number formatting with commas ($6,800 not $6800)
-- Disclaimer present and exact
-- Zero handling (shows $0 gracefully)
-- Missing data graceful fallback
-- Test for "could save" present, "will save" ABSENT
-
+**Files:** `components/forms/instant-analysis/SavingsDisplay.tsx`, `__tests__/SavingsDisplay.test.tsx`
+**Build:** 2yr/3yr savings with "~" prefix, "could save" copy, EXACT legal disclaimer
+**Props:** `{ scenarios: SavingsScenario[], outstandingLoan: number }`
+**CRITICAL:** Must use exact disclaimer from implementation guide
+**Test:** Number formatting, disclaimer exact, "could save" present, "will save" ABSENT
 **Commit:** `feat(components): add SavingsDisplay component`
-
-**Details:** See implementation guide "Visual Design Specifications" for mockups, copy rules, styling.
+**Details:** Implementation guide Task 6 + Visual Design Specifications
 
 ---
 
 ### Task 7: Redesign RefinanceOutlookSidebar (2h)
-
-**⚠️ PRE-CHECK:** Run `git status components/forms/instant-analysis/RefinanceOutlookSidebar.tsx`
-- If UNTRACKED: Commit baseline first with `git add [file] && git commit -m "feat: baseline RefinanceOutlookSidebar before redesign"`
-- If TRACKED: Proceed with refactoring
-
-**Update files:**
-- `components/forms/instant-analysis/RefinanceOutlookSidebar.tsx` (refactor)
-- `components/forms/instant-analysis/__tests__/RefinanceOutlookSidebar.test.tsx` (update tests)
-
-**What to change:**
-- **Import child components:** `MarketRateDisplay`, `SavingsDisplay`, `MarketContextWidget` (see implementation guide for exact import)
-- Replace current display with 3 child components
-- Keep existing loading state logic (lines 14-29 in current file)
-- Maintain mobile/desktop responsive behavior
-- Update props interface if needed
-
-**Component dependency order (must exist before this task):**
-1. ✅ MarketRateDisplay (Task 5)
-2. ✅ SavingsDisplay (Task 6)
-3. ✅ MarketContextWidget (Task 9)
-
-**Test cases:**
-- No regression (existing tests pass)
-- Renders new sub-components
-- Loading states work
-- Missing data handled gracefully
-- Mobile layout correct
-
+**PRE-CHECK:** `git status RefinanceOutlookSidebar.tsx` - commit baseline if untracked
+**Files:** Update `components/forms/instant-analysis/RefinanceOutlookSidebar.tsx` and tests
+**Change:** Import 3 child components (MarketRateDisplay, SavingsDisplay, MarketContextWidget), replace current display
+**Requires:** Tasks 5, 6, 9 completed first (child components exist)
+**Test:** No regression, renders sub-components, loading states, mobile layout
 **Commit:** `refactor(components): redesign RefinanceOutlookSidebar with market opportunity UI`
-
-**Details:** See implementation guide "Component Dependency Tree" for import structure and integration pattern.
+**Details:** Implementation guide Task 7 + Component Dependency Tree
 
 ---
 
 ### Task 8: Integrate Market Rates into Form (2h)
-**Update files:** `components/forms/ProgressiveFormWithController.tsx` (lines 318-358), `__tests__/ProgressiveFormWithController.test.tsx`
-
-**What to change:**
-- Update `useMemo` hook to call `getPlaceholderRates()` and pass to calculation
-- Add `includeSavingsScenarios: true` flag in options
-- Watch for `currentRate` field changes
-
-**Test cases:** Calculation triggers correctly, result includes scenarios, backward compatibility maintained
-
+**Files:** Update `components/forms/ProgressiveFormWithController.tsx` (lines ~318-358) and tests
+**Change:** Update `useMemo` to call `getPlaceholderRates()`, add `includeSavingsScenarios: true`
+**Test:** Calculation triggers, result includes scenarios, backward compatibility
 **Commit:** `feat(forms): integrate market rates into refinance calculation`
-
-**Note:** Tier 1 file - check CANONICAL_REFERENCES.md lines 21-45 before modifying.
-
-**Details:** See implementation guide "Task 8" for useMemo pattern.
+**Note:** Tier 1 file - check CANONICAL_REFERENCES.md before modifying
+**Details:** Implementation guide Task 8
 
 ---
 
 ### Task 9: Add MarketContextWidget (1h)
-
-**New files (EXPLICIT PATHS):**
-- `components/forms/instant-analysis/MarketContextWidget.tsx` (component)
-- `components/forms/instant-analysis/__tests__/MarketContextWidget.test.tsx` (tests, co-located)
-
-**What to build:**
-- Small card showing SORA benchmarks (1M, 3M) and update timestamp
-- Props: `{ soraBenchmarks: { one_month, three_month }, updatedAt: string }`
-- Relative date formatting: "Today at 6:00 AM", "Yesterday", etc.
-- **Design:** See "MarketContextWidget Layout" in implementation guide for ASCII mockup
-
-**Test cases:**
-- Renders SORA rates correctly
-- Formats timestamp relative ("Today", "Yesterday", "DD MMM YYYY")
-- Handles missing data gracefully
-- Shows update time
-
+**Files:** `components/forms/instant-analysis/MarketContextWidget.tsx`, `__tests__/MarketContextWidget.test.tsx`
+**Build:** SORA benchmarks card with relative date formatting
+**Props:** `{ soraBenchmarks: { one_month, three_month }, updatedAt: string }`
+**Test:** Renders SORA rates, formats dates ("Today", "Yesterday"), missing data handling
 **Commit:** `feat(components): add MarketContextWidget for SORA benchmarks`
-
-**Details:** See implementation guide "Visual Design Specifications" for mockups and date formatting rules.
+**Details:** Implementation guide Task 9 + Visual Design Specifications
 
 ---
 
 ### Task 10: E2E Test for Complete Flow (1h)
-
-**New files (EXPLICIT PATHS):**
-- `tests/e2e/refinance-market-opportunity-step2.spec.ts` (Playwright E2E test)
-
-**What to test:**
-- Full user flow: navigate → fill Step 1 → fill Step 2 → verify sidebar displays
-- Verify MarketRateDisplay appears (rate ranges visible)
-- Verify savings numbers correct (match calculation)
-- Verify "could save" copy present (hedging language)
-- **CRITICAL:** Verify "will save" NOT present (guarantees forbidden)
-- Verify legal disclaimer present
-
-**Test assertions:**
-- Sidebar visible after Step 2 fields filled
-- All 3 child components render (MarketRateDisplay, SavingsDisplay, MarketContextWidget)
-- Numbers formatted correctly (commas, $ prefix)
-- Copy uses approximate language ("~", "could", "estimated")
-- No guarantee language ("will", "guaranteed", "promise")
-
+**Files:** `tests/e2e/refinance-market-opportunity-step2.spec.ts`
+**Test:** Full flow (navigate → fill → verify), all 3 components render, "could save" present, "will save" ABSENT, disclaimer present
 **Commit:** `test(e2e): add refinance market opportunity flow test`
-
-**Details:** See implementation guide "Testing Patterns" section for Playwright test structure and assertions.
+**Details:** Implementation guide Task 10 + Testing Patterns
 
 ---
 
