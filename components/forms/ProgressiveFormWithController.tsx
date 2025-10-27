@@ -1054,6 +1054,13 @@ export function ProgressiveFormWithController({
 
             {loanType === 'refinance' && (
               <>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-base">💡</span>
+                    <span>Suggested estimates provided in placeholders - update with your actual numbers for precise calculations</span>
+                  </p>
+                </div>
+
                 <Controller
                   name="currentRate"
                   control={control}
