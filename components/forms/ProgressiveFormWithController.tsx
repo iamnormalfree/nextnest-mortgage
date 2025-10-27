@@ -33,6 +33,7 @@ import { useWatch } from 'react-hook-form'
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout'
 import { cn, formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 import { calculateInstantProfile, roundMonthlyPayment, calculateRefinanceOutlook } from '@/lib/calculations/instant-profile'
+import { getPlaceholderRates } from '@/lib/types/market-rates'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -345,6 +346,9 @@ export function ProgressiveFormWithController({
       is_owner_occupied: refinanceOwnerOccupied !== false,
       objective: mapGoalToObjective(primaryGoal),
       outstanding_loan: outstandingLoan
+    }, {
+      includeSavingsScenarios: true,
+      marketRates: getPlaceholderRates()
     })
   }, [
     loanType,
@@ -1533,6 +1537,7 @@ export function ProgressiveFormWithController({
                 <RefinanceOutlookSidebar
                   outlookResult={refinanceOutlookResult}
                   isLoading={!refinanceDataAvailable}
+                  currentRate={refinanceCurrentRate || 3.0}
                 />
               </div>
             )}
@@ -1623,6 +1628,7 @@ export function ProgressiveFormWithController({
               <RefinanceOutlookSidebar
                 outlookResult={refinanceOutlookResult}
                 isLoading={!refinanceDataAvailable}
+                  currentRate={refinanceCurrentRate || 3.0}
               />
             ) : null
             }
