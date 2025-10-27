@@ -28,6 +28,8 @@ import { ResponsiveFormLayout } from './layout/ResponsiveFormLayout'
 import { InstantAnalysisSidebar } from './instant-analysis/InstantAnalysisSidebar'
 import { MasReadinessSidebar } from './instant-analysis/MasReadinessSidebar'
 import { RefinanceOutlookSidebar } from './instant-analysis/RefinanceOutlookSidebar'
+import { MarketContextSidebar } from './instant-analysis/MarketContextSidebar'
+import { RefinanceSavingsSidebar } from './instant-analysis/RefinanceSavingsSidebar'
 import { useMasReadiness } from '@/hooks/useMasReadiness'
 import { useWatch } from 'react-hook-form'
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout'
@@ -1617,10 +1619,9 @@ export function ProgressiveFormWithController({
                   isLoading={isInstantCalcLoading}
                 />
               ) : currentStep === 2 && loanType === 'refinance' ? (
-              <RefinanceOutlookSidebar
-                outlookResult={refinanceOutlookResult}
+              <MarketContextSidebar
+                currentRate={refinanceCurrentRate || 3.0}
                 isLoading={!refinanceDataAvailable}
-                  currentRate={refinanceCurrentRate || 3.0}
               />
             ) : currentStep === 3 && loanType === 'new_purchase' ? (
               <MasReadinessSidebar
@@ -1630,12 +1631,18 @@ export function ProgressiveFormWithController({
                 onUnlock={() => setShowMasReadiness(true)}
                 onContinue={handleStepSubmit}
               />
+            ) : currentStep === 3 && loanType === 'refinance' ? (
+              <RefinanceSavingsSidebar
+                outlookResult={refinanceOutlookResult}
+                isLoading={!refinanceDataAvailable}
+              />
             ) : null
             }
             showSidebar={
               (currentStep === 2 && loanType === 'new_purchase' && Boolean(instantCalcResult)) ||
-              (currentStep === 2 && loanType === 'refinance' && Boolean(refinanceOutlookResult)) ||
-              (currentStep === 3 && loanType === 'new_purchase')
+              (currentStep === 2 && loanType === 'refinance' && refinanceCurrentRate > 0) ||
+              (currentStep === 3 && loanType === 'new_purchase') ||
+              (currentStep === 3 && loanType === 'refinance' && Boolean(refinanceOutlookResult))
             }
           >
             <form onSubmit={handleStepSubmit}>
