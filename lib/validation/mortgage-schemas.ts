@@ -133,10 +133,15 @@ export const refinanceSchema = baseLeadSchema.extend({
   yearsPurchased: z.number().min(0).max(50),
   refinanceReason: z.enum(['lower_rate', 'cash_out', 'better_terms', 'debt_consolidation']),
   cashOutAmount: z.number().min(0).max(2000000).optional(),
-  // New Step 3 refinance fields
+  // Step 3 refinance fields
+  hasChangedJobPrimary: z.boolean().optional(),
+  hasChangedJobCoApplicant: z.boolean().optional(),
+  employmentStatusPrimary: z.enum(['self-employed', 'in-between-jobs', 'not-working']).optional(),
+  employmentStatusCoApplicant: z.enum(['self-employed', 'in-between-jobs', 'not-working']).optional(),
+  lockInTimeframe: z.enum(['within-3-months', '3-6-months', 'more-than-6-months', 'out-of-lock-in']).optional(),
+  lockInSpecificMonth: z.number().min(1).max(3).optional(),
   refinancingGoals: z.array(z.enum(['lower_monthly_payment', 'shorten_tenure', 'rate_certainty', 'cash_out'])),
   cashOutReason: z.string().optional(),
-  monthsRemaining: z.number().min(0).max(360).describe('How many months remaining in lock-in'),
   ownerOccupied: z.boolean().default(true).describe('Is this your primary residence?')
 })
 

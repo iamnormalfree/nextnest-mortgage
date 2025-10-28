@@ -1543,16 +1543,6 @@ export function ProgressiveFormWithController({
               </div>
             )}
 
-            {/* Mobile: Inline refinance outlook card */}
-            {currentStep === 3 && isMobile && loanType === 'refinance' && refinanceOutlookResult && (
-              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
-                <RefinanceOutlookSidebar
-                  outlookResult={refinanceOutlookResult}
-                  isLoading={!refinanceDataAvailable}
-                  currentRate={refinanceCurrentRate || 3.0}
-                />
-              </div>
-            )}
           </div>
         )
 
@@ -1640,18 +1630,12 @@ export function ProgressiveFormWithController({
                 onUnlock={() => setShowMasReadiness(true)}
                 onContinue={handleStepSubmit}
               />
-            ) : currentStep === 3 && loanType === 'refinance' ? (
-              <RefinanceSavingsSidebar
-                outlookResult={refinanceOutlookResult}
-                isLoading={!refinanceDataAvailable}
-              />
             ) : null
             }
             showSidebar={
               (currentStep === 2 && loanType === 'new_purchase' && Boolean(instantCalcResult)) ||
               (currentStep === 2 && loanType === 'refinance' && refinanceCurrentRate > 0) ||
-              (currentStep === 3 && loanType === 'new_purchase') ||
-              (currentStep === 3 && loanType === 'refinance' && Boolean(refinanceOutlookResult))
+              (currentStep === 3 && loanType === 'new_purchase')
             }
           >
             <form onSubmit={handleStepSubmit}>
