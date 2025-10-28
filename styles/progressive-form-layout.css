@@ -77,10 +77,10 @@
   .form-sidebar {
     display: block;
     position: sticky;
-    top: 2rem; /* Spacing from viewport top when scrolling */
-    align-self: start; /* Align to grid row start */
+    top: 2rem;
+    align-self: start;
     height: fit-content;
-    max-height: calc(100vh - 4rem); /* Account for top position */
+    max-height: calc(100vh - 4rem);
     overflow-y: auto;
   }
 }

@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Controller, Control, UseFormSetValue, UseFormWatch, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -11,6 +11,7 @@ import { calculateComplianceSnapshot, calculateRefinanceOutlook } from '@/lib/ca
 import { formatNumberWithCommas, parseFormattedNumber } from '@/lib/utils'
 import { EmploymentPanel } from './EmploymentPanel'
 import { CoApplicantPanel } from './CoApplicantPanel'
+import { EditableSection } from './EditableSection'
 
 interface Step3RefinanceProps {
   onFieldChange: (field: string, value: any, analytics?: any) => void
@@ -23,16 +24,40 @@ interface Step3RefinanceProps {
   watch: UseFormWatch<any>
 }
 
-export function Step3Refinance({ 
-  onFieldChange, 
-  showJointApplicant, 
-  errors, 
-  getErrorMessage, 
-  fieldValues, 
-  control, 
-  setValue, 
-  watch 
+export function Step3Refinance({
+  onFieldChange,
+  showJointApplicant,
+  errors,
+  getErrorMessage,
+  fieldValues,
+  control,
+  setValue,
+  watch
 }: Step3RefinanceProps) {
+  // State management for EditableSection expansion tracking
+  const [isPrimaryEmploymentExpanded, setIsPrimaryEmploymentExpanded] = useState(true)
+  const [isCoApplicantEmploymentExpanded, setIsCoApplicantEmploymentExpanded] = useState(false)
+  const [hasShownCoApplicantSection, setHasShownCoApplicantSection] = useState(false)
+
+  // First-time visibility tracking to prevent premature auto-collapse (Problem 3)
+  useEffect(() => {
+    if (showJointApplicant && !hasShownCoApplicantSection) {
+      setIsCoApplicantEmploymentExpanded(false)  // Start collapsed
+      setHasShownCoApplicantSection(true)         // Mark as shown
+    }
+  }, [showJointApplicant, hasShownCoApplicantSection])
+
+  // "One section open at a time" handlers (Problem 4)
+  const handleEditPrimary = () => {
+    setIsCoApplicantEmploymentExpanded(false)  // Collapse co-applicant
+    setIsPrimaryEmploymentExpanded(prev => !prev)  // Toggle primary
+  }
+
+  const handleEditCoApplicant = () => {
+    setIsPrimaryEmploymentExpanded(false)  // Collapse primary
+    setIsCoApplicantEmploymentExpanded(prev => !prev)  // Toggle co-applicant
+  }
+
   // Watch relevant fields for MAS readiness calculation
   const watchedFields = useWatch({
     control,
@@ -66,6 +91,70 @@ export function Step3Refinance({
     refinancingGoalsForm,
     propertyTypeForm
   ] = watchedFields
+
+  // Watch fields for completion detection
+  const employmentType_1 = useWatch({ control, name: 'employmentType_1' })
+  const coApplicantIncome = useWatch({ control, name: 'actualIncomes.1' })
+  const coApplicantAge = useWatch({ control, name: 'actualAges.1' })
+
+  // Primary employment completion detection
+  const isPrimaryEmploymentComplete = useMemo(() => {
+    // Check if employment type is selected
+    const hasEmploymentType = Boolean(employmentType)
+
+    // Check if no validation errors for primary employment fields
+    const primaryFields = ['employmentType', 'actualIncomes.0', 'actualAges.0']
+    const hasErrors = primaryFields.some(field => errors[field])
+
+    return hasEmploymentType && !hasErrors
+  }, [employmentType, errors])
+
+  // Co-applicant employment completion detection
+  const isCoApplicantEmploymentComplete = useMemo(() => {
+    if (!showJointApplicant) return true  // N/A if no co-applicant
+
+    const hasEmploymentType = Boolean(employmentType_1)
+
+    // Check income field (if applicable for employment type)
+    const needsIncome = employmentType_1 === 'employed' || employmentType_1 === 'in-between-jobs'
+    const hasIncome = needsIncome ? Boolean(coApplicantIncome) : true
+
+    // Check age field (always required when employment type selected)
+    const hasAge = Boolean(coApplicantAge)
+
+    // Check for validation errors
+    const coApplicantFields = ['employmentType_1', 'actualIncomes.1', 'actualAges.1']
+    const hasErrors = coApplicantFields.some(field => errors[field])
+
+    return hasEmploymentType && hasIncome && hasAge && !hasErrors
+  }, [showJointApplicant, employmentType_1, coApplicantIncome, coApplicantAge, errors])
+
+  // Summary text generators
+  const getPrimaryEmploymentSummary = () => {
+    if (!employmentType) return 'Click Complete to provide employment details'
+
+    const labels: Record<string, string> = {
+      'employed': 'Employed',
+      'self-employed': 'Self-employed',
+      'not-working': 'Not working',
+      'in-between-jobs': 'In-between jobs'
+    }
+
+    return labels[employmentType] || 'Employment details provided'
+  }
+
+  const getCoApplicantEmploymentSummary = () => {
+    if (!employmentType_1) return 'Click Complete to provide employment details'
+
+    const labels: Record<string, string> = {
+      'employed': 'Employed',
+      'self-employed': 'Self-employed',
+      'not-working': 'Not working',
+      'in-between-jobs': 'In-between jobs'
+    }
+
+    return labels[employmentType_1] || 'Employment details provided'
+  }
 
   const toNumber = (value: unknown, fallback = 0): number => {
     if (typeof value === 'number' && !Number.isNaN(value)) return value
@@ -360,21 +449,37 @@ export function Step3Refinance({
             )}
           />
 
-          <EmploymentPanel
-            applicantNumber={0}
-            control={control}
-            errors={errors}
-            onFieldChange={onFieldChange}
-          />
+          <EditableSection
+            title="Primary Applicant Employment"
+            isExpanded={isPrimaryEmploymentExpanded}
+            isComplete={isPrimaryEmploymentComplete}
+            onEdit={handleEditPrimary}
+            summaryText={getPrimaryEmploymentSummary()}
+          >
+            <EmploymentPanel
+              applicantNumber={0}
+              control={control}
+              errors={errors}
+              onFieldChange={onFieldChange}
+            />
+          </EditableSection>
         </div>
 
         {showJointApplicant && (
-          <CoApplicantPanel
-            control={control}
-            errors={errors}
-            onFieldChange={onFieldChange}
-            loanType="refinance"
-          />
+          <EditableSection
+            title="Co-Applicant Employment"
+            isExpanded={isCoApplicantEmploymentExpanded}
+            isComplete={isCoApplicantEmploymentComplete}
+            onEdit={handleEditCoApplicant}
+            summaryText={getCoApplicantEmploymentSummary()}
+          >
+            <CoApplicantPanel
+              control={control}
+              errors={errors}
+              onFieldChange={onFieldChange}
+              loanType="refinance"
+            />
+          </EditableSection>
         )}
       </div>
 

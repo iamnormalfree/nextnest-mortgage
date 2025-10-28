@@ -1524,6 +1524,9 @@ export function ProgressiveFormWithController({
                 errors={errors}
                 getErrorMessage={getErrorMessage}
                 control={control}
+                fieldValues={fieldValues}
+                setValue={setValue}
+                watch={watch}
               />
             )}
 
@@ -1595,7 +1598,7 @@ export function ProgressiveFormWithController({
 
   return (
     <div className="w-full">
-      {/* Progress Indicator - outside grid */}
+      {/* Progress Indicator - OUTSIDE ResponsiveFormLayout */}
       <div className={cn('mb-8 w-full max-w-2xl mx-auto', className)}>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-black">
@@ -1608,16 +1611,21 @@ export function ProgressiveFormWithController({
         <Progress value={progressPercentage} className="h-1" />
       </div>
 
-      {/* Unified container for headline + form + sidebar */}
-      <div className="w-full max-w-6xl mx-auto">
-        <div className="rounded-lg border border-[#E5E5E5]/50 bg-white/40 backdrop-blur-sm p-8 md:p-10 shadow-sm">
-          {/* Step headline inside container */}
-          <h2 className="text-3xl md:text-4xl font-normal text-black mb-8 leading-tight text-center">
-            {currentStepConfig.description}
-          </h2>
+      {/* Step Description - OUTSIDE ResponsiveFormLayout */}
+      <div className="mb-6 w-full max-w-2xl mx-auto">
+        <h2 className="text-2xl font-light text-black mb-2">
+          {currentStepConfig.description}
+        </h2>
+        {leadScore > 0 && (
+          <div className="flex items-center gap-2 text-sm text-[#666666]">
+            <Shield className="w-4 h-4 text-[#10B981]" />
+            <span>Trust Score: {leadScore}%</span>
+          </div>
+        )}
+      </div>
 
-          {/* Grid with form + sidebar */}
-          <ResponsiveFormLayout
+      {/* Grid with form card + sidebar */}
+      <ResponsiveFormLayout
             sidebar={
               currentStep === 2 && loanType === 'new_purchase' ? (
                 <InstantAnalysisSidebar
@@ -1727,8 +1735,6 @@ export function ProgressiveFormWithController({
               </div>
             </form>
           </ResponsiveFormLayout>
-        </div>
-      </div>
     </div>
   )
 }
