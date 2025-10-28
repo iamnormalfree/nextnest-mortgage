@@ -24,7 +24,7 @@ export const formSteps: FormStep[] = [
   {
     stepNumber: 1,
     label: 'Who You Are',
-    description: 'Let\'s get to know you',
+    description: 'Your contact information',
     fieldsRequired: ['name', 'email', 'phone'],
     minimumFields: 3,
     trustLevel: 25,
@@ -41,7 +41,7 @@ export const formSteps: FormStep[] = [
   },
   {
     stepNumber: 3,
-    label: 'Your Finances',
+    label: 'Financial Details',
     description: 'Help us understand your financial situation',
     fieldsRequired: ['actualAges.0', 'actualIncomes.0', 'employmentType'],
     minimumFields: 3,

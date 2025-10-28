@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Controller } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
 import { useProgressiveFormController } from '@/hooks/useProgressiveFormController'
 import {
   FormState,
@@ -61,10 +62,10 @@ import { formSteps, propertyCategoryOptions, getPropertyTypeOptions } from '@/li
 
 // Helper function to safely extract error messages
 const getErrorMessage = (error: any): string => {
-  if (!error) return 'This field is required'
+  if (!error) return 'We need this to prepare your analysis'
   if (typeof error === 'string') return error
   if (typeof error === 'object' && 'message' in error) return error.message
-  return 'This field is required'
+  return 'We need this to prepare your analysis'
 }
 
 // Helper function to check if error should be displayed (only show if field has been touched)
@@ -124,6 +125,9 @@ export function ProgressiveFormWithController({
 
   // Responsive layout detection
   const { isMobile, isDesktop } = useResponsiveLayout()
+
+  // Next.js router for navigation
+  const router = useRouter()
 
   // Use the headless controller
   const controller = useProgressiveFormController({
@@ -718,7 +722,7 @@ export function ProgressiveFormWithController({
                     {...field}
                     id="full-name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Tan Wei Ming"
                     onChange={(e) => {
                       field.onChange(e)
                       onFieldChange('name', e.target.value)
@@ -746,7 +750,7 @@ export function ProgressiveFormWithController({
                     {...field}
                     id="email"
                     type="email"
-                    placeholder="john@example.com"
+                    placeholder="weiming@gmail.com"
                     onChange={(e) => {
                       field.onChange(e)
                       onFieldChange('email', e.target.value)
@@ -764,7 +768,7 @@ export function ProgressiveFormWithController({
               control={control}
               render={({ field }) => (
                 <div>
-                  <label 
+                  <label
                     htmlFor="phone"
                     className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2 block"
                   >
@@ -774,7 +778,7 @@ export function ProgressiveFormWithController({
                     {...field}
                     id="phone"
                     type="tel"
-                    placeholder="91234567"
+                    placeholder="9123 4567"
                     onChange={(e) => {
                       field.onChange(e)
                       onFieldChange('phone', e.target.value)
@@ -783,6 +787,9 @@ export function ProgressiveFormWithController({
                   {shouldShowError(errors, touchedFields, 'phone') && (
                     <p className="text-[#EF4444] text-xs mt-1">{getErrorMessage(errors.phone)}</p>
                   )}
+                  <p className="text-sm text-[#666666] mt-2">
+                    Your data is encrypted. PDPA-compliant. Consent expires in 5 days.
+                  </p>
                 </div>
               )}
             />
@@ -1576,8 +1583,8 @@ export function ProgressiveFormWithController({
         sessionId={sessionId}
         onTransitionComplete={(conversationId) => {
           console.log('Chat transition complete:', conversationId)
-          // Navigate to chat page with conversation ID
-          window.location.href = `/chat?conversation=${conversationId}`
+          // Navigate to chat page with conversation ID (replace to prevent back button loop)
+          router.replace(`/chat?conversation=${conversationId}`)
         }}
         onFallbackRequired={(fallbackData) => {
           console.log('Fallback required:', fallbackData)
@@ -1604,9 +1611,18 @@ export function ProgressiveFormWithController({
       {/* Unified container for headline + form + sidebar */}
       <div className="w-full max-w-6xl mx-auto">
         <div className="rounded-lg border border-[#E5E5E5]/50 bg-white/40 backdrop-blur-sm p-8 md:p-10 shadow-sm">
-          <h2 className="text-3xl md:text-4xl font-light text-black mb-8 leading-tight">
+          <h2 className="text-3xl md:text-4xl font-light text-black mb-2 leading-tight">
             {currentStepConfig.description}
           </h2>
+
+          {/* Privacy disclosure for Step 1 (contact information) */}
+          {currentStep === 1 && (
+            <p className="text-base text-[#666666] mb-8">
+              We&apos;ll send your analysis within 24 hours. Your data stays private, per PDPA.
+            </p>
+          )}
+
+          {currentStep !== 1 && <div className="mb-8" />}
 
           {/* Grid with form content + sidebar */}
           <ResponsiveFormLayout
@@ -1695,7 +1711,7 @@ export function ProgressiveFormWithController({
               >
                 {isSubmitting || isExternallySubmitting ? (
                   <span className="flex items-center gap-2">
-                    <span className="animate-pulse">Processing...</span>
+                    <span className="animate-pulse">Preparing your analysis...</span>
                   </span>
                 ) : currentStep === 3 && loanType === 'new_purchase' ? (
                   // Step 3 new purchase: Mirror sidebar state

@@ -16,7 +16,7 @@ import { z } from 'zod'
  * Singapore phone number validation
  */
 const singaporePhoneSchema = z.string()
-  .regex(/^[689]\d{7}$/, 'Please enter a valid Singapore phone number (8 digits starting with 6, 8, or 9)')
+  .regex(/^[689]\d{7}$/, 'Phone format should be: 9123 4567')
   .transform((val) => val.replace(/\D/g, ''))
 
 /**
@@ -93,7 +93,7 @@ const baseLeadSchema = z.object({
     .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
   
   email: z.string()
-    .email('Please enter a valid email address')
+    .email('Email format: name@domain.com')
     .toLowerCase()
     .transform((email) => email.trim()),
   

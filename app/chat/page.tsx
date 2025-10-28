@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import CustomChatInterface from '@/components/chat/CustomChatInterface'
 import ChatLayoutShell from '@/components/chat/ChatLayoutShell'
 import InsightsSidebar from '@/components/chat/InsightsSidebar'
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 
 function ChatContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const conversationId = searchParams.get('conversation')
   const [isReady, setIsReady] = useState(false)
   const [userData, setUserData] = useState<any>(null)
@@ -23,6 +24,24 @@ function ChatContent() {
   const [handoffDetails, setHandoffDetails] = useState<{ reason?: string; urgency?: any }>({})
   const hasInitialized = useRef(false)
   const [inputMessage, setInputMessage] = useState('')
+
+  // Navigation guard: Prevent back button from returning to form
+  useEffect(() => {
+    // Add a history entry so we can detect back button press
+    const currentPath = window.location.pathname + window.location.search
+    window.history.pushState(null, '', currentPath)
+
+    const handlePopState = () => {
+      // Back button was pressed - redirect to homepage
+      window.location.replace('/')
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [])
 
   useEffect(() => {
     // Prevent re-running
@@ -92,15 +111,15 @@ function ChatContent() {
       <div className="min-h-screen bg-mist flex items-center justify-center">
         <Card className="max-w-md border-fog">
           <CardContent className="p-6 text-center">
-            <h2 className="text-xl font-semibold text-ink mb-2">No Conversation Found</h2>
+            <h2 className="text-xl font-semibold text-ink mb-2">Analysis not ready yet</h2>
             <p className="text-graphite mb-4">
-              Please complete the mortgage form first to start a conversation.
+              Complete the form first—we&apos;ll have your breakdown ready within 24 hours.
             </p>
             <Button
-              onClick={() => window.location.href = '/'}
+              onClick={() => window.location.href = '/apply'}
               className="bg-gold text-ink hover:bg-gold-dark"
             >
-              Go to Home
+              Start Your Analysis
             </Button>
           </CardContent>
         </Card>

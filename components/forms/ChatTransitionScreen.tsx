@@ -376,20 +376,22 @@ export default function ChatTransitionScreen({
           </div>
 
           {/* Title and subtitle */}
-          <div className="space-y-1">
-            <h3 className="text-lg font-semibold text-ink">Connecting to Your Broker</h3>
-            <p className="text-sm text-graphite">{message}</p>
+          <div className="space-y-2">
+            <h3 className="text-2xl font-light text-[#000000]">
+              We&apos;re analyzing your scenario now
+            </h3>
+            <p className="text-base text-[#666666]">
+              Expect your breakdown within 24 hours.
+            </p>
+            <p className="text-base text-[#666666]">
+              We&apos;ll compare 16 banks and show you what fits your situation.
+            </p>
           </div>
 
           {/* Progress bar */}
           <div className="w-full mt-2">
             <Progress value={progress} className="h-2 w-full bg-fog [&>div]:bg-gold" aria-label="Analysis progress" />
           </div>
-
-          {/* Bottom caption */}
-          <p className="text-xs uppercase tracking-wider text-silver mt-2">
-            Preparing your dashboard...
-          </p>
         </CardContent>
       </Card>
     )
