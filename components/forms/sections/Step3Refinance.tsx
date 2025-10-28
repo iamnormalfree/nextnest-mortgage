@@ -72,8 +72,15 @@ export function Step3Refinance({
       <div className="space-y-4">
         <h3 className="text-sm font-semibold text-black">Employment Status</h3>
 
-        <div className="space-y-4 p-4 border border-[#E5E5E5] bg-white">
-          {/* Primary Applicant Job Change */}
+        {/* Primary Applicant Section */}
+        <div className="p-4 border-l-4 border-l-[#FCD34D] bg-[#FFFBEB]/30 border border-[#E5E5E5]">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-full bg-[#FCD34D] flex items-center justify-center text-black font-semibold text-sm">
+              1
+            </div>
+            <h4 className="text-sm font-semibold text-black">Primary Applicant</h4>
+          </div>
+
           <div className="space-y-3">
             <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
               Have you changed jobs since taking this loan?
@@ -146,10 +153,19 @@ export function Step3Refinance({
               </div>
             )}
           </div>
+        </div>
 
-          {/* Co-Applicant Job Change (if joint application) */}
-          {showJointApplicant && (
-            <div className="space-y-3 mt-6 pt-6 border-t border-[#E5E5E5]">
+        {/* Co-Applicant Section (if joint application) */}
+        {showJointApplicant && (
+          <div className="p-4 border-l-4 border-l-[#10B981] bg-[#F0FDF4]/30 border border-[#E5E5E5]">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-full bg-[#10B981] flex items-center justify-center text-white font-semibold text-sm">
+                2
+              </div>
+              <h4 className="text-sm font-semibold text-black">Co-Applicant</h4>
+            </div>
+
+            <div className="space-y-3">
               <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
                 Has co-applicant changed jobs since taking this loan?
               </p>
@@ -221,8 +237,8 @@ export function Step3Refinance({
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Lock-in Period Progressive Disclosure */}

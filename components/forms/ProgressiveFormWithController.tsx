@@ -29,7 +29,7 @@ import { InstantAnalysisSidebar } from './instant-analysis/InstantAnalysisSideba
 import { MasReadinessSidebar } from './instant-analysis/MasReadinessSidebar'
 import { RefinanceOutlookSidebar } from './instant-analysis/RefinanceOutlookSidebar'
 import { MarketContextSidebar } from './instant-analysis/MarketContextSidebar'
-import { RefinanceSavingsSidebar } from './instant-analysis/RefinanceSavingsSidebar'
+import { RefinanceOpportunitySidebar } from './instant-analysis/RefinanceOpportunitySidebar'
 import { useMasReadiness } from '@/hooks/useMasReadiness'
 import { useWatch } from 'react-hook-form'
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout'
@@ -1630,12 +1630,21 @@ export function ProgressiveFormWithController({
                 onUnlock={() => setShowMasReadiness(true)}
                 onContinue={handleStepSubmit}
               />
+            ) : currentStep === 3 && loanType === 'refinance' ? (
+              <RefinanceOpportunitySidebar
+                currentRate={refinanceCurrentRate || 0}
+                marketRate={getPlaceholderRates().floating_packages.three_month_sora.min}
+                loanAmount={refinanceOutstandingLoan || 0}
+                onConnectToBroker={handleStepSubmit}
+                isLoading={!refinanceCurrentRate || refinanceCurrentRate === 0}
+              />
             ) : null
             }
             showSidebar={
               (currentStep === 2 && loanType === 'new_purchase' && Boolean(instantCalcResult)) ||
               (currentStep === 2 && loanType === 'refinance' && refinanceCurrentRate > 0) ||
-              (currentStep === 3 && loanType === 'new_purchase')
+              (currentStep === 3 && loanType === 'new_purchase') ||
+              (currentStep === 3 && loanType === 'refinance' && refinanceCurrentRate > 0)
             }
           >
             <form onSubmit={handleStepSubmit}>

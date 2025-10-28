@@ -89,8 +89,6 @@
     align-self: start;
     padding-left: 2rem; /* Space after divider */
     height: fit-content;
-    max-height: calc(100vh - 4rem);
-    overflow-y: auto;
   }
 }
 
