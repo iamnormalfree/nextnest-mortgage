@@ -174,23 +174,118 @@ const tabs = ['savings', 'analysis', 'timeline']
 
 ---
 
-### Task 1.5: Footer Superlative Removal
+### Task 1.5: Footer Redesign (Minimal Professional)
 
-**Location:** `app/page.tsx` line ~463
+**Location:** `app/page.tsx` (search for "footer" or last section before closing tags)
 
-**Before:**
+**Current issue:** Footer contains superlative ("Singapore's most transparent") and may lack essential legal/contact links
+
+**Decision:** Implement minimal professional footer with 4 columns
+
+**Full footer code:**
 ```typescript
-<p className="text-sm text-[#666666]">
-  Singapore&apos;s most transparent mortgage advisory service
-</p>
+{/* Footer - Minimal Professional */}
+<footer className="py-12 bg-white border-t border-[#E5E5E5]">
+  <div className="max-w-7xl mx-auto px-4 md:px-8">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+
+      {/* Column 1: Tagline + Copyright */}
+      <div className="md:col-span-2">
+        <p className="text-sm text-[#666666] mb-4">
+          Evidence-based mortgage advisory service
+        </p>
+        <p className="text-xs text-[#666666]">
+          © 2024 NextNest. All rights reserved.
+        </p>
+      </div>
+
+      {/* Column 2: Legal */}
+      <div>
+        <h3 className="text-sm font-semibold text-[#000000] mb-3">
+          Legal
+        </h3>
+        <ul className="space-y-2">
+          <li>
+            <Link href="/privacy" className="text-sm text-[#666666] hover:text-[#000000]">
+              Privacy Policy
+            </Link>
+          </li>
+          <li>
+            <Link href="/terms" className="text-sm text-[#666666] hover:text-[#000000]">
+              Terms of Service
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      {/* Column 3: Contact */}
+      <div>
+        <h3 className="text-sm font-semibold text-[#000000] mb-3">
+          Contact
+        </h3>
+        <ul className="space-y-2">
+          <li>
+            <a
+              href="mailto:hello@nextnest.sg"
+              className="text-sm text-[#666666] hover:text-[#000000]"
+            >
+              hello@nextnest.sg
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
 ```
 
-**After:**
-```typescript
-<p className="text-sm text-[#666666]">
-  Evidence-based mortgage advisory service
-</p>
-```
+**Design notes:**
+
+**Typography:**
+- Tagline: `text-sm` (14px)
+- Column headings: `text-sm font-semibold` (14px, weight 600)
+- Links: `text-sm` (14px)
+- Copyright: `text-xs` (12px, de-emphasized)
+
+**Colors:**
+- Background: `bg-white` (clean, matches page sections)
+- Border: `border-t border-[#E5E5E5]` (subtle top border only)
+- Text: `text-[#666666]` (grey, professional)
+- Headings: `text-[#000000]` (black, hierarchy)
+- Hover: `hover:text-[#000000]` (links darken on hover)
+- **NO yellow** (footer is informational, not conversion)
+
+**Layout:**
+- Grid: 4 columns on desktop (`md:grid-cols-4`)
+- Column 1: Spans 2 columns (`md:col-span-2`) for tagline/copyright
+- Columns 2-3: Single column each (Legal, Contact)
+- Mobile: Stacks vertically (`grid-cols-1`)
+- Spacing: `gap-8` between columns (32px)
+
+**Padding:**
+- Section: `py-12` (48px vertical)
+- Bottom margin on grid: `mb-8` (32px, space before page end)
+
+**What NOT to include:**
+- ❌ Social media links (unless actively used)
+- ❌ Newsletter signup (adds friction)
+- ❌ "About Us" link (not needed for B2B homepage)
+- ❌ Sitemap (unnecessary for small site)
+- ❌ Multiple addresses/phones (digital-first service)
+
+**Responsive behavior:**
+- Desktop: 4 columns (2-wide + 1 + 1)
+- Tablet: May stack to 2 rows
+- Mobile: Single column stack
+
+**Testing:**
+1. Verify footer appears at bottom of page
+2. Verify "Evidence-based" tagline (not "most transparent")
+3. Verify copyright year: 2024 (update annually)
+4. Click Privacy Policy link → should route to `/privacy` (create page if needed)
+5. Click Terms link → should route to `/terms` (create page if needed)
+6. Click email → opens mail client with "hello@nextnest.sg"
+7. Mobile (375px): Verify columns stack vertically, links are tappable
 
 ---
 
