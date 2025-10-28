@@ -175,7 +175,7 @@ export default function Home() {
                       ].map((metric, index) => (
                         <div key={index} className="p-4 bg-[#F8F8F8]">
                           <div className="text-xs text-[#666666] mb-2">{metric.label}</div>
-                          <div className={`font-mono text-3xl font-semibold ${metric.accent ? 'text-[#000000] border-b-2 border-[#FCD34D] inline-block' : 'text-[#000000]'}`}>
+                          <div className={`font-mono text-3xl font-semibold text-[#000000]`}>
                             <AnimatedCounter
                               end={metric.value}
                               prefix={metric.prefix}
@@ -208,7 +208,7 @@ export default function Home() {
                 {[
                   { value: 16, label: 'Banks', sublabel: 'Tracked Real-Time' },
                   { value: 34560, label: 'Average Savings', sublabel: 'Per Customer', prefix: '$' },
-                  { value: 24, label: 'Hour Response', sublabel: 'Guaranteed' }
+                  { value: 24, label: 'Hour Response', sublabel: 'Targeted' }
                 ].map((stat, index) => (
                   <div key={index} className="text-center">
                     <div className="mb-1">
@@ -249,8 +249,8 @@ export default function Home() {
                     {
                       title: 'Complete Transparency',
                       description: 'See all options including staying with your current bank',
-                      metric: '100%',
-                      metricLabel: 'Coverage'
+                      metric: '3',
+                      metricLabel: 'Options'
                     },
                     {
                       title: 'AI-Powered Insights',
@@ -261,8 +261,8 @@ export default function Home() {
                     {
                       title: 'Lifetime Partnership',
                       description: 'Continuous monitoring and optimization throughout your loan',
-                      metric: '4.9/5',
-                      metricLabel: 'Rating'
+                      metric: '30yr',
+                      metricLabel: 'Support'
                     }
                   ].map((feature, index) => (
                     <div
@@ -371,7 +371,7 @@ export default function Home() {
                 Ready to optimize?
               </h2>
               <p className="text-base text-[#666666] mb-8">
-                Join thousands who&apos;ve saved with intelligent mortgage analysis
+                Get personalized analysis backed by real Singapore data
               </p>
               <button onClick={navigateToLoanTypeSelection} className="h-14 px-8 bg-[#FCD34D] text-[#000000] font-semibold hover:bg-[#FBB614] transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 mx-auto">
                 Get Your Free Analysis
@@ -414,7 +414,7 @@ export default function Home() {
                   type: 'refinance' as const,
                   title: 'Refinancing',
                   description: 'Optimize your existing mortgage',
-                  badge: 'Save $34K avg',
+                  badge: 'Most Popular',
                   badgeColor: 'bg-[#FCD34D] text-[#000000]'
                 },
                 {
@@ -461,7 +461,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 md:px-8">
             <div className="flex justify-between items-center">
               <div className="text-sm text-[#666666]">
-                © 2024 NextNest. Singapore&apos;s most transparent mortgage advisor.
+                © 2024 NextNest. Evidence-based mortgage advisory.
               </div>
               <div className="flex gap-6">
                 <a href="#" className="text-sm font-semibold text-[#666666] hover:text-[#000000] cursor-pointer transition-colors duration-200">
