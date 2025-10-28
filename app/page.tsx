@@ -128,17 +128,18 @@ export default function Home() {
               <div className="grid md:grid-cols-[1fr_420px] gap-12 items-center max-w-[1100px] mx-auto">
                 {/* Left: Content */}
                 <div>
-                  <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#FCD34D]/10 text-[#000000] mb-4">
-                    AI-POWERED INTELLIGENCE
-                  </div>
+                  {/* Remove badge entirely - cleaner, less yellow */}
                   <h1 className="text-5xl md:text-6xl font-light text-[#000000] leading-tight mb-4">
-                    Singapore&apos;s Smartest
+                    Evidence-based
                     <br />
-                    Mortgage Platform
+                    mortgage advisory.
                   </h1>
-                  <p className="text-lg text-[#666666] mb-8 font-normal">
-                    Real-time analysis of <span className="font-mono font-semibold text-[#000000]">286</span> packages.
-                    Complete transparency. Mathematical precision.
+                  <p className="text-2xl text-[#374151] mb-2 font-normal">
+                    Built on real Singapore scenarios.
+                  </p>
+                  <p className="text-lg text-[#666666] mb-8 font-normal leading-relaxed">
+                    We track 16 banks in real-time—
+                    you get only what fits your situation.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
@@ -205,7 +206,7 @@ export default function Home() {
             <div className="max-w-7xl mx-auto px-4 md:px-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
-                  { value: 286, label: 'Packages', sublabel: 'Analyzed Daily' },
+                  { value: 16, label: 'Banks', sublabel: 'Tracked Real-Time' },
                   { value: 34560, label: 'Average Savings', sublabel: 'Per Customer', prefix: '$' },
                   { value: 24, label: 'Hour Response', sublabel: 'Guaranteed' }
                 ].map((stat, index) => (
@@ -240,10 +241,10 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[
                     {
-                      title: 'Real-time Analysis',
-                      description: 'Market data updated every 15 minutes from 23 banks',
-                      metric: '99.9%',
-                      metricLabel: 'Accuracy'
+                      title: 'Real-Time Analysis',
+                      description: 'We track 16 banks and update rates throughout the day',
+                      metric: '16',
+                      metricLabel: 'Banks'
                     },
                     {
                       title: 'Complete Transparency',
@@ -322,11 +323,11 @@ export default function Home() {
                   <div className="bg-white border border-[#E5E5E5] p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
                     <h3 className="text-xl font-semibold text-[#000000] mb-2">Maximum Savings Strategy</h3>
                     <p className="text-base text-[#666666] mb-6">
-                      Our AI analyzes all 286 packages to find your optimal rate,
+                      We analyze 16 banks to find your optimal rate,
                       considering repricing penalties, lock-in periods, and long-term costs.
                     </p>
                     <div className="flex items-center gap-3">
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#10B981] text-white">Save up to 40%</div>
+                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">Comparison included</div>
                       <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">Real-time rates</div>
                     </div>
                   </div>
@@ -340,7 +341,7 @@ export default function Home() {
                       staying with your current bank, repricing, or refinancing.
                     </p>
                     <div className="flex items-center gap-3">
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">286 packages</div>
+                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">16 banks</div>
                       <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#FCD34D]/10 text-[#000000]">Updated daily</div>
                     </div>
                   </div>
@@ -396,7 +397,7 @@ export default function Home() {
                 What&apos;s your <span className="font-semibold">mortgage goal</span>?
               </h1>
               <p className="text-lg text-[#666666]">
-                Choose your path and we&apos;ll analyze 286 packages in real-time
+                Choose your path and we&apos;ll analyze 16 banks in real-time
               </p>
             </div>
 
