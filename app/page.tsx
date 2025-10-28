@@ -16,6 +16,7 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Logo from '@/public/images/logos/nn-logo-nobg-img.png'
 import ContactSection from '@/components/landing/ContactSection'
@@ -61,7 +62,6 @@ const AnimatedCounter = ({ end, duration = 2000, prefix = '', suffix = '' }: { e
 export default function Home() {
   const router = useRouter()
   const [currentView, setCurrentView] = useState<ViewState>('landing')
-  const [activeTab, setActiveTab] = useState('savings')
 
   const navigateToLoanTypeSelection = () => {
     setCurrentView('loanTypeSelection')
@@ -205,178 +205,212 @@ export default function Home() {
           <section className="py-16 bg-white">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {[
-                  { value: 16, label: 'Banks', sublabel: 'Tracked Real-Time' },
-                  { value: 34560, label: 'Average Savings', sublabel: 'Per Customer', prefix: '$' },
-                  { value: 24, label: 'Hour Response', sublabel: 'Targeted' }
-                ].map((stat, index) => (
+                {([
+                  { value: 16, label: 'Banks Tracked', sublabel: '', isString: false, prefix: '', suffix: '' },
+                  { value: 50, label: 'Real Scenarios', sublabel: '', isString: false, prefix: '', suffix: '+' },
+                  { value: '24hr', label: 'Analysis Time', sublabel: '', isString: true, prefix: '', suffix: '' }
+                ] as Array<{value: number | string; label: string; sublabel: string; isString: boolean; prefix: string; suffix: string}>).map((stat, index) => (
                   <div key={index} className="text-center">
                     <div className="mb-1">
                       <span className="font-mono text-3xl font-semibold text-[#000000]">
-                        {stat.prefix}<AnimatedCounter end={stat.value} duration={2000} />
+                        {stat.isString ? stat.value : (
+                          <>
+                            {stat.prefix}<AnimatedCounter end={stat.value as number} duration={2000} />{stat.suffix}
+                          </>
+                        )}
                       </span>
                     </div>
                     <div className="text-sm font-semibold text-[#666666]">{stat.label}</div>
-                    <div className="text-xs text-[#666666]">{stat.sublabel}</div>
+                    {stat.sublabel && <div className="text-xs text-[#666666]">{stat.sublabel}</div>}
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* Clean Feature Section - Swiss Spa Style */}
+          {/* Real Scenarios - Evidence-Based Proof */}
           <section className="py-16 bg-[#F8F8F8]">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
-              <div className="max-w-4xl mx-auto">
+              <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                   <h2 className="text-2xl font-light text-[#000000] mb-2">
-                    Why Intelligence Matters
+                    Real scenarios, real savings
                   </h2>
                   <p className="text-base text-[#666666]">
-                    Our AI analyzes market conditions 24/7 to find your perfect moment
+                    Built on 50+ actual Singapore cases. Here are three.
                   </p>
                 </div>
 
-                {/* Clean Feature Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    {
-                      title: 'Real-Time Analysis',
-                      description: 'We track 16 banks and update rates throughout the day',
-                      metric: '16',
-                      metricLabel: 'Banks'
-                    },
-                    {
-                      title: 'Complete Transparency',
-                      description: 'See all options including staying with your current bank',
-                      metric: '3',
-                      metricLabel: 'Options'
-                    },
-                    {
-                      title: 'AI-Powered Insights',
-                      description: 'GPT-4 analyzes your unique situation for optimal timing',
-                      metric: '<3s',
-                      metricLabel: 'Processing'
-                    },
-                    {
-                      title: 'Lifetime Partnership',
-                      description: 'Continuous monitoring and optimization throughout your loan',
-                      metric: '30yr',
-                      metricLabel: 'Support'
-                    }
-                  ].map((feature, index) => (
-                    <div
-                      key={index}
-                      className="bg-white border border-[#E5E5E5] p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="text-lg font-semibold text-[#000000] mb-1">
-                            {feature.title}
-                          </h3>
-                          <p className="text-sm text-[#666666]">
-                            {feature.description}
-                          </p>
-                        </div>
-                        <div className="text-right min-w-[60px]">
-                          <div className="font-mono text-lg font-semibold text-[#000000]">
-                            {feature.metric}
-                          </div>
-                          <div className="text-xs text-[#666666]">
-                            {feature.metricLabel}
-                          </div>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Scenario 1: HDB Refinance */}
+                  <div className="bg-white border border-[#E5E5E5] p-6">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#666666] mb-3">
+                      HDB 4-ROOM REFINANCE
+                    </div>
+                    <p className="text-sm text-[#666666] mb-4">
+                      $650K remaining, 3.2% current rate
+                    </p>
+                    <div className="border-t border-[#E5E5E5] pt-4 mb-4">
+                      <div className="text-sm text-[#666666] mb-1">Refinanced to 2.65% SORA</div>
+                      <div className="font-mono text-xl font-semibold text-[#000000] mb-2">
+                        $185<span className="text-base font-normal text-[#666666]">/month saved</span>
+                      </div>
+                      <div className="text-xs text-[#666666]">
+                        Break-even: 14 months
                       </div>
                     </div>
-                  ))}
+                    <div className="text-xs text-[#666666]">
+                      Validated Oct 2025
+                    </div>
+                  </div>
+
+                  {/* Scenario 2: Private Condo New Purchase */}
+                  <div className="bg-white border border-[#E5E5E5] p-6">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#666666] mb-3">
+                      PRIVATE CONDO NEW PURCHASE
+                    </div>
+                    <p className="text-sm text-[#666666] mb-4">
+                      $1.2M loan, comparing 3.1% fixed vs SORA
+                    </p>
+                    <div className="border-t border-[#E5E5E5] pt-4 mb-4">
+                      <div className="text-sm text-[#666666] mb-1">Chose 2-year fixed at 2.88%</div>
+                      <div className="font-mono text-xl font-semibold text-[#000000] mb-2">
+                        $264<span className="text-base font-normal text-[#666666]">/month saved</span>
+                      </div>
+                      <div className="text-xs text-[#666666]">
+                        vs 3.1% SORA baseline
+                      </div>
+                    </div>
+                    <div className="text-xs text-[#666666]">
+                      Validated Sep 2025
+                    </div>
+                  </div>
+
+                  {/* Scenario 3: EC Refinance with Cash-Out */}
+                  <div className="bg-white border border-[#E5E5E5] p-6">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-[#666666] mb-3">
+                      EC REFINANCE + CASH-OUT
+                    </div>
+                    <p className="text-sm text-[#666666] mb-4">
+                      $800K remaining, needed $100K for renovation
+                    </p>
+                    <div className="border-t border-[#E5E5E5] pt-4 mb-4">
+                      <div className="text-sm text-[#666666] mb-1">Refinanced $900K at 2.75%</div>
+                      <div className="font-mono text-xl font-semibold text-[#000000] mb-2">
+                        $142<span className="text-base font-normal text-[#666666]">/month saved</span>
+                      </div>
+                      <div className="text-xs text-[#666666]">
+                        vs previous 3.05% rate
+                      </div>
+                    </div>
+                    <div className="text-xs text-[#666666]">
+                      Validated Oct 2025
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Services with Tabs - Clean Design */}
+          {/* How It Works - Process Transparency */}
           <section className="py-16 bg-white">
             <div className="max-w-7xl mx-auto px-4 md:px-8">
-              <h2 className="text-2xl font-light text-[#000000] text-center mb-2">
-                Intelligent Solutions
-              </h2>
-              <p className="text-base text-[#666666] text-center mb-12">
-                Choose how we can help optimize your mortgage
-              </p>
-
-              {/* Tab Navigation */}
-              <div className="flex justify-center gap-2 mb-8">
-                {['savings', 'analysis', 'timeline'].map((tab) => (
-                  <button
-                    key={tab}
-                    className={`h-12 px-6 text-sm font-semibold flex items-center transition-all duration-200 ${activeTab === tab ? 'bg-[#000000] text-white' : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'}`}
-                    onClick={() => setActiveTab(tab)}
-                  >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab Content */}
               <div className="max-w-3xl mx-auto">
-                {activeTab === 'savings' && (
-                  <div className="bg-white border border-[#E5E5E5] p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <h3 className="text-xl font-semibold text-[#000000] mb-2">Maximum Savings Strategy</h3>
-                    <p className="text-base text-[#666666] mb-6">
-                      We analyze 16 banks to find your optimal rate,
-                      considering repricing penalties, lock-in periods, and long-term costs.
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">Comparison included</div>
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">Real-time rates</div>
-                    </div>
-                  </div>
-                )}
+                <div className="text-center mb-12">
+                  <h2 className="text-2xl font-light text-[#000000] mb-2">
+                    How it works
+                  </h2>
+                  <p className="text-base text-[#666666]">
+                    Transparent process, clear expectations.
+                  </p>
+                </div>
 
-                {activeTab === 'analysis' && (
-                  <div className="bg-white border border-[#E5E5E5] p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <h3 className="text-xl font-semibold text-[#000000] mb-2">Complete Market Analysis</h3>
-                    <p className="text-[#666666] mb-6">
-                      Get a comprehensive view of every option available, including
-                      staying with your current bank, repricing, or refinancing.
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">16 banks</div>
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#FCD34D]/10 text-[#000000]">Updated daily</div>
+                <div className="flex flex-col gap-8 items-center">
+                  {/* Step 1 */}
+                  <div className="flex gap-4 w-full max-w-2xl">
+                    <div className="flex-shrink-0 w-12 h-12 bg-[#000000] text-white flex items-center justify-center font-mono font-semibold text-lg">
+                      1
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#000000] mb-2">
+                        Share your scenario
+                      </h3>
+                      <p className="text-sm text-[#666666] mb-2">
+                        Tell us about your property, income, and mortgage needs. Takes 5 minutes.
+                      </p>
+                      <p className="text-xs text-[#666666]">
+                        Your data stays private. PDPA-compliant.
+                      </p>
                     </div>
                   </div>
-                )}
 
-                {activeTab === 'timeline' && (
-                  <div className="bg-white border border-[#E5E5E5] p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <h3 className="text-xl font-semibold text-[#000000] mb-2">Perfect Timing Optimization</h3>
-                    <p className="text-[#666666] mb-6">
-                      Know exactly when to make your move based on lock-in periods,
-                      market conditions, and rate predictions.
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#10B981] text-white">24h response</div>
-                      <div className="inline-flex items-center px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[#F8F8F8] text-[#666666]">AI predictions</div>
+                  {/* Step 2 */}
+                  <div className="flex gap-4 w-full max-w-2xl">
+                    <div className="flex-shrink-0 w-12 h-12 bg-[#000000] text-white flex items-center justify-center font-mono font-semibold text-lg">
+                      2
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#000000] mb-2">
+                        We analyze 16 banks
+                      </h3>
+                      <p className="text-sm text-[#666666] mb-2">
+                        Real-time rate comparison across all property types and loan structures.
+                      </p>
+                      <p className="text-xs text-[#666666]">
+                        Analysis completes within 24 hours.
+                      </p>
                     </div>
                   </div>
-                )}
+
+                  {/* Step 3 */}
+                  <div className="flex gap-4 w-full max-w-2xl">
+                    <div className="flex-shrink-0 w-12 h-12 bg-[#000000] text-white flex items-center justify-center font-mono font-semibold text-lg">
+                      3
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#000000] mb-2">
+                        Get your options
+                      </h3>
+                      <p className="text-sm text-[#666666] mb-2">
+                        Clear comparison: stay with current package or refinance. No jargon.
+                      </p>
+                      <p className="text-xs text-[#666666]">
+                        All calculations shown transparently.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="flex gap-4 w-full max-w-2xl">
+                    <div className="flex-shrink-0 w-12 h-12 bg-[#000000] text-white flex items-center justify-center font-mono font-semibold text-lg">
+                      4
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#000000] mb-2">
+                        We handle the process
+                      </h3>
+                      <p className="text-sm text-[#666666] mb-2">
+                        Bank submissions, documentation, approval tracking. You stay informed.
+                      </p>
+                      <p className="text-xs text-[#666666]">
+                        Typical timeline: 4-6 weeks to completion.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
 
-          {/* CTA Section - Clean Call to Action */}
-          <section className="py-16 bg-white border-t border-[#E5E5E5]">
-            <div className="max-w-3xl mx-auto px-4 md:px-8 text-center">
-              <h2 className="text-2xl font-light text-[#000000] mb-2">
-                Ready to optimize?
+          {/* Trust Bridge - Reinforcement Before Conversion */}
+          <section className="py-12 bg-[#000000]">
+            <div className="max-w-4xl mx-auto px-4 text-center">
+              <h2 className="text-2xl font-light text-white mb-3">
+                Built on 50+ real Singapore scenarios
               </h2>
-              <p className="text-base text-[#666666] mb-8">
-                Get personalized analysis backed by real Singapore data
+              <p className="text-base text-[#CCCCCC] mb-0">
+                Evidence-based methodology. Transparent calculations. Choose your scenario below to get started.
               </p>
-              <button onClick={navigateToLoanTypeSelection} className="h-14 px-8 bg-[#FCD34D] text-[#000000] font-semibold hover:bg-[#FBB614] transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 mx-auto">
-                Get Your Free Analysis
-                <ArrowRight />
-              </button>
             </div>
           </section>
 
@@ -455,21 +489,56 @@ export default function Home() {
         </div>
       )}
 
-      {/* Footer - Minimal Swiss Spa Style */}
+      {/* Footer - Minimal Professional */}
       {currentView === 'landing' && (
-        <footer className="bg-white border-t border-[#E5E5E5] py-6">
+        <footer className="py-12 bg-white border-t border-[#E5E5E5]">
           <div className="max-w-7xl mx-auto px-4 md:px-8">
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-[#666666]">
-                © 2024 NextNest. Evidence-based mortgage advisory.
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+
+              {/* Column 1: Tagline + Copyright */}
+              <div className="md:col-span-2">
+                <p className="text-sm text-[#666666] mb-4">
+                  Evidence-based mortgage advisory service
+                </p>
+                <p className="text-xs text-[#666666]">
+                  © 2025 NextNest. All rights reserved.
+                </p>
               </div>
-              <div className="flex gap-6">
-                <a href="#" className="text-sm font-semibold text-[#666666] hover:text-[#000000] cursor-pointer transition-colors duration-200">
-                  Privacy
-                </a>
-                <a href="#" className="text-sm font-semibold text-[#666666] hover:text-[#000000] cursor-pointer transition-colors duration-200">
-                  Terms
-                </a>
+
+              {/* Column 2: Legal */}
+              <div>
+                <h3 className="text-sm font-semibold text-[#000000] mb-3">
+                  Legal
+                </h3>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/pdpa" className="text-sm text-[#666666] hover:text-[#000000]">
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/pdpa" className="text-sm text-[#666666] hover:text-[#000000]">
+                      Terms of Service
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Column 3: Contact */}
+              <div>
+                <h3 className="text-sm font-semibold text-[#000000] mb-3">
+                  Contact
+                </h3>
+                <ul className="space-y-2">
+                  <li>
+                    <a
+                      href="mailto:hello@nextnest.sg"
+                      className="text-sm text-[#666666] hover:text-[#000000]"
+                    >
+                      hello@nextnest.sg
+                    </a>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
