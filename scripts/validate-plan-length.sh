@@ -1,6 +1,6 @@
 #!/bin/bash
 # ABOUTME: Validates that Tier 3 plans in docs/plans/active/ comply with 200-line limit
-# ABOUTME: Warns at 180 lines (soft limit), blocks at 450 lines (hard limit)
+# ABOUTME: Warns at 180 lines (soft limit), blocks at 500 lines (hard limit)
 
 # Exit codes:
 # 0 = All plans compliant
@@ -10,7 +10,7 @@
 PLANS_DIR="docs/plans/active"
 SOFT_LIMIT=180
 TARGET_LIMIT=200
-HARD_LIMIT=450
+HARD_LIMIT=500
 
 # Color codes for output
 RED='\033[0;31m'

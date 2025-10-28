@@ -1,5 +1,16 @@
 # Work Log
 
+## 2025-11-07 - Form & Chat Brand Alignment Implementation Plan
+
+**Constraint:** A – Public Surfaces Ready
+**CAN Tasks:** CAN-001, CAN-016, CAN-036
+**Deliverables:**
+- Created comprehensive implementation plan `docs/plans/active/2025-11-07-form-chat-brand-alignment.md` with 8 bite-sized tasks, code snippets, testing strategy.
+- Plan addresses brand violations: (1) Casual tone ("Let's get to know you"), (2) System language ("No Conversation Found"), (3) Generic placeholders ("John Doe"), (4) Missing PDPA/timeline disclosures.
+- Targets 2 files: `ProgressiveFormWithController.tsx` (3 tasks) and `app/chat/page.tsx` (2 tasks), plus Swiss spa finesse audit.
+- Assumes zero-context engineer: included search instructions, rationale for each change, manual testing procedures.
+**Next Steps:** Execute plan in parallel with homepage implementation; manual user flow testing; create completion report when done.
+
 ## 2025-11-07 - Homepage Brand Alignment Implementation Plan
 
 **Constraint:** A – Public Surfaces Ready
