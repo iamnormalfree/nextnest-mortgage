@@ -128,7 +128,7 @@ export const refinanceSchema = baseLeadSchema.extend({
   lockInStatus: z.enum(['ending_soon', 'no_lock', 'locked', 'not_sure']),
   currentBank: z.string().min(1),
   outstandingLoan: z.number().min(10000).max(10000000),
-  propertyValue: z.number().min(100000).max(20000000),
+  propertyValue: z.number().min(100000).max(20000000).optional(),
   propertyType: z.enum(['HDB', 'EC', 'Private', 'Landed', 'Commercial']),
   yearsPurchased: z.number().min(0).max(50),
   refinanceReason: z.enum(['lower_rate', 'cash_out', 'better_terms', 'debt_consolidation']),
@@ -588,7 +588,7 @@ export const createGateSchema = (loanType: string, gateNumber: number) => {
         currentRate: z.number().min(1, 'Current rate must be at least 1%').max(10, 'Please verify current rate'),
         lockInStatus: z.enum(['ending_soon', 'no_lock', 'locked', 'not_sure']),
         currentBank: z.string().min(1, 'Please select your current bank'),
-        propertyValue: z.number().min(300000, 'Minimum property value is $300,000'),
+        propertyValue: z.number().min(300000, 'Minimum property value is $300,000').optional(),
         outstandingLoan: z.number().min(0, 'Outstanding loan cannot be negative')
       })
     
