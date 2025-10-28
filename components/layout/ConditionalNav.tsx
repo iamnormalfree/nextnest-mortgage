@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import Image from 'next/image'
 import Logo from '@/public/images/logos/nn-logo-nobg-img.png'
 import { FEATURE_FLAGS } from '@/lib/features/feature-flags'
+import { FormNav } from '@/components/layout/FormNav'
 
 export function ConditionalNav() {
   const pathname = usePathname()
@@ -23,22 +24,9 @@ export function ConditionalNav() {
     return null
   }
 
-  // Minimal header (logo only) for form flow - maximize focus & conversion
+  // Form flow navigation - standardized across loan selector and form steps
   if (pathname?.startsWith('/apply')) {
-    return (
-      <nav className="fixed top-0 w-full h-14 sm:h-16 bg-white border-b border-fog z-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center">
-          <a href="/" className="flex items-center">
-            <Image
-              src={Logo}
-              alt="NextNest Logo"
-              className="h-5 sm:h-10 w-auto max-w-[200px]"
-              priority
-            />
-          </a>
-        </div>
-      </nav>
-    )
+    return <FormNav showGetStarted={true} />
   }
 
   return (

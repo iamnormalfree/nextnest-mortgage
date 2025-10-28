@@ -1,65 +1,59 @@
-// ABOUTME: Homepage contact section offering loan-type selection CTA
-// ABOUTME: Routes users to /apply workflow after choosing a journey
+// ABOUTME: Homepage loan selector section - primary conversion point
+// ABOUTME: Routes users directly to /apply workflow after choosing loan type
 
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import type { LoanType } from '@/components/forms/SimpleLoanTypeSelector'
 
-const loanTypeOptions: Array<{ id: LoanType; label: string; caption: string; badge?: string }> = [
-  { id: 'new_purchase', label: 'New Purchase', caption: 'First home or upgrading', badge: 'Most popular' },
-  { id: 'refinance', label: 'Refinancing', caption: 'Lower existing payments', badge: 'Save avg $34K' },
-  { id: 'commercial', label: 'Commercial', caption: 'Business property financing', badge: 'Direct to broker' }
+const loanTypeOptions: Array<{ id: LoanType; label: string; caption: string; badge?: string; badgeStyle: string }> = [
+  { id: 'new_purchase', label: 'New Purchase', caption: 'First home or upgrading', badge: 'MOST POPULAR', badgeStyle: 'bg-[#F8F8F8] text-[#666666] border border-[#E5E5E5]' },
+  { id: 'refinance', label: 'Refinancing', caption: 'Lower existing payments', badge: 'SAVE AVG $34K', badgeStyle: 'bg-[#FCD34D] text-[#000000]' },
+  { id: 'commercial', label: 'Commercial', caption: 'Business property financing', badge: 'DIRECT TO BROKER', badgeStyle: 'bg-[#F8F8F8] text-[#666666] border border-[#E5E5E5]' }
 ]
 
 export default function ContactSection() {
-  const router = useRouter()
-
   return (
-    <section id="contact" className="py-16 bg-nn-grey-light">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="loan-selector" className="py-16 bg-[#F8F8F8]">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-gilda font-normal text-nn-grey-dark mb-4">
-            Start your intelligent mortgage analysis
+          <h2 className="text-2xl font-light text-[#000000] mb-2">
+            Choose your scenario
           </h2>
-          <p className="text-lg text-nn-grey-medium max-w-3xl mx-auto font-inter">
-            Pick the journey that fits you. We’ll take you straight into the progressive form on /apply, where instant analysis and MAS-compliant insights are waiting.
+          <p className="text-base text-[#666666]">
+            Select your situation to see available packages
           </p>
         </div>
 
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {loanTypeOptions.map(option => (
-            <button
+            <Link
               key={option.id}
-              type="button"
-              onClick={() => router.push(`/apply?loanType=${option.id}`)}
-              className="border border-nn-grey-medium/40 bg-white px-6 py-8 text-left transition-all duration-200 hover:border-nn-gold hover:bg-nn-gold/10 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-nn-gold"
+              href={`/apply?loanType=${option.id}`}
+              className="bg-white border border-[#E5E5E5] p-6 hover:border-[#000000] transition-colors block"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="text-xl font-semibold text-nn-grey-dark font-inter">
-                  {option.label}
-                </div>
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-lg font-semibold text-[#000000]">{option.label}</h3>
                 {option.badge && (
-                  <span className="inline-flex items-center px-3 py-1 text-xs font-medium uppercase tracking-wide bg-nn-gold/15 text-nn-grey-dark">
+                  <span className={`px-2 py-1 text-xs font-semibold ${option.badgeStyle}`}>
                     {option.badge}
                   </span>
                 )}
               </div>
-              <p className="text-sm text-nn-grey-medium font-inter">
+              <p className="text-sm text-[#666666] mb-6">
                 {option.caption}
               </p>
-              <div className="mt-6 text-sm font-medium text-nn-gold font-inter">
+              <span className="text-[#000000] font-semibold hover:text-[#666666]">
                 Continue →
-              </div>
-            </button>
+              </span>
+            </Link>
           ))}
         </div>
 
-        <p className="text-xs text-nn-grey-medium text-center font-inter mt-6">
-          The full multi-step form, instant calculations, and Chatwoot-tested broker handoff live on /apply. Selecting a journey takes you straight there.
+        <p className="text-xs text-[#666666] text-center mt-8">
+          Takes 5 minutes. Your data stays private per PDPA.
         </p>
       </div>
     </section>
   )
 }
-
