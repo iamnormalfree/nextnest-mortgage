@@ -1,5 +1,34 @@
 # Work Log
 
+## 2025-11-07 - Homepage Brand Alignment Implementation Plan
+
+**Constraint:** A – Public Surfaces Ready
+**CAN Tasks:** CAN-001, CAN-020, CAN-036
+**Deliverables:**
+- Created comprehensive implementation plan `docs/plans/active/2025-11-07-homepage-brand-alignment-facelift.md` with bite-sized tasks, code snippets, testing strategy, and rollback plan.
+- Plan addresses 4 priorities: (1) Copy updates to evidence-based positioning, (2) Yellow reduction per Rule of Two, (3) Claims cleanup (remove unverified stats), (4) Visual regression testing.
+- Targets production homepage (`app/page.tsx`) with specific line references, before/after code examples, and commit messages.
+- Assumes zero-context engineer: included voice guide summary, design system principles, common mistakes checklist.
+**Next Steps:** Execute plan via TDD workflow; manual browser testing after each priority; create completion report when all tasks done.
+
+## 2025-11-07 - Constraint A Voice & Accessibility Docs
+
+**Constraint:** A – Public Surfaces Ready  
+**CAN Tasks:** CAN-036 (voice and tone reference), CAN-037 (accessibility checklist)  
+**Deliverables:**  
+- Authored `docs/content/voice-and-tone.md` with voice pillars, tonal modes, lexicon, and surface playbooks tied to the T.A.M.A. messaging sequence.  
+- Published `docs/runbooks/design/accessibility-checklist.md` outlining WCAG 2.1 AA checks for homepage, progressive form, AI broker chat, and PDFs, plus audit procedures and regression triggers.  
+**Next Steps:** Align homepage copy and component workstreams with the new guide; trigger accessibility audit before mobile chat rollout.
+
+## 2025-11-07 - Decision Bank Homepage Concepts Prototype
+
+**Constraint:** A – Public Surfaces Ready  
+**CAN Tasks:** CAN-001, CAN-020, CAN-036  
+**Deliverables:**  
+- Drafted `docs/plans/active/2025-11-07-decision-bank-homepage-test-page.md` capturing scope and success criteria.  
+- Implemented `app/test-homepage-decision-bank/page.tsx` with Decision Bank range snapshot, stay-vs-switch comparison, case log carousel, process explainer, and disclosure banner.  
+**Next Steps:** Review prototype with Brent; upon approval, schedule production homepage updates and run accessibility checklist per CAN-037.
+
 ## 2025-10-26 - IWAA & 55% LTV Tenure Fix - COMPLETE ✅
 
 **Goal:** Implement IWAA (Income-Weighted Average Age) for joint applicants and 55% LTV extended tenure rules per Dr Elena v2 spec.
