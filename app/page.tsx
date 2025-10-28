@@ -309,7 +309,7 @@ export default function Home() {
                 {['savings', 'analysis', 'timeline'].map((tab) => (
                   <button
                     key={tab}
-                    className={`h-12 px-6 text-sm font-semibold flex items-center transition-all duration-200 ${activeTab === tab ? 'bg-[#FCD34D] text-[#000000]' : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'}`}
+                    className={`h-12 px-6 text-sm font-semibold flex items-center transition-all duration-200 ${activeTab === tab ? 'bg-[#000000] text-white' : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F8F8F8]'}`}
                     onClick={() => setActiveTab(tab)}
                   >
                     {tab.charAt(0).toUpperCase() + tab.slice(1)}
