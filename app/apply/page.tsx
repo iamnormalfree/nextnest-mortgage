@@ -74,8 +74,8 @@ function ApplyPageContent() {
     <>
       {/* Main content - form only (header comes from ConditionalNav in layout) */}
       <main className="min-h-screen bg-mist">
-        <div className="max-w-3xl mx-auto px-4 md:px-6 py-8">
-          {/* Form container with compact desktop mode support */}
+        <div>
+          {/* Form container handles its own max-width constraints */}
           {validLoanType === 'commercial' ? (
             <CommercialQuickForm sessionId={sessionId} className="w-full" />
           ) : (

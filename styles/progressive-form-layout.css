@@ -65,8 +65,16 @@
   /* Grid only when sidebar is present */
   .form-layout-container--with-sidebar {
     display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 2rem;
+    grid-template-columns: minmax(450px, 1fr) 380px;
+    gap: 0; /* No gap - using padding + divider instead */
+    align-items: start;
+  }
+
+  .form-layout-container--with-sidebar .form-content {
+    margin: 0;
+    width: 100%;
+    border-right: 1px solid #E5E5E5; /* Vertical divider */
+    padding-right: 2rem; /* Space before divider */
   }
 
   .form-content {
@@ -79,6 +87,7 @@
     position: sticky;
     top: 2rem;
     align-self: start;
+    padding-left: 2rem; /* Space after divider */
     height: fit-content;
     max-height: calc(100vh - 4rem);
     overflow-y: auto;
