@@ -175,6 +175,27 @@ We analyze 16 banks to find your optimal rate,
 
 ---
 
+#### Task 1.5: Update Footer Superlative
+**File:** `app/page.tsx` line 463
+
+**Before:**
+```typescript
+© 2024 NextNest. Singapore&apos;s most transparent mortgage advisor.
+```
+
+**After:**
+```typescript
+© 2024 NextNest. Evidence-based mortgage advisory.
+```
+
+**Rationale:** "Most transparent" is a superlative claim. Voice guide requires evidence-backed positioning. Footer should match hero headline for brand consistency.
+
+**Testing:** Scroll to footer, verify new copy appears without superlatives
+
+**Commit message:** `fix(homepage): replace footer superlative with evidence-based positioning`
+
+---
+
 ### Priority 2: Yellow Reduction (1 hour)
 
 #### Task 2.1: Change Tab Active State to Black
