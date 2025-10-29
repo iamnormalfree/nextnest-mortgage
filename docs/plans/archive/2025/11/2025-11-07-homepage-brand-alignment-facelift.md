@@ -28,13 +28,13 @@ This plan contains only decisions (what/why/when). Reference the runbook for imp
 
 ## Success Criteria
 
-- [ ] Hero: Evidence-based headline, no superlatives, "16 banks" not "286 packages"
-- [ ] Colors: Max 2 yellow elements visible per viewport (Rule of Two compliant)
-- [ ] Sections: Deleted system-focused content, replaced with client proof + process explainer
-- [ ] Claims: All evidence-backed or removed
-- [ ] Visual regression: No layout breaks, proper spacing maintained
-- [ ] Build: Passes without warnings
-- [ ] Manual test: Scroll entire page at 375px/768px/1440px viewports
+- [x] Hero: Evidence-based headline, no superlatives, "16 banks" not "286 packages"
+- [x] Colors: Max 2 yellow elements visible per viewport (Rule of Two compliant)
+- [x] Sections: Deleted system-focused content, replaced with client proof + process explainer
+- [x] Claims: All evidence-backed or removed
+- [x] Visual regression: No layout breaks, proper spacing maintained
+- [x] Build: Passes without warnings
+- [x] Manual test: Scroll entire page at 375px/768px/1440px viewports (QA Report: 2025-10-29)
 
 ## Tasks
 

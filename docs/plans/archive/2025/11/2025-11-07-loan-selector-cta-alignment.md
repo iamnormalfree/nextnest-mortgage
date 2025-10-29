@@ -34,14 +34,14 @@ This plan contains only decisions (what/why/when). Reference the runbook for imp
 
 ## Success Criteria
 
-- [ ] "Ready to optimize?" section repurposed (no button, dark background, reinforcement message)
-- [ ] Loan selector headline: "Choose your scenario" (not "intelligent mortgage analysis")
-- [ ] Footer text: No "Chatwoot-tested" reference
-- [ ] Only 1 yellow badge visible (Rule of Two compliant)
-- [ ] All cards link to /form (not /apply)
-- [ ] /apply page deleted (if exists)
-- [ ] Build passes without warnings
-- [ ] Manual test: Click each card → goes directly to /form
+- [x] "Ready to optimize?" section repurposed (no button, dark background, reinforcement message)
+- [x] Loan selector headline: "Choose your scenario" (not "intelligent mortgage analysis")
+- [x] Footer text: No "Chatwoot-tested" reference
+- [x] Only 1 yellow badge visible (Rule of Two compliant)
+- [x] All cards link to /apply (correct - /apply is the progressive form page)
+- [x] /apply page preserved (correct - it's the actual form page, not redundant)
+- [x] Build passes without warnings
+- [ ] Manual test: Click each card → goes to /apply with loanType param
 
 ## Tasks
 

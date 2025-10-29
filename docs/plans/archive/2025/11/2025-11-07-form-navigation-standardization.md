@@ -33,13 +33,13 @@ This plan contains only decisions (what/why/when). Reference the runbook for imp
 
 ## Success Criteria
 
-- [ ] FormNav component created (shared across loan selector + form steps)
-- [ ] "Back to Home" link visible on all form pages (direct link to `/`, not browser back)
-- [ ] "Get Started" button shows on loan selector, hides in form steps
-- [ ] ConditionalNav uses FormNav for /apply route
-- [ ] Chat page uses `router.replace('/chat')` (prevents back button loop)
-- [ ] Navigation guard on chat page (back button → homepage, not form)
-- [ ] Build passes without warnings
+- [x] FormNav component created (shared across loan selector + form steps)
+- [x] "Back to Home" link visible on all form pages (direct link to `/`, not browser back)
+- [x] "Get Started" button shows on loan selector, hides in form steps
+- [x] ConditionalNav uses FormNav for /apply route
+- [x] Chat page uses `router.replace('/chat')` (prevents back button loop)
+- [x] Navigation guard on chat page (back button → homepage, not form)
+- [x] Build passes without warnings
 - [ ] Manual test: Homepage → Apply → Form → Chat → Back button goes to homepage
 
 ## Tasks

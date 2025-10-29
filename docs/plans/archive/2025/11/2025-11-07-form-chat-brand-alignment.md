@@ -28,13 +28,13 @@ This plan contains only decisions (what/why/when). Reference the runbook for imp
 
 ## Success Criteria
 
-- [ ] Form headlines: Professional tone (no "Let's..." phrasing)
-- [ ] Chat empty state: Human-centered language (no "system" references)
-- [ ] Placeholders: Singapore naming conventions (Tan Wei Ming, 9123 4567)
-- [ ] Disclosures: PDPA + 24hr timeline visible on contact step
-- [ ] CTAs: Outcome-focused (not navigation-focused)
-- [ ] Error messages: Helpful tone (no "Invalid..." messaging)
-- [ ] Build: Passes without warnings
+- [x] Form headlines: Professional tone (no "Let's..." phrasing)
+- [x] Chat empty state: Human-centered language (no "system" references)
+- [x] Placeholders: Singapore naming conventions (Tan Wei Ming, 9123 4567)
+- [x] Disclosures: PDPA + 24hr timeline visible on contact step
+- [x] CTAs: Outcome-focused (not navigation-focused)
+- [x] Error messages: Helpful tone (no "Invalid..." messaging)
+- [x] Build: Passes without warnings
 - [ ] Manual test: Complete form flow at 375px/768px/1440px
 
 ## Tasks
