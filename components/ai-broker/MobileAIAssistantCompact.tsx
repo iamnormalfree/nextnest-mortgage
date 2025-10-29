@@ -97,9 +97,9 @@ export const MobileAIAssistantCompact: React.FC<MobileAIAssistantCompactProps> =
 
   return (
     <div className="h-full w-full flex flex-col bg-gray-50">
-      {/* Ultra Compact Header - 40px */}
-      <div className="h-10 bg-white border-b flex items-center px-3 flex-shrink-0">
-        <button className="w-7 h-7 flex items-center justify-center">
+      {/* Ultra Compact Header - 44px for touch targets */}
+      <div className="h-11 bg-white border-b flex items-center px-3 flex-shrink-0">
+        <button className="w-11 h-11 flex items-center justify-center" aria-label="Go back">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div className="flex-1 mx-2 flex items-center gap-2">
@@ -109,7 +109,7 @@ export const MobileAIAssistantCompact: React.FC<MobileAIAssistantCompactProps> =
             <span className="text-xs text-gray-500">Active</span>
           </div>
         </div>
-        <button className="w-7 h-7 flex items-center justify-center">
+        <button className="w-11 h-11 flex items-center justify-center" aria-label="Call broker">
           <Phone className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -170,18 +170,18 @@ export const MobileAIAssistantCompact: React.FC<MobileAIAssistantCompactProps> =
                   {/* Spacer to push quick actions to bottom */}
                   <div className="flex-1" />
 
-                  {/* Ultra Compact Quick Actions - Single Row */}
+                  {/* Ultra Compact Quick Actions - Single Row with horizontal scroll */}
                   {showQuickActions && (
                     <div className="px-2 pb-2">
-                      <div className="flex gap-0.5">
+                      <div className="flex gap-2 overflow-x-auto" data-testid="quick-actions">
                         {quickActions.map((action, idx) => (
                           <button
                             key={idx}
-                            className="flex-1 flex items-center justify-center gap-0.5 px-1 py-0.5 bg-white rounded-full border border-gray-200 hover:bg-gray-50"
+                            className="flex-shrink-0 min-h-[44px] flex items-center gap-1.5 px-3 py-2 bg-white rounded-full border border-gray-200 hover:bg-gray-50"
                             onClick={() => handleQuickAction(action.query)}
                           >
-                            <action.icon className="w-2.5 h-2.5 text-gray-500 flex-shrink-0" />
-                            <span className="text-[10px] text-gray-600">{action.label}</span>
+                            <action.icon className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                            <span className="text-xs text-gray-600">{action.label}</span>
                           </button>
                         ))}
                       </div>
@@ -280,31 +280,35 @@ export const MobileAIAssistantCompact: React.FC<MobileAIAssistantCompactProps> =
         )}
       </div>
 
-      {/* Compact Input Area - 44px */}
+      {/* Compact Input Area - 44px for accessibility */}
       {activeView === 'chat' && (
-        <div className="h-11 bg-white border-t flex items-center px-3 gap-2 flex-shrink-0">
-          <button className="w-7 h-7 flex items-center justify-center text-gray-500" aria-label="Attach image">
-            <ImageIcon className="w-3.5 h-3.5" />
+        <div className="min-h-[56px] bg-white border-t flex items-center px-3 gap-2 flex-shrink-0" data-testid="messages-container">
+          <button className="w-11 h-11 flex items-center justify-center text-gray-500" aria-label="Attach image">
+            <ImageIcon className="w-4 h-4" />
           </button>
 
           <input
+            data-testid="message-input"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type message..."
-            className="flex-1 h-7 px-2.5 bg-gray-100 rounded-full text-xs outline-none focus:bg-white focus:ring-1 focus:ring-amber-400"
+            className="flex-1 h-11 px-3 bg-gray-100 rounded-full text-sm outline-none focus:bg-white focus:ring-1 focus:ring-amber-400"
           />
 
           {inputValue ? (
             <button
+              data-testid="send-button"
               onClick={handleSend}
-              className="w-7 h-7 bg-amber-400 text-white rounded-full flex items-center justify-center"
+              disabled={!inputValue.trim()}
+              className="w-11 h-11 bg-amber-400 text-white rounded-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Send message"
             >
-              <Send className="w-3 h-3" />
+              <Send className="w-4 h-4" />
             </button>
           ) : (
-            <button className="w-7 h-7 flex items-center justify-center text-gray-500">
-              <Mic className="w-3.5 h-3.5" />
+            <button className="w-11 h-11 flex items-center justify-center text-gray-500" aria-label="Voice input">
+              <Mic className="w-4 h-4" />
             </button>
           )}
         </div>

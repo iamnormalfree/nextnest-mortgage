@@ -108,16 +108,14 @@ function ChatContent() {
 
 export default function ChatPage() {
   return (
-    <div className="fixed inset-0">
-      <Suspense fallback={
-        <div className="min-h-screen bg-mist flex items-center justify-center">
-          <div className="w-16 h-1 bg-fog overflow-hidden">
-            <div className="h-full bg-gold transition-all duration-200" style={{ width: '60%' }}/>
-          </div>
+    <Suspense fallback={
+      <div className="min-h-screen bg-mist flex items-center justify-center">
+        <div className="w-16 h-1 bg-fog overflow-hidden">
+          <div className="h-full bg-gold transition-all duration-200" style={{ width: '60%' }}/>
         </div>
-      }>
-        <ChatContent />
-      </Suspense>
-    </div>
+      </div>
+    }>
+      <ChatContent />
+    </Suspense>
   )
 }
