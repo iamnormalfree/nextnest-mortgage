@@ -32,7 +32,7 @@ export default function TestDesktopChatPage() {
       <Suspense fallback={<div>Loading...</div>}>
         <IntegratedBrokerChat
           conversationId={12345}
-          broker={{ name: 'Test Broker', email: 'broker@example.com' }}
+          broker={{ name: 'Test Broker', id: 'test-broker-1', status: 'assigned' }}
           formData={{ name: 'Test User', email: 'test@example.com' }}
           sessionId="test-session-123"
           situationalInsights={mockData.situationalInsights}
