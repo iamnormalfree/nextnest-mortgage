@@ -1,158 +1,251 @@
 ---
 status: active
 priority: high
-complexity: heavy
-estimated_hours: 40
+complexity: medium
+estimated_hours: 8
+constraint: C1 – Public Surface Readiness
+can_tasks: CAN-051
 ---
 
-# Mobile-First AI Broker UI Rebuild
+# Mobile AI Broker Chat Integration
 
 ## Context
 
-Current AI Broker UI (SimpleAgentUI) suffers from desktop-centric design causing poor mobile UX:
-- Heavy padding (24px) and large spacing unsuitable for mobile viewports
-- No progressive disclosure - information overload on small screens
-- Missing mobile breakpoint strategy and touch-friendly interactions
-- Desktop grid systems (md:grid-cols-2) assume desktop space
+Mobile users cannot effectively use AI Broker features on the chat page. Current implementation (`app/chat/page.tsx`) uses desktop-only components causing poor mobile UX.
 
-**Rebuild Strategy:** Progressive Enhancement with feature flag
-- Build mobile components alongside existing desktop UI
-- Feature flag to toggle between implementations  
-- Gradual rollout with fallback safety (maintain SimpleAgentUI)
+**Problems:**
+- Desktop layout forced on mobile (sidebars, large padding)
+- Touch targets <44px (WCAG violation)
+- Horizontal scroll on 320px-375px viewports
+- No progressive disclosure
 
-## Problem
+**Strategic alignment (Part 04 § 4.3):** Chat experience must adapt to mobile with full-screen, chat-first layout.
 
-Mobile users cannot effectively use AI Broker features due to desktop-first UI design. Must rebuild with mobile-first architecture while maintaining desktop experience and business metrics.
+## Solution
+
+**Decision:** Integrate existing `ResponsiveBrokerShell` component with production chat page.
+
+**Why ResponsiveBrokerShell:**
+- Already built and tested (mobile components exist)
+- Feature flag enabled (`FEATURE_FLAGS.MOBILE_AI_BROKER_UI`)
+- Automatic viewport detection and routing
+- Aligns with "Invisible Automation" principle (Part 04)
+
+**What changes:**
+- `app/chat/page.tsx`: ChatLayoutShell → ResponsiveBrokerShell
+- Shell routes to MobileAIAssistantCompact (mobile) or IntegratedBrokerChat (desktop)
+
+## Implementation Guide
+
+**All code examples, file paths, testing procedures, and troubleshooting:**
+`docs/runbooks/ai-broker/mobile-chat-integration-guide.md` ← **READ THIS**
+
+This plan contains only decisions (what/why/when). Runbook has implementation details (how).
 
 ## Success Criteria
 
-- [ ] 100% content visible without horizontal scroll on 320px+ viewports
-- [ ] All touch targets ≥44px (iOS/Android standard)
-- [ ] Load time <2s on throttled 3G connection
-- [ ] Core Web Vitals: LCP <2.5s, CLS <0.1, FID <100ms
-- [ ] Business metrics maintained or improved (broker consultation requests, engagement)
+- [ ] ResponsiveBrokerShell integrated with chat page
+- [ ] Feature flag toggle works (mobile/desktop UI switch)
+- [ ] Mobile viewport (375px): mobile UI, no horizontal scroll
+- [ ] Desktop viewport (1440px): desktop UI with sidebar
+- [ ] Props pass through correctly (conversationId, broker, formData)
+- [ ] All tests pass (unit + E2E)
+- [ ] Touch targets ≥44px (verified via E2E)
+- [ ] Production build succeeds
 
 ## Tasks
 
-See [Mobile-First Architecture Runbook](../../runbooks/ai-broker/MOBILE_FIRST_ARCHITECTURE.md) for complete implementation patterns, design tokens, component examples, and testing strategies.
+**Pre-Implementation: Read These First (30 min)**
 
-### Setup Gate (Half Day)
+1. Strategic: `Part04-brand-ux-canon.md` § 4.3, `Part02-strategic-canon.md`, `ROADMAP.md`
+2. Technical: `mobile-chat-integration-guide.md` (full runbook), `MOBILE_FIRST_ARCHITECTURE.md`
+3. Current code: `app/chat/page.tsx`, `ResponsiveBrokerShell.tsx`, `types.ts`
+4. Testing: `CLAUDE.md` (TDD rules), `TECH_STACK_GUIDE.md`
 
-- [ ] Implement `useMobileAIBroker` feature flag and mobile design tokens (MOBILE_DESIGN_TOKENS)
-  - See runbook: Design System Tokens section
-  - Create lib/design-tokens/mobile.ts
-  - Add NEXT_PUBLIC_MOBILE_AI_BROKER environment variable
-- [ ] Create chat-first layout skeleton behind progressive enhancement guardrail
-  - Verify guardrail leaves desktop experience untouched
-- [ ] Add Storybook/DevTools viewport presets for iPhone SE (375×667) and Pixel widths (360×760)
+### Task 0: Environment Setup (5 min, Commit 1)
 
-### Iteration 1 - Chat Spine (Day 1)
+**Decision:** Enable mobile feature flag in `.env.local`
 
-- [ ] Build mobile shell: top bar, chat transcript list, sticky composer
-  - See runbook: Screen-by-Screen Implementation > Live Chat Shell
-  - Composer surfaces loading/error states inline above input
-- [ ] Hook composer to existing chat service with streaming skeleton states
-  - Confirm thumb reach for primary actions (56px touch targets)
-- [ ] Capture QA notes and screenshots in validation-reports/ for traceability
+**Files:** Create `.env.local` with `NEXT_PUBLIC_MOBILE_AI_BROKER=true`
 
-### Iteration 2 - Insight Layer (Day 2)
+**See:** Runbook Task 0 for complete steps
 
-- [ ] Implement MobileScoreWidget plus Tier-1 insight strip
-  - See runbook: Component Implementation Patterns > MobileScoreWidget
-  - Wire collapse state, telemetry events, align with MOBILE_DESIGN_TOKENS
-- [ ] Validate screen-reader output for score announcements and priority badges
+**Verify:** Flag enabled, dev server restarts
 
-### Iteration 3 - Analysis Stack (Day 3)
-
-- [ ] Compose accordion of MobileInsightCard instances for each domain track
-  - See runbook: Component Implementation Patterns > MobileInsightCard
-  - Persist expansion state across navigation and refreshes
-- [ ] Ensure CTA chips inject prompts into composer and respect touch target sizing (≥44px)
-- [ ] Add Storybook stories or unit tests covering collapsed/expanded variations
-
-### Iteration 4 - Rates & Offers (Day 4)
-
-- [ ] Build tab chip navigation and swipeable rate card carousel
-  - See runbook: Component Implementation Patterns > MobileSectionTabs
-  - Lazy-load data with skeleton placeholders
-  - Guard data fetching so chat shell stays responsive on slow networks
-- [ ] Provide "Send to chat" and "Compare" hooks with offer metadata and analytics
-- [ ] Test horizontal gestures on physical iOS/Android devices (avoid system gesture conflicts)
-
-### Iteration 5 - Actions & Drawers (Day 5)
-
-- [ ] Implement sticky action sheet with primary/secondary/tertiary CTAs
-  - See runbook: Screen-by-Screen Implementation > Actions & Support
-  - Confirm CTA order and copy with product before freezing
-- [ ] Add supplemental drawers for documents, calculators, disclosures
-  - Restore focus to chat transcript after each drawer closes
-- [ ] Confirm drawers respect touch targets, accessible headings, keyboard escape routes
-
-### Validation & Sign-Off
-
-- [ ] Run npm run lint:all, mobile device smoke tests (iPhone SE, Pixel 7, iPad Mini)
-  - See runbook: Testing Strategies > Device Testing
-- [ ] Execute screen-reader passes (VoiceOver, TalkBack)
-- [ ] Low-bandwidth testing via DevTools throttling, verify analytics events, feature flag fallback
-- [ ] Record manual validation in validation-reports/, update plan with learnings
-- [ ] Notify stakeholders before expanding flag cohort
-
-## Testing Strategy
-
-See [Mobile-First Architecture Runbook](../../runbooks/ai-broker/MOBILE_FIRST_ARCHITECTURE.md#testing-strategies) for:
-- Feature flag setup (FEATURE_FLAGS.MOBILE_AI_BROKER_UI)
-- Progressive testing phases (dev → internal → staging → 5% production → full)
-- Device testing checklist (iPhone SE, iPhone 12, Samsung Galaxy S10)
-- Cross-browser testing (Safari Mobile, Chrome Mobile, Samsung Internet, Firefox Mobile)
-- A/B testing framework (control vs treatment variants)
-- Success metrics (technical, UX, business)
-
-**Critical Test Files:**
-- app/test-mobile/page.tsx - 360px playground
-- app/test-ui/TestUIClient.tsx - 375px frame for side-by-side
-- validation-reports/2025-09-mobile-ui/ - Screenshot series
-
-## Rollback Plan
-
-See [Mobile-First Architecture Runbook](../../runbooks/ai-broker/MOBILE_FIRST_ARCHITECTURE.md#risk-mitigation) for:
-- Feature flag rollout config (start 0% production, allowlist test users)
-- Automatic fallback to SimpleAgentUI via ErrorBoundary
-- Data compatibility (MobileAIBrokerUIProps extends SimpleAgentUIProps)
-- No backend changes required (backward compatibility guaranteed)
-
-**Rollback Steps:**
-1. Set NEXT_PUBLIC_MOBILE_AI_BROKER=false in environment
-2. Redeploy application (mobile UI disabled, desktop UI active)
-3. Monitor metrics for 24h to confirm restoration
-4. Investigate root cause before re-enabling
-
-## Related Documentation
-
-- [Mobile-First Architecture Runbook](../../runbooks/ai-broker/MOBILE_FIRST_ARCHITECTURE.md) - Complete implementation guide
-- [AI Broker Complete Guide](../../runbooks/AI_BROKER_COMPLETE_GUIDE.md) - Full system architecture
-- [Design System](../../DESIGN_SYSTEM.md) - Bloomberg color tokens
-- [Forms Architecture](../../runbooks/FORMS_ARCHITECTURE_GUIDE.md) - Form patterns
-- [Component Placement Decision Tree](../../CLAUDE.md#component-placement-decision-tree)
-- [CANONICAL_REFERENCES.md](../../CANONICAL_REFERENCES.md) - Tier 1 files
-
-## Constraint Alignment
-
-- Constraint A – Public Surfaces Ready (`docs/plans/re-strategy/strategy-alignment-matrix.md`, C1): Rebuilding the mobile chat experience ensures Stage 0 surfaces meet accessibility, mobile parity, and SLA guardrails before launch.
-
-## Notes
-
-**Field Testing Summary (September 2025):**
-- Visual QA: iPhone 12 (390×844), Pixel 7 (412×915) passed
-- DevTools: 320×568, 360×720 no horizontal scroll, ≥44px touch targets
-- Cross-browser: Safari Mobile 17, Chrome 128, Firefox 128 passed
-- Assumptions: Fast 3G tested; slower networks + full analytics pending
-- Accessibility: VoiceOver/TalkBack sanity passed; full narration pending
-
-**Progressive Enhancement Strategy:**
-Option 1 (Recommended) maintains existing SimpleAgentUI while building MobileAIBrokerUI alongside. Feature flag enables gradual migration with fallback safety. Option 2 (Complete Rebuild) considered only if Option 1 proves insufficient.
+**Commit:** `chore: enable mobile AI broker feature flag for development`
 
 ---
 
-**Last Updated:** 2025-10-19  
-**Canonical Code:** components/ai-broker/, lib/design-tokens/mobile.ts  
-**Runbook:** docs/runbooks/ai-broker/MOBILE_FIRST_ARCHITECTURE.md
+### Task 1: Write Integration Test (15 min, Commit 2)
+
+**Decision:** Write failing test (TDD RED phase)
+
+**Files:** Create `app/chat/__tests__/ChatPageMobileIntegration.test.tsx`
+
+**Tests verify:** ResponsiveBrokerShell renders, props pass through, empty state works
+
+**See:** Runbook Task 1 for complete test code
+
+**Verify:** Tests run and FAIL (expected)
+
+**Commit:** `test: add failing test for mobile AI broker chat integration`
+
+---
+
+### Task 2: Refactor Chat Page (30 min, Commit 3)
+
+**Decision:** Replace ChatLayoutShell with ResponsiveBrokerShell in `app/chat/page.tsx`
+
+**Changes:**
+- Import ResponsiveBrokerShell
+- Remove unused imports (ChatLayoutShell, CustomChatInterface, InsightsSidebar, HandoffNotification)
+- Simplify return: Pass props to ResponsiveBrokerShell
+- Remove unused state (isHandoff, handoffDetails, inputMessage)
+
+**See:** Runbook Task 2 for complete refactored code
+
+**Verify:** Tests PASS (TDD GREEN), no TypeScript errors, page renders
+
+**Commit:** `feat: integrate ResponsiveBrokerShell with chat page`
+
+---
+
+### Task 3: Manual Toggle Verification (10 min, doc commit)
+
+**Decision:** Manually verify feature flag toggle (no code changes)
+
+**Test scenarios:**
+1. Flag ON + 375px → Mobile UI
+2. Flag ON + 1440px → Desktop UI
+3. Flag OFF + any viewport → Desktop UI (fallback)
+
+**See:** Runbook Task 3 for step-by-step instructions
+
+**Document:** Create `docs/test-reports/2025-11-07-mobile-chat-integration-manual-test.md`
+
+**Verify:** All scenarios work, no console errors
+
+**Commit:** `docs: add mobile chat integration manual test report`
+
+---
+
+### Task 4: Add E2E Test (20 min, Commit 4)
+
+**Decision:** Write Playwright test for mobile flow
+
+**Files:** Create `tests/e2e-mobile-chat-integration.spec.ts`
+
+**Tests verify:** Form→chat redirect, mobile/desktop UI per viewport, no horizontal scroll, touch targets ≥44px
+
+**See:** Runbook Task 4 for complete E2E test code
+
+**Verify:** E2E tests pass on mobile and desktop viewports
+
+**Commit:** `test: add e2e tests for mobile chat integration`
+
+---
+
+### Task 5: Create Test Playground Pages (15 min, Commit 5)
+
+**Decision:** Create isolated test pages for rapid manual QA
+
+**Files:**
+- `app/test-mobile-chat/page.tsx` (forces mobile UI + mock data)
+- `app/test-desktop-chat/page.tsx` (forces desktop UI + mock data)
+
+**See:** Runbook Task 5 for complete page code with mock data
+
+**Verify:** Pages load, mock data displays, useful for visual QA
+
+**Commit:** `feat: add test playground pages for mobile/desktop chat`
+
+---
+
+## Testing Strategy
+
+**See runbook for complete testing procedures.**
+
+**Test levels:**
+1. Unit tests (Jest + RTL) - Logic, state, props
+2. E2E tests (Playwright) - Full flow, viewport behavior
+3. Manual tests - Visual regression, touch interactions
+
+**Key files:**
+- `app/chat/__tests__/ChatPageMobileIntegration.test.tsx`
+- `tests/e2e-mobile-chat-integration.spec.ts`
+- `docs/test-reports/2025-11-07-mobile-chat-integration-manual-test.md`
+
+**Passing criteria:** All unit tests pass, all E2E tests pass, manual verification complete, production build succeeds
+
+## Rollback Plan
+
+**Quick rollback:** `git revert HEAD && npm run dev`
+
+**Feature flag disable:** Set `NEXT_PUBLIC_MOBILE_AI_BROKER=false` in `.env.local`, restart
+
+**Code rollback:** Revert Task 2 commits, restore ChatLayoutShell
+
+**Monitoring:** Check console errors, mobile user analytics, Chatwoot conversation rates
+
+## Execution Order
+
+1. Read prerequisites (30 min)
+2. Task 0 - Environment (5 min, Commit 1)
+3. Task 1 - Failing test (15 min, Commit 2)
+4. Task 2 - Refactor (30 min, Commit 3)
+5. Task 3 - Manual test (10 min, doc commit)
+6. Task 4 - E2E test (20 min, Commit 4)
+7. Task 5 - Test pages (15 min, Commit 5)
+
+**Total:** ~2 hours active work, 8 hours estimated (includes reading + debugging buffer)
+
+**Commits:** 5 commits (1 every 20-30 min of work)
+
+## Related Documentation
+
+**Primary:** `docs/runbooks/ai-broker/mobile-chat-integration-guide.md` ← **COMPLETE STEP-BY-STEP GUIDE**
+
+**See runbook for full documentation list** (strategic, technical, component references)
+
+## Constraint Alignment
+
+**Constraint A – Public Surfaces Ready** (Stage 0 Launch Gate):
+
+**Exit criteria:**
+- ✅ Stage 0 checklist green
+- ✅ WCAG AA verified (touch targets ≥44px)
+- ✅ E2E tests pass
+- ⬜ Work log entry (after completion)
+
+**This integration satisfies:**
+- Accessibility: Touch targets ≥44px
+- Mobile parity: Chat works on all viewports
+- Professional readiness: Systematic, testable, feature-flagged
+
+**Aligns with:**
+- Part 04 § 2 "Invisible Automation" - User doesn't see complexity
+- Part 02 "Systematized Operations" - Single routing point
+- DRY - No duplicate responsive logic
+- Testable - Feature flag toggle easy to verify
+
+## Notes
+
+**What already exists (no need to build):**
+- ✅ Mobile components (MobileAIBrokerUI, MobileAIAssistantCompact)
+- ✅ Design tokens (lib/design-tokens/mobile.ts)
+- ✅ Feature flag system (lib/features/feature-flags.ts)
+- ✅ ResponsiveBrokerShell router
+- ✅ Desktop fallback (IntegratedBrokerChat)
+
+**What this plan adds:**
+- Integration with production chat page
+- Tests (unit + E2E)
+- Test playground pages
+- Manual test documentation
+
+---
+
+**Last Updated:** 2025-11-07
+**Estimated Hours:** 8 (reading + implementation + testing + docs)
+**Actual Commits:** 5
+**Runbook:** docs/runbooks/ai-broker/mobile-chat-integration-guide.md
