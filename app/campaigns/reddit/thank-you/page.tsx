@@ -26,7 +26,7 @@ export default function RedditThankYouPage() {
               </svg>
             </div>
             
-            <h1 className="text-3xl font-gilda font-bold text-nn-grey-dark mb-4">
+            <h1 className="text-3xl font-sans font-bold text-nn-grey-dark mb-4">
               Thanks r/PersonalFinanceSG! 🎉
             </h1>
             
@@ -36,7 +36,7 @@ export default function RedditThankYouPage() {
             </p>
 
             <div className="bg-orange-50 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-gilda font-semibold text-nn-grey-dark mb-3">
+              <h2 className="text-xl font-sans font-semibold text-nn-grey-dark mb-3">
                 Community Promise - What&apos;s Next:
               </h2>
               <div className="space-y-2 text-left">

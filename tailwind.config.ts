@@ -9,7 +9,6 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        'gilda': ['Gilda Display', 'serif'],
         'sans': ['Inter', 'sans-serif'],
       },
       colors: {
@@ -19,7 +18,6 @@ const config: Config = {
         'nn-grey-dark': '#1C1C1E',
         'nn-grey-medium': '#8E8E93',
         'nn-grey-light': '#F5F5F7',
-        'nn-purple': '#6B46C1',
         'nn-blue': '#0F4C75',
         'nn-red': '#DC2626',
         'nn-green': '#059669',
@@ -42,7 +40,7 @@ const config: Config = {
       },
       backgroundImage: {
         'nn-gradient-gold': 'linear-gradient(135deg, #FFB800 0%, #F4B942 100%)',
-        'nn-gradient-calculation': 'linear-gradient(90deg, rgba(255, 184, 0, 0.1) 0%, rgba(107, 70, 193, 0.1) 100%)',
+        'nn-gradient-calculation': 'linear-gradient(90deg, rgba(255, 184, 0, 0.1) 0%, rgba(15, 76, 117, 0.1) 100%)',
         'nn-gradient-trust': 'linear-gradient(90deg, rgba(15, 76, 117, 0.05) 0%, rgba(15, 76, 117, 0.1) 100%)',
         'hero-gradient': 'linear-gradient(180deg, #FFFFFF 0%, #F2F2F7 100%)',
         'gradient-gold': 'linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%)',

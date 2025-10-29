@@ -24,7 +24,7 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-gilda font-bold text-nn-grey-dark mb-4">
+            <h1 className="text-4xl font-sans font-bold text-nn-grey-dark mb-4">
               Mortgage Calculator
             </h1>
             <p className="text-lg text-nn-grey-medium">
@@ -35,7 +35,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Calculator Inputs */}
             <div className="bg-white rounded-xl shadow-lg border p-8">
-              <h2 className="text-2xl font-gilda font-semibold text-nn-grey-dark mb-6">
+              <h2 className="text-2xl font-sans font-semibold text-nn-grey-dark mb-6">
                 Loan Details
               </h2>
 
@@ -127,7 +127,7 @@ const Dashboard = () => {
 
             {/* Results */}
             <div className="bg-white rounded-xl shadow-lg border p-8">
-              <h2 className="text-2xl font-gilda font-semibold text-nn-grey-dark mb-6">
+              <h2 className="text-2xl font-sans font-semibold text-nn-grey-dark mb-6">
                 Payment Summary
               </h2>
 
@@ -135,7 +135,7 @@ const Dashboard = () => {
                 <div className="bg-nn-gradient-gold text-nn-grey-dark rounded-lg p-6">
                   <div className="text-center">
                     <div className="text-sm opacity-90 mb-1">Monthly Payment</div>
-                    <div className="text-3xl font-gilda font-bold">
+                    <div className="text-3xl font-sans font-bold">
                       ${monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                     </div>
                   </div>
@@ -188,20 +188,20 @@ const Dashboard = () => {
 
           {/* Additional Information */}
           <div className="mt-12 bg-white rounded-xl shadow-lg border p-8">
-            <h2 className="text-2xl font-gilda font-semibold text-nn-grey-dark mb-6">
+            <h2 className="text-2xl font-sans font-semibold text-nn-grey-dark mb-6">
               Why Choose NextNest?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="text-2xl font-gilda font-bold text-nn-gold mb-2">15+</div>
+                <div className="text-2xl font-sans font-bold text-nn-gold mb-2">15+</div>
                 <div className="text-sm text-nn-grey-medium">Banks Compared</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-gilda font-bold text-nn-gold mb-2">24h</div>
+                <div className="text-2xl font-sans font-bold text-nn-gold mb-2">24h</div>
                 <div className="text-sm text-nn-grey-medium">Pre-approval Time</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-gilda font-bold text-nn-gold mb-2">1.5%</div>
+                <div className="text-2xl font-sans font-bold text-nn-gold mb-2">1.5%</div>
                 <div className="text-sm text-nn-grey-medium">Average Savings</div>
               </div>
             </div>

@@ -64,7 +64,7 @@ export default function LinkedInMortgageCalculator() {
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
-            <h3 className="text-2xl font-gilda font-bold text-center mb-8">
+            <h3 className="text-2xl font-sans font-bold text-center mb-8">
               Why Singapore Executives Choose NextNest
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -81,8 +81,8 @@ export default function LinkedInMortgageCalculator() {
               </div>
               
               <div className="text-center">
-                <div className="w-16 h-16 bg-nn-purple-authority/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-nn-purple-authority" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-nn-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-nn-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>

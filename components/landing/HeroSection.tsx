@@ -10,7 +10,7 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center justify-between">
           {/* Left side content */}
           <div className="lg:w-1/2 mb-12 lg:mb-0">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-gilda font-normal text-nn-grey-dark leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-sans font-normal text-nn-grey-dark leading-tight mb-6">
               Singapore&apos;s <span className="text-nn-gold">Smartest</span>
               <br />
               Mortgage Intelligence
@@ -47,7 +47,7 @@ const HeroSection = () => {
               <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-nn-grey-medium/20 z-10 relative">
                 <div className="p-6">
                   <div className="bg-nn-grey-light rounded-xl p-5">
-                    <h3 className="text-lg font-gilda font-normal text-nn-grey-dark mb-3">
+                    <h3 className="text-lg font-sans font-normal text-nn-grey-dark mb-3">
                       Your mortgage overview
                     </h3>
 
@@ -86,7 +86,7 @@ const HeroSection = () => {
                         <span className="text-sm font-medium text-nn-grey-dark font-sans">
                           Total savings over loan
                         </span>
-                        <span className="font-bold text-lg text-nn-green font-gilda">$34,560</span>
+                        <span className="font-bold text-lg text-nn-green font-sans">$34,560</span>
                       </div>
                     </div>
                   </div>

@@ -59,7 +59,7 @@ export default function RedditMortgageCalculator() {
       <div className="bg-white border-t border-nn-grey-medium/30 py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-lg font-gilda font-semibold text-nn-grey-dark mb-4">
+            <h3 className="text-lg font-sans font-semibold text-nn-grey-dark mb-4">
               Why r/PersonalFinanceSG Trusts This Calculator
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

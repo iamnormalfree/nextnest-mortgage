@@ -21,7 +21,7 @@ export default function ThankYouPage() {
               </svg>
             </div>
             
-            <h1 className="text-3xl font-gilda font-bold text-nn-grey-dark mb-4">
+            <h1 className="text-3xl font-sans font-bold text-nn-grey-dark mb-4">
               Analysis Request Submitted Successfully!
             </h1>
             
@@ -30,7 +30,7 @@ export default function ThankYouPage() {
             </p>
 
             <div className="bg-nn-blue-trust/10 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-gilda font-semibold text-nn-grey-dark mb-3">
+              <h2 className="text-xl font-sans font-semibold text-nn-grey-dark mb-3">
                 What happens next:
               </h2>
               <div className="space-y-2 text-left">
@@ -51,15 +51,15 @@ export default function ThankYouPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <div className="text-center p-4">
-                <div className="text-2xl font-bold text-nn-gold font-gilda">24h</div>
+                <div className="text-2xl font-bold text-nn-gold font-sans">24h</div>
                 <div className="text-sm text-nn-grey-medium">Guaranteed response</div>
               </div>
               <div className="text-center p-4">
-                <div className="text-2xl font-bold text-nn-green font-gilda">$0</div>
+                <div className="text-2xl font-bold text-nn-green font-sans">$0</div>
                 <div className="text-sm text-nn-grey-medium">Cost to you</div>
               </div>
               <div className="text-center p-4">
-                <div className="text-2xl font-bold text-nn-purple-authority font-gilda">286</div>
+                <div className="text-2xl font-bold text-nn-blue font-sans">286</div>
                 <div className="text-sm text-nn-grey-medium">Packages compared</div>
               </div>
             </div>

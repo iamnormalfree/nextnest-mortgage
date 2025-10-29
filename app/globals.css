@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Gilda+Display:wght@400&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,24 +13,22 @@
   --nn-grey-light: #F5F5F7;
   
   /* Accent Colors */
-  --nn-purple-authority: #6B46C1;
   --nn-blue-trust: #0F4C75;
   --nn-red-alert: #DC2626;
   --nn-green-success: #059669;
   --nn-white: #FFFFFF;
   /* Borders */
   --nn-border-subtle: rgba(142, 142, 147, 0.2);
-  
+
   /* Alpha Variants */
   --nn-gold-10: rgba(255, 184, 0, 0.1);
   --nn-gold-30: rgba(255, 184, 0, 0.3);
   --nn-blue-05: rgba(15, 76, 117, 0.05);
   --nn-blue-10: rgba(15, 76, 117, 0.1);
-  --nn-purple-10: rgba(107, 70, 193, 0.1);
   --nn-gold-deep: #E6A536;
-  
+
   /* Typography */
-  --nn-font-display: 'Gilda Display', serif;
+  --nn-font-display: 'Inter', sans-serif;
   --nn-font-body: 'Inter', sans-serif;
   
   /* Spacing */
@@ -47,7 +45,7 @@
   
   /* Gradients */
   --nn-gradient-gold: linear-gradient(135deg, #FFB800 0%, #F4B942 100%);
-  --nn-gradient-calculation: linear-gradient(90deg, var(--nn-gold-10) 0%, var(--nn-purple-10) 100%);
+  --nn-gradient-calculation: linear-gradient(90deg, var(--nn-gold-10) 0%, var(--nn-blue-10) 100%);
   --nn-gradient-trust: linear-gradient(90deg, var(--nn-blue-05) 0%, var(--nn-blue-10) 100%);
 }
 
@@ -65,10 +63,6 @@ body {
 }
 
 /* Custom Font Classes */
-.font-gilda {
-  font-family: var(--nn-font-display);
-}
-
 .font-inter {
   font-family: var(--nn-font-body);
 }
@@ -156,7 +150,6 @@ body {
 .text-nn-grey-dark { color: var(--nn-grey-dark) !important; }
 .text-nn-grey-medium { color: var(--nn-grey-medium) !important; }
 .text-nn-blue { color: var(--nn-blue-trust) !important; }
-.text-nn-purple { color: var(--nn-purple-authority) !important; }
 .text-nn-green { color: var(--nn-green-success) !important; }
 .bg-nn-grey-light { background-color: var(--nn-grey-light) !important; }
 .bg-nn-gold { background-color: var(--nn-gold-primary) !important; }
