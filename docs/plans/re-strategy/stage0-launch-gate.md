@@ -28,7 +28,7 @@ Record the date, reviewer, and evidence when each category crosses the finish li
 | Category | Verified On | Reviewer | Evidence (link or note) |
 |----------|-------------|----------|-------------------------|
 | Brand & Messaging |  |  |  |
-| Accessibility & UX | 2025-10-29 | Claude Code | ✅ CAN-037 complete: 13/13 WCAG 2.1 AA tests passing. Test suite: `tests/e2e/accessibility-audit.spec.ts`. Report: `docs/test-reports/2025-10-29-accessibility-audit-can-037.md`. Fixes: homepage aria-labels, form/chat touch targets (44px), aria-live infrastructure. Commit: 20ecd3a. ⬜ CAN-016 pending (retire purple/Gilda assets). |
+| Accessibility & UX | 2025-10-29 | Claude Code | ✅ CAN-037 complete: 13/13 WCAG 2.1 AA tests passing. Test suite: `tests/e2e/accessibility-audit.spec.ts`. Report: `docs/test-reports/2025-10-29-accessibility-audit-can-037.md`. Fixes: homepage aria-labels, form/chat touch targets (44px), aria-live infrastructure. Commit: 20ecd3a. ✅ CAN-016 complete: Removed all purple/Gilda from production. Commit: 839a15c. ✅ CAN-036 complete: Voice & tone guide at `docs/content/voice-and-tone.md`. |
 | PDPA & Compliance |  |  |  |
 | Follow-Up System |  |  |  |
 | Rate Pipeline & Guardrails |  |  |  |
