@@ -2,13 +2,7 @@
 
 import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import CustomChatInterface from '@/components/chat/CustomChatInterface'
-import ChatLayoutShell from '@/components/chat/ChatLayoutShell'
-import InsightsSidebar from '@/components/chat/InsightsSidebar'
-// Removed AdvisorHeader - integrated inline
-// Removed unused components for cleaner UI
-import BrokerProfile from '@/components/chat/BrokerProfile'
-import HandoffNotification from '@/components/chat/HandoffNotification'
+import { ResponsiveBrokerShell } from '@/components/ai-broker/ResponsiveBrokerShell'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -20,19 +14,14 @@ function ChatContent() {
   const [userData, setUserData] = useState<any>(null)
   const [broker, setBroker] = useState<any>(null)
   const [isLoadingBroker, setIsLoadingBroker] = useState(true)
-  const [isHandoff, setIsHandoff] = useState(false)
-  const [handoffDetails, setHandoffDetails] = useState<{ reason?: string; urgency?: any }>({})
   const hasInitialized = useRef(false)
-  const [inputMessage, setInputMessage] = useState('')
 
   // Navigation guard: Prevent back button from returning to form
   useEffect(() => {
-    // Add a history entry so we can detect back button press
     const currentPath = window.location.pathname + window.location.search
     window.history.pushState(null, '', currentPath)
 
     const handlePopState = () => {
-      // Back button was pressed - redirect to homepage
       window.location.replace('/')
     }
 
@@ -44,7 +33,6 @@ function ChatContent() {
   }, [])
 
   useEffect(() => {
-    // Prevent re-running
     if (hasInitialized.current) return
     hasInitialized.current = true
 
@@ -62,25 +50,10 @@ function ChatContent() {
       fetchBrokerDetails(conversationId)
     }
 
-    // Listen for handoff events (custom event from chat interface)
-    const handleHandoff = (event: CustomEvent) => {
-      setIsHandoff(true)
-      setHandoffDetails({
-        reason: event.detail?.reason || 'Customer requested human assistance',
-        urgency: event.detail?.urgency || 'normal'
-      })
-    }
-
-    window.addEventListener('chatwoot:handoff' as any, handleHandoff)
-
     // Small delay to ensure everything is loaded
     setTimeout(() => {
       setIsReady(true)
     }, 500)
-
-    return () => {
-      window.removeEventListener('chatwoot:handoff' as any, handleHandoff)
-    }
   }, [conversationId])
 
   const fetchBrokerDetails = async (convId: string) => {
@@ -99,11 +72,6 @@ function ChatContent() {
     } finally {
       setIsLoadingBroker(false)
     }
-  }
-
-  const handleSuggestionClick = (text: string) => {
-    setInputMessage(text)
-    // The input will be passed to CustomChatInterface via props or context
   }
 
   if (!conversationId) {
@@ -128,54 +96,19 @@ function ChatContent() {
   }
 
   return (
-    <ChatLayoutShell
-      leftSidebar={<InsightsSidebar />}
-    >
-      <div className="h-full flex flex-col">
-        {!isReady ? (
-          <div className="flex items-center justify-center min-h-[600px]">
-            <div className="text-center">
-              {/* Simple progress indicator instead of continuous spinner */}
-              <div className="w-16 h-1 bg-fog mx-auto mb-4 overflow-hidden">
-                <div className="h-full bg-gold transition-all duration-200" style={{ width: '60%' }}/>
-              </div>
-              <p className="text-graphite">Loading chat interface...</p>
-            </div>
-          </div>
-        ) : (
-          <>
-
-            {/* Broker Profile removed - not needed */}
-
-            {/* Handoff Notification */}
-            {isHandoff && (
-              <HandoffNotification
-                reason={handoffDetails.reason}
-                urgencyLevel={handoffDetails.urgency}
-              />
-            )}
-
-            {/* Custom Chat Interface - Full Height */}
-            <div className="flex-1 overflow-hidden">
-              <CustomChatInterface
-                conversationId={parseInt(conversationId)}
-                contactName={userData?.name || 'You'}
-                contactEmail={userData?.email}
-                brokerName={broker?.name || 'Agent'}
-                prefillMessage={inputMessage}
-              />
-            </div>
-
-          </>
-        )}
-      </div>
-    </ChatLayoutShell>
+    <ResponsiveBrokerShell
+      conversationId={parseInt(conversationId)}
+      broker={broker}
+      formData={userData}
+      sessionId={conversationId}
+      isLoading={!isReady}
+    />
   )
 }
 
 export default function ChatPage() {
   return (
-    <div className="fixed inset-0"> {/* Full viewport without nav bar padding */}
+    <div className="fixed inset-0">
       <Suspense fallback={
         <div className="min-h-screen bg-mist flex items-center justify-center">
           <div className="w-16 h-1 bg-fog overflow-hidden">
