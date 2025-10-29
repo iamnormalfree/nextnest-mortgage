@@ -68,7 +68,7 @@ export function FormNav({
           {/* Back to Home - Always visible */}
           <Link
             href="/"
-            className="text-sm text-[#666666] hover:text-[#000000] transition-colors"
+            className="min-h-[44px] flex items-center text-sm text-[#666666] hover:text-[#000000] transition-colors"
           >
             Back to Home
           </Link>
@@ -77,7 +77,7 @@ export function FormNav({
           {showGetStarted && (
             <button
               onClick={handleGetStartedClick}
-              className="px-6 py-2 bg-[#FCD34D] text-[#000000] text-sm font-semibold hover:bg-[#FBB614] transition-colors"
+              className="min-h-[44px] px-6 flex items-center bg-[#FCD34D] text-[#000000] text-sm font-semibold hover:bg-[#FBB614] transition-colors"
             >
               Get Started →
             </button>

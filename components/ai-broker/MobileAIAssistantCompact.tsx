@@ -131,19 +131,20 @@ export const MobileAIAssistantCompact: React.FC<MobileAIAssistantCompactProps> =
         </div>
       )}
 
-      {/* Compact Tab Navigation - 32px */}
-      <div className="h-8 flex border-b bg-white flex-shrink-0">
+      {/* Tab Navigation - 44px for accessibility */}
+      <div className="h-12 flex border-b bg-white flex-shrink-0">
         {['chat', 'insights', 'analysis'].map((view) => (
           <button
             key={view}
             onClick={() => setActiveView(view as any)}
             className={cn(
-              "flex-1 text-xs font-medium capitalize",
+              "flex-1 text-xs font-medium capitalize min-h-[44px]",
               "border-b-2 transition-colors",
               activeView === view
                 ? "border-amber-400 text-amber-600 bg-amber-50"
                 : "border-transparent text-gray-600"
             )}
+            aria-label={`Switch to ${view} view`}
           >
             {view}
           </button>
@@ -289,11 +290,13 @@ export const MobileAIAssistantCompact: React.FC<MobileAIAssistantCompactProps> =
 
           <input
             data-testid="message-input"
+            type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type message..."
             className="flex-1 h-11 px-3 bg-gray-100 rounded-full text-sm outline-none focus:bg-white focus:ring-1 focus:ring-amber-400"
+            aria-label="Chat message input"
           />
 
           {inputValue ? (

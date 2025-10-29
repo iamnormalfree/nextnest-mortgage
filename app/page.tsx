@@ -83,7 +83,7 @@ export default function Home() {
       {/* Glass Morphism Navigation - Swiss Spa Design */}
       <nav className="fixed top-0 w-full h-20 bg-white/95 backdrop-blur-md border-b border-[#E5E5E5] z-50">
         <div className="max-w-7xl mx-auto px-8 h-full flex items-center justify-between">
-          <button onClick={navigateToHome} className="flex items-center">
+          <button onClick={navigateToHome} className="flex items-center" aria-label="Go to homepage">
             <Image
               src={Logo}
               alt="NextNest"
