@@ -12,7 +12,7 @@ Stage 0 represents the professional readiness gate defined in Part 02. Every ite
 
 | Category | Requirement | Source(s) | Backlog Task(s) | Primary Owner |
 |----------|-------------|-----------|-----------------|---------------|
-| Brand & Messaging | Hero copy, trust strip, and transparency statement aligned to “Assured Intelligence”; publish voice and tone guide for reuse. | Part 02 §2, Part 04 §4–5 | CAN-001, CAN-017, CAN-020, CAN-036 | Design / Brent |
+| Brand & Messaging | Hero copy, trust strip, and transparency statement aligned to "Evidence-based advisory"; publish voice and tone guide for reuse. | Part 02 §2, Part 04 §4–5 | CAN-001, CAN-017, CAN-020, CAN-036 | Design / Brent |
 | Accessibility & UX | Confirm accessibility checklist coverage for homepage, form, chat, and PDFs; retire purple/Gilda assets. | Part 04 §3, §7, §11 | CAN-016, CAN-037 | Design / Engineering |
 | PDPA & Compliance | Validate consent capture, auto-expiry, audit logging, and documentation of the process. | Part 02 §2, Part 05 §5–6 | CAN-003, CAN-035 | Ops |
 | Follow-Up System | Draft value-driven follow-up scripts, publish operations playbook, and ensure AI/human approval flow is documented. | Part 05 §0–§4 | CAN-002, CAN-038 | Ops / Brent |
@@ -27,7 +27,7 @@ Record the date, reviewer, and evidence when each category crosses the finish li
 
 | Category | Verified On | Reviewer | Evidence (link or note) |
 |----------|-------------|----------|-------------------------|
-| Brand & Messaging |  |  |  |
+| Brand & Messaging | 2025-10-29 | Claude Code | ✅ CAN-001 complete: Homepage hero messaging aligned to voice-and-tone guide. Commits: 07fea9c, 966fd5a, ddc014a. ✅ CAN-020 complete: New messaging implemented in `app/page.tsx`. ✅ CAN-036 complete: Voice & tone guide at `docs/content/voice-and-tone.md`. ⬜ CAN-017 pending: Brand kit/Figma components (design deliverable, Brent owns). |
 | Accessibility & UX | 2025-10-29 | Claude Code | ✅ CAN-037 complete: 13/13 WCAG 2.1 AA tests passing. Test suite: `tests/e2e/accessibility-audit.spec.ts`. Report: `docs/test-reports/2025-10-29-accessibility-audit-can-037.md`. Fixes: homepage aria-labels, form/chat touch targets (44px), aria-live infrastructure. Commit: 20ecd3a. ✅ CAN-016 complete: Removed all purple/Gilda from production. Commit: 839a15c. ✅ CAN-036 complete: Voice & tone guide at `docs/content/voice-and-tone.md`. |
 | PDPA & Compliance |  |  |  |
 | Follow-Up System |  |  |  |
