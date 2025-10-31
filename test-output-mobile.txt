@@ -1,0 +1,4 @@
+Error: Project(s) "Mobile Chrome" not found. Available projects: "chromium"
+    at filterProjects (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\playwright\lib\runner\projectUtils.js:80:11)
+    at runTests (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\playwright\lib\program.js:217:42)
+    at i.<anonymous> (C:\Users\HomePC\Desktop\Code\NextNest\node_modules\playwright\lib\program.js:71:7)

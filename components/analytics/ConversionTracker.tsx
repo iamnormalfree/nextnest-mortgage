@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 // Inline type declarations for Railway build environment
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void
+    gtag?: (command: string, action: string, options?: any) => void
     fbq?: (...args: any[]) => void
     conversions?: any
   }

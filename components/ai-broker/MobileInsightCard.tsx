@@ -69,7 +69,7 @@ export const MobileInsightCard: React.FC<MobileInsightCardProps> = ({
   return (
     <div
       className={cn(
-        'border rounded-lg transition-all duration-200',
+        'border transition-all duration-200',
         colors.card
       )}
       style={{
@@ -99,7 +99,7 @@ export const MobileInsightCard: React.FC<MobileInsightCardProps> = ({
             <h4 className={cn(MOBILE_DESIGN_TOKENS.typography.body, 'font-medium text-ink truncate')}>{title}</h4>
             <span className={cn(
               MOBILE_DESIGN_TOKENS.typography.tiny,
-              'px-2 py-0.5 rounded-full flex-shrink-0',
+              'px-2 py-0.5 flex-shrink-0',
               colors.badge
             )}>
               {priority}
@@ -110,9 +110,9 @@ export const MobileInsightCard: React.FC<MobileInsightCardProps> = ({
         
         {/* Expand/Collapse Button */}
         {hasExpandableContent && (
-          <button 
+          <button
             className={cn(
-              'p-2 rounded-lg transition-colors flex-shrink-0',
+              'p-2 transition-colors flex-shrink-0',
               colors.button
             )}
             onClick={(e) => {
@@ -142,7 +142,7 @@ export const MobileInsightCard: React.FC<MobileInsightCardProps> = ({
             {details.map((detail, idx) => (
               <li key={idx} className={cn(MOBILE_DESIGN_TOKENS.typography.small, 'text-graphite flex items-start')}>
                 <span
-                  className="w-1 h-1 bg-graphite rounded-full flex-shrink-0"
+                  className="w-1 h-1 bg-graphite flex-shrink-0"
                   style={{
                     marginTop: MOBILE_DESIGN_TOKENS.spacing.sm,
                     marginRight: MOBILE_DESIGN_TOKENS.spacing.sm
@@ -167,7 +167,7 @@ export const MobileInsightCard: React.FC<MobileInsightCardProps> = ({
           <button
             onClick={action.onClick}
             className={cn(
-              'w-full rounded-lg font-medium transition-colors',
+              'w-full font-medium transition-colors',
               'flex items-center justify-center',
               MOBILE_DESIGN_TOKENS.typography.body,
               action.variant === 'secondary'

@@ -12,10 +12,12 @@ export function ConditionalNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  // Hide navigation for internal tools, redesign pages, and chat page
+  // Hide navigation for internal tools, redesign pages, chat page, and chat test pages
   if (pathname?.startsWith('/validation-dashboard') ||
       pathname?.startsWith('/redesign/') ||
-      pathname?.startsWith('/chat')) {
+      pathname?.startsWith('/chat') ||
+      pathname?.startsWith('/test-mobile-chat') ||
+      pathname?.startsWith('/test-desktop-chat')) {
     return null
   }
 

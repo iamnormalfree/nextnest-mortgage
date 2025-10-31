@@ -40,8 +40,8 @@ Lock the customer-facing identity so every surface—web, chat, PDFs, follow-ups
 ### 3.1 Color Canon
 - **Base**: Off-white (`#F8F8F8`), light grey (`#E5E5E5`), neutral divider grey (`#D1D5DB`).  
 - **Primary Text**: Charcoal (`#374151`) – used for nearly all copy.  
-- **Primary Action / Trust Accent**: Deep trust blue (`#0F4C75`) – buttons, links, key highlights.  
-- **Secondary Accent**: Warm gold (`#FCD34D`) – success/savings highlights, progress indicators, brand flourishes.  
+- **Primary CTA Accent**: Warm gold (`#FCD34D`) – reserved for primary CTAs and documented success highlights. Enforce the Rule of Two (max two yellow elements per viewport).  
+- **Trust Accent / Secondary**: Deep trust blue (`#0F4C75`) – links, informational callouts, reassurance copy, secondary actions.  
 - **Functional Colors**:  
   - Success green (`#059669`)  
   - Alert red (`#DC2626`)  

@@ -1,0 +1,164 @@
+
+> modernmortgage-simple@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+  ▲ Next.js 14.2.32
+  - Local:        http://localhost:3002
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 4.3s
+ ○ Compiling /apply ...
+ ✓ Compiled /apply in 10.1s (1072 modules)
+🎯 LeadForm.progressToStep called! {
+  targetStep: 1,
+  currentStep: 0,
+  formDataSize: 1,
+  formDataEntries: { loanType: 'new_purchase' },
+  loanType: 'new_purchase'
+}
+🔎 About to validate step requirements...
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔧 getStep2Fields for new_purchase - checking form data: { loanType: 'new_purchase' }
+🔍 LeadForm validation debug: {
+  step: 0,
+  requirements: {
+    requiredFields: [ 'loanType' ],
+    requiresEmail: false,
+    requiresPhone: false
+  },
+  formData: { loanType: 'new_purchase' },
+  formDataSize: 1,
+  hasRequiredFields: [
+    {
+      field: 'loanType',
+      hasField: true,
+      value: 'new_purchase',
+      valueType: 'string'
+    }
+  ]
+}
+✅ LeadForm validation passed!
+📊 Validation result: true
+🚀 useProgressiveFormController render: currentStep=1, isValid=false, manualIsValid=false
+🔴 BUTTON DEBUG (Step 1): {
+  canSubmitCurrentStep: false,
+  isSubmitting: false,
+  isExternallySubmitting: false,
+  isValid: false,
+  buttonWillBeDisabled: true,
+  formErrors: {},
+  formValues: {
+    loanType: 'new_purchase',
+    name: '',
+    email: '',
+    phone: '',
+    applicantType: 'joint',
+    actualAges: { '0': undefined, '1': undefined },
+    actualIncomes: { '0': undefined, '1': undefined },
+    actualVariableIncomes: { '0': undefined, '1': undefined },
+    existingCommitments: undefined,
+    employmentType: undefined,
+    creditCardCount: 0,
+    hasJointApplicant: false,
+    existingProperties: 0,
+    employmentDetails: { 'self-employed': [Object], variable: [Object] },
+    liabilities: {
+      propertyLoans: [Object],
+      carLoans: [Object],
+      creditCards: [Object],
+      personalLines: [Object],
+      otherCommitments: ''
+    },
+    applicant2Commitments: undefined,
+    refinancingGoals: [],
+    cashOutAmount: undefined,
+    cashOutReason: undefined,
+    ownerOccupied: true,
+    monthsRemaining: undefined,
+    tdsrRatio: undefined,
+    tdsrLimit: 55,
+    msrRatio: undefined,
+    msrLimit: 30,
+    propertyCategory: undefined,
+    propertyType: undefined,
+    priceRange: undefined,
+    combinedAge: undefined,
+    developmentName: undefined,
+    paymentScheme: undefined
+  }
+}
+ GET /apply 200 in 11131ms
+ ✓ Compiled in 1169ms (516 modules)
+ ✓ Compiled in 169ms (502 modules)
+ ✓ Compiled in 1187ms (516 modules)
+ ✓ Compiled in 3.9s (516 modules)
+ ✓ Compiled in 597ms (516 modules)
+ ✓ Compiled in 3.4s (516 modules)
+ ✓ Compiled in 1415ms (516 modules)
+ ✓ Compiled in 1025ms (516 modules)
+ ✓ Compiled in 1087ms (516 modules)
+ ✓ Compiled in 930ms (516 modules)
+ ✓ Compiled in 1005ms (516 modules)
+ ✓ Compiled in 985ms (516 modules)
+ ✓ Compiled in 827ms (516 modules)
+ ✓ Compiled in 866ms (516 modules)
+ ✓ Compiled in 893ms (516 modules)
+ ✓ Compiled in 920ms (516 modules)
+ ✓ Compiled in 1008ms (516 modules)
+ ✓ Compiled in 966ms (516 modules)
+ ✓ Compiled in 3.9s (516 modules)
+ ✓ Compiled in 4.1s (516 modules)
+ ✓ Compiled in 779ms (516 modules)
+ ✓ Compiled in 852ms (516 modules)
+ ✓ Compiled in 1683ms (516 modules)
+ ✓ Compiled in 1099ms (516 modules)
+ ✓ Compiled in 3.4s (516 modules)
+ ✓ Compiled in 384ms (516 modules)
+ ✓ Compiled in 534ms (516 modules)
+ ✓ Compiled in 719ms (516 modules)
+ ✓ Compiled in 978ms (516 modules)
+ ✓ Compiled in 778ms (516 modules)
+ ✓ Compiled in 661ms (516 modules)
+ ⨯ ./components/forms/ProgressiveFormWithController.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4mC:\Users\HomePC\Desktop\Code\NextNest\components\forms\ProgressiveFormWithController.tsx[0m:801:1]
+ [2m801[0m | 
+ [2m802[0m |       case 2: // What You Need
+ [2m803[0m |         return (
+ [2m804[0m |           <div className="space-y-5">
+     : [31;1m           ^^^[0m
+ [2m805[0m |             {loanType === 'new_purchase' && (
+ [2m806[0m |               <Controller
+ [2m806[0m |                 name="propertyCategory"
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/forms/ProgressiveFormWithController.tsx
+./app/apply/page.tsx
+ ⨯ ./components/forms/ProgressiveFormWithController.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4mC:\Users\HomePC\Desktop\Code\NextNest\components\forms\ProgressiveFormWithController.tsx[0m:801:1]
+ [2m801[0m | 
+ [2m802[0m |       case 2: // What You Need
+ [2m803[0m |         return (
+ [2m804[0m |           <div className="space-y-5">
+     : [31;1m           ^^^[0m
+ [2m805[0m |             {loanType === 'new_purchase' && (
+ [2m806[0m |               <Controller
+ [2m806[0m |                 name="propertyCategory"
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/forms/ProgressiveFormWithController.tsx
+./app/apply/page.tsx

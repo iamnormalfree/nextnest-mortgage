@@ -586,7 +586,7 @@ export default function CustomChatInterface({
           </form>
 
           {/* Subtle Quick Actions - Floating Text */}
-          <div data-testid="quick-actions" className="flex items-center gap-3 mt-1 overflow-x-auto">
+          <div data-testid="quick-actions" className="flex items-center gap-3 mt-1 whitespace-nowrap" style={{ overflowX: "auto" }}>
             <span className="text-xs text-silver flex-shrink-0">Quick:</span>
             <button
               onClick={() => setInputMessage('What are current market rates?')}

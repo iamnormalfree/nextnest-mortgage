@@ -1345,21 +1345,20 @@ ENABLE_AI_BROKER=true
 ```
 Redeploy and monitor health status.
 
-#### Staged Rollout Playbook
+#### Direct Rollout Requirement
 
-| Stage | Traffic Target | Preconditions | Actions | Observability |
-| --- | --- | --- | --- | --- |
-| Validation | 10% of conversations | Phase 2 tests green, worker stable for 24 h, queue depth <10 | Keep `ENABLE_AI_BROKER=true`, set `BULLMQ_ROLLOUT_PERCENTAGE=10`, announce validation window in #ai-broker | `/api/admin/migration-status`, Redis `waiting` + `failed` counts, worker logs |
-| Ramp | 50% of conversations | Failed jobs <1%, P95 response <5 s, customer satisfaction >=4.3 | Update `BULLMQ_ROLLOUT_PERCENTAGE=50`, pin health metrics in #ai-broker, run hourly spot checks | Migration API, `monitor:queue`, Chatwoot transcript review, Lighthouse synthetic |
-| Full Cutover | 100% of conversations | Stable ramp for 72 h, leadership sign-off, fallback confirmed | Set `ENABLE_AI_BROKER=false`, set `BULLMQ_ROLLOUT_PERCENTAGE=100`, redeploy worker, post update in release notes | Synthetic chat script, worker health endpoint, Slack alert noise |
+- ❗ `BULLMQ_ROLLOUT_PERCENTAGE` must stay at **100%** during activation; staged percentages are no longer permitted.
+- ✅ Preconditions: Plan 1 integration tests green, migration status healthy, worker auto-start verified, and fallback templates confirmed.
+- 📣 Announce the direct cutover in `#ai-broker` with links to health dashboards and rollback instructions.
+- 📊 Monitor `/api/admin/migration-status` (queue depth, failed count, worker running) and Slack BullMQ alerts continuously during the first 24 h.
 
-**Rollback trigger:** Any stage breaching SLA (response P95 >5 s, failed job rate >=2%, duplicated replies) requires reverting to previous percentage and notifying stakeholders within 15 minutes.
+**Rollback trigger:** Any breach of the chat SLA (P95 > 5 s, failed job rate ≥ 2%, duplicated responses) demands immediate rollback to the n8n path and stakeholder notification within 15 minutes.
 
 **How to revert quickly:**
-1. Restore prior `BULLMQ_ROLLOUT_PERCENTAGE`.
+1. Set `BULLMQ_ROLLOUT_PERCENTAGE=0`.
 2. Toggle `ENABLE_AI_BROKER=true`.
-3. Redeploy worker service.
-4. Confirm n8n path processes live messages before resuming traffic.
+3. Redeploy the worker service.
+4. Confirm n8n resumes processing live messages before reopening traffic.
 
 #### Production Verification Checklist
 

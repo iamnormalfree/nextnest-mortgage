@@ -37,7 +37,7 @@ Covers:
 
 **Root Cause:** `BULLMQ_ROLLOUT_PERCENTAGE=0`, thin automated test coverage
 
-**Approach:** Re-activate BullMQ pipeline, harden with tests, stage rollout with monitoring
+**Approach:** Re-activate BullMQ pipeline, harden with tests, deploy at 100% with close monitoring (staged rollout skipped)
 
 ## Success Criteria
 
@@ -45,7 +45,7 @@ Covers:
 - End-to-end message flow (queue → worker → Chatwoot) covered by automated tests
 - Desktop and mobile chat UIs show same conversation history, no polling gaps, no console errors
 - Worker health observable via `/api/worker/start` and Railway logs
-- Rollout staged (10% → 50% → 100%) with clear gating metrics and rollback steps
+- Direct 100% activation with monitoring dashboards and rollback plan ready
 
 ---
 
@@ -72,9 +72,11 @@ Document current `bullmqEnabled`, `trafficPercentage`, `n8nEnabled` in work log.
 ### Task 1.1: Configure environment variables
 Update `.env.local` and Railway with required variables:
 - `ENABLE_BULLMQ_BROKER=true`
-- `BULLMQ_ROLLOUT_PERCENTAGE=10` (start at 10%)
+- `BULLMQ_ROLLOUT_PERCENTAGE=100` (going straight to 100% - no staged rollout)
 - Worker concurrency and rate limits
 - Redis, OpenAI, Chatwoot credentials
+
+**Note:** Decision made to skip gradual rollout (10% → 50% → 100%) and go directly to full BullMQ activation. Phase 3 staged rollout tasks are superseded by this approach.
 
 **Reference:** `AI_BROKER_COMPLETE_GUIDE.md#environment-configuration`
 
@@ -144,18 +146,23 @@ Write tests in `tests/integration/ai-broker-message-flow.test.ts`:
 
 ## Phase 3: Rollout & Monitoring (3.5 hours)
 
-### Task 3.1: Execute staged rollout
-Follow playbook in `AI_BROKER_COMPLETE_GUIDE.md#staged-rollout-playbook`:
+### Task 3.1: Execute direct 100% rollout ⚠️ MODIFIED
+**Decision:** Going directly to 100% BullMQ (staged rollout skipped per Task 1.1 update)
 
-| Stage | Traffic | Preconditions | Observability |
-|-------|---------|---------------|---------------|
-| Validation | 10% | Phase 2 tests green, worker stable 24h | Migration status API, Redis metrics |
-| Ramp | 50% | <1% failed jobs, P95 <5s | Worker logs, Chatwoot QA |
-| Full Cutover | 100% | Stable 72h, leadership approval | Synthetic tests, error budget |
+**Preconditions before activating:**
+- Phase 2 tests green (integration tests passing)
+- Worker health verified via `/api/worker/start`
+- Migration status API shows healthy state
 
-**Rollback:** Revert `BULLMQ_ROLLOUT_PERCENTAGE`, re-enable n8n, redeploy
+**Monitoring during initial 24h:**
+- Watch `/api/admin/migration-status` for failed jobs
+- Monitor worker logs for errors
+- Track Chatwoot message delivery
+- Alert on SLA breaches (P95 >5s)
 
-**Reference:** `AI_BROKER_COMPLETE_GUIDE.md#staged-rollout-playbook`
+**Rollback:** Set `BULLMQ_ROLLOUT_PERCENTAGE=0`, re-enable n8n fallback if needed, redeploy
+
+**Reference:** `AI_BROKER_COMPLETE_GUIDE.md#staged-rollout-playbook` (adapted for direct cutover)
 
 ### Task 3.2: Production verification (1 hour)
 Use checklist from `AI_BROKER_COMPLETE_GUIDE.md#production-verification-checklist`:

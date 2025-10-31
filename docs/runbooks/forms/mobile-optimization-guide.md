@@ -38,48 +38,25 @@ This guide covers mobile-first optimization patterns for mortgage application fo
 
 ### Implementation Pattern
 
-**Component:** `components/forms/mobile/MobileTouchInput.tsx`
+**Components:** `components/forms/mobile/MobileNumberInput.tsx`, `components/forms/mobile/MobileSelect.tsx`
 
 ```typescript
-interface MobileTouchInputProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: 'text' | 'number' | 'email';
-}
+import { MobileNumberInput } from '@/components/forms/mobile/MobileNumberInput'
 
-export function MobileTouchInput({ label, value, onChange, type = 'text' }: MobileTouchInputProps) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="
-          min-h-[56px]
-          w-full
-          rounded-lg
-          border-2
-          border-gray-300
-          px-4
-          text-base
-          focus:border-nn-blue
-          focus:outline-none
-          touch-manipulation
-        "
-      />
-    </div>
-  );
-}
+<MobileNumberInput
+  label="Monthly income"
+  name="monthlyIncome"
+  value={monthlyIncome}
+  onChange={(val) => setMonthlyIncome(val)}
+  helperText="Gross income before CPF contributions"
+/>
 ```
 
 **Key CSS Properties:**
 - `min-h-[56px]` - Ensures touch target height
 - `touch-manipulation` - Disables zoom on double-tap
 - `text-base` (16px) - Prevents iOS zoom on focus
+- Warm-gold focus states (`#FCD34D`) and sharp corners to match Part 04 canon
 
 ### Touch Gesture Support
 
@@ -129,66 +106,50 @@ useEffect(() => {
 
 ### Field Conditional Rules
 
-**File:** `lib/forms/field-conditionals.ts`
+**File:** `lib/forms/field-visibility-rules.ts`
 
 ```typescript
-export interface FieldConditional {
-  fieldName: string;
-  visibleWhen: (formData: Record<string, any>) => boolean;
+import type { LoanType, PropertyCategory, PropertyType } from '@/lib/contracts/form-contracts';
+
+export interface Step2State {
+  loanType: LoanType;
+  propertyCategory: PropertyCategory | null;
+  propertyType: PropertyType | null;
 }
 
-export const FIELD_CONDITIONALS: FieldConditional[] = [
-  // Hide commercial fields for residential
-  {
-    fieldName: 'cpfUsage',
-    visibleWhen: (data) => data.propertyType !== 'commercial'
-  },
+export function getStep2VisibleFields(state: Step2State): string[] {
+  const fields: string[] = [];
 
-  // Show second property fields only when applicable
-  {
-    fieldName: 'existingPropertyValue',
-    visibleWhen: (data) => Number(data.existingProperties) > 0
-  },
-
-  // Refinance-specific fields
-  {
-    fieldName: 'currentRate',
-    visibleWhen: (data) => data.loanType === 'refinance'
-  },
-  {
-    fieldName: 'outstandingLoan',
-    visibleWhen: (data) => data.loanType === 'refinance'
-  },
-  {
-    fieldName: 'cashOutAmount',
-    visibleWhen: (data) =>
-      data.loanType === 'refinance' &&
-      data.propertyType === 'private'
-  },
-
-  // HDB-specific
-  {
-    fieldName: 'hdbRemainingLease',
-    visibleWhen: (data) => data.propertyType === 'hdb'
-  },
-
-  // Self-employed fields
-  {
-    fieldName: 'businessAge',
-    visibleWhen: (data) => data.employmentType === 'self_employed'
-  },
-  {
-    fieldName: 'noaDocuments',
-    visibleWhen: (data) => data.employmentType === 'self_employed'
+  if (state.loanType === 'refinance') {
+    return [
+      'propertyType',
+      'priceRange',
+      'outstandingLoan',
+      'currentRate',
+      'currentBank',
+      'existingProperties',
+    ];
   }
-];
 
-export function isFieldVisible(
-  fieldName: string,
-  formData: Record<string, any>
-): boolean {
-  const conditional = FIELD_CONDITIONALS.find(c => c.fieldName === fieldName);
-  return conditional ? conditional.visibleWhen(formData) : true;
+  fields.push('propertyCategory');
+
+  if (state.propertyCategory) {
+    fields.push('propertyType');
+  }
+
+  if (state.propertyType) {
+    fields.push('priceRange', 'combinedAge');
+
+    if (['Private', 'EC', 'Landed'].includes(state.propertyType)) {
+      fields.push('existingProperties');
+    }
+  }
+
+  return fields;
+}
+
+export function shouldShowField(fieldName: string, visibleFields: string[]): boolean {
+  return visibleFields.includes(fieldName);
 }
 ```
 
@@ -198,12 +159,13 @@ export function isFieldVisible(
 
 ```typescript
 import { useMemo } from 'react';
-import { isFieldVisible } from '@/lib/forms/field-conditionals';
+import { getStep2VisibleFields, shouldShowField } from '@/lib/forms/field-visibility-rules';
 
-export function useFieldVisibility(formData: Record<string, any>) {
+export function useFieldVisibility(formState: Step2State) {
   return useMemo(() => {
-    return (fieldName: string) => isFieldVisible(fieldName, formData);
-  }, [formData]);
+    const visible = getStep2VisibleFields(formState);
+    return (fieldName: string) => shouldShowField(fieldName, visible);
+  }, [formState]);
 }
 ```
 
@@ -211,17 +173,24 @@ export function useFieldVisibility(formData: Record<string, any>) {
 
 ```typescript
 // In ProgressiveFormWithController.tsx
+import type { Step2State } from '@/lib/forms/field-visibility-rules';
 import { useFieldVisibility } from '@/lib/hooks/useFieldVisibility';
+import { MobileNumberInput } from '@/components/forms/mobile/MobileNumberInput';
 
 export function ProgressiveFormWithController() {
-  const { watch } = useForm();
+  const { watch, setValue } = useForm();
   const formData = watch();
-  const isVisible = useFieldVisibility(formData);
+  const step2State: Step2State = {
+    loanType: formData.loanType,
+    propertyCategory: formData.propertyCategory,
+    propertyType: formData.propertyType,
+  };
+  const isVisible = useFieldVisibility(step2State);
 
   return (
     <div>
       {isVisible('cpfUsage') && (
-        <MobileTouchInput
+        <MobileNumberInput
           label="CPF Usage"
           value={formData.cpfUsage}
           onChange={(val) => setValue('cpfUsage', val)}
@@ -229,7 +198,7 @@ export function ProgressiveFormWithController() {
       )}
 
       {isVisible('currentRate') && (
-        <MobileTouchInput
+        <MobileNumberInput
           label="Current Interest Rate"
           type="number"
           value={formData.currentRate}
@@ -628,26 +597,39 @@ export default function ApplyPage() {
 ### Unit Test Template
 
 ```typescript
-// lib/forms/__tests__/field-conditionals.test.ts
-import { isFieldVisible } from '../field-conditionals';
+// lib/forms/__tests__/field-visibility-rules.test.ts
+import type { Step2State } from '../field-visibility-rules';
+import { getStep2VisibleFields, shouldShowField } from '../field-visibility-rules';
 
-describe('Field Conditionals', () => {
-  it('hides CPF for commercial properties', () => {
-    const formData = { propertyType: 'commercial' };
-    expect(isFieldVisible('cpfUsage', formData)).toBe(false);
+describe('Step 2 visibility rules', () => {
+  const baseState: Step2State = {
+    loanType: 'new_purchase',
+    propertyCategory: null,
+    propertyType: null,
+  };
+
+  it('always shows propertyCategory first', () => {
+    const fields = getStep2VisibleFields(baseState);
+    expect(shouldShowField('propertyCategory', fields)).toBe(true);
+    expect(shouldShowField('priceRange', fields)).toBe(false);
   });
 
-  it('shows CPF for residential properties', () => {
-    const formData = { propertyType: 'private' };
-    expect(isFieldVisible('cpfUsage', formData)).toBe(true);
+  it('reveals propertyType once category selected', () => {
+    const fields = getStep2VisibleFields({
+      ...baseState,
+      propertyCategory: 'HDB',
+    });
+    expect(shouldShowField('propertyType', fields)).toBe(true);
   });
 
-  it('shows cash-out only for private refinance', () => {
-    const data1 = { loanType: 'refinance', propertyType: 'private' };
-    expect(isFieldVisible('cashOutAmount', data1)).toBe(true);
-
-    const data2 = { loanType: 'refinance', propertyType: 'hdb' };
-    expect(isFieldVisible('cashOutAmount', data2)).toBe(false);
+  it('reveals price and age only after property type selected', () => {
+    const fields = getStep2VisibleFields({
+      ...baseState,
+      propertyCategory: 'Private',
+      propertyType: 'Private',
+    });
+    expect(shouldShowField('priceRange', fields)).toBe(true);
+    expect(shouldShowField('combinedAge', fields)).toBe(true);
   });
 });
 ```

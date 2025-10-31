@@ -1,0 +1,231 @@
+
+Running 7 tests using 1 worker
+
+  ✘  1 [chromium] › tests\e2e\chat-production-e2e.spec.ts:226:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction (30.2s)
+  ✘  2 [chromium] › tests\e2e\chat-production-e2e.spec.ts:273:7 › Production E2E: Complete User Journey › Mobile viewport: Form → Chat on iPhone (30.1s)
+  ✘  3 [chromium] › tests\e2e\chat-production-e2e.spec.ts:309:7 › Production E2E: Complete User Journey › Chat persistence: Message survives page refresh (30.2s)
+  ✘  4 [chromium] › tests\e2e\chat-production-e2e.spec.ts:341:7 › Production Smoke Tests (Post-Form) › Critical: Message input accessible on mobile (30.2s)
+  ✘  5 [chromium] › tests\e2e\chat-production-e2e.spec.ts:353:7 › Production Smoke Tests (Post-Form) › Critical: Send button accessible after typing (30.2s)
+  ✘  6 [chromium] › tests\e2e\chat-production-e2e.spec.ts:366:7 › Production Smoke Tests (Post-Form) › Critical: No horizontal overflow on narrow viewport (30.2s)
+  ✘  7 [chromium] › tests\e2e\chat-production-e2e.spec.ts:382:7 › Production Smoke Tests (Post-Form) › Critical: Auto-scroll to bottom on new messages (30.2s)
+
+
+  1) [chromium] › tests\e2e\chat-production-e2e.spec.ts:226:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+    ============================================================
+
+      203 |
+      204 |   // Wait for navigation to chat page (after clicking Continue to Chat)
+    > 205 |   await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
+          |              ^
+      206 |   await page.waitForLoadState('networkidle');
+      207 |   await page.waitForTimeout(3000); // Allow chat to fully initialize
+      208 | }
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:205:14)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:228:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-94a2d-e-→-Form-→-Chat-interaction-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-94a2d-e-→-Form-→-Chat-interaction-chromium\error-context.md
+
+  2) [chromium] › tests\e2e\chat-production-e2e.spec.ts:273:7 › Production E2E: Complete User Journey › Mobile viewport: Form → Chat on iPhone 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+    ============================================================
+
+      203 |
+      204 |   // Wait for navigation to chat page (after clicking Continue to Chat)
+    > 205 |   await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
+          |              ^
+      206 |   await page.waitForLoadState('networkidle');
+      207 |   await page.waitForTimeout(3000); // Allow chat to fully initialize
+      208 | }
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:205:14)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:278:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-8a5d2-wport-Form-→-Chat-on-iPhone-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-8a5d2-wport-Form-→-Chat-on-iPhone-chromium\error-context.md
+
+  3) [chromium] › tests\e2e\chat-production-e2e.spec.ts:309:7 › Production E2E: Complete User Journey › Chat persistence: Message survives page refresh 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+    ============================================================
+
+      203 |
+      204 |   // Wait for navigation to chat page (after clicking Continue to Chat)
+    > 205 |   await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
+          |              ^
+      206 |   await page.waitForLoadState('networkidle');
+      207 |   await page.waitForTimeout(3000); // Allow chat to fully initialize
+      208 | }
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:205:14)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:311:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-ef6d7-ssage-survives-page-refresh-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-ef6d7-ssage-survives-page-refresh-chromium\error-context.md
+
+  4) [chromium] › tests\e2e\chat-production-e2e.spec.ts:341:7 › Production Smoke Tests (Post-Form) › Critical: Message input accessible on mobile 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      333 | test.describe('Production Smoke Tests (Post-Form)', () => {
+      334 |
+    > 335 |   test.beforeEach(async ({ page }) => {
+          |        ^
+      336 |     // Complete form to get to chat before each test
+      337 |     await completeLoanApplicationForm(page);
+      338 |     await waitForChatReady(page);
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:335:8
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+    ============================================================
+
+      203 |
+      204 |   // Wait for navigation to chat page (after clicking Continue to Chat)
+    > 205 |   await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
+          |              ^
+      206 |   await page.waitForLoadState('networkidle');
+      207 |   await page.waitForTimeout(3000); // Allow chat to fully initialize
+      208 | }
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:205:14)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:337:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-2d675--input-accessible-on-mobile-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-2d675--input-accessible-on-mobile-chromium\error-context.md
+
+  5) [chromium] › tests\e2e\chat-production-e2e.spec.ts:353:7 › Production Smoke Tests (Post-Form) › Critical: Send button accessible after typing 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      333 | test.describe('Production Smoke Tests (Post-Form)', () => {
+      334 |
+    > 335 |   test.beforeEach(async ({ page }) => {
+          |        ^
+      336 |     // Complete form to get to chat before each test
+      337 |     await completeLoanApplicationForm(page);
+      338 |     await waitForChatReady(page);
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:335:8
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+    ============================================================
+
+      203 |
+      204 |   // Wait for navigation to chat page (after clicking Continue to Chat)
+    > 205 |   await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
+          |              ^
+      206 |   await page.waitForLoadState('networkidle');
+      207 |   await page.waitForTimeout(3000); // Allow chat to fully initialize
+      208 | }
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:205:14)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:337:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-34d38-ton-accessible-after-typing-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-34d38-ton-accessible-after-typing-chromium\error-context.md
+
+  6) [chromium] › tests\e2e\chat-production-e2e.spec.ts:366:7 › Production Smoke Tests (Post-Form) › Critical: No horizontal overflow on narrow viewport 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      333 | test.describe('Production Smoke Tests (Post-Form)', () => {
+      334 |
+    > 335 |   test.beforeEach(async ({ page }) => {
+          |        ^
+      336 |     // Complete form to get to chat before each test
+      337 |     await completeLoanApplicationForm(page);
+      338 |     await waitForChatReady(page);
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:335:8
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+    ============================================================
+
+      203 |
+      204 |   // Wait for navigation to chat page (after clicking Continue to Chat)
+    > 205 |   await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
+          |              ^
+      206 |   await page.waitForLoadState('networkidle');
+      207 |   await page.waitForTimeout(3000); // Allow chat to fully initialize
+      208 | }
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:205:14)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:337:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-0ce2d-overflow-on-narrow-viewport-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-0ce2d-overflow-on-narrow-viewport-chromium\error-context.md
+
+  7) [chromium] › tests\e2e\chat-production-e2e.spec.ts:382:7 › Production Smoke Tests (Post-Form) › Critical: Auto-scroll to bottom on new messages 
+
+    [31mTest timeout of 30000ms exceeded while running "beforeEach" hook.[39m
+
+      333 | test.describe('Production Smoke Tests (Post-Form)', () => {
+      334 |
+    > 335 |   test.beforeEach(async ({ page }) => {
+          |        ^
+      336 |     // Complete form to get to chat before each test
+      337 |     await completeLoanApplicationForm(page);
+      338 |     await waitForChatReady(page);
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:335:8
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+    ============================================================
+
+      203 |
+      204 |   // Wait for navigation to chat page (after clicking Continue to Chat)
+    > 205 |   await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
+          |              ^
+      206 |   await page.waitForLoadState('networkidle');
+      207 |   await page.waitForTimeout(3000); // Allow chat to fully initialize
+      208 | }
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:205:14)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:337:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-5c37e-l-to-bottom-on-new-messages-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-5c37e-l-to-bottom-on-new-messages-chromium\error-context.md
+
+  7 failed
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:226:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:273:7 › Production E2E: Complete User Journey › Mobile viewport: Form → Chat on iPhone 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:309:7 › Production E2E: Complete User Journey › Chat persistence: Message survives page refresh 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:341:7 › Production Smoke Tests (Post-Form) › Critical: Message input accessible on mobile 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:353:7 › Production Smoke Tests (Post-Form) › Critical: Send button accessible after typing 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:366:7 › Production Smoke Tests (Post-Form) › Critical: No horizontal overflow on narrow viewport 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:382:7 › Production Smoke Tests (Post-Form) › Critical: Auto-scroll to bottom on new messages 

@@ -1,0 +1,34 @@
+
+Running 7 tests using 1 worker
+
+  ✘  1 [chromium] › tests\e2e\chat-production-e2e.spec.ts:216:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction (20.9s)
+[31mTesting stopped early after 1 maximum allowed failures.[39m
+
+
+  1) [chromium] › tests\e2e\chat-production-e2e.spec.ts:216:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction 
+
+    TimeoutError: locator.waitFor: Timeout 5000ms exceeded.
+    Call log:
+    [2m  - waiting for getByLabel(/monthly income/i).first() to be visible[22m
+
+
+      141 |   const incomeInput = page.getByLabel(/monthly income/i).first();
+      142 |
+    > 143 |   await incomeInput.waitFor({ timeout: 5000 });
+          |                     ^
+      144 |   await incomeInput.click();
+      145 |   await incomeInput.fill('8000');
+      146 |   await incomeInput.blur();
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:143:21)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:218:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-94a2d-e-→-Form-→-Chat-interaction-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-94a2d-e-→-Form-→-Chat-interaction-chromium\error-context.md
+
+  1 failed
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:216:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction 
+  6 did not run
+  1 error was not a part of any test, see above for details

@@ -42,7 +42,7 @@ const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>
     <div
       ref={ref}
       className={cn(
-        'flex w-full flex-col gap-2 rounded-lg p-1 md:inline-flex md:w-auto md:flex-row md:gap-1',
+        'flex w-full flex-col gap-2 p-1 md:inline-flex md:w-auto md:flex-row md:gap-1',
         containerVariants[variant],
         className
       )}
@@ -67,7 +67,7 @@ const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>
             }}
             disabled={isDisabled}
             className={cn(
-              'relative flex-1 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+              'relative flex-1 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
               'text-center md:min-w-[120px]',
               buttonSizeMap[size],
               isSelected
@@ -77,7 +77,7 @@ const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>
           >
             <span className="truncate">{option.label}</span>
             {isSelected && (
-              <span className="absolute inset-x-3 bottom-1 hidden h-0.5 rounded-full bg-gold md:block" aria-hidden="true"></span>
+              <span className="absolute inset-x-3 bottom-1 hidden h-0.5 bg-gold md:block" aria-hidden="true"></span>
             )}
           </button>
         )

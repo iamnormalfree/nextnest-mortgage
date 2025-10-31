@@ -1,0 +1,202 @@
+
+Running 7 tests using 1 worker
+
+  ✘  1 [chromium] › tests\e2e\chat-production-e2e.spec.ts:190:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction (18.7s)
+  ✘  2 [chromium] › tests\e2e\chat-production-e2e.spec.ts:237:7 › Production E2E: Complete User Journey › Mobile viewport: Form → Chat on iPhone (18.1s)
+  ✘  3 [chromium] › tests\e2e\chat-production-e2e.spec.ts:273:7 › Production E2E: Complete User Journey › Chat persistence: Message survives page refresh (18.6s)
+  ✘  4 [chromium] › tests\e2e\chat-production-e2e.spec.ts:305:7 › Production Smoke Tests (Post-Form) › Critical: Message input accessible on mobile (18.5s)
+  ✘  5 [chromium] › tests\e2e\chat-production-e2e.spec.ts:317:7 › Production Smoke Tests (Post-Form) › Critical: Send button accessible after typing (18.3s)
+  ✘  6 [chromium] › tests\e2e\chat-production-e2e.spec.ts:330:7 › Production Smoke Tests (Post-Form) › Critical: No horizontal overflow on narrow viewport (18.2s)
+  ✘  7 [chromium] › tests\e2e\chat-production-e2e.spec.ts:346:7 › Production Smoke Tests (Post-Form) › Critical: Auto-scroll to bottom on new messages (18.7s)
+
+
+  1) [chromium] › tests\e2e\chat-production-e2e.spec.ts:190:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction 
+
+    Error: locator.click: Error: strict mode violation: getByRole('option', { name: /employed/i }) resolved to 2 elements:
+        1) <div role="option" tabindex="-1" data-highlighted="" aria-selected="true" data-state="checked" aria-labelledby="radix-:rt:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Employed (salary)' })
+        2) <div role="option" tabindex="-1" aria-selected="false" data-state="unchecked" aria-labelledby="radix-:ru:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Self-employed' })
+
+    Call log:
+    [2m  - waiting for getByRole('option', { name: /employed/i })[22m
+
+
+      157 |     // Select "Employed"
+      158 |     const employedOption = page.getByRole('option', { name: /employed/i });
+    > 159 |     await employedOption.click();
+          |                          ^
+      160 |     await page.waitForTimeout(800);
+      161 |   }
+      162 |
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:159:26)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:192:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-94a2d-e-→-Form-→-Chat-interaction-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-94a2d-e-→-Form-→-Chat-interaction-chromium\error-context.md
+
+  2) [chromium] › tests\e2e\chat-production-e2e.spec.ts:237:7 › Production E2E: Complete User Journey › Mobile viewport: Form → Chat on iPhone 
+
+    Error: locator.click: Error: strict mode violation: getByRole('option', { name: /employed/i }) resolved to 2 elements:
+        1) <div role="option" tabindex="-1" data-highlighted="" aria-selected="true" data-state="checked" aria-labelledby="radix-:rt:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Employed (salary)' })
+        2) <div role="option" tabindex="-1" aria-selected="false" data-state="unchecked" aria-labelledby="radix-:ru:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Self-employed' })
+
+    Call log:
+    [2m  - waiting for getByRole('option', { name: /employed/i })[22m
+
+
+      157 |     // Select "Employed"
+      158 |     const employedOption = page.getByRole('option', { name: /employed/i });
+    > 159 |     await employedOption.click();
+          |                          ^
+      160 |     await page.waitForTimeout(800);
+      161 |   }
+      162 |
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:159:26)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:242:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-8a5d2-wport-Form-→-Chat-on-iPhone-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-8a5d2-wport-Form-→-Chat-on-iPhone-chromium\error-context.md
+
+  3) [chromium] › tests\e2e\chat-production-e2e.spec.ts:273:7 › Production E2E: Complete User Journey › Chat persistence: Message survives page refresh 
+
+    Error: locator.click: Error: strict mode violation: getByRole('option', { name: /employed/i }) resolved to 2 elements:
+        1) <div role="option" tabindex="-1" data-highlighted="" aria-selected="true" data-state="checked" aria-labelledby="radix-:rt:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Employed (salary)' })
+        2) <div role="option" tabindex="-1" aria-selected="false" data-state="unchecked" aria-labelledby="radix-:ru:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Self-employed' })
+
+    Call log:
+    [2m  - waiting for getByRole('option', { name: /employed/i })[22m
+
+
+      157 |     // Select "Employed"
+      158 |     const employedOption = page.getByRole('option', { name: /employed/i });
+    > 159 |     await employedOption.click();
+          |                          ^
+      160 |     await page.waitForTimeout(800);
+      161 |   }
+      162 |
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:159:26)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:275:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-ef6d7-ssage-survives-page-refresh-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-ef6d7-ssage-survives-page-refresh-chromium\error-context.md
+
+  4) [chromium] › tests\e2e\chat-production-e2e.spec.ts:305:7 › Production Smoke Tests (Post-Form) › Critical: Message input accessible on mobile 
+
+    Error: locator.click: Error: strict mode violation: getByRole('option', { name: /employed/i }) resolved to 2 elements:
+        1) <div role="option" tabindex="-1" data-highlighted="" aria-selected="true" data-state="checked" aria-labelledby="radix-:rt:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Employed (salary)' })
+        2) <div role="option" tabindex="-1" aria-selected="false" data-state="unchecked" aria-labelledby="radix-:ru:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Self-employed' })
+
+    Call log:
+    [2m  - waiting for getByRole('option', { name: /employed/i })[22m
+
+
+      157 |     // Select "Employed"
+      158 |     const employedOption = page.getByRole('option', { name: /employed/i });
+    > 159 |     await employedOption.click();
+          |                          ^
+      160 |     await page.waitForTimeout(800);
+      161 |   }
+      162 |
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:159:26)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:301:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-2d675--input-accessible-on-mobile-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-2d675--input-accessible-on-mobile-chromium\error-context.md
+
+  5) [chromium] › tests\e2e\chat-production-e2e.spec.ts:317:7 › Production Smoke Tests (Post-Form) › Critical: Send button accessible after typing 
+
+    Error: locator.click: Error: strict mode violation: getByRole('option', { name: /employed/i }) resolved to 2 elements:
+        1) <div role="option" tabindex="-1" data-highlighted="" aria-selected="true" data-state="checked" aria-labelledby="radix-:rt:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Employed (salary)' })
+        2) <div role="option" tabindex="-1" aria-selected="false" data-state="unchecked" aria-labelledby="radix-:ru:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Self-employed' })
+
+    Call log:
+    [2m  - waiting for getByRole('option', { name: /employed/i })[22m
+
+
+      157 |     // Select "Employed"
+      158 |     const employedOption = page.getByRole('option', { name: /employed/i });
+    > 159 |     await employedOption.click();
+          |                          ^
+      160 |     await page.waitForTimeout(800);
+      161 |   }
+      162 |
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:159:26)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:301:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-34d38-ton-accessible-after-typing-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-34d38-ton-accessible-after-typing-chromium\error-context.md
+
+  6) [chromium] › tests\e2e\chat-production-e2e.spec.ts:330:7 › Production Smoke Tests (Post-Form) › Critical: No horizontal overflow on narrow viewport 
+
+    Error: locator.click: Error: strict mode violation: getByRole('option', { name: /employed/i }) resolved to 2 elements:
+        1) <div role="option" tabindex="-1" data-highlighted="" aria-selected="true" data-state="checked" aria-labelledby="radix-:rt:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Employed (salary)' })
+        2) <div role="option" tabindex="-1" aria-selected="false" data-state="unchecked" aria-labelledby="radix-:ru:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Self-employed' })
+
+    Call log:
+    [2m  - waiting for getByRole('option', { name: /employed/i })[22m
+
+
+      157 |     // Select "Employed"
+      158 |     const employedOption = page.getByRole('option', { name: /employed/i });
+    > 159 |     await employedOption.click();
+          |                          ^
+      160 |     await page.waitForTimeout(800);
+      161 |   }
+      162 |
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:159:26)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:301:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-0ce2d-overflow-on-narrow-viewport-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-0ce2d-overflow-on-narrow-viewport-chromium\error-context.md
+
+  7) [chromium] › tests\e2e\chat-production-e2e.spec.ts:346:7 › Production Smoke Tests (Post-Form) › Critical: Auto-scroll to bottom on new messages 
+
+    Error: locator.click: Error: strict mode violation: getByRole('option', { name: /employed/i }) resolved to 2 elements:
+        1) <div role="option" tabindex="-1" data-highlighted="" aria-selected="true" data-state="checked" aria-labelledby="radix-:rt:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Employed (salary)' })
+        2) <div role="option" tabindex="-1" aria-selected="false" data-state="unchecked" aria-labelledby="radix-:ru:" data-radix-collection-item="" class="relative flex w-full cursor-default select-none items-center py-2 pl-4 pr-8 text-base text-ink outline-none focus:bg-mist focus:text-ink hover:bg-mist data-[disabled]:pointer-events-none data-[disabled]:opacity-50">…</div> aka getByRole('option', { name: 'Self-employed' })
+
+    Call log:
+    [2m  - waiting for getByRole('option', { name: /employed/i })[22m
+
+
+      157 |     // Select "Employed"
+      158 |     const employedOption = page.getByRole('option', { name: /employed/i });
+    > 159 |     await employedOption.click();
+          |                          ^
+      160 |     await page.waitForTimeout(800);
+      161 |   }
+      162 |
+        at completeLoanApplicationForm (C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:159:26)
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-production-e2e.spec.ts:301:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-production-e2e-Produc-5c37e-l-to-bottom-on-new-messages-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-production-e2e-Produc-5c37e-l-to-bottom-on-new-messages-chromium\error-context.md
+
+  7 failed
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:190:7 › Production E2E: Complete User Journey › Full flow: Homepage → Form → Chat interaction 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:237:7 › Production E2E: Complete User Journey › Mobile viewport: Form → Chat on iPhone 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:273:7 › Production E2E: Complete User Journey › Chat persistence: Message survives page refresh 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:305:7 › Production Smoke Tests (Post-Form) › Critical: Message input accessible on mobile 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:317:7 › Production Smoke Tests (Post-Form) › Critical: Send button accessible after typing 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:330:7 › Production Smoke Tests (Post-Form) › Critical: No horizontal overflow on narrow viewport 
+    [chromium] › tests\e2e\chat-production-e2e.spec.ts:346:7 › Production Smoke Tests (Post-Form) › Critical: Auto-scroll to bottom on new messages 

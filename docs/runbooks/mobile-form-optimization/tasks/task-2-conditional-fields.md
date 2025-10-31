@@ -4,6 +4,8 @@
 **Estimated Time:** 4-6 hours
 **Prerequisites:** Task 1 completed ✅
 
+> **Update – 2025-10-31:** Field visibility logic now lives in `lib/forms/field-visibility-rules.ts`. Extend that module instead of creating `field-conditionals.ts`. This runbook has been adjusted to reflect the new structure; ignore older instructions that reference `field-conditionals`.
+
 [← Back to Index](../00-INDEX.md) | [Previous: Task 1](task-1-mobile-components.md) | [Next: Task 3 →](task-3-smart-defaults.md)
 
 ---
@@ -22,10 +24,10 @@
 - 20-30% reduction in form abandonment
 - Faster completion times
 
-**Files to Create:**
-- `lib/forms/field-conditionals.ts` - Centralized conditional logic
-- `lib/hooks/useFieldVisibility.ts` - React integration hook
-- `lib/forms/__tests__/field-conditionals.test.ts` - Unit tests
+**Files to Update/Create:**
+- Extend `lib/forms/field-visibility-rules.ts` – centralized Step 2 progressive disclosure rules
+- `lib/hooks/useFieldVisibility.ts` – React integration hook
+- `lib/forms/__tests__/field-visibility-rules.test.ts` – Unit tests
 
 **Files to Update:**
 - `components/forms/ProgressiveFormWithController.tsx` - Apply conditional rendering
@@ -37,128 +39,61 @@
 
 ### 2.1 Define Conditional Rules
 
-**Create:** `lib/forms/field-conditionals.ts`
+**Update:** `lib/forms/field-visibility-rules.ts`
 
 ```typescript
-// ABOUTME: Conditional logic for showing/hiding form fields based on user context
-// ABOUTME: Centralizes all field visibility rules to prevent scattered conditional logic
+// ABOUTME: Progressive disclosure rules for Step 2 loan/property fields
+// ABOUTME: Keeps conditional logic centralized and testable
 
-import type { LoanType, PropertyCategory, FormState } from '@/lib/contracts/form-contracts'
+import type { LoanType, PropertyCategory, PropertyType } from '@/lib/contracts/form-contracts';
 
-export interface FieldCondition {
-  field: string
-  showWhen: (formState: Partial<FormState>) => boolean
-  requiredWhen?: (formState: Partial<FormState>) => boolean
+export interface Step2State {
+  loanType: LoanType;
+  propertyCategory: PropertyCategory | null;
+  propertyType: PropertyType | null;
 }
 
-export const fieldConditionals: FieldCondition[] = [
-  // Development name only for new launch properties
-  {
-    field: 'developmentName',
-    showWhen: (state) =>
-      state.loanType === 'new_purchase' &&
-      state.propertyCategory === 'new_launch',
-    requiredWhen: (state) => false // Optional field
-  },
+export function getStep2VisibleFields(state: Step2State): string[] {
+  const fields: string[] = [];
 
-  // Unit type only for new launch
-  {
-    field: 'unitType',
-    showWhen: (state) =>
-      state.loanType === 'new_purchase' &&
-      state.propertyCategory === 'new_launch',
-    requiredWhen: (state) => false
-  },
-
-  // TOP date only for new launch
-  {
-    field: 'topDate',
-    showWhen: (state) =>
-      state.loanType === 'new_purchase' &&
-      state.propertyCategory === 'new_launch',
-    requiredWhen: (state) => false
-  },
-
-  // BTO project only for BTO
-  {
-    field: 'btoProject',
-    showWhen: (state) =>
-      state.loanType === 'new_purchase' &&
-      state.propertyCategory === 'bto',
-    requiredWhen: (state) => true // Required for BTO
-  },
-
-  // Refinancing goals only for refinance
-  {
-    field: 'refinancingGoals',
-    showWhen: (state) => state.loanType === 'refinance',
-    requiredWhen: (state) => true
-  },
-
-  // Cash out amount only if "cash_out" is in refinancing goals
-  {
-    field: 'cashOutAmount',
-    showWhen: (state) =>
-      state.loanType === 'refinance' &&
-      Array.isArray(state.refinancingGoals) &&
-      state.refinancingGoals.includes('cash_out'),
-    requiredWhen: (state) =>
-      state.refinancingGoals?.includes('cash_out') || false
-  },
-
-  // Joint applicant fields only if hasJointApplicant = true
-  {
-    field: 'actualIncomes.1',
-    showWhen: (state) => state.hasJointApplicant === true,
-    requiredWhen: (state) => state.hasJointApplicant === true
-  },
-  {
-    field: 'actualAges.1',
-    showWhen: (state) => state.hasJointApplicant === true,
-    requiredWhen: (state) => state.hasJointApplicant === true
-  },
-
-  // Employment details only for self-employed or variable income
-  {
-    field: 'employmentDetails.self-employed',
-    showWhen: (state) => state.employmentType === 'self-employed',
-    requiredWhen: (state) => state.employmentType === 'self-employed'
-  },
-  {
-    field: 'employmentDetails.variable',
-    showWhen: (state) =>
-      state.employmentType === 'contract' ||
-      state.employmentType === 'variable',
-    requiredWhen: (state) =>
-      state.employmentType === 'contract' ||
-      state.employmentType === 'variable'
+  if (state.loanType === 'refinance') {
+    return [
+      'propertyType',
+      'priceRange',
+      'outstandingLoan',
+      'currentRate',
+      'currentBank',
+      'existingProperties',
+    ];
   }
-]
 
-export function shouldShowField(
-  fieldName: string,
-  formState: Partial<FormState>
-): boolean {
-  const condition = fieldConditionals.find(c => c.field === fieldName)
-  if (!condition) return true // Show by default if no condition defined
-  return condition.showWhen(formState)
+  fields.push('propertyCategory');
+
+  if (state.propertyCategory) {
+    fields.push('propertyType');
+  }
+
+  if (state.propertyType) {
+    fields.push('priceRange', 'combinedAge');
+
+    if (['Private', 'EC', 'Landed'].includes(state.propertyType)) {
+      fields.push('existingProperties');
+    }
+  }
+
+  return fields;
 }
 
-export function isFieldRequired(
-  fieldName: string,
-  formState: Partial<FormState>
-): boolean {
-  const condition = fieldConditionals.find(c => c.field === fieldName)
-  if (!condition || !condition.requiredWhen) return false
-  return condition.requiredWhen(formState)
+export function shouldShowField(fieldName: string, visibleFields: string[]): boolean {
+  return visibleFields.includes(fieldName);
 }
 ```
 
 **Key Design Decisions:**
-1. Centralized rules prevent scattered logic across components
-2. Pure functions for testability
-3. Default to showing fields (fail-safe)
-4. Separate `showWhen` and `requiredWhen` for flexibility
+1. Progressive disclosure limits Step 2 to 8-10 fields per scenario
+2. Refinance path reveals all required fields immediately
+3. New purchase path unlocks fields only as choices solidify
+4. Utility (`shouldShowField`) keeps components declarative
 
 ---
 
@@ -168,21 +103,23 @@ export function isFieldRequired(
 
 ```typescript
 // ABOUTME: React hook for managing conditional field visibility in forms
-// ABOUTME: Integrates field-conditionals.ts rules with React Hook Form
+// ABOUTME: Integrates field-visibility-rules.ts with React Hook Form
 
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
-import { shouldShowField, isFieldRequired } from '@/lib/forms/field-conditionals'
-import type { FormState } from '@/lib/contracts/form-contracts'
+import { getStep2VisibleFields, shouldShowField } from '@/lib/forms/field-visibility-rules'
+import type { Step2State } from '@/lib/forms/field-visibility-rules'
 
 export function useFieldVisibility(control: any) {
   // Watch all form values
-  const formState = useWatch({ control }) as Partial<FormState>
+  const formState = useWatch({ control }) as Step2State
 
-  return useMemo(() => ({
-    shouldShow: (fieldName: string) => shouldShowField(fieldName, formState),
-    isRequired: (fieldName: string) => isFieldRequired(fieldName, formState)
-  }), [formState])
+  return useMemo(() => {
+    const visible = getStep2VisibleFields(formState)
+    return {
+      shouldShow: (fieldName: string) => shouldShowField(fieldName, visible),
+    }
+  }, [formState])
 }
 ```
 

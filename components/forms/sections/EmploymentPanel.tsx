@@ -207,7 +207,6 @@ export function EmploymentPanel({
               <SelectTrigger
                 id={`employment-type-select-${applicantNumber}`}
                 aria-labelledby={`employment-type-label-${applicantNumber}`}
-                autoComplete="off"
               >
                 <SelectValue placeholder="Select employment type" />
               </SelectTrigger>

@@ -74,3 +74,6 @@ nul
 .claude/skills/response-awareness-full
 .claude/skills/brainstorming
 .npm/
+.env.local.backup
+auth.json
+docs/RAILWAY_ENVIRONMENT_CONFIGURATION.md

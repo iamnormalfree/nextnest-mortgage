@@ -7,26 +7,18 @@ updated: 2025-10-31
 workstream: forms
 complexity: medium
 estimated_hours: 40
-blocked_by: 2025-10-18-lead-form-desktop-ux-quick-wins.md
 ---
 
 # Lead Form Mobile-First Rebuild
 
 ## Prerequisites
 
-**BLOCKED BY:** `2025-10-18-lead-form-desktop-ux-quick-wins.md`
-
-Path 1 (desktop UX quick wins) must complete first because:
-1. Both modify same components (`ProgressiveFormWithController.tsx`, Step 3 sections)
-2. Path 1 establishes baseline desktop UX that mobile build depends on
-3. Desktop conversion metrics inform mobile A/B testing strategy
-4. Sequential execution avoids merge conflicts from parallel work on same files
+**Desktop Baseline:** `2025-10-18-lead-form-desktop-ux-quick-wins.md` finished on 2025-10-20. Confirm the production metrics gathered since that deployment before changing the mobile flow.
 
 **Before starting Phase 2:**
-- [ ] Path 1 deployed to production
-- [ ] Desktop conversion metrics collected (2 weeks minimum)
-- [ ] Baseline established for mobile comparison
-- [ ] No regressions or console errors from Path 1 changes
+- [ ] Validate that desktop quick-win changes remain stable (no open regressions in `ProgressiveFormWithController.tsx`)
+- [ ] Capture the current desktop conversion baseline (rolling 14-day window) to compare against mobile rollouts
+- [ ] Verify form typography and color usage match the refreshed Part 04 brand canon (warm-gold CTAs, no rounded corners)
 
 ## Implementation Guide
 
@@ -57,19 +49,16 @@ Covers:
 ## Tasks
 
 ### Phase 1: Mobile Components (✅ COMPLETED)
-- [x] Mobile-optimized input components with 56px touch targets
+- [x] Mobile-optimized number/select inputs shipped in `components/forms/mobile/` (56px touch targets, warm-gold focus rings)
 - [x] Native touch gesture support (0KB vs 40KB framer-motion)
 - [x] Error boundary for graceful failures
 
 **Reference:** `docs/runbooks/forms/mobile-optimization-guide.md#touch-target-standards`
 
 ### Phase 2: Conditional Visibility (🚧 IN PROGRESS)
-- [ ] Field conditional rules engine
-  - File: `lib/forms/field-conditionals.ts`, tests
-  - Show/hide based on loan type, property type, employment status
-- [ ] Visibility hook integrated with React Hook Form
-  - File: `lib/hooks/useFieldVisibility.ts`
-- [ ] Apply to `ProgressiveFormWithController.tsx`
+- [ ] Extend Step 2 visibility logic in `lib/forms/field-visibility-rules.ts` (progressive disclosure by loan/property type)
+- [ ] Add `hooks/useFieldVisibility.ts` to connect React Hook Form with the visibility rules
+- [ ] Apply the hook to the mobile flow within `ProgressiveFormWithController.tsx`
 
 **Reference:** `docs/runbooks/forms/mobile-optimization-guide.md#conditional-field-visibility`
 
@@ -85,7 +74,7 @@ Covers:
 
 ### Phase 4: A/B Testing Framework
 - [ ] Experiment configuration system
-  - File: `lib/ab-testing/experiments.ts`, `lib/hooks/useExperiment.ts`
+  - Files: `lib/analytics/experiments.ts`, `lib/hooks/useExperiment.ts`
   - Deterministic hash-based bucketing
 - [ ] Conversion tracking events
   - Track: step_started, step_completed, instant_calc_viewed, form_completed
@@ -98,8 +87,8 @@ Covers:
 
 ### Phase 5: Feature Flags & Rollout
 - [ ] Feature flag system (percentage + allowlist)
-  - File: `lib/feature-flags.ts`
-- [ ] Conditional rendering in `app/apply/page.tsx`
+  - Files: `lib/features/feature-flags.ts`, `lib/features/server-feature-flags.ts`
+- [ ] Conditional rendering in `app/apply/page.tsx` (mobile vs desktop experience)
 - [ ] Gradual rollout schedule:
   - Week 1: 0% (team allowlist)
   - Week 2: 10% → 25% → 50% → 75%
@@ -111,7 +100,7 @@ Covers:
 - [ ] Unit tests (conditional rules, smart defaults, experiments)
 - [ ] Integration tests (field visibility, session restore)
 - [ ] E2E tests (complete flow, touch targets ≥48px validation, session restore)
-- [ ] Update `docs/runbooks/FORMS_ARCHITECTURE_GUIDE.md` with Path 2 enhancements
+- [ ] Update `docs/runbooks/FORMS_ARCHITECTURE_GUIDE.md` with Path 2 enhancements and warm-gold CTA guidance
 
 **Reference:** `docs/runbooks/forms/mobile-optimization-guide.md#testing-patterns`
 

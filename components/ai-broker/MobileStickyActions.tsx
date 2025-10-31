@@ -69,7 +69,7 @@ export const MobileStickyActions: React.FC<MobileStickyActionsProps> = ({
                 <div className="space-y-1">
                   {defenseStrategy.nextActions.slice(0, 3).map((action, idx) => (
                     <div key={idx} className="text-xs text-gray-600 flex items-start gap-2">
-                      <div className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 flex-shrink-0" />
+                      <div className="w-1 h-1 bg-gray-400 mt-1.5 flex-shrink-0" />
                       <span className="leading-relaxed">{action}</span>
                     </div>
                   ))}
@@ -77,11 +77,11 @@ export const MobileStickyActions: React.FC<MobileStickyActionsProps> = ({
               )}
 
               <div className="flex gap-2 pt-2">
-                <button className="flex-1 py-2 px-3 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors min-h-[36px]">
+                <button className="flex-1 py-2 px-3 bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors min-h-[36px]">
                   <HelpCircle className="w-3 h-3 inline mr-1" />
                   FAQ
                 </button>
-                <button className="flex-1 py-2 px-3 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors min-h-[36px]">
+                <button className="flex-1 py-2 px-3 bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors min-h-[36px]">
                   Compliance
                 </button>
               </div>
@@ -103,7 +103,7 @@ export const MobileStickyActions: React.FC<MobileStickyActionsProps> = ({
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className={cn(
-              'p-2 rounded-lg border border-gray-300 bg-white',
+              'p-2 border border-gray-300 bg-white',
               'min-h-[40px] min-w-[40px] flex items-center justify-center',
               'hover:bg-gray-50 transition-colors'
             )}
@@ -120,7 +120,7 @@ export const MobileStickyActions: React.FC<MobileStickyActionsProps> = ({
           <button
             onClick={onSecondaryAction}
             className={cn(
-              'flex items-center justify-center px-2 py-2 border border-gray-300 bg-gray-50 rounded-lg',
+              'flex items-center justify-center px-2 py-2 border border-gray-300 bg-gray-50',
               'text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors',
               'min-h-[44px] min-w-[64px]'
             )}
@@ -133,7 +133,7 @@ export const MobileStickyActions: React.FC<MobileStickyActionsProps> = ({
           <button
             onClick={onPrimaryAction}
             className={cn(
-              'flex items-center justify-center gap-2 px-3 py-2 bg-gold text-ink rounded-lg',
+              'flex items-center justify-center gap-2 px-3 py-2 bg-gold text-ink',
               'text-sm font-bold hover:bg-gold/90 transition-colors',
               'min-h-[44px] w-full',
               'shadow-sm ring-1 ring-gold/10'

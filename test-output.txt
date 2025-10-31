@@ -1,0 +1,28 @@
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] › tests\e2e\chat-critical-validation.spec.ts:98:7 › Chat UI - Critical Validation (Task 2.2) › No critical console errors on mobile
+[1A[2K  1) [chromium] › tests\e2e\chat-critical-validation.spec.ts:98:7 › Chat UI - Critical Validation (Task 2.2) › No critical console errors on mobile 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForLoadState: Test timeout of 30000ms exceeded.
+
+      107 |     await page.goto('http://localhost:3000/test-chat-interface');
+      108 |
+    > 109 |     await page.waitForLoadState('networkidle');
+          |                ^
+      110 |     await page.waitForTimeout(3000);
+      111 |
+      112 |     // Filter known acceptable errors
+        at C:\Users\HomePC\Desktop\Code\NextNest\tests\e2e\chat-critical-validation.spec.ts:109:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-critical-validation-C-30235-al-console-errors-on-mobile-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-critical-validation-C-30235-al-console-errors-on-mobile-chromium\error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] › tests\e2e\chat-critical-validation.spec.ts:98:7 › Chat UI - Critical Validation (Task 2.2) › No critical console errors on mobile 

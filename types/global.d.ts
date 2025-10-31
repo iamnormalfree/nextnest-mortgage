@@ -3,7 +3,7 @@
 declare global {
   interface Window {
     // Analytics tools
-    gtag?: (...args: any[]) => void
+    gtag?: (command: string, action: string, options?: any) => void
     fbq?: (...args: any[]) => void
     conversions?: any
 
