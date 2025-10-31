@@ -943,7 +943,7 @@ export function ProgressiveFormWithController({
                     name="existingProperties"
                 control={control}
                 render={({ field }) => (
-                  <div className="flex items-center gap-3 p-3 bg-[#F8F8F8] rounded-lg border border-[#E5E5E5]">
+                  <div className="flex items-center gap-3 p-3 bg-[#F8F8F8] border border-[#E5E5E5]">
                     <input
                       type="checkbox"
                       id="second-property"
@@ -1061,7 +1061,7 @@ export function ProgressiveFormWithController({
 
             {loanType === 'refinance' && (
               <>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div className="bg-[#FEF3C7] border border-[#FCD34D] p-3 mb-4">
                   <p className="text-sm text-gray-700 flex items-start gap-2">
                     <span className="text-base">💡</span>
                     <span>Suggested estimates provided in placeholders - update with your actual numbers for precise calculations</span>
@@ -1441,7 +1441,7 @@ export function ProgressiveFormWithController({
 
             {/* Mobile: Inline instant analysis card */}
             {currentStep === 2 && isMobile && instantCalcResult && (
-              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white">
                 <InstantAnalysisSidebar
                   calcResult={instantCalcResult}
                   loanType={loanType}
@@ -1495,13 +1495,13 @@ export function ProgressiveFormWithController({
                           fieldState: { hasJointApplicant: newValue }
                         })
                       }}
-                      className={`relative inline-flex h-11 w-20 items-center rounded-full transition-colors ${
+                      className={`relative inline-flex h-11 w-20 items-center transition-colors ${
                         field.value ? 'bg-[#FCD34D]' : 'bg-[#E5E5E5]'
                       }`}
                       aria-label="Toggle joint applicant"
                     >
                       <span
-                        className={`inline-block h-8 w-8 transform rounded-full bg-white transition-transform ${
+                        className={`inline-block h-8 w-8 transform bg-white transition-transform ${
                           field.value ? 'translate-x-11' : 'translate-x-1'
                         }`}
                       />
@@ -1540,7 +1540,7 @@ export function ProgressiveFormWithController({
 
             {/* Mobile: Inline MAS readiness card */}
             {currentStep === 3 && isMobile && loanType === 'new_purchase' && (
-              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white rounded-lg">
+              <div className="mt-6 p-4 border border-[#E5E5E5] bg-white">
                 <MasReadinessSidebar
                   result={masReadiness}
                   propertyType={propertyType}
@@ -1611,7 +1611,7 @@ export function ProgressiveFormWithController({
 
       {/* Unified container for headline + form + sidebar */}
       <div className="w-full max-w-6xl mx-auto">
-        <div className="rounded-lg border border-[#E5E5E5]/50 bg-white/40 backdrop-blur-sm p-8 md:p-10 shadow-sm">
+        <div className="border border-[#E5E5E5]/50 bg-white/40 backdrop-blur-sm p-8 md:p-10 shadow-sm">
           <h2 className="text-3xl md:text-4xl font-light text-black mb-2 leading-tight">
             {currentStepConfig.description}
           </h2>
@@ -1679,35 +1679,21 @@ export function ProgressiveFormWithController({
             )}
 
             {/* Navigation Buttons */}
-            <div className="mt-8 flex justify-between gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
               {currentStep > 1 && (
                 <Button
                   type="button"
                   variant="outline"
                   onClick={prev}
-                  className="h-12 px-6"
+                  className="h-12 px-6 w-full sm:w-auto"
                 >
                   Back
                 </Button>
               )}
 
-              {/* DEBUG: Log button state */}
-              {(() => {
-                console.log(`🔴 BUTTON DEBUG (Step ${currentStep}):`, {
-                  canSubmitCurrentStep,
-                  isSubmitting,
-                  isExternallySubmitting,
-                  isValid,
-                  buttonWillBeDisabled: !canSubmitCurrentStep || isSubmitting || isExternallySubmitting,
-                  formErrors: errors,
-                  formValues: watch()
-                })
-                return null
-              })()}
-
               <Button
                 type="submit"
-                className="h-14 px-8 bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg flex-1 ml-auto font-semibold"
+                className="h-14 px-8 bg-[#FCD34D] text-[#000000] hover:bg-[#FDB022] shadow-lg w-full sm:flex-1 sm:ml-auto font-semibold"
                 disabled={!canSubmitCurrentStep || isSubmitting || isExternallySubmitting}
               >
                 {isSubmitting || isExternallySubmitting ? (

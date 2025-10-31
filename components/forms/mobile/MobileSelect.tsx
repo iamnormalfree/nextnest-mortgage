@@ -97,7 +97,7 @@ export function MobileSelect({
           aria-labelledby={`${name}-dialog-title`}
         >
           <div
-            className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[70vh] overflow-auto animate-slide-up"
+            className="absolute bottom-0 left-0 right-0 bg-white max-h-[70vh] overflow-auto animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 bg-white border-b border-[#E5E5E5] px-4 py-3 z-10">

@@ -32,7 +32,7 @@ export function InstantAnalysisSidebar({
   // Loading state
   if (isLoading) {
     return (
-      <div className="p-6 bg-white border border-[#E5E5E5] rounded-lg">
+      <div className="p-6 bg-white border border-[#E5E5E5]">
         <div className="flex items-center gap-2 mb-4">
           <Loader2 className="w-5 h-5 animate-spin text-[#FCD34D]" />
           <span className="text-sm font-semibold text-black">Analyzing...</span>
@@ -52,10 +52,10 @@ export function InstantAnalysisSidebar({
   // Render for new purchase
   if (loanType === 'new_purchase' && calcResult.maxLoanAmount) {
     return (
-      <div className="p-6 bg-white border border-[#E5E5E5] rounded-lg space-y-4">
+      <div className="p-6 bg-white border border-[#E5E5E5] space-y-4">
         {/* Header */}
         <div className="flex items-center gap-2">
-          <CheckCircle className="w-5 h-5 text-[#059669]" />
+          <CheckCircle className="w-5 h-5 text-[#FCD34D]" />
           <span className="text-sm font-semibold text-black">Instant Analysis</span>
         </div>
 
@@ -64,7 +64,7 @@ export function InstantAnalysisSidebar({
           <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
             You can borrow up to
           </p>
-          <p className="text-3xl font-bold text-[#0F4C75]">
+          <p className="text-3xl font-bold text-[#000000]">
             ${formatNumberWithCommas(calcResult.maxLoanAmount.toString())}
           </p>
         </div>
@@ -109,10 +109,10 @@ export function InstantAnalysisSidebar({
       : 0
 
     return (
-      <div className="p-6 bg-white border border-[#E5E5E5] rounded-lg space-y-4">
+      <div className="p-6 bg-white border border-[#E5E5E5] space-y-4">
         {/* Header */}
         <div className="flex items-center gap-2">
-          <CheckCircle className="w-5 h-5 text-[#059669]" />
+          <CheckCircle className="w-5 h-5 text-[#FCD34D]" />
           <span className="text-sm font-semibold text-black">Refinancing Opportunity</span>
         </div>
 
@@ -121,11 +121,11 @@ export function InstantAnalysisSidebar({
           <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold mb-2">
             You could save
           </p>
-          <p className="text-3xl font-bold text-[#059669]">
+          <p className="text-3xl font-bold text-[#000000]">
             ${formatNumberWithCommas(Math.round(calcResult.monthlySavings).toString())}/mo
           </p>
           {savingsPercent > 0 && (
-            <p className="text-sm text-[#059669] font-semibold mt-1">
+            <p className="text-sm text-[#FCD34D] font-semibold mt-1">
               {savingsPercent}% reduction
             </p>
           )}

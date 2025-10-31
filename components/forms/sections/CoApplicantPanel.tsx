@@ -27,7 +27,7 @@ export function CoApplicantPanel({
   const employmentType_1 = (useWatch({ control, name: 'employmentType_1' }) as string) || ''
 
   return (
-    <div className="space-y-4 p-4 border border-[#E5E5E5] border-l-4 border-l-purple-500 bg-[#F8F8F8]">
+    <div className="space-y-4 p-4 border border-[#E5E5E5] border-l-4 border-l-[#FCD34D] bg-[#F8F8F8]">
       <p className="text-xs uppercase tracking-wider text-[#666666] font-semibold">
         Income Details
       </p>

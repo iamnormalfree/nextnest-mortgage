@@ -3,7 +3,7 @@
 
 import type { LoanType, PropertyCategory, PropertyType } from '@/lib/contracts/form-contracts'
 
-interface Step2State {
+export interface Step2State {
   loanType: LoanType
   propertyCategory: PropertyCategory | null
   propertyType: PropertyType | null

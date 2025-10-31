@@ -51,8 +51,6 @@ function ApplyPageContent() {
   const [leadScore, setLeadScore] = useState<any>(null)
 
   const handleGateCompletion = (gate: number, gateData: any) => {
-    console.log(`Gate ${gate} completed with data:`, gateData)
-
     // Update context with gate data
     updateStepData(gate, gateData)
 

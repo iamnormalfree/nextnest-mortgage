@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 // Inline type declarations for Railway build environment
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void
+    gtag?: (command: string, action: string, options?: any) => void
     $chatwoot?: any
     chatwootSettings?: any
   }
