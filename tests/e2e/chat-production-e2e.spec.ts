@@ -168,7 +168,9 @@ async function completeLoanApplicationForm(page: Page) {
     await page.waitForTimeout(500);
 
     // Select "Employed (3+ months with current employer)" - updated label after form refactor
+    // Wait for dropdown animation to complete and option to be visible
     const employedOption = page.getByRole('option', { name: 'Employed (3+ months with current employer)' });
+    await employedOption.waitFor({ state: 'visible', timeout: 5000 });
     await employedOption.click();
     await page.waitForTimeout(800);
   }
