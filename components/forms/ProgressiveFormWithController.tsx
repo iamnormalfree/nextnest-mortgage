@@ -723,6 +723,7 @@ export function ProgressiveFormWithController({
                     id="full-name"
                     type="text"
                     placeholder="Tan Wei Ming"
+                    autoComplete="off"
                     onChange={(e) => {
                       field.onChange(e)
                       onFieldChange('name', e.target.value)
@@ -751,6 +752,7 @@ export function ProgressiveFormWithController({
                     id="email"
                     type="email"
                     placeholder="weiming@gmail.com"
+                    autoComplete="off"
                     onChange={(e) => {
                       field.onChange(e)
                       onFieldChange('email', e.target.value)
@@ -779,6 +781,7 @@ export function ProgressiveFormWithController({
                     id="phone"
                     type="tel"
                     placeholder="9123 4567"
+                    autoComplete="off"
                     onChange={(e) => {
                       field.onChange(e)
                       onFieldChange('phone', e.target.value)
@@ -819,7 +822,7 @@ export function ProgressiveFormWithController({
                         setPropertyCategory(value as any)
                       }}
                     >
-                      <SelectTrigger id="property-category">
+                      <SelectTrigger id="property-category" autoComplete="off">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -868,7 +871,7 @@ export function ProgressiveFormWithController({
                           }
                         }}
                       >
-                        <SelectTrigger id="property-type">
+                        <SelectTrigger id="property-type" autoComplete="off">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -903,7 +906,7 @@ export function ProgressiveFormWithController({
                     </label>
                     <Select
                       value={field.value}
-                      onValueChange={(value) => {
+                      onValueChange=(value) => {
                         field.onChange(value)
                         onFieldChange('propertyType', value)
 
@@ -913,7 +916,7 @@ export function ProgressiveFormWithController({
                         }
                       }}
                     >
-                      <SelectTrigger id="property-type">
+                      <SelectTrigger id="property-type" autoComplete="off">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>

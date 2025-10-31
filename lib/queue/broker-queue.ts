@@ -2,6 +2,7 @@ import { Queue, QueueEvents } from 'bullmq';
 import { getRedisConnection } from './redis-config';
 import { ProcessedLeadData } from '@/lib/integrations/chatwoot-client';
 import { BrokerPersona } from '@/lib/calculations/broker-persona';
+import { TimeoutError, withTimeout } from '@/lib/utils/async-timeout';
 
 /**
  * BullMQ Job Data Structure
@@ -47,6 +48,9 @@ export interface BrokerConversationJob {
   // Metadata
   timestamp?: number;
 }
+
+const TIMING_INSTRUMENTATION_TIMEOUT_MS =
+  parseInt(process.env.BROKER_QUEUE_TIMING_TIMEOUT_MS || '100', 10);
 
 /**
  * Lazy initialization for BullMQ queue instance
@@ -524,20 +528,42 @@ async function addTimingDataToJob(
   messageId: string,
   queueAddTimestamp: number
 ): Promise<void> {
-  try {
-    const Redis = require('ioredis');
-    const redis = new Redis(getRedisConnection());
-    const key = `${TIMING_DATA_KEY_PREFIX}${conversationId}:${messageId}`;
+  const Redis = require('ioredis');
+  const redis = new Redis(getRedisConnection());
+  const key = `${TIMING_DATA_KEY_PREFIX}${conversationId}:${messageId}`;
+  let connectionClosed = false;
 
-    await redis.hset(key, {
-      messageId,
-      conversationId: conversationId.toString(),
-      queueAddTimestamp: queueAddTimestamp.toString(),
-    });
-    await redis.expire(key, TIMING_TTL);
-    await redis.quit();
+  try {
+    await withTimeout(async () => {
+      await redis.hset(key, {
+        messageId,
+        conversationId: conversationId.toString(),
+        queueAddTimestamp: queueAddTimestamp.toString(),
+      });
+      await redis.expire(key, TIMING_TTL);
+    }, TIMING_INSTRUMENTATION_TIMEOUT_MS, 'redis instrumentation');
   } catch (error) {
-    console.error('❌ Failed to add timing data to job:', error);
-    // Non-critical
+    if (typeof redis.disconnect === 'function' && redis.status !== 'end') {
+      redis.disconnect();
+      connectionClosed = true;
+    }
+
+    if (error instanceof TimeoutError) {
+      console.error('❌ Redis instrumentation timed out while adding timing data:', error);
+    } else {
+      console.error('❌ Failed to add timing data to job:', error);
+    }
+    throw error;
+  } finally {
+    if (!connectionClosed) {
+      try {
+        await redis.quit();
+      } catch (quitError) {
+        if (typeof redis.disconnect === 'function') {
+          redis.disconnect();
+        }
+        console.error('❌ Failed to close Redis connection after timing instrumentation:', quitError);
+      }
+    }
   }
 }
