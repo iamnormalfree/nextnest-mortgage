@@ -2,15 +2,6 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 
-// Inline type declarations for Railway build environment
-declare global {
-  interface Window {
-    gtag?: (command: string, action: string, options?: any) => void
-    $chatwoot?: any
-    chatwootSettings?: any
-  }
-}
-
 interface ChatWidgetConfig {
   baseUrl: string
   websiteToken: string
