@@ -160,17 +160,18 @@ async function completeLoanApplicationForm(page: Page) {
     await page.waitForTimeout(500);
   }
 
-  // Employment Type
-  const employmentSelect = page.getByRole("combobox", { name: /employment/i }).first();
+  // Employment Type - Use deterministic data-testid selector
+  // Bypasses Radix UI portal issues with display text matching
+  const employmentSelect = page.locator('[id="employment-type-select-0"]').or(
+    page.getByRole('combobox', { name: /employment/i }).first()
+  );
 
   if (await employmentSelect.isVisible({ timeout: 5000 })) {
     await employmentSelect.click();
     await page.waitForTimeout(500);
 
-    // Select "Employed (3+ months with current employer)" - updated label after form refactor
-    // Wait for dropdown animation to complete and option to be visible
-    const employedOption = page.getByRole('option', { name: 'Employed (3+ months with current employer)' });
-    await employedOption.waitFor({ state: 'visible', timeout: 5000 });
+    // Target by data-testid - deterministic and avoids portal/text matching issues
+    const employedOption = page.locator('[data-testid="employment-option-employed"]');
     await employedOption.click();
     await page.waitForTimeout(800);
   }

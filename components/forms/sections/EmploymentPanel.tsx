@@ -212,7 +212,11 @@ export function EmploymentPanel({
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(EMPLOYMENT_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
+                  <SelectItem
+                    key={value}
+                    value={value}
+                    data-testid={`employment-option-${value}`}
+                  >
                     {label}
                   </SelectItem>
                 ))}
