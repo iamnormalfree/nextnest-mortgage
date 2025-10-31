@@ -4,6 +4,7 @@
 import { test, expect, Page } from '@playwright/test';
 
 // Helper: Complete the loan application form
+// Helper: Complete the loan application form
 async function completeLoanApplicationForm(page: Page) {
   // Step 1: Visit homepage and navigate to apply page with loan type
   await page.goto('https://nextnest.sg');
@@ -28,95 +29,164 @@ async function completeLoanApplicationForm(page: Page) {
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
 
-  // Step 2: Fill out the progressive form
-  // The form uses a step-by-step flow, so we need to fill and continue through each step
-
-  // Step 2a: Property details
-  // Property type - click HDB option
-  const hdbButton = page.getByRole('button', { name: /HDB|4-room|5-room/i }).first();
-  if (await hdbButton.isVisible({ timeout: 5000 })) {
-    await hdbButton.click();
-    await page.waitForTimeout(800);
-  }
-
-  // Property price
-  const priceInput = page.getByPlaceholder(/price|amount/i).or(
-    page.locator('input[type="number"]').first()
-  );
-  if (await priceInput.isVisible({ timeout: 5000 })) {
-    await priceInput.click();
-    await priceInput.fill('500000');
-    await page.waitForTimeout(800);
-  }
-
-  // Continue to next step
-  let continueBtn = page.getByRole('button', { name: /continue|next/i });
-  if (await continueBtn.isVisible({ timeout: 3000 })) {
-    await continueBtn.click();
-    await page.waitForTimeout(1500);
-  }
-
-  // Step 2b: Personal information
-  // Age
-  const ageInput = page.getByPlaceholder(/age/i).or(
-    page.locator('input[type="number"]').filter({ hasText: '' }).first()
-  );
-  if (await ageInput.isVisible({ timeout: 5000 })) {
-    await ageInput.click();
-    await ageInput.fill('35');
-    await page.waitForTimeout(800);
-  }
-
-  // Income
-  const incomeInput = page.getByPlaceholder(/income|salary/i).or(
-    page.locator('input[type="number"]').filter({ hasText: '' }).nth(1)
-  );
-  if (await incomeInput.isVisible({ timeout: 5000 })) {
-    await incomeInput.click();
-    await incomeInput.fill('8000');
-    await page.waitForTimeout(800);
-  }
-
-  // Continue
-  continueBtn = page.getByRole('button', { name: /continue|next/i });
-  if (await continueBtn.isVisible({ timeout: 3000 })) {
-    await continueBtn.click();
-    await page.waitForTimeout(1500);
-  }
-
-  // Step 2c: Contact information (final step before chat)
+  // =========================================================================
+  // GATE 1: Who You Are (name, email, phone)
+  // =========================================================================
+  
   // Name
   const nameInput = page.getByPlaceholder(/name|full name/i).or(
     page.locator('input[type="text"]').first()
   );
-  if (await nameInput.isVisible({ timeout: 5000 })) {
-    await nameInput.click();
-    await nameInput.fill('Playwright Test User');
-    await page.waitForTimeout(800);
-  }
+  await nameInput.waitFor({ timeout: 5000 });
+  await nameInput.click();
+  await nameInput.fill('Playwright Test User');
+  await nameInput.blur();
+  await page.waitForTimeout(500);
 
   // Email
   const emailInput = page.getByPlaceholder(/email/i).or(
     page.locator('input[type="email"]')
   );
-  if (await emailInput.isVisible({ timeout: 5000 })) {
-    await emailInput.click();
-    await emailInput.fill(`test${Date.now()}@playwright.test`);
-    await page.waitForTimeout(800);
-  }
+  await emailInput.click();
+  await emailInput.fill(`test${Date.now()}@playwright.test`);
+  await emailInput.blur();
+  await page.waitForTimeout(500);
 
   // Phone
   const phoneInput = page.getByPlaceholder(/phone|mobile|contact/i).or(
     page.locator('input[type="tel"]')
   );
-  if (await phoneInput.isVisible({ timeout: 5000 })) {
-    await phoneInput.click();
-    await phoneInput.fill('91234567');
+  await phoneInput.click();
+  await phoneInput.fill('91234567');
+  await phoneInput.blur();
+  await page.waitForTimeout(500);
+
+  // Continue to Gate 2
+  let continueBtn = page.getByRole('button', { name: /continue/i });
+  await continueBtn.waitFor({ timeout: 5000 });
+  await continueBtn.click();
+  await page.waitForTimeout(1500);
+
+  // =========================================================================
+  // GATE 2: What You Need (propertyCategory, propertyType, priceRange, combinedAge)
+  // =========================================================================
+  
+  // Wait for property category dropdown
+  await page.waitForTimeout(1000);
+  
+  // Property Category - need to find and click the select dropdown
+  const categorySelect = page.locator('[id="property-category"]').or(
+    page.getByRole('combobox').first()
+  );
+  
+  if (await categorySelect.isVisible({ timeout: 5000 })) {
+    await categorySelect.click();
+    await page.waitForTimeout(500);
+    
+    // Select "Resale" option from dropdown
+    const resaleOption = page.getByRole('option', { name: /resale/i });
+    await resaleOption.click();
     await page.waitForTimeout(800);
   }
 
+  // Property Type - appears after category is selected
+  await page.waitForTimeout(500);
+  
+  const typeSelect = page.locator('[id="property-type"]').or(
+    page.getByRole('combobox').nth(1)
+  );
+  
+  if (await typeSelect.isVisible({ timeout: 5000 })) {
+    await typeSelect.click();
+    await page.waitForTimeout(500);
+    
+    // Select "HDB" option
+    const hdbOption = page.getByRole('option', { name: /HDB/i });
+    await hdbOption.click();
+    await page.waitForTimeout(800);
+  }
+
+  // Property Price
+  const priceInput = page.locator('[id="property-price"]').or(
+    page.getByPlaceholder(/price|amount/i)
+  );
+  await priceInput.waitFor({ timeout: 5000 });
+  await priceInput.click();
+  await priceInput.fill('500000');
+  await priceInput.blur();
+  await page.waitForTimeout(500);
+
+  // Combined Age - CRITICAL: Required by Gate 2 schema
+  const ageInput = page.locator('[id="combined-age"]').or(
+    page.getByPlaceholder(/age/i)
+  );
+  await ageInput.waitFor({ timeout: 5000 });
+  await ageInput.click();
+  await ageInput.fill('35');
+  await ageInput.blur();
+  await page.waitForTimeout(500);
+
+  // Continue to Gate 3
+  continueBtn = page.getByRole('button', { name: /continue|get instant/i });
+  await continueBtn.waitFor({ timeout: 5000 });
+  await continueBtn.click();
+  await page.waitForTimeout(2000);
+
+  // =========================================================================
+  // GATE 3: Financial Details (actualIncomes.0, age, employmentType, commitments)
+  // =========================================================================
+
+  // Income (actualIncomes.0)
+  // Updated selector: use label instead of placeholder (placeholder is now numeric "8,000")
+  const incomeInput = page.getByLabel(/monthly income/i).first();
+
+  await incomeInput.waitFor({ timeout: 5000 });
+  await incomeInput.click();
+  await incomeInput.fill('8000');
+  await incomeInput.blur();
+  await page.waitForTimeout(500);
+
+  // Age - CRITICAL: Separate from combined age in Gate 2
+  // Use spinbutton role to target the age field specifically
+  const ageFieldStep4 = page.getByRole('spinbutton', { name: /age/i }).or(
+    page.locator('input[type="number"]').nth(1)
+  );
+
+  if (await ageFieldStep4.isVisible({ timeout: 5000 })) {
+    await ageFieldStep4.click();
+    await ageFieldStep4.clear();
+    await ageFieldStep4.fill('35');
+    await ageFieldStep4.blur();
+    await page.waitForTimeout(500);
+  }
+
+  // Employment Type
+  const employmentSelect = page.getByRole("combobox", { name: /employment/i }).first();
+
+  if (await employmentSelect.isVisible({ timeout: 5000 })) {
+    await employmentSelect.click();
+    await page.waitForTimeout(500);
+
+    // Select "Employed (3+ months with current employer)" - updated label after form refactor
+    const employedOption = page.getByRole('option', { name: 'Employed (3+ months with current employer)' });
+    await employedOption.click();
+    await page.waitForTimeout(800);
+  }
+
+  // Financial Commitments - CRITICAL: Required question
+  // Look for the Yes/No buttons for "Do you have any existing loans or commitments?"
+  const noCommitmentsButton = page.getByRole('button', { name: /^no$/i });
+
+  if (await noCommitmentsButton.isVisible({ timeout: 5000 })) {
+    await noCommitmentsButton.click();
+    await page.waitForTimeout(500);
+  }
+
+  // Wait for validation to enable submit button
+  await page.waitForTimeout(1000);
+
   // Submit form - triggers chat creation and redirect
-  const submitButton = page.getByRole('button', { name: /submit|chat|speak to broker|get started/i }).last();
+  const submitButton = page.getByRole('button', { name: /submit|chat|speak to broker|get started|connect|continue/i }).last();
   await submitButton.waitFor({ timeout: 10000 });
   await submitButton.click();
 
@@ -136,6 +206,7 @@ async function waitForChatReady(page: Page) {
 async function sendMessage(page: Page, message: string) {
   const input = page.locator('[data-testid="message-input"]');
   await input.fill(message);
+  await input.blur();
   await page.locator('[data-testid="send-button"]').click();
 }
 
@@ -275,6 +346,7 @@ test.describe('Production Smoke Tests (Post-Form)', () => {
     // Fill input
     const input = page.locator('[data-testid="message-input"]');
     await input.fill('Test message');
+    await input.blur();
 
     // Verify send button is in viewport
     await expect(sendButton).toBeInViewport();
