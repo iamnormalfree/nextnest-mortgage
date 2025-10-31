@@ -133,10 +133,29 @@ async function completeLoanApplicationForm(page: Page) {
   await page.waitForTimeout(2000);
 
   // =========================================================================
-  // GATE 3: Financial Details (actualIncomes.0, age, employmentType, commitments)
+  // GATE 3: Financial Details (employmentType, actualIncomes.0, age, commitments)
+  // CRITICAL: Employment type MUST be selected FIRST (progressive disclosure)
   // =========================================================================
 
+  // Employment Type - Use deterministic data-testid selector
+  // Bypasses Radix UI portal issues with display text matching
+  // MUST BE FIRST: Income field only appears after employment type selected
+  const employmentSelect = page.locator('[id="employment-type-select-0"]').or(
+    page.getByRole('combobox', { name: /employment/i }).first()
+  );
+
+  if (await employmentSelect.isVisible({ timeout: 5000 })) {
+    await employmentSelect.click();
+    await page.waitForTimeout(500);
+
+    // Target by data-testid - deterministic and avoids portal/text matching issues
+    const employedOption = page.locator('[data-testid="employment-option-employed"]');
+    await employedOption.click();
+    await page.waitForTimeout(800);
+  }
+
   // Income (actualIncomes.0)
+  // Progressive disclosure: Only visible after employment type selected
   // Updated selector: use label instead of placeholder (placeholder is now numeric "8,000")
   const incomeInput = page.getByLabel(/monthly income/i).first();
 
@@ -160,22 +179,6 @@ async function completeLoanApplicationForm(page: Page) {
     await page.waitForTimeout(500);
   }
 
-  // Employment Type - Use deterministic data-testid selector
-  // Bypasses Radix UI portal issues with display text matching
-  const employmentSelect = page.locator('[id="employment-type-select-0"]').or(
-    page.getByRole('combobox', { name: /employment/i }).first()
-  );
-
-  if (await employmentSelect.isVisible({ timeout: 5000 })) {
-    await employmentSelect.click();
-    await page.waitForTimeout(500);
-
-    // Target by data-testid - deterministic and avoids portal/text matching issues
-    const employedOption = page.locator('[data-testid="employment-option-employed"]');
-    await employedOption.click();
-    await page.waitForTimeout(800);
-  }
-
   // Financial Commitments - CRITICAL: Required question
   // Look for the Yes/No buttons for "Do you have any existing loans or commitments?"
   const noCommitmentsButton = page.getByRole('button', { name: /^no$/i });
@@ -188,13 +191,22 @@ async function completeLoanApplicationForm(page: Page) {
   // Wait for validation to enable submit button
   await page.waitForTimeout(1000);
 
-  // Submit form - triggers chat creation and redirect
+  // Submit form - triggers chat creation and ChatTransitionScreen
   const submitButton = page.getByRole('button', { name: /submit|chat|speak to broker|get started|connect|continue/i }).last();
   await submitButton.waitFor({ timeout: 10000 });
   await submitButton.click();
 
-  // Wait for navigation to chat page
-  await page.waitForURL(/.*\/chat.*/i, { timeout: 20000 });
+  // Wait for ChatTransitionScreen - may show "Connecting..." first
+  await page.waitForTimeout(2000);
+
+  // Wait for "Continue to Chat" button (appears after connecting finishes)
+  // This may take a while as it creates the chat session on backend
+  const continueToChat = page.getByRole('button', { name: /continue to chat/i });
+  await continueToChat.waitFor({ timeout: 45000 }); // Increased timeout for chat creation
+  await continueToChat.click();
+
+  // Wait for navigation to chat page (after clicking Continue to Chat)
+  await page.waitForURL(/.*\/chat.*/i, { timeout: 30000 });
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(3000); // Allow chat to fully initialize
 }
