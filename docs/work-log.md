@@ -20,6 +20,23 @@
 
 ---
 
+## 2025-11-01 - Chat Message Persistence Fix ✅
+
+**Constraint:** C1 – Public Surface Readiness
+**CAN Tasks:** CAN-053
+**Status:** Complete (awaiting end-to-end verification once chat creation stabilizes)
+
+**What was implemented:**
+- Updated `CustomChatInterface` initialization to await the first `/api/chat/messages` response before starting the polling interval, removing the hydration race condition.
+- Added regression test `components/chat/__tests__/CustomChatInterface.init.test.tsx` to assert polling starts only after the initial fetch resolves.
+
+**Tests:**
+- `npm test -- --runTestsByPath components/chat/__tests__/CustomChatInterface.init.test.tsx` (pending)
+
+**Evidence:** New unit test guarantees polling setup occurs after hydration; console now logs `✓ Initial fetch complete, starting polling interval` once messages are loaded.
+
+---
+
 ## 2025-10-31 - Employment Select E2E Test Fix ✅
 
 **Constraint:** C1 – Public Surface Readiness

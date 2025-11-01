@@ -317,15 +317,32 @@ export default function CustomChatInterface({
 
   // Initialize chat
   useEffect(() => {
-    setIsLoading(true)
-    fetchMessages()
+    let isMounted = true
+    let pollInterval: NodeJS.Timeout | null = null
 
-    // Set up polling for new messages every 3 seconds
-    pollIntervalRef.current = setInterval(pollNewMessages, 3000)
+    const initialize = async () => {
+      setIsLoading(true)
+
+      // CRITICAL: wait for initial fetch to finish before polling
+      await fetchMessages()
+
+      if (isMounted) {
+        console.log('✓ Initial fetch complete, starting polling interval')
+        pollInterval = setInterval(pollNewMessages, 3000)
+        pollIntervalRef.current = pollInterval
+      }
+    }
+
+    initialize()
 
     return () => {
+      isMounted = false
+      if (pollInterval) {
+        clearInterval(pollInterval)
+      }
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current)
+        pollIntervalRef.current = null
       }
       // Clean up typing timeout on unmount
       clearTyping()

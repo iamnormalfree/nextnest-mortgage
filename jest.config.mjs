@@ -12,6 +12,7 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
+  modulePathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/plugins.disabled/'],
   // Transform ESM modules (BullMQ, msgpackr, etc.)
   transformIgnorePatterns: [
     'node_modules/(?!(bullmq|msgpackr|ioredis|get-port|uuid|cron-parser|@msgpack)/)',
